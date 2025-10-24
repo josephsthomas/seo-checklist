@@ -10,10 +10,12 @@ import {
   Search,
   ChevronDown,
   ChevronUp,
-  MessageSquare
+  MessageSquare,
+  Star
 } from 'lucide-react';
 import { exportToExcel } from '../../lib/excelExport';
 import ItemDetailModal from './ItemDetailModal';
+import FilterPresetManager from './FilterPresetManager';
 import HelpTooltip from '../help/HelpTooltip';
 
 const PRIORITIES = ['CRITICAL', 'HIGH', 'MEDIUM', 'LOW'];
@@ -29,6 +31,7 @@ export default function SEOChecklist() {
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedItem, setSelectedItem] = useState(null);
+  const [showPresetManager, setShowPresetManager] = useState(false);
   const [filters, setFilters] = useState({
     phase: '',
     priority: '',
@@ -37,6 +40,13 @@ export default function SEOChecklist() {
     showCompleted: true
   });
   const [expandedPhases, setExpandedPhases] = useState(PHASES);
+
+  const handleApplyPreset = (presetFilters) => {
+    setFilters(prev => ({
+      ...prev,
+      ...presetFilters
+    }));
+  };
 
   // Open modal from URL parameter
   useEffect(() => {
@@ -265,20 +275,38 @@ export default function SEOChecklist() {
               <option value="IA">IA</option>
             </select>
 
-            <button
-              onClick={() => setFilters({
-                phase: '',
-                priority: '',
-                owner: '',
-                category: '',
-                showCompleted: true
-              })}
-              className="btn btn-secondary"
-            >
-              Clear Filters
-            </button>
+            <div className="flex gap-2">
+              <button
+                onClick={() => setShowPresetManager(true)}
+                className="btn btn-primary flex items-center gap-2"
+              >
+                <Star className="w-4 h-4" />
+                Filter Presets
+              </button>
+              <button
+                onClick={() => setFilters({
+                  phase: '',
+                  priority: '',
+                  owner: '',
+                  category: '',
+                  showCompleted: true
+                })}
+                className="btn btn-secondary"
+              >
+                Clear Filters
+              </button>
+            </div>
           </div>
         </div>
+
+        {/* Filter Preset Manager Modal */}
+        {showPresetManager && (
+          <FilterPresetManager
+            currentFilters={filters}
+            onApplyPreset={handleApplyPreset}
+            onClose={() => setShowPresetManager(false)}
+          />
+        )}
 
         {/* Checklist Items by Phase */}
         <div className="space-y-4">
