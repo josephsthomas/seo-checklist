@@ -242,9 +242,9 @@ export default function TimeTracker({ projectId, itemId, estimatedHours }) {
                     <button
                       onClick={() => deleteEntry(entry.id)}
                       className="p-1 text-gray-400 hover:text-red-600"
-                      title="Delete entry"
+                      aria-label="Delete time entry"
                     >
-                      <Trash2 className="w-4 h-4" />
+                      <Trash2 className="w-4 h-4" aria-hidden="true" />
                     </button>
                   </div>
                 </div>

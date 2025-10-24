@@ -192,8 +192,9 @@ export default function FilterPresetManager({ currentFilters, onApplyPreset, onC
             <button
               onClick={onClose}
               className="text-gray-400 hover:text-gray-500"
+              aria-label="Close filter presets modal"
             >
-              <X className="w-6 h-6" />
+              <X className="w-6 h-6" aria-hidden="true" />
             </button>
           </div>
 
@@ -319,16 +320,16 @@ export default function FilterPresetManager({ currentFilters, onApplyPreset, onC
                           <button
                             onClick={() => handleEditPreset(preset)}
                             className="p-1.5 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded"
-                            title="Edit preset"
+                            aria-label={`Edit ${preset.name} preset`}
                           >
-                            <Edit2 className="w-4 h-4" />
+                            <Edit2 className="w-4 h-4" aria-hidden="true" />
                           </button>
                           <button
                             onClick={() => handleDeletePreset(preset.id)}
                             className="p-1.5 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded"
-                            title="Delete preset"
+                            aria-label={`Delete ${preset.name} preset`}
                           >
-                            <Trash2 className="w-4 h-4" />
+                            <Trash2 className="w-4 h-4" aria-hidden="true" />
                           </button>
                         </div>
                       </div>

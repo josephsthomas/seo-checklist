@@ -89,6 +89,7 @@ export default function RegisterForm() {
                   onChange={handleChange}
                   className="input pl-10"
                   placeholder="John Doe"
+                  autoComplete="name"
                   required
                 />
               </div>
@@ -107,6 +108,7 @@ export default function RegisterForm() {
                   onChange={handleChange}
                   className="input pl-10"
                   placeholder="you@example.com"
+                  autoComplete="email"
                   required
                 />
               </div>
@@ -125,6 +127,7 @@ export default function RegisterForm() {
                   onChange={handleChange}
                   className="input pl-10"
                   placeholder="••••••••"
+                  autoComplete="new-password"
                   required
                   minLength={6}
                 />
@@ -144,6 +147,7 @@ export default function RegisterForm() {
                   onChange={handleChange}
                   className="input pl-10"
                   placeholder="••••••••"
+                  autoComplete="new-password"
                   required
                 />
               </div>

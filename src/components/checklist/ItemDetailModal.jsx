@@ -128,8 +128,9 @@ export default function ItemDetailModal({ item, projectId, isOpen, onClose, onTo
               <button
                 onClick={onClose}
                 className="ml-4 text-gray-400 hover:text-gray-500"
+                aria-label="Close modal"
               >
-                <X className="w-6 h-6" />
+                <X className="w-6 h-6" aria-hidden="true" />
               </button>
             </div>
           </div>

@@ -31,10 +31,14 @@ function App() {
     <AuthProvider>
       <Router>
         <div className="min-h-screen bg-gray-50">
+          <a href="#main-content" className="skip-link">
+            Skip to main content
+          </a>
           <Navigation />
           <OnboardingWalkthrough />
           <KeyboardShortcuts />
-          <Routes>
+          <main id="main-content">
+            <Routes>
             {/* Public Routes */}
             <Route path="/login" element={<LoginForm />} />
             <Route path="/register" element={<RegisterForm />} />
@@ -116,6 +120,7 @@ function App() {
               }
             />
           </Routes>
+          </main>
 
           {/* Toast Notifications */}
           <Toaster

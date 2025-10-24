@@ -172,16 +172,16 @@ export default function FileUpload({ projectId, itemId }) {
                     target="_blank"
                     rel="noopener noreferrer"
                     className="p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded"
-                    title="Download"
+                    aria-label={`Download ${attachment.filename}`}
                   >
-                    <Download className="w-4 h-4" />
+                    <Download className="w-4 h-4" aria-hidden="true" />
                   </a>
                   <button
                     onClick={() => handleDelete(attachment.id)}
                     className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded"
-                    title="Delete"
+                    aria-label={`Delete ${attachment.filename}`}
                   >
-                    <Trash2 className="w-4 h-4" />
+                    <Trash2 className="w-4 h-4" aria-hidden="true" />
                   </button>
                 </div>
               </div>
