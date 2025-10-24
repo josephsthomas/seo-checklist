@@ -14,6 +14,7 @@ import {
 } from 'lucide-react';
 import { exportToExcel } from '../../lib/excelExport';
 import ItemDetailModal from './ItemDetailModal';
+import HelpTooltip from '../help/HelpTooltip';
 
 const PRIORITIES = ['CRITICAL', 'HIGH', 'MEDIUM', 'LOW'];
 const PHASES = ['Discovery', 'Strategy', 'Build', 'Pre-Launch', 'Launch', 'Post-Launch'];
@@ -368,9 +369,12 @@ export default function SEOChecklist() {
                               </span>
                             </div>
 
-                            <p className={`text-gray-900 ${completions[item.id] ? 'line-through text-gray-600' : ''}`}>
-                              {item.item}
-                            </p>
+                            <div className="flex items-start gap-2">
+                              <p className={`flex-1 text-gray-900 ${completions[item.id] ? 'line-through text-gray-600' : ''}`}>
+                                {item.item}
+                              </p>
+                              <HelpTooltip itemId={item.id} itemTitle={`#${item.id}`} />
+                            </div>
 
                             <div className="flex flex-wrap gap-4 mt-2 text-xs text-gray-500">
                               <span>Category: {item.category}</span>

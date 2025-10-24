@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
-import { Home, FolderOpen, User, LogOut, Menu, X, CheckSquare, Users } from 'lucide-react';
+import { Home, FolderOpen, User, LogOut, Menu, X, CheckSquare, Users, HelpCircle, ChevronDown } from 'lucide-react';
 import NotificationPanel from './NotificationPanel';
 import { hasPermission } from '../../utils/roles';
 
@@ -10,6 +10,7 @@ export default function Navigation() {
   const navigate = useNavigate();
   const location = useLocation();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [helpMenuOpen, setHelpMenuOpen] = useState(false);
 
   const handleLogout = async () => {
     try {
@@ -80,6 +81,56 @@ export default function Navigation() {
 
             {/* Notifications */}
             <NotificationPanel />
+
+            {/* Help Menu */}
+            <div className="relative">
+              <button
+                onClick={() => setHelpMenuOpen(!helpMenuOpen)}
+                className="flex items-center gap-2 px-3 py-2 rounded-lg text-gray-600 hover:text-gray-900 hover:bg-gray-100 transition-colors"
+              >
+                <HelpCircle className="w-5 h-5" />
+                <span>Help</span>
+                <ChevronDown className="w-4 h-4" />
+              </button>
+
+              {helpMenuOpen && (
+                <>
+                  <div
+                    className="fixed inset-0 z-40"
+                    onClick={() => setHelpMenuOpen(false)}
+                  />
+                  <div className="absolute right-0 mt-2 w-56 bg-white rounded-lg shadow-xl border border-gray-200 z-50">
+                    <Link
+                      to="/help/resources"
+                      onClick={() => setHelpMenuOpen(false)}
+                      className="block px-4 py-3 hover:bg-gray-50 transition-colors border-b"
+                    >
+                      <div className="font-medium text-gray-900">Resource Library</div>
+                      <div className="text-xs text-gray-600">Guides & tutorials</div>
+                    </Link>
+                    <Link
+                      to="/help/glossary"
+                      onClick={() => setHelpMenuOpen(false)}
+                      className="block px-4 py-3 hover:bg-gray-50 transition-colors border-b"
+                    >
+                      <div className="font-medium text-gray-900">SEO Glossary</div>
+                      <div className="text-xs text-gray-600">Term definitions</div>
+                    </Link>
+                    <button
+                      onClick={() => {
+                        setHelpMenuOpen(false);
+                        // Trigger keyboard shortcuts panel
+                        window.dispatchEvent(new KeyboardEvent('keydown', { key: '?' }));
+                      }}
+                      className="block w-full text-left px-4 py-3 hover:bg-gray-50 transition-colors"
+                    >
+                      <div className="font-medium text-gray-900">Keyboard Shortcuts</div>
+                      <div className="text-xs text-gray-600">Press ? to view</div>
+                    </button>
+                  </div>
+                </>
+              )}
+            </div>
 
             {/* User Menu */}
             <div className="flex items-center gap-3 pl-4 border-l">

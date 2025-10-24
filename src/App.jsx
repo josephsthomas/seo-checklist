@@ -20,12 +20,20 @@ import TeamManagementPage from './components/projects/TeamManagementPage';
 // Checklist Components
 import SEOChecklist from './components/checklist/SEOChecklist';
 
+// Help Components
+import ResourceLibrary from './components/help/ResourceLibrary';
+import GlossaryPage from './components/help/GlossaryPage';
+import KeyboardShortcuts from './components/help/KeyboardShortcuts';
+import OnboardingWalkthrough from './components/help/OnboardingWalkthrough';
+
 function App() {
   return (
     <AuthProvider>
       <Router>
         <div className="min-h-screen bg-gray-50">
           <Navigation />
+          <OnboardingWalkthrough />
+          <KeyboardShortcuts />
           <Routes>
             {/* Public Routes */}
             <Route path="/login" element={<LoginForm />} />
@@ -69,6 +77,22 @@ function App() {
               element={
                 <ProtectedRoute>
                   <TeamManagementPage />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/help/resources"
+              element={
+                <ProtectedRoute>
+                  <ResourceLibrary />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/help/glossary"
+              element={
+                <ProtectedRoute>
+                  <GlossaryPage />
                 </ProtectedRoute>
               }
             />
