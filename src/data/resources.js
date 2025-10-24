@@ -64,8 +64,7 @@ A technical SEO audit examines the infrastructure of your website to ensure sear
 6. Duplicate content
 7. Missing or incorrect canonicals
 8. Sitemap errors
-    `,
-    videoUrl: "https://www.youtube.com/embed/dQw4w9WgXcQ" // Example URL
+    `
   },
   {
     id: 2,

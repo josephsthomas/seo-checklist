@@ -66,20 +66,6 @@ export default function ResourceLibrary() {
               <p className="text-gray-600">{selectedResource.description}</p>
             </div>
 
-            {selectedResource.videoUrl && (
-              <div className="mb-6">
-                <div className="aspect-video">
-                  <iframe
-                    src={selectedResource.videoUrl}
-                    title={selectedResource.title}
-                    className="w-full h-full rounded-lg"
-                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                    allowFullScreen
-                  />
-                </div>
-              </div>
-            )}
-
             <div className="prose prose-sm max-w-none">
               <ReactMarkdown>{selectedResource.content}</ReactMarkdown>
             </div>
