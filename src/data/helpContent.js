@@ -5932,6 +5932,116 @@ export const helpContent = {
     ],
     estimatedTime: "8-40 hours",
     difficulty: "Advanced"
+  },
+
+  // SECURITY & COMPLIANCE (6 items: IDs 344-349)
+
+  344: {
+    description: "GDPR (General Data Protection Regulation) requires explicit user consent before setting non-essential cookies. Without GDPR compliance, you risk €20M fines or 4% annual revenue, face user distrust, and lose ability to operate in EU markets. Cookie consent must block tracking until users opt in.",
+    tips: [
+      "Implement cookie banner before any tracking scripts load: Use libraries like CookieBot, OneTrust, or Osano",
+      "Categorize cookies: Strictly necessary (no consent), functional (consent), analytics (consent), marketing (consent)",
+      "Block tracking scripts until consent: Wrap GA, Facebook Pixel, etc. in consent checks - don't load until opt-in",
+      "Record consent choices: Store timestamp, IP, consent version, specific categories consented to for audit trail",
+      "Provide granular controls: Let users accept/reject by category, not just 'Accept All' or 'Reject All'",
+      "Make banner dismissal = rejection: Clicking 'X' or scrolling without choice must NOT equal consent"
+    ],
+    resources: [
+      { title: "GDPR Cookie Consent Guide", url: "https://gdpr.eu/cookies/" },
+      { title: "CookieBot Implementation", url: "https://www.cookiebot.com/en/gdpr-cookies/" }
+    ],
+    estimatedTime: "8-40 hours",
+    difficulty: "Advanced"
+  },
+
+  345: {
+    description: "CCPA (California Consumer Privacy Act) gives California residents rights to know what data is collected, request deletion, and opt-out of data sales. Non-compliance risks $7,500 per intentional violation. Required if you have 50,000+ CA consumers or sell their data.",
+    tips: [
+      "Add 'Do Not Sell My Personal Information' link in footer visible on every page",
+      "Create opt-out mechanism: Form or button that honors requests within 15 days",
+      "Don't discriminate: Can't deny service, charge different prices, or provide lower quality to users who opt out",
+      "Implement data deletion: Process for users to request complete data deletion within 45 days",
+      "Update privacy policy: Disclose categories of data collected, sources, business purposes, third parties shared with",
+      "Verify deletion requests: Use two-step verification to confirm identity before deleting data"
+    ],
+    resources: [
+      { title: "CCPA Compliance Guide", url: "https://oag.ca.gov/privacy/ccpa" },
+      { title: "CCPA vs GDPR", url: "https://www.termsfeed.com/blog/ccpa-vs-gdpr/" }
+    ],
+    estimatedTime: "2-8 hours",
+    difficulty: "Intermediate"
+  },
+
+  346: {
+    description: "WCAG 2.1 AA compliance ensures your site is usable by people with disabilities (visual, auditory, motor, cognitive). Beyond legal compliance, accessibility expands your audience by 15%+ and improves SEO (screen reader optimization overlaps with search engine optimization).",
+    tips: [
+      "Run automated audits: Use WAVE, axe DevTools, Lighthouse Accessibility score to find quick fixes",
+      "Fix critical issues: Alt text on images, keyboard navigation, color contrast ratio 4.5:1+, form labels, heading hierarchy",
+      "Manual testing required: 30% of accessibility issues can't be detected by tools - test with screen readers (NVDA, JAWS)",
+      "Keyboard navigation: Ensure all interactive elements accessible via Tab, Enter, Space, arrow keys without mouse",
+      "Captions and transcripts: Provide for all video/audio content per WCAG guidelines",
+      "Test with real users: Hire accessibility testers with disabilities to find issues tools miss"
+    ],
+    resources: [
+      { title: "WCAG 2.1 Guidelines", url: "https://www.w3.org/WAI/WCAG21/quickref/" },
+      { title: "WebAIM WAVE Tool", url: "https://wave.webaim.org/" }
+    ],
+    estimatedTime: "8-40 hours",
+    difficulty: "Advanced"
+  },
+
+  347: {
+    description: "Security headers protect against common web vulnerabilities: XSS attacks, clickjacking, protocol downgrade attacks. Headers are server-side configuration that tell browsers how to behave when handling your site's content. Essential for enterprise sites handling sensitive data.",
+    tips: [
+      "HSTS: Strict-Transport-Security: max-age=31536000; includeSubDomains; preload forces HTTPS, prevents downgrade attacks",
+      "X-Frame-Options: DENY or SAMEORIGIN prevents your site from being embedded in iframes (clickjacking protection)",
+      "X-Content-Type-Options: nosniff prevents MIME type sniffing, reduces XSS risk",
+      "Referrer-Policy: strict-origin-when-cross-origin controls what referrer info sent to other sites",
+      "Permissions-Policy: Control which features/APIs can be used (camera=(), microphone=(), geolocation=())",
+      "Test with securityheaders.com: Check your headers get an 'A' rating before launch"
+    ],
+    resources: [
+      { title: "Security Headers Guide", url: "https://securityheaders.com/" },
+      { title: "OWASP Secure Headers", url: "https://owasp.org/www-project-secure-headers/" }
+    ],
+    estimatedTime: "2-8 hours",
+    difficulty: "Intermediate"
+  },
+
+  348: {
+    description: "A comprehensive privacy policy is legally required in most jurisdictions (GDPR, CCPA, etc.) and builds user trust. It must accurately describe all data collection, use, and sharing practices. Vague or outdated privacy policies create legal liability and damage credibility.",
+    tips: [
+      "List all data collected: Email, name, IP address, cookies, analytics data, form submissions, purchase history",
+      "Explain purpose for each: Why collecting, how using, how long retaining (e.g., 'Email for newsletters, kept until unsubscribe')",
+      "Disclose third parties: List every service that accesses user data: Google Analytics, Mailchimp, payment processors",
+      "Include user rights: GDPR/CCPA rights to access, delete, port data, opt-out, withdraw consent",
+      "Contact information: Email and physical address for privacy inquiries required by law",
+      "Update regularly: Review quarterly, update when adding new tools/services, show 'Last updated' date"
+    ],
+    resources: [
+      { title: "Privacy Policy Generator", url: "https://www.termsfeed.com/privacy-policy-generator/" },
+      { title: "GDPR Privacy Policy Requirements", url: "https://gdpr.eu/privacy-notice/" }
+    ],
+    estimatedTime: "2-8 hours",
+    difficulty: "Intermediate"
+  },
+
+  349: {
+    description: "Content Security Policy (CSP) is a security header that prevents XSS (cross-site scripting) attacks by controlling which resources can load. CSP defines allowed sources for scripts, styles, images, fonts, etc. Start permissive, gradually tighten to strengthen security without breaking functionality.",
+    tips: [
+      "Start with report-only mode: Content-Security-Policy-Report-Only header logs violations without blocking",
+      "Basic CSP: default-src 'self'; script-src 'self' https://cdn.example.com; prevents inline scripts and external sources",
+      "Allow necessary domains: Add Google Analytics, CDNs, payment processors to script-src, img-src, font-src directives",
+      "Avoid 'unsafe-inline' and 'unsafe-eval': These bypass CSP protection - refactor inline scripts to external files with nonces/hashes",
+      "Use nonces for necessary inline scripts: Generate random nonce per page load, add to <script nonce='random'> and CSP header",
+      "Monitor violations: Set report-uri or report-to endpoint to log CSP violations, review weekly to tighten policy"
+    ],
+    resources: [
+      { title: "CSP Guide", url: "https://developer.mozilla.org/en-US/docs/Web/HTTP/CSP" },
+      { title: "CSP Evaluator", url: "https://csp-evaluator.withgoogle.com/" }
+    ],
+    estimatedTime: "2-8 hours",
+    difficulty: "Advanced"
   }
 };
 
