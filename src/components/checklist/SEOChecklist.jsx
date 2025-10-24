@@ -16,6 +16,7 @@ import {
 import { exportToExcel } from '../../lib/excelExport';
 import ItemDetailModal from './ItemDetailModal';
 import FilterPresetManager from './FilterPresetManager';
+import PdfExportModal from './PdfExportModal';
 import HelpTooltip from '../help/HelpTooltip';
 
 const PRIORITIES = ['CRITICAL', 'HIGH', 'MEDIUM', 'LOW'];
@@ -32,6 +33,7 @@ export default function SEOChecklist() {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedItem, setSelectedItem] = useState(null);
   const [showPresetManager, setShowPresetManager] = useState(false);
+  const [showPdfExport, setShowPdfExport] = useState(false);
   const [filters, setFilters] = useState({
     phase: '',
     priority: '',
@@ -177,13 +179,22 @@ export default function SEOChecklist() {
               <p className="text-gray-600">Client: {project.clientName}</p>
               <p className="text-sm text-gray-500">Type: {project.projectType}</p>
             </div>
-            <button
-              onClick={handleExport}
-              className="btn btn-primary flex items-center gap-2"
-            >
-              <Download className="w-4 h-4" />
-              Export to Excel
-            </button>
+            <div className="flex gap-2">
+              <button
+                onClick={() => setShowPdfExport(true)}
+                className="btn btn-primary flex items-center gap-2"
+              >
+                <Download className="w-4 h-4" />
+                Export PDF
+              </button>
+              <button
+                onClick={handleExport}
+                className="btn btn-secondary flex items-center gap-2"
+              >
+                <Download className="w-4 h-4" />
+                Export Excel
+              </button>
+            </div>
           </div>
 
           {/* Progress Bar */}
@@ -305,6 +316,15 @@ export default function SEOChecklist() {
             currentFilters={filters}
             onApplyPreset={handleApplyPreset}
             onClose={() => setShowPresetManager(false)}
+          />
+        )}
+
+        {/* PDF Export Modal */}
+        {showPdfExport && (
+          <PdfExportModal
+            items={filteredItems}
+            completions={completions}
+            onClose={() => setShowPdfExport(false)}
           />
         )}
 
