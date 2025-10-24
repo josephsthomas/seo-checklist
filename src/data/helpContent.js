@@ -1665,6 +1665,420 @@ export const helpContent = {
     ],
     estimatedTime: "8-40 hours",
     difficulty: "Advanced"
+  },
+
+  // PRE-LAUNCH TESTING - CRITICAL (Items 98-106)
+  98: {
+    description: "URL Inspection tool shows exactly how Googlebot renders your pages. Testing all critical pages before launch prevents indexing disasters and ensures content is crawlable.",
+    tips: [
+      "Test homepage, key landing pages, and each page template type",
+      "Click 'View Tested Page' to see rendered HTML vs raw HTML",
+      "Verify all content appears in rendered version",
+      "Check for JavaScript errors in 'More Info' tab",
+      "Ensure structured data is detected correctly",
+      "Fix any issues before requesting indexing"
+    ],
+    resources: [
+      { title: "URL Inspection Tool Guide", url: "https://support.google.com/webmasters/answer/9012289" }
+    ],
+    estimatedTime: "2-8 hours",
+    difficulty: "Intermediate"
+  },
+
+  99: {
+    description: "Schema validation prevents rich results errors that can harm CTR. Invalid schema won't earn rich snippets and may trigger manual actions.",
+    tips: [
+      "Test all pages with schema using Google Rich Results Test",
+      "Validate with Schema.org Validator for syntax errors",
+      "Fix all errors - warnings are optional but recommended",
+      "Test each schema type separately (Article, Product, etc.)",
+      "Verify required properties are present",
+      "Re-test after fixing errors to ensure they're resolved"
+    ],
+    resources: [
+      { title: "Rich Results Test", url: "https://search.google.com/test/rich-results" },
+      { title: "Schema Validator", url: "https://validator.schema.org/" }
+    ],
+    estimatedTime: "2-8 hours",
+    difficulty: "Intermediate"
+  },
+
+  100: {
+    description: "Complete site crawl identifies all technical issues before launch. Fixing issues pre-launch prevents ranking problems and indexing delays.",
+    tips: [
+      "Crawl entire site with Screaming Frog (desktop app)",
+      "Review all errors: 404s, 500s, redirect chains, missing titles",
+      "Check for duplicate content and thin content pages",
+      "Verify all images have alt text",
+      "Export crawl report and fix issues systematically",
+      "Re-crawl after fixes to verify resolution"
+    ],
+    resources: [
+      { title: "Screaming Frog SEO Spider", url: "https://www.screamingfrog.co.uk/seo-spider/" }
+    ],
+    estimatedTime: "8-40 hours",
+    difficulty: "Advanced"
+  },
+
+  101: {
+    description: "Testing every single 301 redirect prevents catastrophic ranking drops during site refresh. One broken redirect can cost thousands in lost traffic.",
+    tips: [
+      "Test each redirect manually or use automated redirect checker",
+      "Verify redirects return 301 status code (not 302 or 200)",
+      "Ensure destination pages return 200 OK status",
+      "Check for redirect chains (more than one redirect)",
+      "Test that HTTPS redirects work correctly",
+      "Document any intentional non-redirected URLs"
+    ],
+    resources: [
+      { title: "Redirect Checker Tool", url: "https://www.redirect-checker.org/" }
+    ],
+    estimatedTime: "8-40 hours",
+    difficulty: "Intermediate"
+  },
+
+  102: {
+    description: "Accidentally blocking important pages in robots.txt is a common launch disaster. One line can deindex your entire site instantly.",
+    tips: [
+      "Review robots.txt line by line before launch",
+      "Test critical URLs with Search Console robots.txt Tester",
+      "Ensure only intended pages are disallowed",
+      "Never block CSS, JavaScript, or image files",
+      "Remove staging/development disallow rules",
+      "Keep backup of old robots.txt just in case"
+    ],
+    resources: [
+      { title: "Robots.txt Tester", url: "https://support.google.com/webmasters/answer/6062598" }
+    ],
+    estimatedTime: "1 hour",
+    difficulty: "Beginner"
+  },
+
+  103: {
+    description: "Core Web Vitals are confirmed ranking factors. Pages failing thresholds (LCP > 2.5s, INP > 200ms, CLS > 0.1) may rank lower, especially on mobile.",
+    tips: [
+      "Test all page templates with PageSpeed Insights",
+      "Run Lighthouse audits in Chrome DevTools",
+      "Test on real mobile devices with slow connections",
+      "Fix failing pages before launch - prioritize mobile",
+      "Focus on LCP (largest image/text block) first",
+      "Monitor Field Data (real users) vs Lab Data (tests)"
+    ],
+    resources: [
+      { title: "PageSpeed Insights", url: "https://pagespeed.web.dev/" },
+      { title: "Web Vitals Guide", url: "https://web.dev/vitals/" }
+    ],
+    estimatedTime: "8-40 hours",
+    difficulty: "Advanced"
+  },
+
+  104: {
+    description: "Mobile-first indexing means Google primarily uses mobile version for ranking. Mobile-unfriendly sites suffer severe ranking penalties.",
+    tips: [
+      "Test with Google Mobile-Friendly Test tool",
+      "Test on real iOS and Android devices",
+      "Verify content parity between mobile and desktop",
+      "Check tap targets are minimum 48x48 pixels",
+      "Ensure text is readable without zooming (16px minimum)",
+      "Test forms, navigation, and key interactions on mobile"
+    ],
+    resources: [
+      { title: "Mobile-Friendly Test", url: "https://search.google.com/test/mobile-friendly" }
+    ],
+    estimatedTime: "2-8 hours",
+    difficulty: "Intermediate"
+  },
+
+  105: {
+    description: "Broken internal links waste crawl budget and create poor user experience. Finding and fixing all 404s before launch prevents indexing issues.",
+    tips: [
+      "Use crawler tool to identify all broken links",
+      "Fix or remove links to non-existent pages",
+      "Update navigation and footer links",
+      "Check for broken links in content body",
+      "Verify image src URLs work correctly",
+      "Test that all buttons and CTAs lead to valid pages"
+    ],
+    resources: [
+      { title: "Broken Link Checker", url: "https://www.brokenlinkcheck.com/" }
+    ],
+    estimatedTime: "2-8 hours",
+    difficulty: "Beginner"
+  },
+
+  106: {
+    description: "Launching with staging site still indexed or production site blocked causes indexing disasters. This simple check prevents catastrophic mistakes.",
+    tips: [
+      "Verify production robots.txt allows search engines",
+      "Remove noindex meta tags from production site",
+      "Ensure staging site HAS noindex or robots.txt disallow",
+      "Check htaccess doesn't password protect production",
+      "Verify DNS points to production server, not staging",
+      "Test that site is actually accessible to public"
+    ],
+    resources: [
+      { title: "Common Indexing Issues", url: "https://developers.google.com/search/docs/crawling-indexing/block-indexing" }
+    ],
+    estimatedTime: "30 minutes",
+    difficulty: "Beginner"
+  },
+
+  // PRE-LAUNCH TESTING - HIGH PRIORITY (Items 107-112)
+  107: {
+    description: "Title tags and meta descriptions are your SERP listing. Optimizing them before launch maximizes click-through rates from day one.",
+    tips: [
+      "Audit all titles for uniqueness - no duplicates",
+      "Verify titles are 50-60 characters (not truncated in SERPs)",
+      "Ensure primary keyword appears near beginning of title",
+      "Check meta descriptions are 150-160 characters",
+      "Include compelling calls-to-action in descriptions",
+      "Export audit report and fix systematically"
+    ],
+    resources: [
+      { title: "Title Tag Guide", url: "https://moz.com/learn/seo/title-tag" }
+    ],
+    estimatedTime: "8-40 hours",
+    difficulty: "Intermediate"
+  },
+
+  108: {
+    description: "Alt text is critical for accessibility and image SEO. Missing alt text fails WCAG compliance and wastes image search opportunities.",
+    tips: [
+      "Crawl site and identify images without alt text",
+      "Write descriptive alt text for every content image",
+      "Keep alt text 5-15 words, descriptive and specific",
+      "Include keywords naturally where relevant",
+      "Use empty alt='' for purely decorative images",
+      "Test with screen reader to verify alt text makes sense"
+    ],
+    resources: [
+      { title: "Alt Text Best Practices", url: "https://moz.com/learn/seo/alt-text" }
+    ],
+    estimatedTime: "8-40 hours",
+    difficulty: "Beginner"
+  },
+
+  109: {
+    description: "Testing on slow connections reveals performance issues that affect majority of mobile users. Slow sites have higher bounce rates and lower rankings.",
+    tips: [
+      "Use Chrome DevTools Network throttling (Slow 3G)",
+      "Test on real mobile devices with limited data connection",
+      "Verify pages load in under 3 seconds on slow 3G",
+      "Check that critical content appears within 2 seconds",
+      "Optimize images and defer non-critical resources",
+      "Consider AMP or lightweight mobile version if needed"
+    ],
+    resources: [
+      { title: "Network Throttling", url: "https://developer.chrome.com/docs/devtools/network/reference#throttle" }
+    ],
+    estimatedTime: "2-8 hours",
+    difficulty: "Intermediate"
+  },
+
+  110: {
+    description: "Incorrect canonical tags cause indexing confusion and can prevent pages from ranking. Every page needs correct canonical implementation.",
+    tips: [
+      "Crawl site and export all canonical tags",
+      "Verify canonical URLs are absolute, not relative",
+      "Check canonical points to accessible page (returns 200)",
+      "Self-referencing canonical is best practice",
+      "Verify paginated pages have correct canonical strategy",
+      "Fix any canonical pointing to 404 or redirected pages"
+    ],
+    resources: [
+      { title: "Canonical Tag Guide", url: "https://developers.google.com/search/docs/crawling-indexing/consolidate-duplicate-urls" }
+    ],
+    estimatedTime: "2-8 hours",
+    difficulty: "Intermediate"
+  },
+
+  111: {
+    description: "Mixed content warnings (HTTP resources on HTTPS pages) break HTTPS implementation and harm trust. Browsers show warnings that scare users away.",
+    tips: [
+      "Test all pages for mixed content warnings in browser console",
+      "Update all internal links to use https://",
+      "Check image src, script src, CSS href use HTTPS",
+      "Update third-party integrations to HTTPS versions",
+      "Use relative URLs (/path) or protocol-relative (//domain)",
+      "Test in multiple browsers (Chrome, Firefox, Safari)"
+    ],
+    resources: [
+      { title: "Mixed Content Issues", url: "https://developers.google.com/web/fundamentals/security/prevent-mixed-content/what-is-mixed-content" }
+    ],
+    estimatedTime: "1-2 hours",
+    difficulty: "Beginner"
+  },
+
+  112: {
+    description: "Strategic internal linking distributes PageRank and helps important pages rank. Reviewing before launch ensures optimal link equity distribution.",
+    tips: [
+      "Identify your most important pages (conversion pages, pillar content)",
+      "Ensure these pages have most internal links pointing to them",
+      "Add contextual links from related content",
+      "Verify homepage links to key landing pages",
+      "Check that deep pages aren't orphaned (no incoming links)",
+      "Use tools to visualize internal linking structure"
+    ],
+    resources: [
+      { title: "Internal Linking Strategy", url: "https://moz.com/learn/seo/internal-link" }
+    ],
+    estimatedTime: "2-8 hours",
+    difficulty: "Intermediate"
+  },
+
+  // LAUNCH PHASE - CRITICAL (Items 113-117)
+  113: {
+    description: "Search Console is essential for monitoring Google's view of your site. Domain-level verification covers all subdomains and protocols automatically.",
+    tips: [
+      "Use domain-level verification for complete coverage",
+      "Add both www and non-www properties if using URL-prefix method",
+      "Verify ownership via DNS TXT record (most reliable)",
+      "Add all team members with appropriate permissions",
+      "Enable email notifications for critical issues",
+      "Verify verification doesn't expire (check annually)"
+    ],
+    resources: [
+      { title: "Search Console Setup", url: "https://support.google.com/webmasters/answer/9008080" }
+    ],
+    estimatedTime: "1 hour",
+    difficulty: "Beginner"
+  },
+
+  114: {
+    description: "XML sitemap submission tells Google which pages exist. Submitting immediately after launch accelerates discovery and indexing of new content.",
+    tips: [
+      "Submit sitemap in Search Console > Sitemaps section",
+      "Verify sitemap is accessible at submitted URL",
+      "Check for sitemap errors in Search Console after submission",
+      "Monitor discovered vs indexed pages in Coverage report",
+      "Resubmit sitemap when adding significant new content",
+      "Submit separate sitemaps for images and videos if applicable"
+    ],
+    resources: [
+      { title: "Submit Sitemap", url: "https://support.google.com/webmasters/answer/7451001" }
+    ],
+    estimatedTime: "30 minutes",
+    difficulty: "Beginner"
+  },
+
+  115: {
+    description: "Google Analytics 4 tracks user behavior and conversions. Proper setup from launch prevents data gaps and enables informed optimization decisions.",
+    tips: [
+      "Create GA4 property and add measurement ID to site",
+      "Set up key events (form submissions, purchases, clicks)",
+      "Enable enhanced measurement for automatic event tracking",
+      "Test that data is collecting using RealTime reports",
+      "Set up conversion tracking for business goals",
+      "Link GA4 to Search Console for combined data"
+    ],
+    resources: [
+      { title: "GA4 Setup Guide", url: "https://support.google.com/analytics/answer/9304153" }
+    ],
+    estimatedTime: "2-8 hours",
+    difficulty: "Intermediate"
+  },
+
+  116: {
+    description: "Removing robots.txt blocks is the final step to allow indexing. Forgetting this step means your site stays invisible to search engines.",
+    tips: [
+      "Remove 'Disallow: /' that blocked entire site during development",
+      "Keep disallows for admin, private, and duplicate content areas",
+      "Verify sitemap location is still listed in robots.txt",
+      "Test with robots.txt tester before and after changes",
+      "Deploy changes to production immediately at launch",
+      "Monitor Search Console Coverage for indexing within 24-48 hours"
+    ],
+    resources: [
+      { title: "Robots.txt Guide", url: "https://developers.google.com/search/docs/crawling-indexing/robots/intro" }
+    ],
+    estimatedTime: "15 minutes",
+    difficulty: "Beginner"
+  },
+
+  117: {
+    description: "Requesting indexing prioritizes critical pages for crawling. While not required, it accelerates initial indexing of most important pages.",
+    tips: [
+      "Use Search Console URL Inspection tool",
+      "Click 'Request Indexing' for homepage first",
+      "Request indexing for key landing pages and top content",
+      "Limit requests to 10-15 most critical pages",
+      "Google typically indexes within hours to days after request",
+      "Monitor Index Coverage report to verify indexing"
+    ],
+    resources: [
+      { title: "Request Indexing", url: "https://support.google.com/webmasters/answer/9012289" }
+    ],
+    estimatedTime: "30 minutes",
+    difficulty: "Beginner"
+  },
+
+  // LAUNCH PHASE - HIGH PRIORITY (Items 118-121)
+  118: {
+    description: "Bing powers ~6% of search market plus voice assistants. Bing Webmaster Tools provides similar insights to Search Console for Microsoft search.",
+    tips: [
+      "Sign up at Bing Webmaster Tools",
+      "Verify ownership via DNS or meta tag",
+      "Import site from Search Console for faster setup",
+      "Submit XML sitemap to Bing",
+      "Enable email notifications",
+      "Monitor Bing-specific crawl and indexing issues"
+    ],
+    resources: [
+      { title: "Bing Webmaster Tools", url: "https://www.bing.com/webmasters/" }
+    ],
+    estimatedTime: "1 hour",
+    difficulty: "Beginner"
+  },
+
+  119: {
+    description: "Google Business Profile is critical for local SEO and appearing in Maps results. Free tool that significantly impacts local visibility.",
+    tips: [
+      "Create or claim existing Google Business Profile",
+      "Verify ownership via postcard, phone, or email",
+      "Complete all profile sections: hours, photos, categories",
+      "Match NAP (Name, Address, Phone) exactly across all citations",
+      "Add business description with keywords",
+      "Upload high-quality photos of location, products, team"
+    ],
+    resources: [
+      { title: "Google Business Profile", url: "https://www.google.com/business/" }
+    ],
+    estimatedTime: "2-8 hours",
+    difficulty: "Beginner"
+  },
+
+  120: {
+    description: "Uptime monitoring alerts you immediately if site goes down. Downtime hurts rankings and costs revenue - fast response minimizes damage.",
+    tips: [
+      "Set up monitoring with UptimeRobot, Pingdom, or StatusCake",
+      "Monitor from multiple global locations",
+      "Set alert threshold to 2-3 minutes (not instant - prevents false alarms)",
+      "Configure alerts via email, SMS, and Slack",
+      "Monitor both homepage and key pages",
+      "Include status code monitoring (200 OK)"
+    ],
+    resources: [
+      { title: "UptimeRobot", url: "https://uptimerobot.com/" }
+    ],
+    estimatedTime: "1 hour",
+    difficulty: "Beginner"
+  },
+
+  121: {
+    description: "Launch announcements generate initial backlinks and social signals. Early links and traffic provide positive ranking signals from day one.",
+    tips: [
+      "Write press release announcing launch or redesign",
+      "Reach out to industry publications and bloggers",
+      "Share on social media channels",
+      "Email announcement to partners and customers",
+      "Create launch content (behind-the-scenes, case study)",
+      "Track referral traffic and backlinks from outreach"
+    ],
+    resources: [
+      { title: "Link Building Guide", url: "https://moz.com/link-building" }
+    ],
+    estimatedTime: "8-40 hours",
+    difficulty: "Intermediate"
   }
 };
 
