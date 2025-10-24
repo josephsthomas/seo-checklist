@@ -1324,6 +1324,347 @@ export const helpContent = {
     ],
     estimatedTime: "2-8 hours",
     difficulty: "Beginner"
+  },
+
+  // ADDITIONAL SCHEMA MARKUP (Items 78-80)
+  78: {
+    description: "VideoObject schema enables rich video results in search with thumbnail, duration, and description. This increases visibility in video search and can earn video carousels in main search results.",
+    tips: [
+      "Include name, description, thumbnailUrl, uploadDate, duration in schema",
+      "Use contentUrl for video file location, embedUrl for player URL",
+      "Add duration in ISO 8601 format: PT1H30M for 1 hour 30 minutes",
+      "Thumbnail should be minimum 160x90px, recommended 1920x1080px",
+      "Mark transcripts with hasPart property",
+      "Validate with Google Rich Results Test"
+    ],
+    resources: [
+      { title: "VideoObject Schema", url: "https://developers.google.com/search/docs/appearance/structured-data/video" }
+    ],
+    estimatedTime: "2-8 hours",
+    difficulty: "Intermediate"
+  },
+
+  79: {
+    description: "Review and AggregateRating schema displays star ratings in search results, significantly increasing click-through rates. Shows average rating and number of reviews.",
+    tips: [
+      "Use AggregateRating for overall rating summary",
+      "Include ratingValue (average score), bestRating (usually 5), and reviewCount",
+      "Add individual Review schema for each review with rating, author, text",
+      "Reviews must be genuine - fake reviews violate Google guidelines",
+      "Star ratings appear only with minimum 50+ reviews typically",
+      "Monitor in Search Console > Enhancements > Review snippets"
+    ],
+    resources: [
+      { title: "Review Schema Guide", url: "https://developers.google.com/search/docs/appearance/structured-data/review-snippet" }
+    ],
+    estimatedTime: "2-8 hours",
+    difficulty: "Intermediate"
+  },
+
+  80: {
+    description: "Event schema enables rich event results showing date, location, and ticket information directly in search results, driving ticket sales and registrations.",
+    tips: [
+      "Include name, startDate, endDate, location (Place or VirtualLocation)",
+      "Add eventAttendanceMode: OfflineEventAttendanceMode, OnlineEventAttendanceMode, or Mixed",
+      "Include offers with price, priceCurrency, url, availability",
+      "For virtual events, add VirtualLocation with url property",
+      "Add performer, organizer, and image properties",
+      "Test with Google Event Rich Results Test"
+    ],
+    resources: [
+      { title: "Event Schema", url: "https://developers.google.com/search/docs/appearance/structured-data/event" }
+    ],
+    estimatedTime: "1-2 hours",
+    difficulty: "Intermediate"
+  },
+
+  // CONTENT ENHANCEMENTS (Items 81-85)
+  81: {
+    description: "Table of contents with anchor links improves UX for long content and can earn jump-to links in search results. Helps users navigate to specific sections quickly.",
+    tips: [
+      "Add TOC at beginning of articles over 2000 words",
+      "Use anchor links (#section-name) pointing to H2 headings",
+      "Keep TOC entries concise - match or summarize H2 text",
+      "Style TOC as sticky sidebar or collapsible module",
+      "Add 'Back to top' links after major sections",
+      "Test that anchor links scroll smoothly to correct positions"
+    ],
+    resources: [
+      { title: "Table of Contents Best Practices", url: "https://www.semrush.com/blog/table-of-contents-seo/" }
+    ],
+    estimatedTime: "2-8 hours",
+    difficulty: "Beginner"
+  },
+
+  82: {
+    description: "Featured snippets (position zero) appear above organic results and significantly increase visibility. Optimize by providing concise 40-60 word answers to common questions.",
+    tips: [
+      "Identify questions your audience asks using People Also Ask and AnswerThePublic",
+      "Write clear, direct answers in 40-60 words immediately after question heading",
+      "Use lists (ordered/unordered) and tables - these formats win snippets frequently",
+      "Include the exact question as H2 heading",
+      "Add follow-up detail after the concise answer",
+      "Monitor featured snippet opportunities in Search Console"
+    ],
+    resources: [
+      { title: "Featured Snippet Optimization", url: "https://moz.com/learn/seo/featured-snippets" }
+    ],
+    estimatedTime: "8-40 hours",
+    difficulty: "Intermediate"
+  },
+
+  83: {
+    description: "Visual content (images, videos, infographics) increases engagement, time on page, and social shares. Rich media makes content more shareable and improves user experience.",
+    tips: [
+      "Include at least one custom image per 500 words of content",
+      "Create original infographics summarizing key data or processes",
+      "Embed relevant videos to increase time on page",
+      "Use charts and graphs to visualize statistics",
+      "Ensure all visual content is mobile-friendly",
+      "Optimize all images for performance (compression, lazy loading)"
+    ],
+    resources: [
+      { title: "Visual Content Strategy", url: "https://www.semrush.com/blog/visual-content/" }
+    ],
+    estimatedTime: "8-40 hours",
+    difficulty: "Intermediate"
+  },
+
+  84: {
+    description: "Linking to authoritative external sources builds trust and demonstrates thoroughness. Citations show you've done research and aren't making unsupported claims.",
+    tips: [
+      "Link to .gov, .edu, and authoritative industry sites when citing data",
+      "Add 2-3 external links per 1000 words to relevant sources",
+      "Link to original research when citing statistics",
+      "Use descriptive anchor text for external links",
+      "Open external links in new tab with rel='noopener noreferrer'",
+      "Don't link to competitors for critical keywords"
+    ],
+    resources: [
+      { title: "External Linking Guide", url: "https://moz.com/learn/seo/external-link" }
+    ],
+    estimatedTime: "2-8 hours",
+    difficulty: "Beginner"
+  },
+
+  85: {
+    description: "Pillar content (2000-4000+ words) comprehensively covers a main topic and serves as hub for related cluster content. Demonstrates topical authority and ranks for competitive keywords.",
+    tips: [
+      "Identify 3-5 core topics central to your business",
+      "Research top-ranking content - aim for 1.5x their depth",
+      "Include all subtopics users want to know about the subject",
+      "Link to related cluster articles throughout pillar content",
+      "Update pillar pages quarterly with new information",
+      "Include downloadable resources or templates to increase engagement"
+    ],
+    resources: [
+      { title: "Pillar Page Strategy", url: "https://www.semrush.com/blog/pillar-page/" }
+    ],
+    estimatedTime: "40+ hours",
+    difficulty: "Advanced"
+  },
+
+  // TECHNICAL SEO ENHANCEMENTS (Items 86-94)
+  86: {
+    description: "Clean URLs without unnecessary parameters improve click-through rates and prevent duplicate content. Static URLs are more user-friendly and easier to share.",
+    tips: [
+      "Remove session IDs and tracking parameters from URLs",
+      "Use URL rewriting to convert /product.php?id=123 to /product/blue-widget/",
+      "Keep URLs under 60 characters when possible",
+      "Use hyphens not underscores for word separation",
+      "Canonical URLs with parameters to clean versions",
+      "Test parameter removal doesn't break functionality"
+    ],
+    resources: [
+      { title: "URL Best Practices", url: "https://developers.google.com/search/docs/crawling-indexing/url-structure" }
+    ],
+    estimatedTime: "2-8 hours",
+    difficulty: "Intermediate"
+  },
+
+  87: {
+    description: "Consistent trailing slash handling prevents duplicate content. Choose with or without trailing slashes and redirect the other version.",
+    tips: [
+      "Decide: example.com/page or example.com/page/ (not both)",
+      "Implement 301 redirects from non-preferred to preferred version",
+      "Update all internal links to use preferred format",
+      "Configure server to add/remove trailing slashes automatically",
+      "Test that redirects work for all pages, not just homepage",
+      "Update sitemap to use consistent format"
+    ],
+    resources: [
+      { title: "Trailing Slash Issues", url: "https://moz.com/learn/seo/url" }
+    ],
+    estimatedTime: "1-2 hours",
+    difficulty: "Beginner"
+  },
+
+  88: {
+    description: "HTML sitemap provides user-friendly navigation of entire site structure. Helps users find content and provides additional internal linking for SEO.",
+    tips: [
+      "Create page listing all main pages organized hierarchically",
+      "Group pages by category/section for easy scanning",
+      "Link from footer on every page",
+      "Keep it simple - don't overwhelm with too many links",
+      "Update automatically or manually when structure changes",
+      "Supplement XML sitemap, don't replace it"
+    ],
+    resources: [
+      { title: "HTML Sitemap Guide", url: "https://www.semrush.com/blog/html-sitemap/" }
+    ],
+    estimatedTime: "1-2 hours",
+    difficulty: "Beginner"
+  },
+
+  89: {
+    description: "Crawl budget optimization ensures search engines crawl your most important pages. Block low-value pages to prevent wasting crawler resources.",
+    tips: [
+      "Block admin areas, login pages, and private sections in robots.txt",
+      "Add noindex to filter pages, search results, and duplicate content",
+      "Don't block CSS, JavaScript, or images files",
+      "Monitor crawl stats in Search Console to identify crawl budget issues",
+      "Reduce redirect chains and broken links",
+      "Prioritize important pages in XML sitemap with higher priority values"
+    ],
+    resources: [
+      { title: "Crawl Budget Optimization", url: "https://developers.google.com/search/docs/crawling-indexing/large-site-managing-crawl-budget" }
+    ],
+    estimatedTime: "2-8 hours",
+    difficulty: "Intermediate"
+  },
+
+  90: {
+    description: "Open Graph tags control how pages appear when shared on Facebook, LinkedIn, and other social platforms. Proper OG tags significantly improve social sharing appearance and click-through.",
+    tips: [
+      "Add to <head>: og:title, og:description, og:image, og:url, og:type",
+      "Image should be 1200x630px for optimal display",
+      "Title should be 60-90 characters",
+      "Description should be 200-300 characters",
+      "Use absolute URLs for og:url and og:image",
+      "Test with Facebook Sharing Debugger tool"
+    ],
+    resources: [
+      { title: "Open Graph Protocol", url: "https://ogp.me/" }
+    ],
+    estimatedTime: "1-2 hours",
+    difficulty: "Beginner"
+  },
+
+  91: {
+    description: "Twitter Card tags optimize how pages appear when shared on Twitter/X. Cards show rich previews with image, title, and description, increasing engagement.",
+    tips: [
+      "Add to <head>: twitter:card, twitter:title, twitter:description, twitter:image",
+      "Use twitter:card type: summary, summary_large_image, app, or player",
+      "Image should be minimum 300x157px, recommended 1200x628px",
+      "Add twitter:site with @username for attribution",
+      "Title max 70 characters, description max 200 characters",
+      "Validate with Twitter Card Validator"
+    ],
+    resources: [
+      { title: "Twitter Cards Guide", url: "https://developer.twitter.com/en/docs/twitter-for-websites/cards/overview/abouts-cards" }
+    ],
+    estimatedTime: "1-2 hours",
+    difficulty: "Beginner"
+  },
+
+  92: {
+    description: "Favicons and touch icons appear in browser tabs, bookmarks, and mobile home screens. They build brand recognition and improve professional appearance.",
+    tips: [
+      "Create favicon.ico in 32x32, 48x48, and 16x16 sizes",
+      "Add Apple touch icon in 180x180 PNG format",
+      "Place favicon.ico in site root or link in <head>",
+      "Use SVG favicon for sharp display at any size",
+      "Include manifest.json for PWA icons",
+      "Test in multiple browsers and devices"
+    ],
+    resources: [
+      { title: "Favicon Generator", url: "https://realfavicongenerator.net/" }
+    ],
+    estimatedTime: "1 hour",
+    difficulty: "Beginner"
+  },
+
+  93: {
+    description: "Structured navigation with keyword-rich categories helps users and search engines understand site organization. Navigation reflects content hierarchy and keyword themes.",
+    tips: [
+      "Organize navigation around main keyword themes",
+      "Limit main navigation to 5-7 top-level items",
+      "Use descriptive labels containing keywords (not generic 'Services')",
+      "Implement mega menus for complex site structures",
+      "Include breadcrumbs to show hierarchy",
+      "Ensure navigation is crawlable HTML, not JavaScript-only"
+    ],
+    resources: [
+      { title: "Navigation Best Practices", url: "https://www.semrush.com/blog/website-navigation/" }
+    ],
+    estimatedTime: "8-40 hours",
+    difficulty: "Intermediate"
+  },
+
+  94: {
+    description: "On-site search helps users find content and provides keyword research data. Search results pages should be noindexed to prevent thin content indexing.",
+    tips: [
+      "Implement search with autocomplete suggestions",
+      "Add noindex meta tag to search results pages",
+      "Track search queries in Analytics to identify content gaps",
+      "Display helpful 'no results' page with suggestions",
+      "Add filters for better search refinement",
+      "Link to search from header on every page"
+    ],
+    resources: [
+      { title: "Site Search Implementation", url: "https://developers.google.com/search/docs/appearance/site-names" }
+    ],
+    estimatedTime: "8-40 hours",
+    difficulty: "Intermediate"
+  },
+
+  // LOW PRIORITY ITEMS (95-97)
+  95: {
+    description: "Print stylesheets optimize pages for printing by removing navigation, ads, and non-essential elements. Improves user experience for those who print articles.",
+    tips: [
+      "Create @media print CSS hiding navigation, sidebar, footer",
+      "Adjust fonts and colors for print readability",
+      "Add page breaks between major sections",
+      "Expand abbreviated URLs to full links",
+      "Test print preview before deploying"
+    ],
+    resources: [
+      { title: "Print Stylesheet Guide", url: "https://www.smashingmagazine.com/2018/05/print-stylesheets-in-2018/" }
+    ],
+    estimatedTime: "1-2 hours",
+    difficulty: "Beginner"
+  },
+
+  96: {
+    description: "Related content sections recommend additional articles to users, increasing pages per session and time on site while distributing link equity.",
+    tips: [
+      "Display 3-4 related articles at end of content",
+      "Use automated recommendations based on tags/categories",
+      "Include thumbnail images for visual appeal",
+      "Link to mix of popular and new content",
+      "Track click-through rates to optimize recommendations"
+    ],
+    resources: [
+      { title: "Related Content Strategies", url: "https://moz.com/blog/related-content" }
+    ],
+    estimatedTime: "2-8 hours",
+    difficulty: "Beginner"
+  },
+
+  97: {
+    description: "Progressive enhancement ensures core content is accessible even if JavaScript fails. Content should work without JS, with JS enhancements layered on top.",
+    tips: [
+      "Render critical content in HTML, not just JavaScript",
+      "Test site with JavaScript disabled",
+      "Use <noscript> tags for fallback content",
+      "Implement server-side rendering for JS frameworks",
+      "Ensure forms work without JavaScript"
+    ],
+    resources: [
+      { title: "Progressive Enhancement", url: "https://developer.mozilla.org/en-US/docs/Glossary/Progressive_Enhancement" }
+    ],
+    estimatedTime: "8-40 hours",
+    difficulty: "Advanced"
   }
 };
 
