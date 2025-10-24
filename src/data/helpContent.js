@@ -2593,6 +2593,673 @@ export const helpContent = {
     ],
     estimatedTime: "8-40 hours",
     difficulty: "Advanced"
+  },
+
+  // PRIVACY & MODERN WEB STANDARDS (Items 152-156)
+  152: {
+    description: "Google Consent Mode v2 is required for EU/EEA compliance with GDPR. It controls how Google Analytics and Ads tags behave based on user consent choices.",
+    tips: [
+      "Implement both basic mode (blocks tags) and advanced mode (pings without data)",
+      "Configure consent for analytics_storage, ad_storage, ad_user_data, ad_personalization",
+      "Use Consent Management Platform (CMP) like OneTrust or Cookiebot",
+      "Test with Google Tag Assistant to verify consent signals",
+      "Default consent to 'denied' for EU traffic, 'granted' for non-EU",
+      "Update consent when users change preferences"
+    ],
+    resources: [
+      { title: "Consent Mode v2", url: "https://support.google.com/analytics/answer/9976101" }
+    ],
+    estimatedTime: "2-8 hours",
+    difficulty: "Advanced"
+  },
+
+  153: {
+    description: "Interaction to Next Paint (INP) measures responsiveness - time between user interaction and visual response. Replacing FID as Core Web Vital in March 2024.",
+    tips: [
+      "Target INP < 200ms for 'Good' rating",
+      "Identify slow interactions with Chrome DevTools Performance panel",
+      "Defer non-critical JavaScript execution",
+      "Break up long JavaScript tasks (> 50ms) into smaller chunks",
+      "Use requestIdleCallback for low-priority work",
+      "Test on mid-range mobile devices, not just desktop"
+    ],
+    resources: [
+      { title: "INP Optimization", url: "https://web.dev/inp/" }
+    ],
+    estimatedTime: "8-40 hours",
+    difficulty: "Advanced"
+  },
+
+  154: {
+    description: "Time to First Byte (TTFB) measures server response time. Target < 800ms for good performance. Slow TTFB delays all other metrics (LCP, FCP, INP).",
+    tips: [
+      "Use CDN to reduce latency with geographic distribution",
+      "Enable server-side caching (Redis, Memcached, Varnish)",
+      "Optimize database queries - add indexes, reduce joins",
+      "Use HTTP/2 or HTTP/3 for faster connection multiplexing",
+      "Enable compression (Brotli preferred over gzip)",
+      "Monitor with Chrome DevTools Network tab and RUM tools"
+    ],
+    resources: [
+      { title: "TTFB Guide", url: "https://web.dev/ttfb/" }
+    ],
+    estimatedTime: "8-40 hours",
+    difficulty: "Advanced"
+  },
+
+  155: {
+    description: "Server-side tracking sends analytics data from server rather than browser, maintaining accuracy as third-party cookies deprecate. Required for privacy-compliant tracking.",
+    tips: [
+      "Implement GA4 Measurement Protocol for server hits",
+      "Use server-side GTM container to proxy requests",
+      "Send server IP and user agent for proper attribution",
+      "Hash PII before sending (email, phone) for privacy",
+      "Combine with client-side tracking for complete data",
+      "Test with GA4 DebugView to verify hits"
+    ],
+    resources: [
+      { title: "Server-Side Tracking", url: "https://developers.google.com/analytics/devguides/collection/protocol/ga4" }
+    ],
+    estimatedTime: "40+ hours",
+    difficulty: "Advanced"
+  },
+
+  156: {
+    description: "Privacy Sandbox APIs replace third-party cookies for advertising. Topics API categorizes interests, Protected Audience API enables remarketing without cross-site tracking.",
+    tips: [
+      "Implement Topics API to access interest categories",
+      "Use Protected Audience API (formerly FLEDGE) for remarketing",
+      "Test with Chrome flags enabled before full rollout",
+      "Monitor performance vs cookie-based tracking for comparison",
+      "Document user consent requirements for each API",
+      "Stay updated - APIs evolving through 2024-2025"
+    ],
+    resources: [
+      { title: "Privacy Sandbox", url: "https://privacysandbox.com/" }
+    ],
+    estimatedTime: "40+ hours",
+    difficulty: "Advanced"
+  },
+
+  // TECHNICAL SEO CONTROLS (Items 157-160)
+  157: {
+    description: "Robots meta tags provide page-level crawl and indexing instructions. More specific than robots.txt, controlling snippets, images, and video previews.",
+    tips: [
+      "Use noindex on thin pages (search results, filters, duplicates)",
+      "Use nofollow to prevent link equity passing to low-value pages",
+      "Set max-snippet:150 to control snippet length in SERPs",
+      "Use max-image-preview:large to allow large image previews",
+      "Combine directives: <meta name='robots' content='noindex, nofollow'>",
+      "Test with URL Inspection to verify Google honors directives"
+    ],
+    resources: [
+      { title: "Robots Meta Tags", url: "https://developers.google.com/search/docs/crawling-indexing/robots-meta-tag" }
+    ],
+    estimatedTime: "2-8 hours",
+    difficulty: "Intermediate"
+  },
+
+  158: {
+    description: "Faceted navigation with URL parameters creates massive duplicate content issues. Strategic handling prevents indexing of millions of filter combinations.",
+    tips: [
+      "Use canonical tags pointing to main category page from filtered pages",
+      "Add noindex meta tag to filter combinations",
+      "Configure URL Parameters in Search Console (deprecated but useful)",
+      "Block filter parameters in robots.txt if no SEO value",
+      "Use JavaScript filtering with pushState for SEO-friendly URLs",
+      "Allow indexing only of high-value filter combinations"
+    ],
+    resources: [
+      { title: "Faceted Navigation SEO", url: "https://www.semrush.com/blog/faceted-navigation-seo/" }
+    ],
+    estimatedTime: "8-40 hours",
+    difficulty: "Advanced"
+  },
+
+  159: {
+    description: "Crawl budget optimization ensures Google crawls important pages, not wasting resources on low-value URLs. Critical for sites with 10,000+ pages.",
+    tips: [
+      "Monitor Search Console > Settings > Crawl Stats",
+      "Block low-value pages in robots.txt (admin, search, filters)",
+      "Fix redirect chains and loops that waste crawl budget",
+      "Improve server response time (TTFB) for faster crawling",
+      "Use internal linking to prioritize important pages",
+      "Set priority values in XML sitemap (0.1 to 1.0)"
+    ],
+    resources: [
+      { title: "Crawl Budget", url: "https://developers.google.com/search/docs/crawling-indexing/large-site-managing-crawl-budget" }
+    ],
+    estimatedTime: "2-8 hours",
+    difficulty: "Intermediate"
+  },
+
+  160: {
+    description: "Link equity distribution strategically channels PageRank to priority pages. Important pages should have more internal links from high-authority pages.",
+    tips: [
+      "Identify priority pages (conversion pages, pillar content, new content)",
+      "Calculate internal link count per page using crawler tool",
+      "Add contextual links from high-traffic pages to priority pages",
+      "Link from homepage to 5-10 most important pages",
+      "Use descriptive anchor text containing target keywords",
+      "Remove or reduce links to low-value pages"
+    ],
+    resources: [
+      { title: "Link Equity", url: "https://moz.com/learn/seo/page-authority" }
+    ],
+    estimatedTime: "8-40 hours",
+    difficulty: "Intermediate"
+  },
+
+  // CONTENT STRATEGY (Items 161-180)
+  161: {
+    description: "Entity optimization helps Google understand your business as entities (people, places, organizations, products). Schema markup and knowledge graphs build entity authority.",
+    tips: [
+      "Create Organization schema on homepage with sameAs to Wikipedia, Wikidata",
+      "Implement Person schema for key team members with credentials",
+      "Link entities using schema relationships (author, publisher, mentions)",
+      "Claim and optimize Google Knowledge Panel",
+      "Build citations on authoritative sites (Crunchbase, LinkedIn, industry directories)",
+      "Monitor brand SERP for knowledge graph appearance"
+    ],
+    resources: [
+      { title: "Entity SEO", url: "https://www.semrush.com/blog/entity-seo/" }
+    ],
+    estimatedTime: "8-40 hours",
+    difficulty: "Advanced"
+  },
+
+  162: {
+    description: "Resource hints (dns-prefetch, preconnect, prefetch, preload) tell browsers which resources to fetch early, reducing latency and improving perceived performance.",
+    tips: [
+      "Use dns-prefetch for external domains you'll load from: <link rel='dns-prefetch' href='//fonts.googleapis.com'>",
+      "Use preconnect for critical third-party origins",
+      "Use prefetch for next-page resources: <link rel='prefetch' href='/next-page.html'>",
+      "Use preload sparingly for critical resources only",
+      "Don't overuse - limit to 3-5 hints per page",
+      "Monitor with Chrome DevTools Network panel"
+    ],
+    resources: [
+      { title: "Resource Hints", url: "https://web.dev/preconnect-and-dns-prefetch/" }
+    ],
+    estimatedTime: "2-8 hours",
+    difficulty: "Intermediate"
+  },
+
+  163: {
+    description: "Content depth benchmarks ensure your content matches or exceeds competitor comprehensiveness. Analyze top 10 results to set word count targets for each topic.",
+    tips: [
+      "Use tools like Surfer SEO or Clearscope for SERP analysis",
+      "Document median word count of top 10 results per target keyword",
+      "Set target at 1.5x median to ensure comprehensiveness",
+      "Note: more words doesn't always mean better - focus on relevance",
+      "Include all subtopics competitors cover plus unique angles",
+      "Review quarterly as competitor content evolves"
+    ],
+    resources: [
+      { title: "Content Depth Analysis", url: "https://www.semrush.com/blog/content-marketing-strategy/" }
+    ],
+    estimatedTime: "8-40 hours",
+    difficulty: "Intermediate"
+  },
+
+  164: {
+    description: "Content quality standards ensure readability and engagement. 8th-10th grade reading level makes content accessible while maintaining authority.",
+    tips: [
+      "Use Hemingway Editor or Grammarly to check reading level",
+      "Target Flesch-Kincaid score of 60-70 (8th-10th grade)",
+      "Keep sentences under 20 words average",
+      "Include 1 custom image per 500 words minimum",
+      "Break up text with headings every 300-400 words",
+      "Use bullet points and numbered lists for scannability"
+    ],
+    resources: [
+      { title: "Readability Testing", url: "https://hemingwayapp.com/" }
+    ],
+    estimatedTime: "1 hour",
+    difficulty: "Beginner"
+  },
+
+  165: {
+    description: "Content freshness strategy defines update frequency to maintain relevance signals. Time-sensitive content needs quarterly updates, evergreen content annual refresh.",
+    tips: [
+      "Classify content as: breaking news (weekly), trending topics (monthly), evergreen (annual)",
+      "Schedule quarterly reviews for YMYL content (health, finance, legal)",
+      "Update statistics and examples annually for evergreen guides",
+      "Add 'Last Updated' dates prominently on refreshed pages",
+      "Monitor Search Console for declining pages requiring refresh",
+      "Document refresh schedule in content calendar"
+    ],
+    resources: [
+      { title: "Content Freshness", url: "https://moz.com/learn/seo/content-freshness" }
+    ],
+    estimatedTime: "1 hour",
+    difficulty: "Beginner"
+  },
+
+  166: {
+    description: "Topic cluster strategy organizes content into pillar pages (comprehensive guides) and cluster content (specific subtopics) linking bidirectionally. Establishes topical authority.",
+    tips: [
+      "Identify 3-5 core topics central to your business",
+      "Create pillar page (3000-5000 words) for each topic",
+      "Develop 8-12 cluster articles per topic covering subtopics",
+      "Link all cluster content back to pillar page",
+      "Link from pillar page to all cluster content",
+      "Update pillar page as new cluster content is added"
+    ],
+    resources: [
+      { title: "Topic Clusters", url: "https://www.semrush.com/blog/topic-clusters/" }
+    ],
+    estimatedTime: "40+ hours",
+    difficulty: "Advanced"
+  },
+
+  167: {
+    description: "FAQ sections answer common questions, earning featured snippets and improving user experience. Use FAQ schema for rich results.",
+    tips: [
+      "Research questions using People Also Ask, AnswerThePublic, Quora",
+      "Answer in 40-60 words for featured snippet optimization",
+      "Include 5-10 FAQs per page",
+      "Use FAQ schema markup for rich results",
+      "Format as accordion or expandable sections for UX",
+      "Update FAQs based on customer support questions"
+    ],
+    resources: [
+      { title: "FAQ Optimization", url: "https://developers.google.com/search/docs/appearance/structured-data/faqpage" }
+    ],
+    estimatedTime: "8-40 hours",
+    difficulty: "Intermediate"
+  },
+
+  168: {
+    description: "Author schema with credentials establishes E-E-A-T signals. Links authors to credentials, affiliations, and social profiles, building content trustworthiness.",
+    tips: [
+      "Implement Person schema for each author",
+      "Include credentials: education, certifications, awards",
+      "Link to author LinkedIn, Twitter, personal website via sameAs",
+      "Add author byline with photo on editorial content",
+      "Create author archive pages with full bios",
+      "Highlight industry expertise and years of experience"
+    ],
+    resources: [
+      { title: "Author Schema", url: "https://schema.org/Person" }
+    ],
+    estimatedTime: "2-8 hours",
+    difficulty: "Intermediate"
+  },
+
+  169: {
+    description: "Location-specific landing pages target local search queries. Each page needs unique content (not duplicated), LocalBusiness schema, local keywords, and authentic local signals.",
+    tips: [
+      "Create unique content per location - don't duplicate templates",
+      "Include LocalBusiness schema with NAP, hours, coordinates",
+      "Add Google Map embed showing exact location",
+      "Include location-specific keywords naturally in content",
+      "Add local customer testimonials and case studies",
+      "Link to location-specific Google Business Profile"
+    ],
+    resources: [
+      { title: "Local Landing Pages", url: "https://www.semrush.com/blog/local-landing-pages/" }
+    ],
+    estimatedTime: "40+ hours",
+    difficulty: "Advanced"
+  },
+
+  170: {
+    description: "Category pages with substantial unique content (300+ words) rank better than thin category pages with just products. Content establishes relevance for category keywords.",
+    tips: [
+      "Write 300-500 words unique content above product grid",
+      "Describe category, use cases, buying guide info",
+      "Include category-specific keywords naturally",
+      "Add filters for refinement (price, brand, features)",
+      "Implement breadcrumb navigation showing hierarchy",
+      "Use pagination with rel='next'/'prev' or load more button"
+    ],
+    resources: [
+      { title: "Category Page SEO", url: "https://www.semrush.com/blog/ecommerce-category-pages/" }
+    ],
+    estimatedTime: "8-40 hours",
+    difficulty: "Intermediate"
+  },
+
+  171: {
+    description: "Comprehensive About page builds trust and establishes business credibility. Critical for E-E-A-T, especially for YMYL businesses.",
+    tips: [
+      "Include company history, mission, and values",
+      "Add team member photos, names, titles, and short bios",
+      "Highlight credentials: certifications, awards, years in business",
+      "Include office photos or behind-the-scenes images",
+      "Add contact information and physical address",
+      "Link to press mentions or media coverage"
+    ],
+    resources: [
+      { title: "About Page Guide", url: "https://moz.com/learn/seo/trust-authority" }
+    ],
+    estimatedTime: "2-8 hours",
+    difficulty: "Beginner"
+  },
+
+  172: {
+    description: "Customer testimonials and reviews build social proof and trust signals. Review schema can earn star ratings in search results, significantly increasing CTR.",
+    tips: [
+      "Collect reviews from real customers with permission",
+      "Display 6-12 testimonials prominently on homepage",
+      "Include customer name, photo, company, and specific results",
+      "Implement Review or AggregateRating schema",
+      "Add testimonials to relevant product/service pages",
+      "Never use fake reviews - violates Google guidelines"
+    ],
+    resources: [
+      { title: "Review Schema", url: "https://developers.google.com/search/docs/appearance/structured-data/review-snippet" }
+    ],
+    estimatedTime: "8-40 hours",
+    difficulty: "Intermediate"
+  },
+
+  173: {
+    description: "Case studies demonstrate results with specific metrics. They build credibility, provide social proof, and create linkable assets that attract backlinks.",
+    tips: [
+      "Document client challenges, solutions implemented, measurable results",
+      "Include specific numbers (25% increase, 10,000 leads, $50K revenue)",
+      "Add client testimonial quote with attribution",
+      "Include before/after screenshots or charts",
+      "Optimize for 'case study' + industry keywords",
+      "Create PDF downloads for lead generation"
+    ],
+    resources: [
+      { title: "Case Study Template", url: "https://www.semrush.com/blog/case-study-template/" }
+    ],
+    estimatedTime: "40+ hours",
+    difficulty: "Intermediate"
+  },
+
+  174: {
+    description: "Product pages need unique descriptions (300+ words), Product schema, high-quality images, specifications, pricing, and reviews to rank for product search queries.",
+    tips: [
+      "Write unique descriptions - never use manufacturer text",
+      "Include Product schema with price, availability, SKU, brand",
+      "Add 5-10 high-resolution images from multiple angles",
+      "Create specifications table (dimensions, materials, features)",
+      "Include customer reviews with AggregateRating schema",
+      "Add related products and cross-sells for internal linking"
+    ],
+    resources: [
+      { title: "Product Page SEO", url: "https://www.semrush.com/blog/ecommerce-product-pages/" }
+    ],
+    estimatedTime: "40+ hours",
+    difficulty: "Advanced"
+  },
+
+  175: {
+    description: "Service pages explain what you offer, how you deliver it, pricing, and why clients should choose you. Service schema helps Google understand offerings.",
+    tips: [
+      "Describe service process/methodology in detail",
+      "Include transparent pricing or pricing ranges",
+      "Add Service schema with serviceType, provider, areaServed",
+      "Highlight team credentials and experience",
+      "Include case studies or client results",
+      "Add FAQ section for common service questions"
+    ],
+    resources: [
+      { title: "Service Schema", url: "https://schema.org/Service" }
+    ],
+    estimatedTime: "8-40 hours",
+    difficulty: "Intermediate"
+  },
+
+  176: {
+    description: "Video transcripts make video content accessible to search engines and deaf/hard-of-hearing users. Transcripts add keyword-rich text that helps pages rank.",
+    tips: [
+      "Use automated transcription (YouTube, Rev, Otter.ai) then edit for accuracy",
+      "Include full transcript below or beside video",
+      "Format with timestamps for navigation",
+      "Add transcript as expandable section to save space",
+      "Use transcript text in VideoObject schema",
+      "Include speaker names in interview transcripts"
+    ],
+    resources: [
+      { title: "Video SEO", url: "https://www.semrush.com/blog/video-seo/" }
+    ],
+    estimatedTime: "8-40 hours",
+    difficulty: "Beginner"
+  },
+
+  177: {
+    description: "Video chapter markers segment long videos into navigable sections. Improves user experience and can appear as seekable moments in search results.",
+    tips: [
+      "Add chapters in YouTube video description (timestamps with titles)",
+      "Use Clip schema with startOffset and endOffset properties",
+      "Create chapters at natural topic transitions",
+      "Keep chapter titles descriptive (not just 'Chapter 1')",
+      "Minimum 10 seconds per chapter required",
+      "Test with YouTube to verify chapters appear"
+    ],
+    resources: [
+      { title: "Video Chapters", url: "https://developers.google.com/search/docs/appearance/structured-data/video#video-segments" }
+    ],
+    estimatedTime: "2-8 hours",
+    difficulty: "Beginner"
+  },
+
+  178: {
+    description: "Content consolidation merges thin or duplicate pages into comprehensive resources. Prevents keyword cannibalization and concentrates ranking signals.",
+    tips: [
+      "Identify thin pages (<300 words) with similar topics using site crawler",
+      "Identify duplicate pages targeting same keywords",
+      "Merge related content into single comprehensive page",
+      "Implement 301 redirects from old URLs to consolidated page",
+      "Update internal links to point to consolidated page",
+      "Monitor rankings and traffic after consolidation"
+    ],
+    resources: [
+      { title: "Content Consolidation", url: "https://moz.com/blog/content-pruning" }
+    ],
+    estimatedTime: "8-40 hours",
+    difficulty: "Intermediate"
+  },
+
+  179: {
+    description: "External links to authoritative sources demonstrate research and build trust. Citing credible sources improves E-E-A-T and provides value to readers.",
+    tips: [
+      "Link to .gov, .edu, and authoritative industry sources",
+      "Include 3-5 external links per 1000 words",
+      "Link to original research when citing statistics",
+      "Use descriptive anchor text for external links",
+      "Open external links in new tab with rel='noopener noreferrer'",
+      "Don't link to direct competitors for critical keywords"
+    ],
+    resources: [
+      { title: "External Linking", url: "https://moz.com/learn/seo/external-link" }
+    ],
+    estimatedTime: "2-8 hours",
+    difficulty: "Beginner"
+  },
+
+  180: {
+    description: "Video thumbnails significantly impact click-through rates on YouTube and in search results. High-contrast, benefit-focused thumbnails perform best.",
+    tips: [
+      "Use minimum 1280x720px resolution for HD display",
+      "Add text overlay highlighting main benefit (large, bold font)",
+      "Use high-contrast colors for visibility",
+      "Include faces showing emotion (curiosity, excitement) when relevant",
+      "Test A/B variations to identify best performers",
+      "Avoid clickbait - thumbnail should accurately represent content"
+    ],
+    resources: [
+      { title: "Video Thumbnails", url: "https://www.youtube.com/howyoutubeworks/resources/creator-tips/" }
+    ],
+    estimatedTime: "2-8 hours",
+    difficulty: "Beginner"
+  },
+
+  // MEASUREMENT & COMPETITIVE INTELLIGENCE (Items 181-190)
+  181: {
+    description: "KPI framework defines success metrics and targets. Without clear benchmarks, it's impossible to measure SEO effectiveness or demonstrate ROI.",
+    tips: [
+      "Set baseline metrics: current organic sessions, ranking keywords, indexed pages",
+      "Define 6-month targets: 30% traffic increase, 50 new ranking keywords, etc.",
+      "Track leading indicators: impressions, average position, pages indexed",
+      "Monitor business metrics: leads, conversions, revenue from organic",
+      "Document in shared dashboard (Data Studio, Tableau, Excel)",
+      "Review monthly and adjust targets based on trends"
+    ],
+    resources: [
+      { title: "SEO KPIs", url: "https://www.semrush.com/blog/seo-kpis/" }
+    ],
+    estimatedTime: "2-8 hours",
+    difficulty: "Intermediate"
+  },
+
+  182: {
+    description: "Competitive monitoring tracks competitor SEO changes and performance. Early detection of competitor strategies allows proactive response.",
+    tips: [
+      "Track 5-10 main competitors using tools like Semrush or Ahrefs",
+      "Monitor their domain authority, referring domains, organic keywords",
+      "Set up alerts for new competitor content and backlinks",
+      "Track their content publishing frequency and topics",
+      "Analyze which of their pages rank best",
+      "Review monthly and document findings"
+    ],
+    resources: [
+      { title: "Competitive Monitoring", url: "https://www.semrush.com/kb/920-position-tracking-overview" }
+    ],
+    estimatedTime: "2-8 hours setup",
+    difficulty: "Intermediate"
+  },
+
+  183: {
+    description: "Competitor featured snippet wins reveal content opportunities. Analyzing which snippets they own shows gaps you can target.",
+    tips: [
+      "Use Semrush or Ahrefs to identify competitor featured snippets",
+      "Analyze snippet format (paragraph, list, table) for each query",
+      "Create content targeting same queries with better answers",
+      "Format content to match snippet type Google prefers",
+      "Monitor snippet changes monthly",
+      "Target snippets with high search volume first"
+    ],
+    resources: [
+      { title: "Featured Snippets", url: "https://moz.com/learn/seo/featured-snippets" }
+    ],
+    estimatedTime: "2-8 hours",
+    difficulty: "Intermediate"
+  },
+
+  184: {
+    description: "Keyword ranking velocity measures how quickly new keywords gain visibility. Fast velocity indicates strong SEO momentum and content-market fit.",
+    tips: [
+      "Track new keywords entering top 100, 50, 10 positions monthly",
+      "Faster velocity = strong content-keyword match",
+      "Slow velocity may indicate: weak content, strong competition, technical issues",
+      "Compare velocity across content types to identify what works",
+      "Use rank tracking tools with velocity reports",
+      "Set velocity targets: X new keywords in top 50 per month"
+    ],
+    resources: [
+      { title: "Ranking Velocity", url: "https://www.semrush.com/kb/920-position-tracking-overview" }
+    ],
+    estimatedTime: "1 hour",
+    difficulty: "Beginner"
+  },
+
+  185: {
+    description: "Indexation rate measures Google's crawl efficiency. Low indexation rate indicates technical issues, crawl budget problems, or content quality concerns.",
+    tips: [
+      "Track URLs submitted vs indexed in Search Console > Coverage",
+      "Good rate: 80-90% of submitted URLs indexed within 30 days",
+      "Low rate causes: duplicate content, thin content, technical errors",
+      "Monitor indexation speed for different content types",
+      "Use URL Inspection to understand why pages aren't indexing",
+      "Request indexing for priority pages"
+    ],
+    resources: [
+      { title: "Index Coverage Report", url: "https://support.google.com/webmasters/answer/7440203" }
+    ],
+    estimatedTime: "1 hour",
+    difficulty: "Beginner"
+  },
+
+  186: {
+    description: "Time-to-recovery tracks how long after site refresh traffic returns to baseline. Target 60 days for full recovery. Longer indicates SEO issues requiring investigation.",
+    tips: [
+      "Document pre-launch baseline: daily organic sessions average",
+      "Track daily post-launch to identify recovery trends",
+      "Typical pattern: 10-30% drop for 2 weeks, gradual recovery 30-60 days",
+      "If recovery slower than expected, audit redirects, indexing, rankings",
+      "Compare recovery time across different page types",
+      "Document learnings for future refreshes"
+    ],
+    resources: [
+      { title: "Site Migration SEO", url: "https://www.semrush.com/blog/website-migration-checklist/" }
+    ],
+    estimatedTime: "1 hour monitoring",
+    difficulty: "Intermediate"
+  },
+
+  187: {
+    description: "Content gap analysis identifies topics competitors rank for but you don't. Reveals untapped keyword opportunities with proven demand.",
+    tips: [
+      "Use Semrush Content Gap tool or Ahrefs Content Gap",
+      "Enter your domain plus 3-5 competitor domains",
+      "Identify keywords competitors rank for (positions 1-20) but you don't",
+      "Filter for keywords with search volume >100/month",
+      "Prioritize gaps matching your expertise and business goals",
+      "Create content targeting high-volume gaps first"
+    ],
+    resources: [
+      { title: "Content Gap Analysis", url: "https://www.semrush.com/kb/847-content-gap-analysis" }
+    ],
+    estimatedTime: "8-40 hours",
+    difficulty: "Intermediate"
+  },
+
+  188: {
+    description: "Competitor backlink analysis identifies link building opportunities from sites already linking to competitors. Higher conversion rate than cold outreach.",
+    tips: [
+      "Export competitor backlinks from Ahrefs or Semrush",
+      "Filter for DR/DA 30+ referring domains",
+      "Identify sites linking to multiple competitors",
+      "Create better content than what they're linking to",
+      "Outreach highlighting superior resource",
+      "Track outreach success rate and iterate"
+    ],
+    resources: [
+      { title: "Backlink Gap Analysis", url: "https://ahrefs.com/blog/link-building-strategies/" }
+    ],
+    estimatedTime: "2-8 hours",
+    difficulty: "Intermediate"
+  },
+
+  189: {
+    description: "SEO playbook documents all implementations, rationale, and procedures. Critical for knowledge transfer, team scaling, and maintaining consistency.",
+    tips: [
+      "Document technical implementations with screenshots",
+      "Include rationale for each SEO decision made",
+      "Create maintenance procedures and schedules",
+      "Document tool access, logins, and configurations",
+      "Include escalation procedures for critical issues",
+      "Update quarterly as strategy evolves"
+    ],
+    resources: [
+      { title: "Documentation Template", url: "https://www.semrush.com/blog/seo-reporting/" }
+    ],
+    estimatedTime: "8-40 hours",
+    difficulty: "Intermediate"
+  },
+
+  190: {
+    description: "Troubleshooting guide empowers non-SEO team members to resolve common issues without SEO expertise. Reduces support burden and speeds issue resolution.",
+    tips: [
+      "Document top 10 most common SEO issues and fixes",
+      "Include step-by-step resolution procedures",
+      "Add screenshots showing where to find settings",
+      "Create decision trees for diagnosing issues",
+      "Include when to escalate to SEO specialist",
+      "Test guide with non-technical team member"
+    ],
+    resources: [
+      { title: "SEO Troubleshooting", url: "https://support.google.com/webmasters/answer/7440203" }
+    ],
+    estimatedTime: "2-8 hours",
+    difficulty: "Beginner"
   }
 };
 
