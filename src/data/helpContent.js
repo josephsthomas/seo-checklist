@@ -861,6 +861,469 @@ export const helpContent = {
     ],
     estimatedTime: "8-40 hours",
     difficulty: "Intermediate"
+  },
+
+  // LINK ARCHITECTURE & SITE STRUCTURE (Items 51-55)
+  51: {
+    description: "Flat site architecture ensures every page is discoverable within 3 clicks from homepage. This improves crawl efficiency, PageRank distribution, and user experience by making all content easily accessible.",
+    tips: [
+      "Map out site structure visually before development",
+      "Use main navigation, footer links, and breadcrumbs to create multiple paths",
+      "Eliminate orphan pages with no incoming internal links",
+      "Test with site crawler to verify all pages reachable within 3 clicks",
+      "Balance breadth (main categories) and depth (subcategories)",
+      "Consider adding popular pages to homepage or main navigation"
+    ],
+    resources: [
+      { title: "Site Architecture Guide", url: "https://moz.com/learn/seo/site-structure" }
+    ],
+    estimatedTime: "2-8 hours",
+    difficulty: "Intermediate"
+  },
+
+  52: {
+    description: "Adding 3-5 relevant internal links per page creates a strong internal linking network. This distributes PageRank effectively, helps users discover related content, and reduces bounce rate.",
+    tips: [
+      "Link to related content that provides additional value to readers",
+      "Use contextual links within body content (not just navigation)",
+      "Vary anchor text naturally while including keywords",
+      "Link to both newer and older evergreen content",
+      "Prioritize linking to pages you want to rank higher",
+      "Review quarterly and add links to new content from existing pages"
+    ],
+    resources: [
+      { title: "Internal Linking Strategies", url: "https://www.semrush.com/blog/internal-linking/" }
+    ],
+    estimatedTime: "8-40 hours",
+    difficulty: "Intermediate"
+  },
+
+  53: {
+    description: "Link dilution occurs when too many links on a page split PageRank too thinly. Limiting to 15-20 links per page maintains link value and keeps users focused on key actions.",
+    tips: [
+      "Count all links: navigation, body content, sidebar, footer",
+      "Prioritize most important links - remove low-value links",
+      "Use dropdown menus to reduce navigation links on page",
+      "Consider nofollow for less important links like login/register",
+      "Footer links should be essential only (About, Contact, Privacy, etc.)",
+      "Test with link counting tools or browser extensions"
+    ],
+    resources: [
+      { title: "Link Equity Distribution", url: "https://moz.com/learn/seo/page-authority" }
+    ],
+    estimatedTime: "2-8 hours",
+    difficulty: "Beginner"
+  },
+
+  54: {
+    description: "Custom 404 error pages turn dead ends into navigation opportunities. A helpful 404 page with search and links reduces bounce rate and helps users find what they were looking for.",
+    tips: [
+      "Include clear message explaining page wasn't found",
+      "Add search box to help users find correct page",
+      "Link to popular/important pages (homepage, categories, top content)",
+      "Match site design for consistency and trust",
+      "Consider humorous or branded messaging to soften frustration",
+      "Track 404 pages in Analytics to identify broken link sources"
+    ],
+    resources: [
+      { title: "404 Page Best Practices", url: "https://moz.com/learn/seo/http-status-codes" }
+    ],
+    estimatedTime: "1-2 hours",
+    difficulty: "Beginner"
+  },
+
+  55: {
+    description: "Regular 404 error monitoring prevents broken links from harming SEO. Google Search Console reports crawl errors that need fixing or redirecting to maintain site health and rankings.",
+    tips: [
+      "Check Search Console > Coverage > Excluded > Not found (404) weekly",
+      "Prioritize fixing 404s with backlinks from external sites",
+      "Implement 301 redirects to most relevant alternative pages",
+      "Use Screaming Frog monthly to find internal broken links",
+      "Set up email alerts in Search Console for new 404 errors",
+      "Document redirect decisions for future reference"
+    ],
+    resources: [
+      { title: "Finding & Fixing 404 Errors", url: "https://support.google.com/webmasters/answer/7440203" }
+    ],
+    estimatedTime: "2-8 hours",
+    difficulty: "Intermediate"
+  },
+
+  // PERFORMANCE OPTIMIZATION (Items 56-61)
+  56: {
+    description: "Deferring non-critical JavaScript prevents render-blocking and improves Largest Contentful Paint (LCP). Scripts load after HTML parsing completes, speeding up initial page display.",
+    tips: [
+      "Add defer attribute to non-critical scripts: <script defer src='...'></script>",
+      "Use async for scripts that don't depend on DOM: <script async src='...'></script>",
+      "Keep critical scripts inline or in <head> without defer",
+      "Test thoroughly - deferred scripts may break functionality if dependencies aren't met",
+      "Use Chrome DevTools Coverage tab to identify unused JavaScript",
+      "Consider code splitting to load only needed JavaScript per page"
+    ],
+    resources: [
+      { title: "Eliminate Render-Blocking Resources", url: "https://web.dev/render-blocking-resources/" }
+    ],
+    estimatedTime: "2-8 hours",
+    difficulty: "Intermediate"
+  },
+
+  57: {
+    description: "Critical CSS inlining embeds above-the-fold styles directly in HTML for instant rendering. Non-critical CSS loads asynchronously, dramatically improving First Contentful Paint.",
+    tips: [
+      "Extract critical CSS (styles for above-fold content) using tools like Critical",
+      "Inline critical CSS in <head> within <style> tags",
+      "Load remaining CSS asynchronously with JavaScript or loadCSS library",
+      "Keep inline CSS under 14KB for optimal performance",
+      "Automate with build tools (Webpack, Gulp) for maintainability",
+      "Test on slow 3G to ensure above-fold content displays immediately"
+    ],
+    resources: [
+      { title: "Critical CSS Guide", url: "https://web.dev/extract-critical-css/" }
+    ],
+    estimatedTime: "8-40 hours",
+    difficulty: "Advanced"
+  },
+
+  58: {
+    description: "Time to First Byte (TTFB) measures server response speed. Target under 600ms through server optimization, caching, CDN, and efficient database queries.",
+    tips: [
+      "Use faster hosting (VPS or dedicated servers over shared hosting)",
+      "Enable server-side caching (Redis, Memcached, or Varnish)",
+      "Optimize database queries - add indexes, reduce joins",
+      "Use a CDN to serve static assets from servers near users",
+      "Enable HTTP/2 or HTTP/3 for faster connections",
+      "Monitor TTFB with PageSpeed Insights and fix slow endpoints"
+    ],
+    resources: [
+      { title: "Reduce Server Response Time", url: "https://web.dev/time-to-first-byte/" }
+    ],
+    estimatedTime: "8-40 hours",
+    difficulty: "Advanced"
+  },
+
+  59: {
+    description: "Resource hints tell browsers which resources to fetch early, reducing latency. Preconnect establishes connections, dns-prefetch resolves DNS, prefetch downloads likely-needed resources, and preload forces early fetch of critical resources.",
+    tips: [
+      "Use preconnect for critical third-party domains: <link rel='preconnect' href='https://fonts.googleapis.com'>",
+      "Use dns-prefetch for domains you'll load from: <link rel='dns-prefetch' href='https://example.com'>",
+      "Use preload for critical fonts/images: <link rel='preload' href='font.woff2' as='font'>",
+      "Use prefetch for next-page resources: <link rel='prefetch' href='next-page.html'>",
+      "Don't overuse - limit to 3-5 most critical resources",
+      "Test with Chrome DevTools Network panel to verify hints work"
+    ],
+    resources: [
+      { title: "Resource Hints Guide", url: "https://web.dev/preconnect-and-dns-prefetch/" }
+    ],
+    estimatedTime: "2-8 hours",
+    difficulty: "Intermediate"
+  },
+
+  60: {
+    description: "Web font optimization prevents flash of invisible text (FOIT) and improves page load speed. Font-display: swap shows fallback text immediately while custom font loads.",
+    tips: [
+      "Add font-display: swap to @font-face declarations",
+      "Subset fonts to include only needed characters (Latin, numerals, etc.)",
+      "Preload critical fonts: <link rel='preload' href='font.woff2' as='font' crossorigin>",
+      "Use WOFF2 format (best compression) with WOFF fallback",
+      "Limit to 2-3 font families maximum",
+      "Self-host fonts instead of Google Fonts for better control and privacy"
+    ],
+    resources: [
+      { title: "Font Optimization", url: "https://web.dev/font-best-practices/" }
+    ],
+    estimatedTime: "2-8 hours",
+    difficulty: "Intermediate"
+  },
+
+  61: {
+    description: "Content Delivery Networks (CDNs) cache your site on servers worldwide, serving content from locations nearest to users. This reduces latency, improves Core Web Vitals, and handles traffic spikes.",
+    tips: [
+      "Popular CDNs: Cloudflare (free tier available), CloudFront, Fastly, KeyCDN",
+      "Configure CDN to cache static assets (images, CSS, JS, fonts)",
+      "Set appropriate cache headers for different content types",
+      "Use CDN URL for assets or configure as reverse proxy",
+      "Enable automatic image optimization if CDN supports it",
+      "Monitor CDN analytics to verify improved performance globally"
+    ],
+    resources: [
+      { title: "CDN Benefits for SEO", url: "https://www.cloudflare.com/learning/cdn/what-is-a-cdn/" }
+    ],
+    estimatedTime: "2-8 hours",
+    difficulty: "Intermediate"
+  },
+
+  // TECHNICAL SEO (Items 62-69)
+  62: {
+    description: "The rel='noopener noreferrer' attribute prevents security vulnerabilities and performance issues when opening external links in new tabs. Noopener prevents window.opener access, noreferrer prevents referrer leakage.",
+    tips: [
+      "Add to all external links with target='_blank': <a href='...' target='_blank' rel='noopener noreferrer'>",
+      "Prevents malicious sites from accessing your window object via window.opener",
+      "Improves performance by not creating back-reference to opener",
+      "Noreferrer prevents passing referrer information (optional for privacy)",
+      "Modern browsers add noopener automatically but best to include explicitly",
+      "Use find/replace or script to add to all external links at once"
+    ],
+    resources: [
+      { title: "Links and Security", url: "https://web.dev/external-anchors-use-rel-noopener/" }
+    ],
+    estimatedTime: "1 hour",
+    difficulty: "Beginner"
+  },
+
+  63: {
+    description: "Breadcrumb navigation shows users their location in site hierarchy and provides SEO benefits. Combined with Breadcrumb schema, it displays rich breadcrumbs in search results.",
+    tips: [
+      "Display breadcrumbs on all pages except homepage",
+      "Format: Home > Category > Subcategory > Current Page",
+      "Make each level clickable except current page",
+      "Style clearly but don't make too prominent",
+      "Implement matching BreadcrumbList schema markup",
+      "Test on mobile - may need to truncate long breadcrumbs"
+    ],
+    resources: [
+      { title: "Breadcrumb Navigation", url: "https://moz.com/learn/seo/breadcrumbs" }
+    ],
+    estimatedTime: "2-8 hours",
+    difficulty: "Intermediate"
+  },
+
+  64: {
+    description: "JavaScript-rendered content must be accessible to Googlebot for indexing. Testing with URL Inspection ensures Google can see dynamically loaded content.",
+    tips: [
+      "Test key pages in Search Console > URL Inspection > View Tested Page",
+      "Compare rendered HTML vs raw HTML - content should match",
+      "Check 'More Info' tab for JavaScript errors",
+      "If content missing, implement server-side rendering or pre-rendering",
+      "Ensure content loads without user interaction (clicks, scrolls)",
+      "Use robots.txt tester to verify JavaScript files aren't blocked"
+    ],
+    resources: [
+      { title: "JavaScript SEO Testing", url: "https://developers.google.com/search/docs/crawling-indexing/javascript/javascript-seo-basics" }
+    ],
+    estimatedTime: "2-8 hours",
+    difficulty: "Intermediate"
+  },
+
+  65: {
+    description: "Dynamic or server-side rendering (SSR) generates HTML on the server for JavaScript-heavy sites. This ensures search engines can crawl content without executing JavaScript, critical for React/Vue/Angular sites.",
+    tips: [
+      "Implement Next.js (React), Nuxt.js (Vue), or Angular Universal for SSR",
+      "Alternative: Use dynamic rendering (serve static HTML to bots, JS to users)",
+      "Test that SSR is working with 'curl' command or Fetch as Google",
+      "Ensure SSR includes all meta tags, schema markup, and content",
+      "Monitor server resources - SSR is more CPU-intensive",
+      "Consider static site generation for better performance if content doesn't change often"
+    ],
+    resources: [
+      { title: "Server-Side Rendering", url: "https://developers.google.com/search/docs/crawling-indexing/javascript/dynamic-rendering" }
+    ],
+    estimatedTime: "40+ hours",
+    difficulty: "Advanced"
+  },
+
+  66: {
+    description: "Proper pagination implementation ensures search engines can discover all paginated content. Use rel='next'/rel='prev' (deprecated but still useful), or canonical to view-all page, or unique URLs with parameters.",
+    tips: [
+      "Give each page unique URL: /category/page/2/ or /category/?page=2",
+      "If using view-all page, canonical from paginated pages to view-all",
+      "If no view-all, use self-referencing canonical on each page",
+      "Include page numbers in title tags: 'Category Name - Page 2'",
+      "Link to previous/next pages prominently",
+      "Add Load More button with URL change as alternative to pagination"
+    ],
+    resources: [
+      { title: "Pagination Best Practices", url: "https://developers.google.com/search/docs/specialty/ecommerce/pagination-and-incremental-page-loading" }
+    ],
+    estimatedTime: "2-8 hours",
+    difficulty: "Intermediate"
+  },
+
+  67: {
+    description: "Infinite scroll can hide content from search engines if not implemented carefully. Each scroll state needs a unique URL, or use 'Load More' button that changes URL and allows direct access to additional content.",
+    tips: [
+      "Use pushState API to change URL as user scrolls: window.history.pushState()",
+      "Update title tag and canonical tag as URL changes",
+      "Provide 'Load More' button as fallback for users without JavaScript",
+      "Include pagination links in footer for search engines",
+      "Update sitemap with all paginated URLs",
+      "Test with JavaScript disabled to ensure content is accessible"
+    ],
+    resources: [
+      { title: "Infinite Scroll SEO", url: "https://developers.google.com/search/docs/specialty/ecommerce/pagination-and-incremental-page-loading#infinite-scroll" }
+    ],
+    estimatedTime: "8-40 hours",
+    difficulty: "Advanced"
+  },
+
+  68: {
+    description: "URL parameters for sorting/filtering can create duplicate content. Use canonical tags to specify the preferred version, or configure parameter handling in Search Console to prevent indexing of duplicate parameter variations.",
+    tips: [
+      "Canonical from filtered URLs to main category page",
+      "Use Search Console > URL Parameters to tell Google how to handle parameters",
+      "Alternative: Use # (fragment identifiers) for filters - not crawled",
+      "For important filter combinations, create unique pages with optimized content",
+      "Add noindex to less important filter combinations",
+      "Use robots.txt to block crawling of filter parameters if needed"
+    ],
+    resources: [
+      { title: "URL Parameter Handling", url: "https://support.google.com/webmasters/answer/6080548" }
+    ],
+    estimatedTime: "2-8 hours",
+    difficulty: "Intermediate"
+  },
+
+  69: {
+    description: "Hreflang tags tell search engines which language/region each page targets. Critical for international sites to serve correct language version in search results and avoid duplicate content across languages.",
+    tips: [
+      "Add hreflang tags in <head> for each language version: <link rel='alternate' hreflang='es' href='...' />",
+      "Include self-referencing hreflang (page links to itself)",
+      "Add x-default version for unmatched languages: hreflang='x-default'",
+      "Use correct language codes: en-US, en-GB, es-ES, fr-CA, etc.",
+      "Implement bidirectional - each language version should reference all others",
+      "Validate with hreflang testing tools before launch"
+    ],
+    resources: [
+      { title: "Hreflang Implementation", url: "https://developers.google.com/search/docs/specialty/international/localized-versions" }
+    ],
+    estimatedTime: "8-40 hours",
+    difficulty: "Advanced"
+  },
+
+  // CONTENT STRATEGY (Items 70-77)
+  70: {
+    description: "Thin content (under 300 words) rarely ranks well. Comprehensive, valuable content demonstrates expertise and satisfies user search intent, directly impacting rankings.",
+    tips: [
+      "Minimum 300 words for basic pages (About, Contact, simple service pages)",
+      "Target 500-1000 words for standard service/product pages",
+      "Aim for 1500-2500 words for blog posts and comprehensive guides",
+      "Analyze top 10 ranking competitors - match or exceed their depth",
+      "Focus on comprehensiveness over word count - answer all user questions",
+      "Use Clearscope or Surfer SEO to identify content gaps"
+    ],
+    resources: [
+      { title: "Content Length Study", url: "https://backlinko.com/search-engine-ranking" }
+    ],
+    estimatedTime: "40+ hours",
+    difficulty: "Intermediate"
+  },
+
+  71: {
+    description: "Natural writing that prioritizes user experience over keyword density performs better. Keyword stuffing triggers penalties. Aim for 1-2% keyword density with natural variations.",
+    tips: [
+      "Write for humans first - answer their questions clearly",
+      "Include primary keyword 3-5 times naturally in 1000-word content",
+      "Use LSI keywords (related terms) and synonyms throughout",
+      "Keyword should appear in: H1, first 100 words, naturally in body, conclusion",
+      "Read content aloud - if it sounds awkward, rewrite more naturally",
+      "Use tools like Yoast or Surfer to check keyword usage is optimal"
+    ],
+    resources: [
+      { title: "Keyword Density Guide", url: "https://moz.com/learn/seo/what-is-keyword-density" }
+    ],
+    estimatedTime: "8-40 hours",
+    difficulty: "Intermediate"
+  },
+
+  72: {
+    description: "Including primary keyword in the first 100 words signals topic relevance to search engines early. This is especially important for featured snippets and answer boxes.",
+    tips: [
+      "Mention primary keyword in opening paragraph naturally",
+      "Include keyword in first sentence if it flows well",
+      "Use keyword in context that explains what page is about",
+      "Don't force it - prioritize readability over keyword placement",
+      "Opening paragraph should hook readers and satisfy search intent",
+      "This is particularly important for blog posts and informational content"
+    ],
+    resources: [
+      { title: "On-Page SEO", url: "https://moz.com/learn/seo/on-page-factors" }
+    ],
+    estimatedTime: "8-40 hours",
+    difficulty: "Beginner"
+  },
+
+  73: {
+    description: "Author bios with credentials establish Expertise, Experience, Authoritativeness, and Trustworthiness (E-E-A-T). Essential for YMYL content and helps content rank higher.",
+    tips: [
+      "Include author name, photo, credentials, and job title",
+      "Link to author's LinkedIn, professional website, or Twitter",
+      "Highlight relevant qualifications, certifications, or awards",
+      "Mention years of experience in the subject area",
+      "Add author bio at beginning or end of articles",
+      "Implement Author schema markup linking to social profiles"
+    ],
+    resources: [
+      { title: "E-E-A-T Guidelines", url: "https://developers.google.com/search/blog/2022/12/google-raters-guidelines-e-e-a-t" }
+    ],
+    estimatedTime: "8-40 hours",
+    difficulty: "Intermediate"
+  },
+
+  74: {
+    description: "Publish and updated dates show content freshness and help users assess information relevance. Especially important for news, guides, and time-sensitive content.",
+    tips: [
+      "Display publish date prominently near title or author bio",
+      "Show 'Last Updated' date when making substantial revisions",
+      "Use ISO 8601 format in datePublished/dateModified schema",
+      "Update date only for significant changes, not minor typos",
+      "For evergreen content, updated date can boost rankings",
+      "Consider removing dates from truly evergreen content that doesn't age"
+    ],
+    resources: [
+      { title: "Content Freshness", url: "https://moz.com/learn/seo/content-freshness" }
+    ],
+    estimatedTime: "2-8 hours",
+    difficulty: "Beginner"
+  },
+
+  75: {
+    description: "Comprehensive About Us page builds trust and establishes business legitimacy. It signals to Google and users that your business is real, credible, and authoritative.",
+    tips: [
+      "Include company history, mission, and values",
+      "Feature team members with photos, names, and roles",
+      "Add credentials, certifications, awards, and industry recognition",
+      "Include office photos or behind-the-scenes images",
+      "Mention years in business and company milestones",
+      "Add links to press mentions or media coverage if available"
+    ],
+    resources: [
+      { title: "Building Trust Signals", url: "https://moz.com/learn/seo/trust-authority" }
+    ],
+    estimatedTime: "2-8 hours",
+    difficulty: "Beginner"
+  },
+
+  76: {
+    description: "Detailed Contact page makes your business accessible and builds trust. Multiple contact methods accommodate user preferences and signal business legitimacy to search engines.",
+    tips: [
+      "Include email, phone, and contact form",
+      "Add physical address if you have a location",
+      "Embed Google Map showing your location",
+      "List business hours and expected response time",
+      "Add social media links",
+      "Include PostalAddress and ContactPoint schema markup"
+    ],
+    resources: [
+      { title: "Contact Page Best Practices", url: "https://www.semrush.com/blog/contact-page/" }
+    ],
+    estimatedTime: "1-2 hours",
+    difficulty: "Beginner"
+  },
+
+  77: {
+    description: "Privacy policy and terms of service pages are legally required in most jurisdictions and build user trust. Footer links to these pages are standard trust signals.",
+    tips: [
+      "Use privacy policy generator or hire lawyer to create compliant policies",
+      "Cover data collection, cookies, third-party services, user rights",
+      "Update policy when adding new tracking/analytics tools",
+      "Link to both pages in footer on every page",
+      "Include last updated date on policy pages",
+      "For GDPR compliance, add cookie consent banner"
+    ],
+    resources: [
+      { title: "Privacy Policy Generator", url: "https://www.termsfeed.com/privacy-policy-generator/" }
+    ],
+    estimatedTime: "2-8 hours",
+    difficulty: "Beginner"
   }
 };
 
