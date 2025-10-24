@@ -31,11 +31,11 @@ export default function Navigation() {
         <div className="flex justify-between items-center h-16">
           {/* Logo/Brand */}
           <Link to="/projects" className="flex items-center gap-2">
-            <div className="w-8 h-8 bg-primary-600 rounded-lg flex items-center justify-center">
-              <span className="text-white font-bold text-lg">S</span>
+            <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
+              <span className="text-white font-bold text-lg">F</span>
             </div>
-            <span className="text-xl font-bold text-gray-900 hidden sm:block">
-              SEO Checklist Pro
+            <span className="text-xl font-bold text-primary hidden sm:block">
+              Flipside SEO & MRI Center
             </span>
           </Link>
 

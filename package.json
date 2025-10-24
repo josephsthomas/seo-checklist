@@ -1,7 +1,7 @@
 {
-  "name": "seo-checklist-pro",
+  "name": "flipside-seo-mri-portal",
   "version": "2.0.0",
-  "description": "Professional SEO Checklist Management Platform for Agencies",
+  "description": "Flipside SEO & MRI Center - Internal Marketing Resource Portal",
   "type": "module",
   "scripts": {
     "dev": "vite",

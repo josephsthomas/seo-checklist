@@ -274,7 +274,7 @@ export function generateChecklistPDF(options) {
   doc.setFontSize(8);
   doc.setTextColor(150);
   doc.text(
-    'Generated with SEO Checklist Pro',
+    'For Internal Flipside Group Use Only',
     pageWidth / 2,
     pageHeight - 15,
     { align: 'center' }

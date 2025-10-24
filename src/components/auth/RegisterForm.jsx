@@ -62,8 +62,8 @@ export default function RegisterForm() {
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-primary-50 to-primary-100 px-4">
       <div className="max-w-md w-full">
         <div className="text-center mb-8">
-          <h1 className="text-4xl font-bold text-gray-900 mb-2">SEO Checklist Pro</h1>
-          <p className="text-gray-600">Create your account to get started</p>
+          <h1 className="text-4xl font-bold text-primary mb-2">Flipside SEO & MRI Center</h1>
+          <p className="text-charcoal">Internal Marketing Resource Portal</p>
         </div>
 
         <div className="bg-white rounded-xl shadow-lg p-8">

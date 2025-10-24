@@ -4,8 +4,8 @@ import { X, ChevronLeft, ChevronRight, Check } from 'lucide-react';
 const onboardingSteps = [
   {
     id: 1,
-    title: "Welcome to SEO Checklist Pro!",
-    description: "Let's take a quick tour of the platform to get you started. This will only take 2 minutes.",
+    title: "Welcome to Flipside SEO & MRI Center!",
+    description: "Let's take a quick tour of your internal marketing resource portal. This will only take 2 minutes.",
     image: "🎉",
     target: null
   },

@@ -10,6 +10,7 @@ import ProtectedRoute from './components/auth/ProtectedRoute';
 
 // Layout Components
 import Navigation from './components/shared/Navigation';
+import Footer from './components/shared/Footer';
 
 // Project Components
 import ProjectDashboard from './components/projects/ProjectDashboard';
@@ -30,14 +31,14 @@ function App() {
   return (
     <AuthProvider>
       <Router>
-        <div className="min-h-screen bg-gray-50">
+        <div className="min-h-screen bg-gray-50 flex flex-col">
           <a href="#main-content" className="skip-link">
             Skip to main content
           </a>
           <Navigation />
           <OnboardingWalkthrough />
           <KeyboardShortcuts />
-          <main id="main-content">
+          <main id="main-content" className="flex-1">
             <Routes>
             {/* Public Routes */}
             <Route path="/login" element={<LoginForm />} />
@@ -121,6 +122,9 @@ function App() {
             />
           </Routes>
           </main>
+
+          {/* Footer */}
+          <Footer />
 
           {/* Toast Notifications */}
           <Toaster
