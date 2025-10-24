@@ -99,7 +99,7 @@ export default function Navigation() {
                     className="fixed inset-0 z-40"
                     onClick={() => setHelpMenuOpen(false)}
                   />
-                  <div className="absolute right-0 mt-2 w-56 bg-white rounded-lg shadow-xl border border-gray-200 z-50">
+                  <div className="absolute right-0 mt-2 w-56 bg-white rounded-lg shadow-xl border border-gray-300 z-50">
                     <Link
                       to="/help/resources"
                       onClick={() => setHelpMenuOpen(false)}

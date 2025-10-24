@@ -53,6 +53,18 @@ export default function ItemDetailModal({ item, projectId, isOpen, onClose, onTo
     }
   }, [assignment]);
 
+  // Keyboard navigation: Escape key to close modal
+  useEffect(() => {
+    const handleEscape = (e) => {
+      if (e.key === 'Escape' && isOpen) {
+        onClose();
+      }
+    };
+
+    document.addEventListener('keydown', handleEscape);
+    return () => document.removeEventListener('keydown', handleEscape);
+  }, [isOpen, onClose]);
+
   if (!isOpen || !item) return null;
 
   const handleAssign = async () => {
@@ -96,12 +108,13 @@ export default function ItemDetailModal({ item, projectId, isOpen, onClose, onTo
   };
 
   return (
-    <div className="fixed inset-0 z-50 overflow-y-auto">
+    <div className="fixed inset-0 z-50 overflow-y-auto" role="dialog" aria-modal="true" aria-labelledby="modal-title">
       <div className="flex items-center justify-center min-h-screen px-4 pt-4 pb-20 text-center sm:block sm:p-0">
         {/* Background overlay */}
         <div
           className="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity"
           onClick={onClose}
+          aria-hidden="true"
         />
 
         {/* Modal panel */}
@@ -121,7 +134,7 @@ export default function ItemDetailModal({ item, projectId, isOpen, onClose, onTo
                     </span>
                   )}
                 </div>
-                <h3 className="text-lg font-semibold text-gray-900">
+                <h3 id="modal-title" className="text-lg font-semibold text-gray-900">
                   {item.item}
                 </h3>
               </div>
@@ -137,10 +150,14 @@ export default function ItemDetailModal({ item, projectId, isOpen, onClose, onTo
 
           {/* Tabs */}
           <div className="border-b">
-            <div className="flex px-6">
+            <div className="flex px-6" role="tablist" aria-label="Item details sections">
               {['details', 'time', 'files', 'comments', 'activity'].map(tab => (
                 <button
                   key={tab}
+                  role="tab"
+                  aria-selected={activeTab === tab}
+                  aria-controls={`${tab}-panel`}
+                  id={`${tab}-tab`}
                   onClick={() => setActiveTab(tab)}
                   className={`px-4 py-3 text-sm font-medium border-b-2 transition-colors ${
                     activeTab === tab
@@ -160,7 +177,7 @@ export default function ItemDetailModal({ item, projectId, isOpen, onClose, onTo
           </div>
 
           {/* Content */}
-          <div className="px-6 py-6 max-h-[600px] overflow-y-auto">
+          <div className="px-6 py-6 max-h-[600px] overflow-y-auto" role="tabpanel" id={`${activeTab}-panel`} aria-labelledby={`${activeTab}-tab`}>
             {activeTab === 'details' && (
               <div className="space-y-6">
                 {/* Item Details */}

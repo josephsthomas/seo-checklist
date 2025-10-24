@@ -259,7 +259,7 @@ export default function MyTasksPage() {
               <div
                 key={index}
                 onClick={() => handleTaskClick(task)}
-                className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 hover:shadow-md hover:border-primary-300 transition-all cursor-pointer"
+                className="bg-white rounded-lg shadow-sm border border-gray-300 p-4 hover:shadow-md hover:border-primary-300 transition-all cursor-pointer"
               >
                 <div className="flex items-start gap-4">
                   <div className="flex-1">

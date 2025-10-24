@@ -30,17 +30,28 @@ export default function ProjectDashboard() {
     };
   }, [projects]);
 
-  // Filter projects
+  // Filter projects with enhanced search
   const filteredProjects = useMemo(() => {
     return projects.filter(project => {
-      const matchesSearch = searchQuery === '' ||
-        project.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        project.clientName.toLowerCase().includes(searchQuery.toLowerCase());
+      // Enhanced search across multiple fields
+      if (searchQuery !== '') {
+        const query = searchQuery.toLowerCase().trim();
+        const searchableFields = [
+          project.name || '',
+          project.clientName || '',
+          project.description || '',
+          project.projectType || '',
+          project.status || ''
+        ].map(field => field.toLowerCase());
+
+        const matchesSearch = searchableFields.some(field => field.includes(query));
+        if (!matchesSearch) return false;
+      }
 
       const matchesStatus = filterStatus === 'all' || project.status === filterStatus;
       const matchesType = filterType === 'all' || project.projectType === filterType;
 
-      return matchesSearch && matchesStatus && matchesType;
+      return matchesStatus && matchesType;
     });
   }, [projects, searchQuery, filterStatus, filterType]);
 
@@ -116,7 +127,7 @@ export default function ProjectDashboard() {
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5" />
               <input
                 type="text"
-                placeholder="Search projects or clients..."
+                placeholder="Search projects, clients, descriptions..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="input pl-10 w-full"

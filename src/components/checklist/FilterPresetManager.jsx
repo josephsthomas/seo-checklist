@@ -5,7 +5,7 @@
  */
 
 import React, { useState, useEffect } from 'react';
-import { Save, Star, Trash2, Edit2, Download, Upload, X, Check } from 'lucide-react';
+import { Save, Star, Trash2, Edit2, Download, Upload, X, Check, CheckCircle } from 'lucide-react';
 import { getFilterPresets, saveFilterPreset, deleteFilterPreset } from '../../utils/storageHelpers';
 import toast from 'react-hot-toast';
 
@@ -78,6 +78,18 @@ export default function FilterPresetManager({ currentFilters, onApplyPreset, onC
   useEffect(() => {
     loadPresets();
   }, []);
+
+  // Keyboard navigation: Escape key to close modal
+  useEffect(() => {
+    const handleEscape = (e) => {
+      if (e.key === 'Escape') {
+        onClose();
+      }
+    };
+
+    document.addEventListener('keydown', handleEscape);
+    return () => document.removeEventListener('keydown', handleEscape);
+  }, [onClose]);
 
   const loadPresets = () => {
     const userPresets = getFilterPresets();
@@ -170,23 +182,38 @@ export default function FilterPresetManager({ currentFilters, onApplyPreset, onC
     reader.readAsText(file);
   };
 
+  // Check if a preset is currently active
+  const isPresetActive = (preset) => {
+    if (!preset.filters || !currentFilters) return false;
+
+    // Compare all filter properties
+    const presetFilters = preset.filters;
+    return Object.keys(presetFilters).every(key => {
+      return presetFilters[key] === currentFilters[key];
+    }) && Object.keys(currentFilters).every(key => {
+      // Only check properties that exist in preset filters
+      return presetFilters.hasOwnProperty(key) ? presetFilters[key] === currentFilters[key] : true;
+    });
+  };
+
   const allPresets = [...PRESET_TEMPLATES, ...presets];
 
   return (
-    <div className="fixed inset-0 z-50 overflow-y-auto">
+    <div className="fixed inset-0 z-50 overflow-y-auto" role="dialog" aria-modal="true" aria-labelledby="filter-presets-title">
       <div className="flex items-center justify-center min-h-screen px-4 pt-4 pb-20 text-center sm:block sm:p-0">
         {/* Background overlay */}
         <div
           className="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity"
           onClick={onClose}
+          aria-hidden="true"
         />
 
         {/* Modal panel */}
         <div className="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-3xl sm:w-full">
           {/* Header */}
           <div className="bg-white px-6 py-4 border-b flex items-center justify-between">
-            <h3 className="text-lg font-semibold text-gray-900">
-              <Star className="inline w-5 h-5 mr-2 text-yellow-500" />
+            <h3 id="filter-presets-title" className="text-lg font-semibold text-gray-900">
+              <Star className="inline w-5 h-5 mr-2 text-yellow-500" aria-hidden="true" />
               Filter Presets
             </h3>
             <button
@@ -273,21 +300,40 @@ export default function FilterPresetManager({ currentFilters, onApplyPreset, onC
             <div className="mb-6">
               <h4 className="text-sm font-medium text-gray-900 mb-3">Built-in Presets</h4>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                {PRESET_TEMPLATES.map(preset => (
-                  <button
-                    key={preset.id}
-                    onClick={() => handleApplyPreset(preset)}
-                    className="p-4 border border-gray-200 rounded-lg hover:border-blue-500 hover:shadow-md transition-all text-left group"
-                  >
-                    <div className="flex items-start justify-between mb-2">
-                      <h5 className="text-sm font-medium text-gray-900 group-hover:text-blue-600">
-                        {preset.name}
-                      </h5>
-                      <Star className="w-4 h-4 text-yellow-500" />
-                    </div>
-                    <p className="text-xs text-gray-600">{preset.description}</p>
-                  </button>
-                ))}
+                {PRESET_TEMPLATES.map(preset => {
+                  const isActive = isPresetActive(preset);
+                  return (
+                    <button
+                      key={preset.id}
+                      onClick={() => handleApplyPreset(preset)}
+                      className={`p-4 border rounded-lg hover:shadow-md transition-all text-left group ${
+                        isActive
+                          ? 'border-green-500 bg-green-50'
+                          : 'border-gray-300 hover:border-blue-500'
+                      }`}
+                    >
+                      <div className="flex items-start justify-between mb-2">
+                        <div className="flex items-center gap-2">
+                          <h5 className={`text-sm font-medium ${
+                            isActive ? 'text-green-700' : 'text-gray-900 group-hover:text-blue-600'
+                          }`}>
+                            {preset.name}
+                          </h5>
+                          {isActive && (
+                            <CheckCircle className="w-4 h-4 text-green-600" aria-label="Currently active" />
+                          )}
+                        </div>
+                        <Star className="w-4 h-4 text-yellow-500" aria-hidden="true" />
+                      </div>
+                      <p className="text-xs text-gray-600">{preset.description}</p>
+                      {isActive && (
+                        <span className="inline-block mt-2 px-2 py-0.5 text-xs font-medium text-green-700 bg-green-100 rounded">
+                          Active
+                        </span>
+                      )}
+                    </button>
+                  );
+                })}
               </div>
             </div>
 
@@ -296,45 +342,64 @@ export default function FilterPresetManager({ currentFilters, onApplyPreset, onC
               <div>
                 <h4 className="text-sm font-medium text-gray-900 mb-3">My Saved Presets</h4>
                 <div className="space-y-2">
-                  {presets.map(preset => (
-                    <div
-                      key={preset.id}
-                      className="p-4 border border-gray-200 rounded-lg hover:border-blue-500 hover:shadow-md transition-all group"
-                    >
-                      <div className="flex items-start justify-between">
-                        <button
-                          onClick={() => handleApplyPreset(preset)}
-                          className="flex-1 text-left"
-                        >
-                          <h5 className="text-sm font-medium text-gray-900 group-hover:text-blue-600 mb-1">
-                            {preset.name}
-                          </h5>
-                          {preset.description && (
-                            <p className="text-xs text-gray-600">{preset.description}</p>
-                          )}
-                          <p className="text-xs text-gray-400 mt-2">
-                            Created: {new Date(preset.createdAt).toLocaleDateString()}
-                          </p>
-                        </button>
-                        <div className="flex gap-2 ml-4">
+                  {presets.map(preset => {
+                    const isActive = isPresetActive(preset);
+                    return (
+                      <div
+                        key={preset.id}
+                        className={`p-4 border rounded-lg hover:shadow-md transition-all group ${
+                          isActive
+                            ? 'border-green-500 bg-green-50'
+                            : 'border-gray-300 hover:border-blue-500'
+                        }`}
+                      >
+                        <div className="flex items-start justify-between">
                           <button
-                            onClick={() => handleEditPreset(preset)}
-                            className="p-1.5 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded"
-                            aria-label={`Edit ${preset.name} preset`}
+                            onClick={() => handleApplyPreset(preset)}
+                            className="flex-1 text-left"
                           >
-                            <Edit2 className="w-4 h-4" aria-hidden="true" />
+                            <div className="flex items-center gap-2 mb-1">
+                              <h5 className={`text-sm font-medium ${
+                                isActive ? 'text-green-700' : 'text-gray-900 group-hover:text-blue-600'
+                              }`}>
+                                {preset.name}
+                              </h5>
+                              {isActive && (
+                                <CheckCircle className="w-4 h-4 text-green-600" aria-label="Currently active" />
+                              )}
+                            </div>
+                            {preset.description && (
+                              <p className="text-xs text-gray-600">{preset.description}</p>
+                            )}
+                            {isActive && (
+                              <span className="inline-block mt-2 px-2 py-0.5 text-xs font-medium text-green-700 bg-green-100 rounded">
+                                Active
+                              </span>
+                            )}
+                            <p className="text-xs text-gray-400 mt-2">
+                              Created: {new Date(preset.createdAt).toLocaleDateString()}
+                            </p>
                           </button>
-                          <button
-                            onClick={() => handleDeletePreset(preset.id)}
-                            className="p-1.5 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded"
-                            aria-label={`Delete ${preset.name} preset`}
-                          >
-                            <Trash2 className="w-4 h-4" aria-hidden="true" />
-                          </button>
+                          <div className="flex gap-2 ml-4">
+                            <button
+                              onClick={() => handleEditPreset(preset)}
+                              className="p-1.5 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded"
+                              aria-label={`Edit ${preset.name} preset`}
+                            >
+                              <Edit2 className="w-4 h-4" aria-hidden="true" />
+                            </button>
+                            <button
+                              onClick={() => handleDeletePreset(preset.id)}
+                              className="p-1.5 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded"
+                              aria-label={`Delete ${preset.name} preset`}
+                            >
+                              <Trash2 className="w-4 h-4" aria-hidden="true" />
+                            </button>
+                          </div>
                         </div>
                       </div>
-                    </div>
-                  ))}
+                    );
+                  })}
                 </div>
               </div>
             )}

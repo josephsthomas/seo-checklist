@@ -152,7 +152,7 @@ export default function TimeTracker({ projectId, itemId, estimatedHours }) {
       {/* Manual Entry */}
       <div>
         {showManualEntry ? (
-          <div className="p-4 border border-gray-200 rounded-lg space-y-3">
+          <div className="p-4 border border-gray-300 rounded-lg space-y-3">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
                 Minutes

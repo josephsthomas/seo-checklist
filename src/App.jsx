@@ -125,6 +125,9 @@ function App() {
           {/* Toast Notifications */}
           <Toaster
             position="top-right"
+            containerStyle={{
+              top: 80,
+            }}
             toastOptions={{
               duration: 4000,
               style: {
@@ -137,12 +140,28 @@ function App() {
                   primary: '#10b981',
                   secondary: '#fff',
                 },
+                style: {
+                  background: '#10b981',
+                  color: '#fff',
+                },
+                ariaProps: {
+                  role: 'status',
+                  'aria-live': 'polite',
+                },
               },
               error: {
                 duration: 4000,
                 iconTheme: {
                   primary: '#ef4444',
                   secondary: '#fff',
+                },
+                style: {
+                  background: '#ef4444',
+                  color: '#fff',
+                },
+                ariaProps: {
+                  role: 'alert',
+                  'aria-live': 'assertive',
                 },
               },
             }}

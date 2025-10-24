@@ -9,14 +9,23 @@ export default function GlossaryPage() {
 
   const filteredTerms = useMemo(() => {
     return glossaryTerms.filter(term => {
-      const matchesSearch = searchQuery === '' ||
-        term.term.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        term.definition.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        term.relatedTerms.some(t => t.toLowerCase().includes(searchQuery.toLowerCase()));
+      // Enhanced search: split query into words for better matching
+      if (searchQuery !== '') {
+        const queryWords = searchQuery.toLowerCase().trim().split(/\s+/);
+        const searchableText = [
+          term.term,
+          term.definition,
+          ...term.relatedTerms,
+          term.category
+        ].join(' ').toLowerCase();
+
+        const matchesSearch = queryWords.every(word => searchableText.includes(word));
+        if (!matchesSearch) return false;
+      }
 
       const matchesCategory = selectedCategory === 'All' || term.category === selectedCategory;
 
-      return matchesSearch && matchesCategory;
+      return matchesCategory;
     }).sort((a, b) => a.term.localeCompare(b.term));
   }, [searchQuery, selectedCategory]);
 

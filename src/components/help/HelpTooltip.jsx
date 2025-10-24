@@ -27,7 +27,7 @@ export default function HelpTooltip({ itemId, itemTitle }) {
           />
 
           {/* Tooltip Panel */}
-          <div className="absolute left-0 top-full mt-2 w-96 bg-white rounded-lg shadow-xl border border-gray-200 z-50 max-h-[500px] overflow-y-auto">
+          <div className="absolute left-0 top-full mt-2 w-96 bg-white rounded-lg shadow-xl border border-gray-300 z-50 max-h-[500px] overflow-y-auto">
             <div className="p-4">
               {/* Header */}
               <div className="flex items-start justify-between mb-3">

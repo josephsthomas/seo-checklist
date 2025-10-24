@@ -4,7 +4,7 @@
  * Phase 9 - Batch 4
  */
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { X, FileText, Download, Eye, Loader } from 'lucide-react';
 import { generateChecklistPDF, downloadPDF, previewPDF } from '../../lib/pdfGenerator';
 import toast from 'react-hot-toast';
@@ -18,6 +18,18 @@ export default function PdfExportModal({ items, completions, onClose }) {
     includeCompleted: true,
     brandColor: '#2563eb'
   });
+
+  // Keyboard navigation: Escape key to close modal
+  useEffect(() => {
+    const handleEscape = (e) => {
+      if (e.key === 'Escape') {
+        onClose();
+      }
+    };
+
+    document.addEventListener('keydown', handleEscape);
+    return () => document.removeEventListener('keydown', handleEscape);
+  }, [onClose]);
 
   const handleExport = async (preview = false) => {
     if (!config.projectName.trim()) {
@@ -55,20 +67,21 @@ export default function PdfExportModal({ items, completions, onClose }) {
   const completionRate = Math.round((completedCount / items.length) * 100);
 
   return (
-    <div className="fixed inset-0 z-50 overflow-y-auto">
+    <div className="fixed inset-0 z-50 overflow-y-auto" role="dialog" aria-modal="true" aria-labelledby="pdf-export-title">
       <div className="flex items-center justify-center min-h-screen px-4 pt-4 pb-20 text-center sm:block sm:p-0">
         {/* Background overlay */}
         <div
           className="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity"
           onClick={onClose}
+          aria-hidden="true"
         />
 
         {/* Modal panel */}
         <div className="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-2xl sm:w-full">
           {/* Header */}
           <div className="bg-white px-6 py-4 border-b flex items-center justify-between">
-            <h3 className="text-lg font-semibold text-gray-900 flex items-center gap-2">
-              <FileText className="w-5 h-5 text-blue-600" />
+            <h3 id="pdf-export-title" className="text-lg font-semibold text-gray-900 flex items-center gap-2">
+              <FileText className="w-5 h-5 text-blue-600" aria-hidden="true" />
               Export to PDF
             </h3>
             <button
@@ -143,7 +156,7 @@ export default function PdfExportModal({ items, completions, onClose }) {
                     className={`p-4 border-2 rounded-lg text-left transition-all ${
                       config.exportType === 'executive'
                         ? 'border-blue-600 bg-blue-50'
-                        : 'border-gray-200 hover:border-gray-300'
+                        : 'border-gray-300 hover:border-gray-400'
                     }`}
                   >
                     <div className="font-medium text-gray-900 mb-1">Executive Summary</div>
@@ -157,7 +170,7 @@ export default function PdfExportModal({ items, completions, onClose }) {
                     className={`p-4 border-2 rounded-lg text-left transition-all ${
                       config.exportType === 'detailed'
                         ? 'border-blue-600 bg-blue-50'
-                        : 'border-gray-200 hover:border-gray-300'
+                        : 'border-gray-300 hover:border-gray-400'
                     }`}
                   >
                     <div className="font-medium text-gray-900 mb-1">Detailed Report</div>

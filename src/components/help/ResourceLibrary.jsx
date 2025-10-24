@@ -12,16 +12,27 @@ export default function ResourceLibrary() {
 
   const filteredResources = useMemo(() => {
     return resources.filter(resource => {
-      const matchesSearch = searchQuery === '' ||
-        resource.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        resource.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        resource.tags.some(tag => tag.toLowerCase().includes(searchQuery.toLowerCase()));
+      // Enhanced search: split query into words for better matching
+      if (searchQuery !== '') {
+        const queryWords = searchQuery.toLowerCase().trim().split(/\s+/);
+        const searchableText = [
+          resource.title,
+          resource.description,
+          ...resource.tags,
+          resource.category,
+          resource.type,
+          resource.difficulty
+        ].join(' ').toLowerCase();
+
+        const matchesSearch = queryWords.every(word => searchableText.includes(word));
+        if (!matchesSearch) return false;
+      }
 
       const matchesCategory = selectedCategory === 'All' || resource.category === selectedCategory;
       const matchesType = selectedType === 'All' || resource.type === selectedType;
       const matchesDifficulty = selectedDifficulty === 'All' || resource.difficulty === selectedDifficulty;
 
-      return matchesSearch && matchesCategory && matchesType && matchesDifficulty;
+      return matchesCategory && matchesType && matchesDifficulty;
     });
   }, [searchQuery, selectedCategory, selectedType, selectedDifficulty]);
 

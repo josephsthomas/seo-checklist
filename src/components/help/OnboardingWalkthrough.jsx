@@ -87,6 +87,19 @@ export default function OnboardingWalkthrough({ onComplete }) {
     }
   }, []);
 
+  // Keyboard navigation: Escape key to close walkthrough
+  useEffect(() => {
+    const handleEscape = (e) => {
+      if (e.key === 'Escape' && isOpen) {
+        setIsOpen(false);
+        localStorage.setItem('hasCompletedOnboarding', 'true');
+      }
+    };
+
+    document.addEventListener('keydown', handleEscape);
+    return () => document.removeEventListener('keydown', handleEscape);
+  }, [isOpen]);
+
   const handleNext = () => {
     if (currentStep < onboardingSteps.length - 1) {
       setCurrentStep(currentStep + 1);
