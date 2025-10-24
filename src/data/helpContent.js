@@ -5786,6 +5786,152 @@ export const helpContent = {
     ],
     estimatedTime: "8-40 hours",
     difficulty: "Intermediate"
+  },
+
+  // CONTENT OPERATIONS (8 items: IDs 336-343)
+
+  336: {
+    description: "An editorial calendar aligns content creation with SEO strategy, ensuring consistent publishing cadence and strategic keyword targeting. Without a calendar, content becomes reactive rather than strategic, missing seasonal opportunities and keyword priorities.",
+    tips: [
+      "Map keywords to content calendar: Assign target keywords and search intent to each planned piece",
+      "Plan 3-6 months ahead with flexibility for timely topics and news-jacking opportunities",
+      "Include content types: Blog posts, guides, case studies, videos, infographics - diversify formats",
+      "Coordinate with business goals: Product launches, seasonal campaigns, industry events",
+      "Track deadlines across workflow stages: Brief due, draft due, review due, publish date",
+      "Use tools like CoSchedule, Airtable, or Google Sheets with columns: Date, Title, Target Keyword, Author, Status, CTA"
+    ],
+    resources: [
+      { title: "Editorial Calendar Templates", url: "https://coschedule.com/marketing-calendar" },
+      { title: "Content Calendar Best Practices", url: "https://moz.com/blog/content-calendar" }
+    ],
+    estimatedTime: "2-8 hours",
+    difficulty: "Intermediate"
+  },
+
+  337: {
+    description: "Content briefs ensure consistency and SEO alignment across all content, especially when working with multiple writers or freelancers. Briefs prevent keyword stuffing, off-topic content, and missing SEO elements by providing clear specifications upfront.",
+    tips: [
+      "Include target keyword + 3-5 related keywords with search volumes and difficulty",
+      "Define search intent clearly: Informational, navigational, commercial, or transactional",
+      "Specify word count range based on SERP analysis: Check top 10 results' average length + 20%",
+      "Outline required structure: H2/H3 headings based on 'People Also Ask' and competitor outlines",
+      "List competitors to outperform: Include URLs of top 3 ranking articles to beat",
+      "Include internal linking requirements: 3-5 related pages to link to with suggested anchor text"
+    ],
+    resources: [
+      { title: "Content Brief Template", url: "https://www.semrush.com/blog/content-brief-template/" },
+      { title: "SEO Content Brief Guide", url: "https://ahrefs.com/blog/content-brief/" }
+    ],
+    estimatedTime: "Less than 2 hours",
+    difficulty: "Beginner"
+  },
+
+  338: {
+    description: "A defined content workflow prevents bottlenecks, ensures quality control, and clarifies responsibilities. Without workflow, content can languish in drafts, launch without SEO review, or bypass necessary approvals, damaging quality and rankings.",
+    tips: [
+      "Define stages: Brief creation → Draft writing → SEO review → Editorial review → Approval → Scheduling → Publishing",
+      "Assign clear owners for each stage: Who creates briefs? Who performs SEO checks? Who gives final approval?",
+      "Set SLAs for each stage: Draft turnaround 5 days, SEO review 2 days, editorial review 2 days",
+      "Use project management tools: Trello, Asana, Monday.com with swim lanes for each workflow stage",
+      "Create SEO review checklist: Target keyword in title/H1/first 100 words, meta description, alt text, internal links",
+      "Build feedback loops: Writers should see what gets changed in review to improve future drafts"
+    ],
+    resources: [
+      { title: "Content Production Workflow", url: "https://contentmarketinginstitute.com/articles/content-production-workflow/" },
+      { title: "Content Operations Guide", url: "https://www.contentstrategy.com/content-operations" }
+    ],
+    estimatedTime: "Less than 2 hours",
+    difficulty: "Beginner"
+  },
+
+  339: {
+    description: "A style guide ensures brand consistency and trains writers on SEO best practices, reducing revision cycles and maintaining quality standards. This is especially critical when scaling content production or working with external contributors.",
+    tips: [
+      "Document tone and voice: Formal vs casual, use of humor, industry jargon guidelines, POV (first/second/third person)",
+      "SEO guidelines section: Keyword placement rules, title tag formulas, meta description templates, heading hierarchy",
+      "Formatting standards: Paragraph length (3-4 sentences), sentence length, use of bullets, bold/italics, code formatting",
+      "Internal linking policy: How many links per article, when to link, anchor text guidelines, link to cornerstone content",
+      "Citation and attribution: How to credit sources, link to external resources, handling statistics and data",
+      "Examples of good/bad content: Show don't just tell - include sample paragraphs demonstrating principles"
+    ],
+    resources: [
+      { title: "Content Style Guide Examples", url: "https://contentmarketinginstitute.com/articles/style-guide-examples/" },
+      { title: "SEO Writing Guide", url: "https://backlinko.com/seo-copywriting" }
+    ],
+    estimatedTime: "2-8 hours",
+    difficulty: "Intermediate"
+  },
+
+  340: {
+    description: "Content performance tracking identifies what's working and what's not, enabling data-driven decisions about future content investment. Without tracking, you're creating content blindly, unable to prove ROI or optimize strategy.",
+    tips: [
+      "Track content-level metrics in spreadsheet or Airtable: URL, publish date, target keyword, current ranking, organic traffic, conversions",
+      "Use Google Analytics custom segments: Filter to organic traffic only, exclude branded searches",
+      "Monitor keyword rankings weekly: Track target keyword + 3-5 related keywords per piece",
+      "Calculate content ROI: (Revenue from content - Cost to create) / Cost to create × 100",
+      "Set up goal tracking: Downloads, form fills, purchases attributed to specific content pieces",
+      "Review quarterly: Identify top performers (replicate), underperformers (refresh or prune), content gaps (new opportunities)"
+    ],
+    resources: [
+      { title: "Content Performance Tracking", url: "https://www.semrush.com/blog/content-performance-tracking/" },
+      { title: "Content Analytics Guide", url: "https://moz.com/blog/content-analytics" }
+    ],
+    estimatedTime: "2-8 hours",
+    difficulty: "Intermediate"
+  },
+
+  341: {
+    description: "Content gap analysis reveals opportunities where competitors rank for valuable keywords that you don't, exposing quick-win topics and strategic content opportunities. This ensures your content strategy is offensive, not just defensive.",
+    tips: [
+      "Use Ahrefs Content Gap tool: Enter your domain + 3-5 competitors, see keywords they rank for that you don't",
+      "Semrush Keyword Gap: Compare up to 5 domains, filter for keywords with top 10 rankings for competitors but not you",
+      "Filter opportunities: Focus on keywords with 500+ monthly searches, KD <50, strong commercial intent",
+      "Analyze search intent: Click through SERPs to understand what type of content ranks (list, guide, comparison, tool)",
+      "Prioritize by business value: Not all traffic is equal - prioritize keywords that drive conversions",
+      "Create content briefs immediately: Gap analysis is worthless without execution - create briefs for top 10 opportunities"
+    ],
+    resources: [
+      { title: "Content Gap Analysis Guide", url: "https://ahrefs.com/blog/content-gap-analysis/" },
+      { title: "Keyword Gap Analysis", url: "https://www.semrush.com/blog/keyword-gap-analysis/" }
+    ],
+    estimatedTime: "8-40 hours",
+    difficulty: "Advanced"
+  },
+
+  342: {
+    description: "Content decays over time as statistics become outdated, screenshots show old UI, and information becomes stale. A refresh schedule keeps high-performing content relevant and maintains rankings, often easier than creating new content.",
+    tips: [
+      "Identify refresh candidates: Content with declining traffic, outdated stats/screenshots, posts 1+ years old in top 20",
+      "Schedule quarterly reviews of top 20 traffic-driving pages using Google Analytics",
+      "Update strategy: Refresh statistics, add new sections for recent developments, improve depth, add/update images",
+      "Change publish date after substantial updates (30%+ new content) to signal freshness",
+      "Use 'Content Decay' report in Ahrefs: Shows pages that lost rankings and traffic over time",
+      "Track results: Monitor ranking and traffic changes post-refresh to prove value of refresh strategy"
+    ],
+    resources: [
+      { title: "Content Refresh Strategy", url: "https://ahrefs.com/blog/content-refresh/" },
+      { title: "Update Old Content", url: "https://backlinko.com/hub/content/update-old-content" }
+    ],
+    estimatedTime: "2-8 hours",
+    difficulty: "Beginner"
+  },
+
+  343: {
+    description: "Content pruning removes or consolidates low-value pages that dilute site quality and waste crawl budget. Pruning can improve overall site performance by concentrating authority on valuable pages and removing thin, duplicate, or outdated content.",
+    tips: [
+      "Identify pruning candidates: Pages with <10 organic sessions/month, high bounce rate, thin content (<300 words), old news/events",
+      "Use Google Analytics: Filter organic traffic, sort by sessions ascending, export bottom 20% of pages",
+      "Audit for quality issues: Check for duplicate content, keyword cannibalization, outdated information",
+      "Three pruning options: Delete + 410 (if truly no value), 301 redirect to relevant page (consolidate), or improve/rewrite",
+      "Consolidation strategy: Merge 3-5 thin posts into one comprehensive guide, redirect old URLs to new consolidated page",
+      "Don't delete valuable backlinks: Check backlink profile before deleting - redirect pages with quality backlinks"
+    ],
+    resources: [
+      { title: "Content Pruning Guide", url: "https://moz.com/blog/content-pruning" },
+      { title: "Content Audit and Pruning", url: "https://ahrefs.com/blog/content-audit/" }
+    ],
+    estimatedTime: "8-40 hours",
+    difficulty: "Advanced"
   }
 };
 
