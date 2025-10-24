@@ -9,6 +9,7 @@ import { useAuth } from '../../contexts/AuthContext';
 import { TASK_STATUS, TASK_STATUS_LABELS } from '../../utils/roles';
 import CommentThread from './CommentThread';
 import TimeTracker from './TimeTracker';
+import FileUpload from './FileUpload';
 import { format, parseISO } from 'date-fns';
 import {
   formatDate,
@@ -136,7 +137,7 @@ export default function ItemDetailModal({ item, projectId, isOpen, onClose, onTo
           {/* Tabs */}
           <div className="border-b">
             <div className="flex px-6">
-              {['details', 'time', 'comments', 'activity'].map(tab => (
+              {['details', 'time', 'files', 'comments', 'activity'].map(tab => (
                 <button
                   key={tab}
                   onClick={() => setActiveTab(tab)}
@@ -347,6 +348,13 @@ export default function ItemDetailModal({ item, projectId, isOpen, onClose, onTo
                 projectId={projectId}
                 itemId={item.id}
                 estimatedHours={assignmentData.estimatedHours}
+              />
+            )}
+
+            {activeTab === 'files' && (
+              <FileUpload
+                projectId={projectId}
+                itemId={item.id}
               />
             )}
 
