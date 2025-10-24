@@ -5397,6 +5397,181 @@ export const helpContent = {
     ],
     estimatedTime: "2-8 hours",
     difficulty: "Intermediate"
+  },
+
+  // INTERNATIONAL SEO ITEMS (314-323)
+  314: {
+    description: "Hreflang tags tell search engines which language and regional version to show users based on their location and language settings. This prevents duplicate content issues across international pages and ensures users see the right version.",
+    tips: [
+      "Implement in <head> or XML sitemap: <link rel='alternate' hreflang='en-US' href='https://example.com/en-us/' />",
+      "Use ISO 639-1 language codes + ISO 3166-1 Alpha 2 country codes: en-US, fr-FR, es-MX",
+      "Include self-referencing hreflang and x-default fallback: hreflang='x-default' for unmatched users",
+      "Ensure bidirectional linking: if page A links to page B, page B must link back to page A",
+      "Only link to canonical versions - don't mix hreflang with canonicalized URLs",
+      "Test implementation with Google Search Console International Targeting report"
+    ],
+    resources: [
+      { title: "Hreflang Implementation Guide", url: "https://developers.google.com/search/docs/specialty/international/localized-versions" },
+      { title: "Hreflang Testing Tool", url: "https://www.aleydasolis.com/english/international-seo-tools/hreflang-tags-generator/" }
+    ],
+    estimatedTime: "8-40 hours",
+    difficulty: "Advanced"
+  },
+
+  315: {
+    description: "International targeting in Google Search Console tells Google which countries your site or specific domains/subfolders target. This helps Google show your content to users in the right geographic regions.",
+    tips: [
+      "For ccTLDs (.co.uk, .fr): Google auto-targets, but verify in GSC",
+      "For subdomains (uk.example.com): Set geographic target in GSC Settings → International Targeting",
+      "For subdirectories (example.com/uk/): Use GSC to set target country per subdirectory",
+      "Generic TLDs (.com, .org): Must manually set targeting in GSC",
+      "Don't set geographic target if serving global audience from same domain",
+      "Review quarterly - update if expanding to new markets"
+    ],
+    resources: [
+      { title: "International Targeting", url: "https://support.google.com/webmasters/answer/62399" }
+    ],
+    estimatedTime: "<2 hours",
+    difficulty: "Beginner"
+  },
+
+  316: {
+    description: "International URL structure affects SEO, hosting costs, and user trust. ccTLDs (.co.uk) build local trust but require separate domains; subdomains (uk.site.com) offer flexibility; subdirectories (site.com/uk/) consolidate domain authority.",
+    tips: [
+      "ccTLDs (example.co.uk): Best for local trust, requires country registration, separate GSC properties",
+      "Subdomains (uk.example.com): Easy to set up, can set geographic targeting, treated as separate sites",
+      "Subdirectories (example.com/uk/): Consolidates domain authority, easier to manage, single GSC property",
+      "Recommendation for most: subdirectories for authority consolidation unless local trust critical",
+      "Consider hosting location - CDN recommended for global reach regardless of structure",
+      "Document decision with rationale for stakeholder alignment"
+    ],
+    resources: [
+      { title: "International Site Structure", url: "https://moz.com/learn/seo/international-seo" },
+      { title: "Google's Guidance", url: "https://developers.google.com/search/docs/specialty/international/managing-multi-regional-sites" }
+    ],
+    estimatedTime: "2-8 hours",
+    difficulty: "Intermediate"
+  },
+
+  317: {
+    description: "Currency and language selectors let users switch regions without losing page context. Proper implementation maintains user session state, updates pricing, and switches language while preserving cart contents and browsing history.",
+    tips: [
+      "Place selector in header for visibility (flag icon or dropdown)",
+      "Auto-detect user location on first visit, but always allow manual override",
+      "Persist selection across sessions using cookies or localStorage",
+      "Update all page elements: prices, shipping info, contact details, schema markup",
+      "Maintain URL structure: redirect or update content dynamically based on preference",
+      "Don't use JavaScript-only switching if using separate URLs (breaks SEO)"
+    ],
+    resources: [
+      { title: "Currency Selector UX", url: "https://www.smashingmagazine.com/2017/03/world-wide-web-not-wealthy-western-web-part-1/" }
+    ],
+    estimatedTime: "8-40 hours",
+    difficulty: "Advanced"
+  },
+
+  318: {
+    description: "Regional keyword research identifies how people actually search in different countries and languages. Search behavior varies dramatically by culture, dialect, and local terminology - direct translation often misses how locals phrase queries.",
+    tips: [
+      "Use Google Keyword Planner with country-specific settings for each target market",
+      "Research in native language using tools like Semrush, Ahrefs with region filters",
+      "Identify local terminology: 'lorry' (UK) vs 'truck' (US), 'mobile' vs 'cell phone'",
+      "Account for cultural differences: search intent varies by culture",
+      "Work with native speakers or local agencies for authentic keyword selection",
+      "Consider seasonal variations by region (summer in Australia = winter in US)"
+    ],
+    resources: [
+      { title: "International Keyword Research", url: "https://www.semrush.com/blog/international-keyword-research/" },
+      { title: "Google Trends by Region", url: "https://trends.google.com/trends/" }
+    ],
+    estimatedTime: "40+ hours",
+    difficulty: "Advanced"
+  },
+
+  319: {
+    description: "Transcreation adapts content for cultural relevance beyond word-for-word translation. It maintains brand voice and messaging intent while adjusting idioms, humor, cultural references, and examples to resonate with local audiences.",
+    tips: [
+      "Hire professional transcreation services (not just translation) for marketing content",
+      "Adapt examples and case studies to use local companies and references",
+      "Replace idioms and expressions that don't translate culturally",
+      "Adjust imagery to reflect local demographics and cultural norms",
+      "Modify calls-to-action to align with local purchasing behavior",
+      "Test content with native focus groups before launch"
+    ],
+    resources: [
+      { title: "Transcreation Guide", url: "https://www.semrush.com/blog/what-is-transcreation/" }
+    ],
+    estimatedTime: "2-8 hours",
+    difficulty: "Intermediate"
+  },
+
+  320: {
+    description: "International schema markup with proper language codes helps search engines understand content language and serve appropriate rich results to users in different regions. The inLanguage property specifies content language in structured data.",
+    tips: [
+      "Add inLanguage to Article, WebPage, Product schema: 'inLanguage': 'en-US' or 'fr-FR'",
+      "Use BCP 47 language codes (same as hreflang): en, en-US, fr, fr-CA",
+      "For multi-language content, implement separate schema per language version",
+      "Ensure schema language matches page HTML lang attribute",
+      "Update all schema properties (name, description) to match page language",
+      "Test with Google Rich Results Test for each language version"
+    ],
+    resources: [
+      { title: "Schema inLanguage Property", url: "https://schema.org/inLanguage" }
+    ],
+    estimatedTime: "2-8 hours",
+    difficulty: "Intermediate"
+  },
+
+  321: {
+    description: "Server-side language detection automatically shows users content in their preferred language based on browser settings or IP geolocation. This improves UX but must include easy manual override to avoid trapping users in wrong language.",
+    tips: [
+      "Detect Accept-Language header from browser (most reliable user preference)",
+      "Use IP geolocation as backup for location-based content (less accurate)",
+      "Always show language selector for manual override (don't trap users)",
+      "Set preference cookie to remember user choice across sessions",
+      "Use 302 redirects (temporary) not 301 for location-based redirects",
+      "Implement logic: Check cookie → Check Accept-Language → Check IP → Default to English"
+    ],
+    resources: [
+      { title: "Language Detection Best Practices", url: "https://www.w3.org/International/questions/qa-lang-priorities" }
+    ],
+    estimatedTime: "2-8 hours",
+    difficulty: "Advanced"
+  },
+
+  322: {
+    description: "International link building requires region-specific outreach strategies. Links from local domains in target countries provide stronger regional ranking signals than links from US sites when targeting international markets.",
+    tips: [
+      "Target local news sites, blogs, and publications in each region",
+      "Build relationships with regional industry associations and directories",
+      "Create location-specific linkable assets (local research, regional guides)",
+      "Partner with local businesses and regional trade organizations",
+      "Guest post on regional blogs in native language",
+      "Prioritize ccTLD backlinks (.co.uk links for UK site) for regional authority"
+    ],
+    resources: [
+      { title: "International Link Building", url: "https://ahrefs.com/blog/international-link-building/" }
+    ],
+    estimatedTime: "8-40 hours",
+    difficulty: "Intermediate"
+  },
+
+  323: {
+    description: "Regional CDNs cache site content on servers near target markets, dramatically reducing page load times for international users. Faster load times improve Core Web Vitals, user experience, and rankings in regional search results.",
+    tips: [
+      "Choose CDN with extensive global coverage: Cloudflare, Fastly, Amazon CloudFront, Akamai",
+      "Configure edge locations near all target markets for lowest latency",
+      "Set appropriate cache headers for static assets (images, CSS, JS)",
+      "Implement geolocation routing to serve content from nearest edge server",
+      "Monitor performance per region using real user monitoring tools",
+      "Test load times from each target country using tools like WebPageTest with location selection"
+    ],
+    resources: [
+      { title: "CDN Selection Guide", url: "https://web.dev/content-delivery-networks/" },
+      { title: "Global Performance Testing", url: "https://www.webpagetest.org/" }
+    ],
+    estimatedTime: "2-8 hours",
+    difficulty: "Intermediate"
   }
 };
 
