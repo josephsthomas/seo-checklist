@@ -6042,6 +6042,80 @@ export const helpContent = {
     ],
     estimatedTime: "2-8 hours",
     difficulty: "Advanced"
+  },
+
+  // TECHNICAL AUDITING (4 items: IDs 350-353)
+
+  350: {
+    description: "JavaScript-heavy sites can have indexing issues if Googlebot can't render JS properly. Critical content rendered by JavaScript might be invisible to search engines, causing pages to rank poorly or not at all. Testing ensures your JS content is crawlable and indexable.",
+    tips: [
+      "Use Google Search Console URL Inspection tool: Enter any URL, click 'Test Live URL', view rendered HTML vs raw HTML",
+      "Check Mobile-Friendly Test: Shows screenshot of how Googlebot renders your page, reveals missing JS content",
+      "Use 'Fetch as Google' or Screaming Frog in JavaScript rendering mode to see what bots see",
+      "Verify critical content in initial HTML: Don't hide important keywords, headings, or internal links behind JS",
+      "Implement dynamic rendering (prerender.io) if Googlebot struggles: Serve static HTML to bots, JS to users",
+      "Test with Chrome DevTools Coverage tool: Identify unused JavaScript that slows rendering"
+    ],
+    resources: [
+      { title: "JavaScript SEO Guide", url: "https://developers.google.com/search/docs/crawling-indexing/javascript/javascript-seo-basics" },
+      { title: "Rendering Tests", url: "https://www.google.com/webmasters/tools/mobile-friendly/" }
+    ],
+    estimatedTime: "2-8 hours",
+    difficulty: "Advanced"
+  },
+
+  351: {
+    description: "Log file analysis reveals exactly how search engines crawl your site: which pages, how often, what status codes, and where crawl budget is wasted. This data is impossible to get from Google Search Console alone and critical for large sites (1000+ pages).",
+    tips: [
+      "Extract log files from server: Apache access.log or Nginx access.log, filter for Googlebot user agent",
+      "Use log analysis tools: Screaming Frog Log File Analyzer, OnCrawl, Botify, or custom Python scripts",
+      "Identify crawl budget waste: Googlebot crawling 404s, redirects, duplicate content, low-value pages",
+      "Analyze crawl frequency: Which pages crawled daily vs weekly vs never - prioritize important pages",
+      "Spot crawling issues: Status code patterns (many 500s?), redirect chains, pages taking too long to load",
+      "Track rendering resources: How much time Googlebot spends rendering JS vs fetching pages"
+    ],
+    resources: [
+      { title: "Log File Analysis Guide", url: "https://moz.com/blog/server-log-file-analysis" },
+      { title: "Screaming Frog Log Analyzer", url: "https://www.screamingfrog.co.uk/log-file-analyser/" }
+    ],
+    estimatedTime: "8-40 hours",
+    difficulty: "Advanced"
+  },
+
+  352: {
+    description: "An XML sitemap tells search engines which pages exist and which are most important. Sitemap errors (404s in sitemap, incorrect URLs, wrong priority values) waste crawl budget and prevent indexing. Validation ensures your sitemap actually helps rather than hinders.",
+    tips: [
+      "Use XML sitemap validators: xml-sitemaps.com validator or Google's XML Sitemap Validator",
+      "Test every URL in sitemap returns 200: Use Screaming Frog to crawl sitemap URLs, check for 404s/redirects",
+      "Verify lastmod dates accurate: Don't include URLs that haven't changed in years or use fake dates",
+      "Check priority and changefreq values: Priority 0.0-1.0, changefreq should reflect actual update frequency",
+      "Don't include noindex pages: Sitemap should only list pages you want indexed (canonical versions only)",
+      "Submit to Google Search Console and Bing Webmaster Tools: Monitor errors in sitemap reports"
+    ],
+    resources: [
+      { title: "XML Sitemap Guide", url: "https://developers.google.com/search/docs/crawling-indexing/sitemaps/build-sitemap" },
+      { title: "Sitemap Validator", url: "https://www.xml-sitemaps.com/validate-xml-sitemap.html" }
+    ],
+    estimatedTime: "Less than 2 hours",
+    difficulty: "Beginner"
+  },
+
+  353: {
+    description: "Structured data errors prevent rich results (star ratings, FAQs, breadcrumbs) from showing in search results, losing CTR and visibility. Many sites have schema implemented but with errors that invalidate it. Validation across all templates ensures rich results eligibility.",
+    tips: [
+      "Use Google Rich Results Test: Test each page template type (homepage, product, article, category, about, contact)",
+      "Check Schema.org Validator: More comprehensive than Google's tool, catches additional issues",
+      "Validate JSON-LD syntax: Use jsonlint.com to catch syntax errors before deploying",
+      "Test required properties: Each schema type has required fields - Article needs headline, author, datePublished, image",
+      "Avoid common mistakes: Don't markup hidden content, don't use review schema for your own reviews, don't duplicate properties",
+      "Monitor Search Console Enhancement reports: Track which pages eligible vs errors vs warnings for rich results"
+    ],
+    resources: [
+      { title: "Rich Results Test", url: "https://search.google.com/test/rich-results" },
+      { title: "Schema Validator", url: "https://validator.schema.org/" }
+    ],
+    estimatedTime: "2-8 hours",
+    difficulty: "Intermediate"
   }
 };
 
