@@ -1,5 +1,5 @@
 import React, { useState, useMemo, useEffect } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useSearchParams } from 'react-router-dom';
 import { useProjects } from '../../hooks/useProjects';
 import { useChecklist } from '../../hooks/useChecklist';
 import { checklistData } from '../../data/checklistData';
@@ -9,21 +9,25 @@ import {
   Download,
   Search,
   ChevronDown,
-  ChevronUp
+  ChevronUp,
+  MessageSquare
 } from 'lucide-react';
 import { exportToExcel } from '../../lib/excelExport';
+import ItemDetailModal from './ItemDetailModal';
 
 const PRIORITIES = ['CRITICAL', 'HIGH', 'MEDIUM', 'LOW'];
 const PHASES = ['Discovery', 'Strategy', 'Build', 'Pre-Launch', 'Launch', 'Post-Launch'];
 
 export default function SEOChecklist() {
   const { projectId } = useParams();
+  const [searchParams] = useSearchParams();
   const { getProject } = useProjects();
   const { completions, toggleItem, loading: checklistLoading } = useChecklist(projectId);
 
   const [project, setProject] = useState(null);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
+  const [selectedItem, setSelectedItem] = useState(null);
   const [filters, setFilters] = useState({
     phase: '',
     priority: '',
@@ -32,6 +36,17 @@ export default function SEOChecklist() {
     showCompleted: true
   });
   const [expandedPhases, setExpandedPhases] = useState(PHASES);
+
+  // Open modal from URL parameter
+  useEffect(() => {
+    const itemId = searchParams.get('itemId');
+    if (itemId) {
+      const item = checklistData.find(i => i.id === parseInt(itemId));
+      if (item) {
+        setSelectedItem(item);
+      }
+    }
+  }, [searchParams]);
 
   useEffect(() => {
     const fetchProject = async () => {
@@ -307,12 +322,16 @@ export default function SEOChecklist() {
                     {phaseItems.map(item => (
                       <div
                         key={item.id}
-                        className={`p-4 border-b last:border-b-0 hover:bg-gray-50 transition-colors
+                        className={`p-4 border-b last:border-b-0 hover:bg-gray-50 transition-colors cursor-pointer
                           ${completions[item.id] ? 'bg-green-50' : ''}`}
+                        onClick={() => setSelectedItem(item)}
                       >
                         <div className="flex items-start gap-3">
                           <button
-                            onClick={() => toggleItem(item.id)}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              toggleItem(item.id);
+                            }}
                             className={`mt-1 w-5 h-5 rounded border-2 flex items-center justify-center flex-shrink-0
                               ${completions[item.id]
                                 ? 'bg-primary-600 border-primary-600'
@@ -357,6 +376,16 @@ export default function SEOChecklist() {
                               <span>Category: {item.category}</span>
                               <span>Effort: {item.effortLevel}</span>
                               <span>Deliverable: {item.deliverableType}</span>
+                              <button
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  setSelectedItem(item);
+                                }}
+                                className="flex items-center gap-1 text-primary-600 hover:text-primary-700 font-medium"
+                              >
+                                <MessageSquare className="w-3 h-3" />
+                                View Details
+                              </button>
                             </div>
                           </div>
                         </div>
@@ -368,6 +397,16 @@ export default function SEOChecklist() {
             );
           })}
         </div>
+
+        {/* Item Detail Modal */}
+        <ItemDetailModal
+          item={selectedItem}
+          projectId={projectId}
+          isOpen={!!selectedItem}
+          onClose={() => setSelectedItem(null)}
+          onToggleComplete={toggleItem}
+          isCompleted={selectedItem ? !!completions[selectedItem.id] : false}
+        />
       </div>
     </div>
   );

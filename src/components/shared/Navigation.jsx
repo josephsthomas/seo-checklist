@@ -1,7 +1,9 @@
 import React, { useState } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
-import { Home, FolderOpen, User, LogOut, Menu, X } from 'lucide-react';
+import { Home, FolderOpen, User, LogOut, Menu, X, CheckSquare, Users } from 'lucide-react';
+import NotificationPanel from './NotificationPanel';
+import { hasPermission } from '../../utils/roles';
 
 export default function Navigation() {
   const { currentUser, userProfile, logout } = useAuth();
@@ -37,7 +39,7 @@ export default function Navigation() {
           </Link>
 
           {/* Desktop Navigation */}
-          <div className="hidden md:flex items-center gap-6">
+          <div className="hidden md:flex items-center gap-4">
             <Link
               to="/projects"
               className={`flex items-center gap-2 px-3 py-2 rounded-lg transition-colors
@@ -50,8 +52,37 @@ export default function Navigation() {
               <span>Projects</span>
             </Link>
 
+            <Link
+              to="/my-tasks"
+              className={`flex items-center gap-2 px-3 py-2 rounded-lg transition-colors
+                ${isActive('/my-tasks')
+                  ? 'bg-primary-100 text-primary-700'
+                  : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'
+                }`}
+            >
+              <CheckSquare className="w-5 h-5" />
+              <span>My Tasks</span>
+            </Link>
+
+            {hasPermission(userProfile?.role, 'canManageTeam') && (
+              <Link
+                to="/team"
+                className={`flex items-center gap-2 px-3 py-2 rounded-lg transition-colors
+                  ${isActive('/team')
+                    ? 'bg-primary-100 text-primary-700'
+                    : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'
+                  }`}
+              >
+                <Users className="w-5 h-5" />
+                <span>Team</span>
+              </Link>
+            )}
+
+            {/* Notifications */}
+            <NotificationPanel />
+
             {/* User Menu */}
-            <div className="flex items-center gap-3 pl-6 border-l">
+            <div className="flex items-center gap-3 pl-4 border-l">
               <div className="text-right">
                 <p className="text-sm font-medium text-gray-900">
                   {userProfile?.name || currentUser.displayName || currentUser.email}
@@ -104,6 +135,34 @@ export default function Navigation() {
                 <FolderOpen className="w-5 h-5" />
                 <span>Projects</span>
               </Link>
+
+              <Link
+                to="/my-tasks"
+                onClick={() => setMobileMenuOpen(false)}
+                className={`flex items-center gap-2 px-4 py-3 rounded-lg transition-colors
+                  ${isActive('/my-tasks')
+                    ? 'bg-primary-100 text-primary-700'
+                    : 'text-gray-600 hover:bg-gray-100'
+                  }`}
+              >
+                <CheckSquare className="w-5 h-5" />
+                <span>My Tasks</span>
+              </Link>
+
+              {hasPermission(userProfile?.role, 'canManageTeam') && (
+                <Link
+                  to="/team"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className={`flex items-center gap-2 px-4 py-3 rounded-lg transition-colors
+                    ${isActive('/team')
+                      ? 'bg-primary-100 text-primary-700'
+                      : 'text-gray-600 hover:bg-gray-100'
+                    }`}
+                >
+                  <Users className="w-5 h-5" />
+                  <span>Team</span>
+                </Link>
+              )}
 
               <div className="px-4 py-3 border-t mt-2">
                 <div className="flex items-center gap-3 mb-3">

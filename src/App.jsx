@@ -14,6 +14,8 @@ import Navigation from './components/shared/Navigation';
 // Project Components
 import ProjectDashboard from './components/projects/ProjectDashboard';
 import ProjectCreationWizard from './components/projects/ProjectCreationWizard';
+import MyTasksPage from './components/projects/MyTasksPage';
+import TeamManagementPage from './components/projects/TeamManagementPage';
 
 // Checklist Components
 import SEOChecklist from './components/checklist/SEOChecklist';
@@ -51,6 +53,22 @@ function App() {
               element={
                 <ProtectedRoute>
                   <SEOChecklist />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/my-tasks"
+              element={
+                <ProtectedRoute>
+                  <MyTasksPage />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/team"
+              element={
+                <ProtectedRoute>
+                  <TeamManagementPage />
                 </ProtectedRoute>
               }
             />
