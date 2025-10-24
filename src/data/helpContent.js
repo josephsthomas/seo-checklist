@@ -293,7 +293,7 @@ export const helpContent = {
     resources: [
       { title: "Content Refresh Strategy", url: "https://www.semrush.com/blog/content-refresh/" }
     ],
-    estimatedTime: "1-2 hours",
+    estimatedTime: "<2 hours",
     difficulty: "Beginner"
   },
 
@@ -329,7 +329,7 @@ export const helpContent = {
       { title: "HTTPS as a Ranking Signal", url: "https://developers.google.com/search/blog/2014/08/https-as-ranking-signal" },
       { title: "Let's Encrypt Free SSL", url: "https://letsencrypt.org/" }
     ],
-    estimatedTime: "1-2 hours",
+    estimatedTime: "<2 hours",
     difficulty: "Beginner"
   },
 
@@ -346,7 +346,7 @@ export const helpContent = {
     resources: [
       { title: "Preferred Domain Setup", url: "https://developers.google.com/search/docs/crawling-indexing/consolidate-duplicate-urls" }
     ],
-    estimatedTime: "1-2 hours",
+    estimatedTime: "<2 hours",
     difficulty: "Beginner"
   },
 
@@ -380,7 +380,7 @@ export const helpContent = {
     resources: [
       { title: "Robots.txt Specifications", url: "https://developers.google.com/search/docs/crawling-indexing/robots/intro" }
     ],
-    estimatedTime: "1-2 hours",
+    estimatedTime: "<2 hours",
     difficulty: "Beginner"
   },
 
@@ -638,7 +638,7 @@ export const helpContent = {
     resources: [
       { title: "Minify Resources", url: "https://web.dev/unminified-css/" }
     ],
-    estimatedTime: "1-2 hours",
+    estimatedTime: "<2 hours",
     difficulty: "Beginner"
   },
 
@@ -655,7 +655,7 @@ export const helpContent = {
     resources: [
       { title: "Enable Text Compression", url: "https://web.dev/uses-text-compression/" }
     ],
-    estimatedTime: "1-2 hours",
+    estimatedTime: "<2 hours",
     difficulty: "Beginner"
   },
 
@@ -672,7 +672,7 @@ export const helpContent = {
     resources: [
       { title: "Browser Caching", url: "https://web.dev/uses-long-cache-ttl/" }
     ],
-    estimatedTime: "1-2 hours",
+    estimatedTime: "<2 hours",
     difficulty: "Beginner"
   },
 
@@ -689,7 +689,7 @@ export const helpContent = {
     resources: [
       { title: "Viewport Meta Tag", url: "https://developers.google.com/search/docs/mobile-sites/mobile-seo/responsive-design" }
     ],
-    estimatedTime: "1-2 hours",
+    estimatedTime: "<2 hours",
     difficulty: "Beginner"
   },
 
@@ -723,7 +723,7 @@ export const helpContent = {
     resources: [
       { title: "Intrusive Interstitials", url: "https://developers.google.com/search/blog/2016/08/helping-users-easily-access-content-on" }
     ],
-    estimatedTime: "1-2 hours",
+    estimatedTime: "<2 hours",
     difficulty: "Beginner"
   },
 
@@ -740,7 +740,7 @@ export const helpContent = {
     resources: [
       { title: "Organization Schema", url: "https://schema.org/Organization" }
     ],
-    estimatedTime: "1-2 hours",
+    estimatedTime: "<2 hours",
     difficulty: "Beginner"
   },
 
@@ -928,7 +928,7 @@ export const helpContent = {
     resources: [
       { title: "404 Page Best Practices", url: "https://moz.com/learn/seo/http-status-codes" }
     ],
-    estimatedTime: "1-2 hours",
+    estimatedTime: "<2 hours",
     difficulty: "Beginner"
   },
 
@@ -1066,7 +1066,7 @@ export const helpContent = {
     resources: [
       { title: "Links and Security", url: "https://web.dev/external-anchors-use-rel-noopener/" }
     ],
-    estimatedTime: "1 hour",
+    estimatedTime: "<2 hours",
     difficulty: "Beginner"
   },
 
@@ -1305,7 +1305,7 @@ export const helpContent = {
     resources: [
       { title: "Contact Page Best Practices", url: "https://www.semrush.com/blog/contact-page/" }
     ],
-    estimatedTime: "1-2 hours",
+    estimatedTime: "<2 hours",
     difficulty: "Beginner"
   },
 
@@ -1374,7 +1374,7 @@ export const helpContent = {
     resources: [
       { title: "Event Schema", url: "https://developers.google.com/search/docs/appearance/structured-data/event" }
     ],
-    estimatedTime: "1-2 hours",
+    estimatedTime: "<2 hours",
     difficulty: "Intermediate"
   },
 
@@ -1495,7 +1495,7 @@ export const helpContent = {
     resources: [
       { title: "Trailing Slash Issues", url: "https://moz.com/learn/seo/url" }
     ],
-    estimatedTime: "1-2 hours",
+    estimatedTime: "<2 hours",
     difficulty: "Beginner"
   },
 
@@ -1512,7 +1512,7 @@ export const helpContent = {
     resources: [
       { title: "HTML Sitemap Guide", url: "https://www.semrush.com/blog/html-sitemap/" }
     ],
-    estimatedTime: "1-2 hours",
+    estimatedTime: "<2 hours",
     difficulty: "Beginner"
   },
 
@@ -1546,7 +1546,7 @@ export const helpContent = {
     resources: [
       { title: "Open Graph Protocol", url: "https://ogp.me/" }
     ],
-    estimatedTime: "1-2 hours",
+    estimatedTime: "<2 hours",
     difficulty: "Beginner"
   },
 
@@ -1563,7 +1563,7 @@ export const helpContent = {
     resources: [
       { title: "Twitter Cards Guide", url: "https://developer.twitter.com/en/docs/twitter-for-websites/cards/overview/abouts-cards" }
     ],
-    estimatedTime: "1-2 hours",
+    estimatedTime: "<2 hours",
     difficulty: "Beginner"
   },
 
@@ -1580,7 +1580,7 @@ export const helpContent = {
     resources: [
       { title: "Favicon Generator", url: "https://realfavicongenerator.net/" }
     ],
-    estimatedTime: "1 hour",
+    estimatedTime: "<2 hours",
     difficulty: "Beginner"
   },
 
@@ -1631,7 +1631,7 @@ export const helpContent = {
     resources: [
       { title: "Print Stylesheet Guide", url: "https://www.smashingmagazine.com/2018/05/print-stylesheets-in-2018/" }
     ],
-    estimatedTime: "1-2 hours",
+    estimatedTime: "<2 hours",
     difficulty: "Beginner"
   },
 
@@ -1750,7 +1750,7 @@ export const helpContent = {
     resources: [
       { title: "Robots.txt Tester", url: "https://support.google.com/webmasters/answer/6062598" }
     ],
-    estimatedTime: "1 hour",
+    estimatedTime: "<2 hours",
     difficulty: "Beginner"
   },
 
@@ -1905,7 +1905,7 @@ export const helpContent = {
     resources: [
       { title: "Mixed Content Issues", url: "https://developers.google.com/web/fundamentals/security/prevent-mixed-content/what-is-mixed-content" }
     ],
-    estimatedTime: "1-2 hours",
+    estimatedTime: "<2 hours",
     difficulty: "Beginner"
   },
 
@@ -1940,7 +1940,7 @@ export const helpContent = {
     resources: [
       { title: "Search Console Setup", url: "https://support.google.com/webmasters/answer/9008080" }
     ],
-    estimatedTime: "1 hour",
+    estimatedTime: "<2 hours",
     difficulty: "Beginner"
   },
 
@@ -2026,7 +2026,7 @@ export const helpContent = {
     resources: [
       { title: "Bing Webmaster Tools", url: "https://www.bing.com/webmasters/" }
     ],
-    estimatedTime: "1 hour",
+    estimatedTime: "<2 hours",
     difficulty: "Beginner"
   },
 
@@ -2060,7 +2060,7 @@ export const helpContent = {
     resources: [
       { title: "UptimeRobot", url: "https://uptimerobot.com/" }
     ],
-    estimatedTime: "1 hour",
+    estimatedTime: "<2 hours",
     difficulty: "Beginner"
   },
 
@@ -2198,7 +2198,7 @@ export const helpContent = {
     resources: [
       { title: "Backlink Monitoring", url: "https://support.google.com/webmasters/answer/9049606" }
     ],
-    estimatedTime: "1-2 hours",
+    estimatedTime: "<2 hours",
     difficulty: "Intermediate"
   },
 
@@ -2335,7 +2335,7 @@ export const helpContent = {
     resources: [
       { title: "Rich Results Status", url: "https://support.google.com/webmasters/answer/7552505" }
     ],
-    estimatedTime: "1 hour",
+    estimatedTime: "<2 hours",
     difficulty: "Beginner"
   },
 
@@ -2352,7 +2352,7 @@ export const helpContent = {
     resources: [
       { title: "Sitemap Updates", url: "https://developers.google.com/search/docs/crawling-indexing/sitemaps/build-sitemap" }
     ],
-    estimatedTime: "1 hour",
+    estimatedTime: "<2 hours",
     difficulty: "Beginner"
   },
 
@@ -2815,7 +2815,7 @@ export const helpContent = {
     resources: [
       { title: "Readability Testing", url: "https://hemingwayapp.com/" }
     ],
-    estimatedTime: "1 hour",
+    estimatedTime: "<2 hours",
     difficulty: "Beginner"
   },
 
@@ -2832,7 +2832,7 @@ export const helpContent = {
     resources: [
       { title: "Content Freshness", url: "https://moz.com/learn/seo/content-freshness" }
     ],
-    estimatedTime: "1 hour",
+    estimatedTime: "<2 hours",
     difficulty: "Beginner"
   },
 
@@ -3122,7 +3122,7 @@ export const helpContent = {
     resources: [
       { title: "Competitive Monitoring", url: "https://www.semrush.com/kb/920-position-tracking-overview" }
     ],
-    estimatedTime: "2-8 hours setup",
+    estimatedTime: "2-8 hours",
     difficulty: "Intermediate"
   },
 
@@ -3156,7 +3156,7 @@ export const helpContent = {
     resources: [
       { title: "Ranking Velocity", url: "https://www.semrush.com/kb/920-position-tracking-overview" }
     ],
-    estimatedTime: "1 hour",
+    estimatedTime: "<2 hours",
     difficulty: "Beginner"
   },
 
@@ -3173,7 +3173,7 @@ export const helpContent = {
     resources: [
       { title: "Index Coverage Report", url: "https://support.google.com/webmasters/answer/7440203" }
     ],
-    estimatedTime: "1 hour",
+    estimatedTime: "<2 hours",
     difficulty: "Beginner"
   },
 
@@ -3480,7 +3480,7 @@ export const helpContent = {
     resources: [
       { title: "LearningResource Schema", url: "https://schema.org/LearningResource" }
     ],
-    estimatedTime: "1-2 hours",
+    estimatedTime: "<2 hours",
     difficulty: "Beginner"
   },
 
@@ -3582,7 +3582,7 @@ export const helpContent = {
     resources: [
       { title: "Fact Check Schema", url: "https://developers.google.com/search/docs/appearance/structured-data/factcheck" }
     ],
-    estimatedTime: "1-2 hours",
+    estimatedTime: "<2 hours",
     difficulty: "Intermediate"
   },
 
@@ -3599,7 +3599,7 @@ export const helpContent = {
     resources: [
       { title: "Corrections Transparency", url: "https://schema.org/CorrectionComment" }
     ],
-    estimatedTime: "1 hour",
+    estimatedTime: "<2 hours",
     difficulty: "Beginner"
   },
 
