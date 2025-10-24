@@ -1,24 +1,37 @@
 import React, { useState, useEffect } from 'react';
-import { X, User, Calendar, Clock, MessageSquare, Activity, Check } from 'lucide-react';
+import { X, User, Calendar, Clock, MessageSquare, Activity, Check, AlertCircle, CalendarClock } from 'lucide-react';
+import DatePicker from 'react-datepicker';
+import 'react-datepicker/dist/react-datepicker.css';
 import { useComments } from '../../hooks/useComments';
 import { useAssignments } from '../../hooks/useAssignments';
 import { useActivityLog } from '../../hooks/useActivityLog';
 import { useAuth } from '../../contexts/AuthContext';
 import { TASK_STATUS, TASK_STATUS_LABELS } from '../../utils/roles';
 import CommentThread from './CommentThread';
-import { format } from 'date-fns';
+import { format, parseISO } from 'date-fns';
+import {
+  formatDate,
+  getRelativeDate,
+  isOverdue,
+  isDueSoon,
+  getDueDateColor,
+  getDueDateBadgeColor
+} from '../../utils/dateHelpers';
 
 export default function ItemDetailModal({ item, projectId, isOpen, onClose, onToggleComplete, isCompleted }) {
   const [activeTab, setActiveTab] = useState('details');
   const { currentUser } = useAuth();
   const { comments, loading: commentsLoading, addComment } = useComments(projectId, item?.id);
-  const { assignments, assignTask, updateTaskStatus } = useAssignments(projectId);
+  const { assignments, assignTask, updateTaskStatus, updateTimeline } = useAssignments(projectId);
   const { activities } = useActivityLog(projectId);
 
   const [assignmentData, setAssignmentData] = useState({
     assignedTo: [],
-    dueDate: '',
+    startDate: null,
+    dueDate: null,
+    completedDate: null,
     estimatedHours: '',
+    notes: '',
     status: TASK_STATUS.NOT_STARTED
   });
 
@@ -28,8 +41,11 @@ export default function ItemDetailModal({ item, projectId, isOpen, onClose, onTo
     if (assignment) {
       setAssignmentData({
         assignedTo: assignment.assignedTo || [],
-        dueDate: assignment.dueDate ? format(assignment.dueDate.toDate(), 'yyyy-MM-dd') : '',
+        startDate: assignment.startDate ? assignment.startDate.toDate() : null,
+        dueDate: assignment.dueDate ? assignment.dueDate.toDate() : null,
+        completedDate: assignment.completedDate ? assignment.completedDate.toDate() : null,
         estimatedHours: assignment.estimatedHours || '',
+        notes: assignment.notes || '',
         status: assignment.status || TASK_STATUS.NOT_STARTED
       });
     }
@@ -44,8 +60,16 @@ export default function ItemDetailModal({ item, projectId, isOpen, onClose, onTo
       item.id,
       assignmentData.assignedTo,
       assignmentData.dueDate,
-      assignmentData.estimatedHours
+      assignmentData.estimatedHours,
+      assignmentData.startDate
     );
+
+    // Update additional timeline data
+    if (assignmentData.notes) {
+      await updateTimeline(item.id, {
+        notes: assignmentData.notes
+      });
+    }
   };
 
   const handleStatusChange = async (newStatus) => {
@@ -184,24 +208,60 @@ export default function ItemDetailModal({ item, projectId, isOpen, onClose, onTo
                       />
                     </div>
 
+                    {/* Timeline Fields */}
                     <div className="grid grid-cols-2 gap-4">
                       <div>
                         <label className="block text-sm font-medium text-gray-700 mb-2">
-                          Due Date
+                          <Calendar className="inline w-4 h-4 mr-1" />
+                          Start Date
                         </label>
-                        <input
-                          type="date"
-                          value={assignmentData.dueDate}
-                          onChange={(e) => setAssignmentData(prev => ({
+                        <DatePicker
+                          selected={assignmentData.startDate}
+                          onChange={(date) => setAssignmentData(prev => ({
                             ...prev,
-                            dueDate: e.target.value
+                            startDate: date
                           }))}
-                          className="input"
+                          dateFormat="MMM d, yyyy"
+                          placeholderText="Select start date"
+                          className="input w-full"
+                          isClearable
                         />
                       </div>
 
                       <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2 flex items-center">
+                          <CalendarClock className="inline w-4 h-4 mr-1" />
+                          Due Date
+                          {assignmentData.dueDate && isOverdue(assignmentData.dueDate, isCompleted) && (
+                            <AlertCircle className="inline w-4 h-4 ml-2 text-red-600" />
+                          )}
+                        </label>
+                        <DatePicker
+                          selected={assignmentData.dueDate}
+                          onChange={(date) => setAssignmentData(prev => ({
+                            ...prev,
+                            dueDate: date
+                          }))}
+                          dateFormat="MMM d, yyyy"
+                          placeholderText="Select due date"
+                          className={`input w-full ${getDueDateColor(assignmentData.dueDate, isCompleted)}`}
+                          minDate={assignmentData.startDate || new Date()}
+                          isClearable
+                        />
+                        {assignmentData.dueDate && (
+                          <p className={`text-xs mt-1 ${getDueDateColor(assignmentData.dueDate, isCompleted)}`}>
+                            {getRelativeDate(assignmentData.dueDate)}
+                            {isOverdue(assignmentData.dueDate, isCompleted) && ' - Overdue!'}
+                            {isDueSoon(assignmentData.dueDate) && !isOverdue(assignmentData.dueDate, isCompleted) && ' - Due soon'}
+                          </p>
+                        )}
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
                         <label className="block text-sm font-medium text-gray-700 mb-2">
+                          <Clock className="inline w-4 h-4 mr-1" />
                           Estimated Hours
                         </label>
                         <input
@@ -217,6 +277,35 @@ export default function ItemDetailModal({ item, projectId, isOpen, onClose, onTo
                           step="0.5"
                         />
                       </div>
+
+                      {assignmentData.completedDate && (
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-2">
+                            <Check className="inline w-4 h-4 mr-1 text-green-600" />
+                            Completed Date
+                          </label>
+                          <div className="input bg-green-50 text-green-800 font-medium">
+                            {formatDate(assignmentData.completedDate)}
+                          </div>
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Notes Field */}
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Notes
+                      </label>
+                      <textarea
+                        value={assignmentData.notes}
+                        onChange={(e) => setAssignmentData(prev => ({
+                          ...prev,
+                          notes: e.target.value
+                        }))}
+                        placeholder="Add timeline notes..."
+                        rows={3}
+                        className="input w-full"
+                      />
                     </div>
 
                     <div>

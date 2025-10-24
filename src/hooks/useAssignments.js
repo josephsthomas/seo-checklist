@@ -40,7 +40,7 @@ export function useAssignments(projectId) {
     return unsubscribe;
   }, [projectId]);
 
-  const assignTask = async (itemId, userIds, dueDate = null, estimatedHours = null) => {
+  const assignTask = async (itemId, userIds, dueDate = null, estimatedHours = null, startDate = null) => {
     if (!projectId || !currentUser) return;
 
     try {
@@ -50,9 +50,12 @@ export function useAssignments(projectId) {
         assignedBy: currentUser.uid,
         assignedAt: new Date(),
         dueDate: dueDate ? new Date(dueDate) : null,
+        startDate: startDate ? new Date(startDate) : null,
+        completedDate: null,
         estimatedHours: estimatedHours ? parseFloat(estimatedHours) : null,
         actualHours: null,
-        status: 'not_started'
+        status: 'not_started',
+        notes: ''
       };
 
       // Update local state immediately
@@ -112,7 +115,9 @@ export function useAssignments(projectId) {
       const updatedAssignment = {
         ...currentAssignment,
         status,
-        updatedAt: new Date()
+        updatedAt: new Date(),
+        // Auto-set completedDate when status changes to completed
+        completedDate: status === 'completed' ? new Date() : currentAssignment.completedDate
       };
 
       // Update local state
@@ -169,12 +174,54 @@ export function useAssignments(projectId) {
     }
   };
 
+  const updateTimeline = async (itemId, timelineData) => {
+    if (!projectId) return;
+
+    try {
+      const docRef = doc(db, 'checklist_assignments', `${projectId}_assignments`);
+      const currentAssignment = assignments[itemId] || {};
+
+      const updatedAssignment = {
+        ...currentAssignment,
+        ...timelineData,
+        updatedAt: new Date()
+      };
+
+      // Update local state
+      setAssignments(prev => ({
+        ...prev,
+        [itemId]: updatedAssignment
+      }));
+
+      // Update in Firestore
+      await updateDoc(docRef, {
+        [itemId]: updatedAssignment
+      });
+
+      // Log activity
+      await logActivity(
+        projectId,
+        currentUser.uid,
+        currentUser.displayName || currentUser.email,
+        'updated_timeline',
+        { itemId, updates: Object.keys(timelineData) }
+      );
+
+      toast.success('Timeline updated');
+    } catch (error) {
+      console.error('Error updating timeline:', error);
+      toast.error('Failed to update timeline');
+      throw error;
+    }
+  };
+
   return {
     assignments,
     loading,
     assignTask,
     updateTaskStatus,
-    unassignTask
+    unassignTask,
+    updateTimeline
   };
 }
 
