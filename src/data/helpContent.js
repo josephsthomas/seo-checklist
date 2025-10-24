@@ -3773,6 +3773,1630 @@ export const helpContent = {
     ],
     estimatedTime: "8-40 hours",
     difficulty: "Intermediate"
+  },
+
+  221: {
+    description: "Skip links allow keyboard users and assistive technologies to bypass repetitive navigation and jump directly to main content. These invisible-until-focused links improve accessibility and help search engines identify primary content sections.",
+    tips: [
+      "Add as first element in <body>: <a href='#main-content' class='skip-link'>Skip to main content</a>",
+      "Style with position:absolute; top:-40px; then focus state top:0 to reveal on tab",
+      "Link to id on main content container: <main id='main-content'>",
+      "Add multiple skip links if needed: Skip to navigation, Skip to footer",
+      "Test by pressing Tab key immediately on page load - link should appear",
+      "Include z-index:9999 to ensure link appears above all other content when focused"
+    ],
+    resources: [
+      { title: "WebAIM Skip Navigation", url: "https://webaim.org/techniques/skipnav/" }
+    ],
+    estimatedTime: "<2 hours",
+    difficulty: "Beginner"
+  },
+
+  222: {
+    description: "Semantic HTML5 elements provide meaning to page structure beyond generic divs and spans. Elements like <article>, <section>, <aside>, and <figure> help search engines and AI understand content relationships and hierarchy.",
+    tips: [
+      "Use <article> for self-contained content (blog posts, products, comments)",
+      "Use <section> to group related content with a heading",
+      "Use <aside> for tangentially related content (sidebars, callouts)",
+      "Use <figure> and <figcaption> for images, diagrams, code with captions",
+      "Use <time datetime='2024-01-15'> for dates and times",
+      "Use <address> for contact information in Organization schema context"
+    ],
+    resources: [
+      { title: "HTML5 Semantic Elements", url: "https://developer.mozilla.org/en-US/docs/Web/HTML/Element" },
+      { title: "Semantic HTML Guide", url: "https://web.dev/learn/html/semantic-html/" }
+    ],
+    estimatedTime: "8-40 hours",
+    difficulty: "Intermediate"
+  },
+
+  223: {
+    description: "Data attributes (data-*) store custom metadata on HTML elements that JavaScript and web scrapers can access. They provide machine-readable information without affecting visual presentation.",
+    tips: [
+      "Add product SKU: <div data-product-id='ABC123' data-sku='12345'>",
+      "Store dates in ISO format: data-publish-date='2024-01-15T10:30:00Z'",
+      "Mark categories: data-category='technology' data-subcategory='ai'",
+      "Add price data: data-price='99.99' data-currency='USD'",
+      "Use for AB testing: data-variant='A' data-experiment-id='exp-001'",
+      "Access in JS: element.dataset.productId returns 'ABC123'"
+    ],
+    resources: [
+      { title: "Using Data Attributes", url: "https://developer.mozilla.org/en-US/docs/Learn/HTML/Howto/Use_data_attributes" }
+    ],
+    estimatedTime: "2-8 hours",
+    difficulty: "Beginner"
+  },
+
+  224: {
+    description: "A proper heading outline creates a logical document structure using H1-H6 elements without skipping levels. This hierarchy helps screen readers navigate and assists search engines in understanding content importance and relationships.",
+    tips: [
+      "Use exactly one H1 per page for the main page title",
+      "Follow sequential order: H1 → H2 → H3, never skip levels (no H1 → H3)",
+      "Use headings for structure, not styling (use CSS for visual appearance)",
+      "Test outline with browser extensions like HeadingsMap or WAVE",
+      "Each section should have a heading that describes its content",
+      "Avoid using heading tags for emphasis or making text larger"
+    ],
+    resources: [
+      { title: "HTML Heading Outline", url: "https://developer.mozilla.org/en-US/docs/Web/HTML/Element/Heading_Elements" },
+      { title: "WebAIM Headings", url: "https://webaim.org/techniques/semanticstructure/" }
+    ],
+    estimatedTime: "8-40 hours",
+    difficulty: "Intermediate"
+  },
+
+  225: {
+    description: "The lang attribute specifies the language of HTML content, enabling proper text rendering, pronunciation by screen readers, and language-specific search engine indexing. Essential for international sites and multilingual content.",
+    tips: [
+      "Add to <html> tag: <html lang='en'> for English sites",
+      "Use ISO 639-1 codes: en (English), es (Spanish), fr (French), de (German)",
+      "Mark foreign language sections: <span lang='es'>Hola mundo</span>",
+      "For regional variants use full code: lang='en-US' or lang='en-GB'",
+      "Add to all pages in CMS template to ensure sitewide coverage",
+      "Update hreflang tags to match html lang attribute values"
+    ],
+    resources: [
+      { title: "Language Tags", url: "https://www.w3.org/International/questions/qa-html-language-declarations" }
+    ],
+    estimatedTime: "<2 hours",
+    difficulty: "Beginner"
+  },
+
+  226: {
+    description: "WebPage schema with comprehensive properties like speakable, mainEntity, mentions, and about provides rich context about page content. These properties help voice assistants, AI systems, and search engines deeply understand page purpose and relationships.",
+    tips: [
+      "Add speakable property to mark sections for voice assistants: 'speakable': {'@type': 'SpeakableSpecification', 'cssSelector': ['.summary', 'h1']}",
+      "Use mainEntity to specify primary topic: 'mainEntity': {'@type': 'Product', 'name': '...'}",
+      "Add mentions array for entities referenced: 'mentions': [{'@type': 'Person', 'name': 'Expert Name'}]",
+      "Use about property for subject matter: 'about': [{'@type': 'Thing', 'name': 'SEO'}]",
+      "Combine with other page-level schema (BreadcrumbList, Article)",
+      "Validate with Google Rich Results Test and Schema.org validator"
+    ],
+    resources: [
+      { title: "WebPage Schema", url: "https://schema.org/WebPage" },
+      { title: "Google Speakable Guide", url: "https://developers.google.com/search/docs/appearance/structured-data/speakable" }
+    ],
+    estimatedTime: "2-8 hours",
+    difficulty: "Intermediate"
+  },
+
+  227: {
+    description: "Title attributes on links and images provide additional context that appears on hover and is accessible to screen readers and web scrapers. They supplement alt text and link text with extra descriptive information.",
+    tips: [
+      "Add to links: <a href='/about' title='Learn about our company history and mission'>About Us</a>",
+      "Supplement image alt text: <img alt='Product photo' title='Available in 5 colors'>",
+      "For icon links: <a href='/cart' title='View shopping cart (3 items)'>🛒</a>",
+      "Provide context for abbreviations: <abbr title='Search Engine Optimization'>SEO</abbr>",
+      "Don't duplicate link text or alt text exactly - add unique context",
+      "Keep concise (under 100 characters) for better usability"
+    ],
+    resources: [
+      { title: "Title Attribute Guidelines", url: "https://developer.mozilla.org/en-US/docs/Web/HTML/Global_attributes/title" }
+    ],
+    estimatedTime: "8-40 hours",
+    difficulty: "Beginner"
+  },
+
+  228: {
+    description: "Properly structured forms using <label>, <fieldset>, and <legend> elements ensure accessibility and provide clear machine-readable relationships between form controls and their descriptions. Essential for form understanding by assistive technology and automated systems.",
+    tips: [
+      "Use <label for='email'> with matching <input id='email'> for explicit association",
+      "Wrap related inputs in <fieldset> with <legend> describing the group",
+      "Example: <fieldset><legend>Shipping Address</legend>..fields..</fieldset>",
+      "Always use 'for' attribute on labels, not just wrapping (better compatibility)",
+      "Mark required fields: <input required aria-required='true'>",
+      "Add helpful descriptions with aria-describedby for complex fields"
+    ],
+    resources: [
+      { title: "Accessible Forms", url: "https://webaim.org/techniques/forms/" },
+      { title: "Form Structure", url: "https://www.w3.org/WAI/tutorials/forms/" }
+    ],
+    estimatedTime: "2-8 hours",
+    difficulty: "Intermediate"
+  },
+
+  229: {
+    description: "PriceSpecification schema provides structured pricing data including currency, validity dates, and availability status. This helps e-commerce sites display rich pricing information in search results and enables price comparison by shopping engines.",
+    tips: [
+      "Use within Offer schema: 'priceSpecification': {'@type': 'PriceSpecification', 'price': '99.99', 'priceCurrency': 'USD'}",
+      "Add validity period: 'validFrom': '2024-01-01', 'validThrough': '2024-12-31'",
+      "Mark availability: 'availability': 'https://schema.org/InStock'",
+      "For variable pricing: 'minPrice': '49.99', 'maxPrice': '199.99'",
+      "Include payment methods accepted: 'acceptedPaymentMethod': ['CreditCard', 'PayPal']",
+      "Add shipping costs: 'deliveryLeadTime' and 'shippingDetails' properties"
+    ],
+    resources: [
+      { title: "PriceSpecification Schema", url: "https://schema.org/PriceSpecification" },
+      { title: "Product Pricing Markup", url: "https://developers.google.com/search/docs/appearance/structured-data/product" }
+    ],
+    estimatedTime: "2-8 hours",
+    difficulty: "Intermediate"
+  },
+
+  230: {
+    description: "The og:type OpenGraph property specifies the content type (article, product, website, etc.) for proper classification by social platforms and link preview systems. Different types enable different rich preview formats on Facebook, LinkedIn, and other platforms.",
+    tips: [
+      "For homepage: <meta property='og:type' content='website'>",
+      "For blog posts: <meta property='og:type' content='article'>",
+      "For products: <meta property='og:type' content='product'>",
+      "For videos: <meta property='og:type' content='video.movie'> or 'video.other'>",
+      "Other types: book, profile, music.song, place, restaurant.restaurant",
+      "Match type to primary page purpose for best social sharing results"
+    ],
+    resources: [
+      { title: "OpenGraph Types", url: "https://ogp.me/#types" },
+      { title: "Facebook Sharing Debugger", url: "https://developers.facebook.com/tools/debug/" }
+    ],
+    estimatedTime: "<2 hours",
+    difficulty: "Beginner"
+  },
+
+  231: {
+    description: "ItemList schema marks collections like product listings, article archives, and search results with proper ordering and position properties. This enables rich results like carousel displays and helps AI understand list structure and item relationships.",
+    tips: [
+      "Use for product categories, search results, top 10 lists, article archives",
+      "Include numberOfItems: 'numberOfItems': 25",
+      "Mark each item with position: 'itemListElement': [{'@type': 'ListItem', 'position': 1, 'url': '...'}]",
+      "Specify ordering: 'itemListOrder': 'https://schema.org/ItemListOrderDescending'",
+      "Add item properties like name, image, offers for richer data",
+      "Combine with pagination schema for multi-page lists"
+    ],
+    resources: [
+      { title: "ItemList Schema", url: "https://schema.org/ItemList" },
+      { title: "List Schema Examples", url: "https://developers.google.com/search/docs/appearance/structured-data/carousel" }
+    ],
+    estimatedTime: "2-8 hours",
+    difficulty: "Intermediate"
+  },
+
+  232: {
+    description: "Meaningful anchor text describes link destinations clearly without generic phrases like 'click here' or 'read more'. Descriptive link text helps users and search engines understand where links lead and improves accessibility and SEO.",
+    tips: [
+      "Bad: 'Click here for our services' → Good: 'View our SEO consulting services'",
+      "Bad: 'Read more' → Good: 'Read the complete guide to technical SEO'",
+      "Include keywords naturally: 'Learn about local SEO strategies for small businesses'",
+      "For downloads: 'Download the 2024 SEO Checklist (PDF, 2.5MB)'",
+      "Avoid: 'Learn more', 'Click here', 'This page', 'Here', 'Link'",
+      "Keep concise (3-8 words) while being descriptive"
+    ],
+    resources: [
+      { title: "Link Text Best Practices", url: "https://moz.com/learn/seo/anchor-text" },
+      { title: "Accessible Link Text", url: "https://webaim.org/techniques/hypertext/link_text" }
+    ],
+    estimatedTime: "8-40 hours",
+    difficulty: "Intermediate"
+  },
+
+  233: {
+    description: "PostalAddress schema structures physical address information with separate properties for street, city, state, postal code, and country. This enables location-based features, local search visibility, and proper address display by mapping services and directories.",
+    tips: [
+      "Use within Organization or Place: 'address': {'@type': 'PostalAddress', 'streetAddress': '123 Main St', 'addressLocality': 'Springfield', 'addressRegion': 'IL', 'postalCode': '62701', 'addressCountry': 'US'}",
+      "Include suite/unit numbers in streetAddress: '123 Main St, Suite 200'",
+      "Use full state names or abbreviations consistently sitewide",
+      "Add addressCountry using ISO 3166-1 alpha-2 codes (US, GB, CA, etc.)",
+      "For multiple locations, add PostalAddress to each Place or LocalBusiness instance",
+      "Ensure address format matches Google Business Profile exactly"
+    ],
+    resources: [
+      { title: "PostalAddress Schema", url: "https://schema.org/PostalAddress" }
+    ],
+    estimatedTime: "<2 hours",
+    difficulty: "Beginner"
+  },
+
+  234: {
+    description: "ContactPoint schema marks support phone numbers, email addresses, and contact hours with structured properties for contact type, language, and availability. Essential for customer service visibility and enabling click-to-call rich results.",
+    tips: [
+      "Add to Organization: 'contactPoint': {'@type': 'ContactPoint', 'telephone': '+1-555-555-5555', 'contactType': 'customer service', 'availableLanguage': ['English', 'Spanish']}",
+      "Specify contact types: customer service, technical support, billing support, sales",
+      "Add hours: 'hoursAvailable': {'@type': 'OpeningHoursSpecification', 'dayOfWeek': ['Monday', 'Tuesday'], 'opens': '09:00', 'closes': '17:00'}",
+      "Include area served: 'areaServed': 'US' or specific regions",
+      "Use international phone format: +1-555-555-5555",
+      "Add multiple ContactPoints for different departments"
+    ],
+    resources: [
+      { title: "ContactPoint Schema", url: "https://schema.org/ContactPoint" },
+      { title: "Contact Information Markup", url: "https://developers.google.com/search/docs/appearance/structured-data/logo" }
+    ],
+    estimatedTime: "<2 hours",
+    difficulty: "Beginner"
+  },
+
+  235: {
+    description: "ImageObject schema adds structured metadata to key images including dimensions, license information, creator attribution, and captions. This helps image search visibility and provides proper attribution for photography and graphics.",
+    tips: [
+      "Add to Article or Product: 'image': {'@type': 'ImageObject', 'url': 'https://example.com/image.jpg', 'width': 1200, 'height': 630, 'caption': 'Product in use'}",
+      "Include creator: 'creator': {'@type': 'Person', 'name': 'Photographer Name'}",
+      "Add license: 'license': 'https://creativecommons.org/licenses/by/4.0/'",
+      "Specify thumbnail: 'thumbnail': {'@type': 'ImageObject', 'url': '...', 'width': 200, 'height': 200}",
+      "For copyrighted images: 'copyrightHolder': {'@type': 'Organization', 'name': 'Company'}",
+      "Add contentUrl for original high-res version if different from url"
+    ],
+    resources: [
+      { title: "ImageObject Schema", url: "https://schema.org/ImageObject" }
+    ],
+    estimatedTime: "2-8 hours",
+    difficulty: "Intermediate"
+  },
+
+  236: {
+    description: "Mapping brand entities to authoritative knowledge bases like Wikipedia, Wikidata, Crunchbase, and LinkedIn establishes official entity verification. These sameAs links help search engines confirm entity identity and merge information from multiple sources into knowledge panels.",
+    tips: [
+      "Find official Wikipedia page (not disambiguation page): https://en.wikipedia.org/wiki/Your_Company",
+      "Get Wikidata ID: https://www.wikidata.org/wiki/Q12345",
+      "Add Crunchbase company profile: https://www.crunchbase.com/organization/your-company",
+      "Include official LinkedIn company page: https://www.linkedin.com/company/your-company/",
+      "For public companies, add stock exchange identifiers",
+      "Only link to pages you control or official third-party databases"
+    ],
+    resources: [
+      { title: "Entity Linking Best Practices", url: "https://www.searchenginejournal.com/schema-markup-knowledge-graph/" },
+      { title: "Wikidata for SEO", url: "https://www.wikidata.org/" }
+    ],
+    estimatedTime: "2-8 hours",
+    difficulty: "Intermediate"
+  },
+
+  237: {
+    description: "Comprehensive Person schema for leadership team members includes credentials, job titles, organizational relationships, education, social profiles, and expertise areas. This builds E-E-A-T signals and supports knowledge graph entity recognition for key personnel.",
+    tips: [
+      "Full structure: {'@type': 'Person', 'name': 'Jane Smith', 'jobTitle': 'Chief Technology Officer', 'worksFor': {'@type': 'Organization', 'name': 'ACME Corp'}, 'alumniOf': 'Stanford University', 'sameAs': ['https://www.linkedin.com/in/janesmith', 'https://twitter.com/janesmith'], 'knowsAbout': ['Artificial Intelligence', 'Cloud Computing']}",
+      "Add credentials: 'hasCredential': {'@type': 'EducationalOccupationalCredential', 'credentialCategory': 'PhD'}",
+      "Include awards: 'award': ['Forbes 30 Under 30', 'Industry Innovation Award']",
+      "Add image: 'image': 'https://example.com/headshots/jane-smith.jpg'",
+      "Link to author articles: 'url': 'https://example.com/authors/jane-smith'",
+      "Place on leadership/about page and author pages"
+    ],
+    resources: [
+      { title: "Person Schema", url: "https://schema.org/Person" },
+      { title: "Author Markup Guide", url: "https://developers.google.com/search/docs/appearance/structured-data/article" }
+    ],
+    estimatedTime: "8-40 hours",
+    difficulty: "Intermediate"
+  },
+
+  238: {
+    description: "Brand sameAs links in Organization schema connect to all official social media profiles including LinkedIn, Twitter, Facebook, Instagram, YouTube, and TikTok. These verified links help search engines associate social presence with the brand entity and display social profiles in knowledge panels.",
+    tips: [
+      "Add to Organization schema: 'sameAs': ['https://www.linkedin.com/company/your-company', 'https://twitter.com/yourcompany', 'https://www.facebook.com/yourcompany', 'https://www.instagram.com/yourcompany/', 'https://www.youtube.com/@yourcompany']",
+      "Use full URLs, not shortened links or username-only",
+      "Only include profiles you officially control",
+      "Verify all URLs are publicly accessible (not set to private)",
+      "Include all active platforms (LinkedIn, X/Twitter, Facebook, Instagram, YouTube, TikTok, Pinterest)",
+      "Update when launching new social profiles"
+    ],
+    resources: [
+      { title: "Social Profile Markup", url: "https://developers.google.com/search/docs/appearance/structured-data/social-profile" }
+    ],
+    estimatedTime: "<2 hours",
+    difficulty: "Beginner"
+  },
+
+  239: {
+    description: "ParentOrganization schema properties connect subsidiary brands, divisions, and parent companies in structured relationships. This clarifies corporate structure for search engines and supports entity relationship mapping in knowledge graphs.",
+    tips: [
+      "For subsidiary: 'parentOrganization': {'@type': 'Organization', 'name': 'Parent Company Inc', 'url': 'https://parentco.com'}",
+      "For parent org: 'subOrganization': [{'@type': 'Organization', 'name': 'Subsidiary A'}, {'@type': 'Organization', 'name': 'Subsidiary B'}]",
+      "Link brands under a holding company",
+      "Include department relationships for large organizations",
+      "Add to homepage Organization schema",
+      "Verify parent company has matching schema on their site"
+    ],
+    resources: [
+      { title: "Organization Hierarchy", url: "https://schema.org/Organization" }
+    ],
+    estimatedTime: "<2 hours",
+    difficulty: "Beginner"
+  },
+
+  240: {
+    description: "Industry classification schema using knowsAbout, naics, and industry properties categorizes organizations within sectors and specializations. This helps search engines understand business focus and match companies with industry-specific searches.",
+    tips: [
+      "Add industry: 'industry': 'Software Development' or 'Healthcare'",
+      "Use NAICS code: 'naics': '541511' (Custom Computer Programming Services)",
+      "Add expertise areas: 'knowsAbout': ['SEO', 'Content Marketing', 'Technical SEO', 'E-commerce Optimization']",
+      "Include multiple keywords that describe services/products",
+      "Match industry terms customers actually search for",
+      "Find NAICS codes at https://www.census.gov/naics/"
+    ],
+    resources: [
+      { title: "Organization Properties", url: "https://schema.org/Organization" },
+      { title: "NAICS Code Lookup", url: "https://www.census.gov/naics/" }
+    ],
+    estimatedTime: "<2 hours",
+    difficulty: "Beginner"
+  },
+
+  241: {
+    description: "Place schema marks physical business locations with geographic coordinates, full addresses, and location-specific details. Essential for local SEO, mapping services, and location-based search features.",
+    tips: [
+      "Use for headquarters/offices: {'@type': 'Place', 'name': 'ACME Corp Headquarters', 'address': {PostalAddress}, 'geo': {'@type': 'GeoCoordinates', 'latitude': '37.7749', 'longitude': '-122.4194'}}",
+      "Get coordinates from Google Maps: right-click location → 'What's here?'",
+      "Add hasMap property: 'hasMap': 'https://goo.gl/maps/abc123'",
+      "Include opening hours if applicable using OpeningHoursSpecification",
+      "Add photo: 'image': 'https://example.com/photos/headquarters.jpg'",
+      "For multiple locations, create array of Place objects"
+    ],
+    resources: [
+      { title: "Place Schema", url: "https://schema.org/Place" },
+      { title: "GeoCoordinates", url: "https://schema.org/GeoCoordinates" }
+    ],
+    estimatedTime: "2-8 hours",
+    difficulty: "Intermediate"
+  },
+
+  242: {
+    description: "Founding dates and location information in Organization schema provide historical context and establish business longevity. FoundingDate and foundingLocation properties help with entity verification and knowledge panel displays.",
+    tips: [
+      "Add to Organization: 'foundingDate': '1998-06-15'",
+      "Use ISO 8601 format: YYYY-MM-DD or just YYYY if month/day unknown",
+      "Add location: 'foundingLocation': {'@type': 'Place', 'address': {'@type': 'PostalAddress', 'addressLocality': 'Seattle', 'addressRegion': 'WA'}}",
+      "For acquisitions, keep original founding date (not acquisition date)",
+      "Add to homepage Organization schema",
+      "Include in About page content as well for consistency"
+    ],
+    resources: [
+      { title: "Organization Schema", url: "https://schema.org/Organization" }
+    ],
+    estimatedTime: "<2 hours",
+    difficulty: "Beginner"
+  },
+
+  243: {
+    description: "Award and recognition schema marks certifications, industry awards, and professional accreditations with structured Award schema including issuer information. This builds authority signals and can display in knowledge panels and rich results.",
+    tips: [
+      "Add to Organization or Person: 'award': ['Best Place to Work 2024', 'Inc. 5000 Fastest Growing']",
+      "Use full Award object for detail: 'award': {'@type': 'Award', 'name': 'Industry Excellence Award', 'awardedBy': {'@type': 'Organization', 'name': 'Industry Association'}, 'dateAwarded': '2024-03-15'}",
+      "Include certifications: ISO certifications, industry accreditations",
+      "Add professional credentials for people: CPA, PhD, PE, etc.",
+      "Document recent awards (last 3-5 years) for relevancy",
+      "Include awards page URL in Organization schema"
+    ],
+    resources: [
+      { title: "Award Schema", url: "https://schema.org/award" }
+    ],
+    estimatedTime: "2-8 hours",
+    difficulty: "Intermediate"
+  },
+
+  244: {
+    description: "Brand mentions with entity linking use schema:mentions properties to explicitly mark company, product, and person names with connections to their entity URLs. This helps AI and search engines recognize relationships between entities mentioned in content.",
+    tips: [
+      "In Article schema: 'mentions': [{'@type': 'Organization', 'name': 'Google', 'url': 'https://www.google.com', 'sameAs': 'https://en.wikipedia.org/wiki/Google'}]",
+      "Mark product mentions: {'@type': 'Product', 'name': 'iPhone', 'brand': 'Apple'}",
+      "Link person mentions: {'@type': 'Person', 'name': 'Elon Musk', 'sameAs': 'https://en.wikipedia.org/wiki/Elon_Musk'}",
+      "Prioritize mentions of key industry players, competitors, partners",
+      "Add to long-form content like blog posts, case studies, whitepapers",
+      "Don't overdo it - 3-7 key entity mentions per article is sufficient"
+    ],
+    resources: [
+      { title: "Mentions Property", url: "https://schema.org/mentions" },
+      { title: "Entity Recognition Guide", url: "https://www.searchenginejournal.com/entity-seo/" }
+    ],
+    estimatedTime: "8-40 hours",
+    difficulty: "Intermediate"
+  },
+
+  245: {
+    description: "Author schema connections link content creators to their professional profiles using sameAs properties for LinkedIn, Twitter/X, and personal websites. This builds author authority (E-E-A-T), enables author knowledge panels, and consolidates content across platforms.",
+    tips: [
+      "In Article author: 'author': {'@type': 'Person', 'name': 'John Doe', 'url': 'https://example.com/authors/john-doe', 'sameAs': ['https://www.linkedin.com/in/johndoe', 'https://twitter.com/johndoe', 'https://johndoe.com']}",
+      "Link to author archive page on your site as primary URL",
+      "Include 2-4 verified social profiles per author",
+      "Add author image: 'image': 'https://example.com/headshots/john-doe.jpg'",
+      "Create dedicated author bio pages with full Person schema",
+      "Maintain consistent author name spelling across all content"
+    ],
+    resources: [
+      { title: "Author Markup", url: "https://developers.google.com/search/docs/appearance/structured-data/article" },
+      { title: "Building Author Authority", url: "https://moz.com/blog/google-authorship" }
+    ],
+    estimatedTime: "2-8 hours",
+    difficulty: "Intermediate"
+  },
+
+  246: {
+    description: "Product and service relationship schema using offers, makesOffer, brand, and manufacturer properties connects entities in commerce relationships. This helps e-commerce sites and B2B companies show product-brand-seller connections in knowledge graphs.",
+    tips: [
+      "In Organization: 'makesOffer': [{'@type': 'Offer', 'itemOffered': {'@type': 'Product', 'name': 'Enterprise Software', 'brand': 'ACME'}}]",
+      "In Product: 'manufacturer': {'@type': 'Organization', 'name': 'ACME Manufacturing'}",
+      "Connect brand: 'brand': {'@type': 'Brand', 'name': 'ACME', 'logo': '...'}",
+      "For services: 'makesOffer': [{'@type': 'Service', 'name': 'SEO Consulting'}]",
+      "Link products to categories using category or additionalType properties",
+      "Add to product pages, service pages, and homepage"
+    ],
+    resources: [
+      { title: "Product Schema", url: "https://schema.org/Product" },
+      { title: "Service Schema", url: "https://schema.org/Service" }
+    ],
+    estimatedTime: "2-8 hours",
+    difficulty: "Intermediate"
+  },
+
+  247: {
+    description: "Entity consistency guidelines ensure brand names, leadership names, and product names are spelled identically across the entire site. Consistent entity naming helps search engines consolidate entity signals and avoid confusion between similar entities.",
+    tips: [
+      "Document official spellings: 'ACME Corporation' not 'ACME Corp' or 'Acme'",
+      "Create style guide specifying: full legal name, short name, acronyms",
+      "Standardize person names: 'Robert Smith' vs 'Bob Smith' vs 'R. Smith'",
+      "Use same product name format: 'iPhone 15 Pro' not 'Apple iPhone 15 Pro' or 'iPhone15Pro'",
+      "Check all content: pages, schema, metadata, images, alt text",
+      "Use find/replace to fix inconsistencies before launch"
+    ],
+    resources: [
+      { title: "Entity SEO Best Practices", url: "https://www.searchenginejournal.com/entity-seo/" }
+    ],
+    estimatedTime: "<2 hours",
+    difficulty: "Beginner"
+  },
+
+  248: {
+    description: "EducationalOrganization schema (for schools, universities, training centers) marks educational institutions with specific properties for accreditation, courses offered, alumni, and academic credentials. This enables education-specific rich results and knowledge panel features.",
+    tips: [
+      "Use instead of Organization: {'@type': 'EducationalOrganization', 'name': 'State University'}",
+      "Add accreditation: 'accreditedBy': {'@type': 'Organization', 'name': 'Regional Accrediting Commission'}",
+      "List courses: 'hasOfferCatalog': {'@type': 'OfferCatalog', 'name': 'Course Catalog'}",
+      "Mark alumni: 'alumni': [{'@type': 'Person', 'name': 'Notable Alumnus'}]",
+      "Specify type: 'CollegeOrUniversity', 'ElementarySchool', 'HighSchool', 'Preschool'",
+      "Only use if primary business is education"
+    ],
+    resources: [
+      { title: "EducationalOrganization Schema", url: "https://schema.org/EducationalOrganization" }
+    ],
+    estimatedTime: "<2 hours",
+    difficulty: "Beginner"
+  },
+
+  249: {
+    description: "Logo schema with multiple image size variations (60x60, 600x60, 600x600) ensures proper display in Google Knowledge Panels, search results, and various Google services. Different layouts require different aspect ratios.",
+    tips: [
+      "In Organization schema: 'logo': {'@type': 'ImageObject', 'url': 'https://example.com/logo-square.png', 'width': 600, 'height': 600}",
+      "Provide square version (600x600 or 1:1 ratio) for knowledge panels",
+      "Add small square: 60x60px for mobile displays",
+      "Include horizontal version: 600x60 (10:1 ratio) if available",
+      "Use PNG or JPG, transparent background preferred for square logos",
+      "Test in Google Rich Results Test to verify recognition"
+    ],
+    resources: [
+      { title: "Logo Structured Data", url: "https://developers.google.com/search/docs/appearance/structured-data/logo" }
+    ],
+    estimatedTime: "<2 hours",
+    difficulty: "Beginner"
+  },
+
+  250: {
+    description: "Monitoring Google Knowledge Panel accuracy involves regularly checking your brand's knowledge panel display and submitting corrections when information is incorrect or outdated. Google Search Console provides tools to suggest edits for knowledge panels you have verified ownership of.",
+    tips: [
+      "Search your brand name in Google to view current knowledge panel",
+      "Click 'Suggest an edit' or 'Claim this knowledge panel' if available",
+      "Verify ownership through Search Console if not already done",
+      "Monitor for: incorrect founding date, wrong logo, outdated description, incorrect social links",
+      "Submit corrections via 'Send feedback' option in knowledge panel",
+      "Check monthly and after major business changes (rebrand, merger, address change)"
+    ],
+    resources: [
+      { title: "Knowledge Panel Help", url: "https://support.google.com/knowledgepanel/" },
+      { title: "Claiming Knowledge Panels", url: "https://support.google.com/business/answer/6331288" }
+    ],
+    estimatedTime: "<2 hours",
+    difficulty: "Intermediate"
+  },
+
+  251: {
+    description: "Google Business Profile (formerly Google My Business) is critical for local visibility. Each physical location needs its own verified profile to appear in local search results, Google Maps, and the local pack.",
+    tips: [
+      "Visit google.com/business and sign in with account that will manage profiles",
+      "Add each location separately if you have multiple addresses",
+      "Complete verification (postcard mail, phone, email, or instant for eligible businesses)",
+      "For chains/franchises, check if bulk verification is available",
+      "Use same email domain across all locations for brand consistency",
+      "Set up multiple users with different permission levels (owner, manager)"
+    ],
+    resources: [
+      { title: "Google Business Profile Setup", url: "https://support.google.com/business/answer/2911778" },
+      { title: "Verification Guide", url: "https://support.google.com/business/answer/7107242" }
+    ],
+    estimatedTime: "2-8 hours",
+    difficulty: "Beginner"
+  },
+
+  252: {
+    description: "Complete Google Business Profile optimization involves filling every available field with accurate, keyword-rich information. Google favors profiles with 100% completion, improving local pack rankings.",
+    tips: [
+      "Business description: Use all 750 characters, include primary services and location-specific keywords",
+      "Choose most accurate primary category (impacts ranking heavily)",
+      "Add 9 secondary categories for additional service visibility",
+      "List all services with descriptions and pricing if applicable",
+      "Select all relevant attributes (women-led, veteran-owned, wheelchair accessible, etc.)",
+      "Add phone number (local number preferred over toll-free), website URL"
+    ],
+    resources: [
+      { title: "GBP Optimization Guide", url: "https://support.google.com/business/answer/3038177" },
+      { title: "Category Selection", url: "https://support.google.com/business/answer/3038177" }
+    ],
+    estimatedTime: "8-40 hours",
+    difficulty: "Intermediate"
+  },
+
+  253: {
+    description: "High-quality photos significantly improve Google Business Profile engagement and click-through rates. Businesses with photos get 42% more direction requests and 35% more website clicks than those without.",
+    tips: [
+      "Upload minimum 10 photos per location, ideally 20-30 for best results",
+      "Include: exterior (storefront with signage), interior (multiple angles), products, team at work, before/after",
+      "Use high resolution: minimum 720px wide, 720px tall",
+      "Add photos regularly (monthly) to keep profile active and fresh",
+      "Use actual business photos, not stock images",
+      "Include cover photo (landscape orientation, 1024x576px recommended)"
+    ],
+    resources: [
+      { title: "Photo Guidelines", url: "https://support.google.com/business/answer/6103862" },
+      { title: "GBP Image Specs", url: "https://support.google.com/business/answer/9292476" }
+    ],
+    estimatedTime: "8-40 hours",
+    difficulty: "Intermediate"
+  },
+
+  254: {
+    description: "LocalBusiness schema provides structured data for physical business locations with opening hours, contact information, and geographic coordinates. This powers local search features, map displays, and rich results showing business hours directly in search.",
+    tips: [
+      "Use LocalBusiness or specific subtype: Restaurant, Store, ProfessionalService, etc.",
+      "Include full address with PostalAddress schema nested",
+      "Add geo coordinates: 'geo': {'@type': 'GeoCoordinates', 'latitude': '40.7589', 'longitude': '-73.9851'}",
+      "Specify opening hours: 'openingHoursSpecification': [{'@type': 'OpeningHoursSpecification', 'dayOfWeek': 'Monday', 'opens': '09:00', 'closes': '17:00'}]",
+      "Add priceRange: '$', '$$', '$$$', or '$$$$'",
+      "Include paymentAccepted: ['Cash', 'Credit Card', 'Debit Card']"
+    ],
+    resources: [
+      { title: "LocalBusiness Schema", url: "https://schema.org/LocalBusiness" },
+      { title: "Google Local Business Markup", url: "https://developers.google.com/search/docs/appearance/structured-data/local-business" }
+    ],
+    estimatedTime: "2-8 hours",
+    difficulty: "Intermediate"
+  },
+
+  255: {
+    description: "Dedicated location pages with unique, substantial content are essential for multi-location businesses to rank in local searches. Each page must have 300+ words of original content specific to that location to avoid thin or duplicate content issues.",
+    tips: [
+      "Create separate URL for each location: /locations/city-name or /city-name",
+      "Write unique 300+ word description per location (never duplicate)",
+      "Include: services offered at this location, staff introduction, parking/accessibility details",
+      "Add neighborhood context: nearby landmarks, transit options, popular local areas",
+      "Embed Google Map with location marker",
+      "Include consistent NAP (Name, Address, Phone) prominently"
+    ],
+    resources: [
+      { title: "Location Page Best Practices", url: "https://moz.com/blog/local-landing-pages" },
+      { title: "Multi-Location SEO", url: "https://www.searchenginejournal.com/multi-location-seo/" }
+    ],
+    estimatedTime: "40+ hours",
+    difficulty: "Advanced"
+  },
+
+  256: {
+    description: "NAP (Name, Address, Phone) consistency across your entire website is critical for local SEO. Inconsistent business information confuses search engines and can hurt local rankings. Every mention must match exactly across all pages and directories.",
+    tips: [
+      "Decide on official format: 'Street' vs 'St.', 'Suite 100' vs '#100'",
+      "Add consistent NAP in footer on every page (common best practice)",
+      "Use same phone format everywhere: (555) 555-5555 vs 555-555-5555",
+      "Match exactly what appears on Google Business Profile",
+      "For multiple locations, ensure each has distinct, consistent NAP",
+      "Use LocalBusiness schema with matching NAP data"
+    ],
+    resources: [
+      { title: "NAP Consistency Guide", url: "https://moz.com/learn/seo/nap" }
+    ],
+    estimatedTime: "<2 hours",
+    difficulty: "Beginner"
+  },
+
+  257: {
+    description: "Embedded Google Maps on location pages helps users find your business and provides strong local relevance signals. The map should show your exact business location with marker and allow users to get directions.",
+    tips: [
+      "Use Google Maps Embed API: https://developers.google.com/maps/documentation/embed/get-started",
+      "Get embed code from Google Maps: search location → Share → Embed a map",
+      "Set map to show your business marker clearly centered",
+      "Use responsive iframe or Maps JavaScript API for better mobile experience",
+      "Set appropriate zoom level (15-17 typically works well for businesses)",
+      "Ensure map doesn't slow page load - consider lazy loading"
+    ],
+    resources: [
+      { title: "Google Maps Embed Guide", url: "https://developers.google.com/maps/documentation/embed/get-started" }
+    ],
+    estimatedTime: "<2 hours",
+    difficulty: "Beginner"
+  },
+
+  258: {
+    description: "Location-specific content including local landmarks, neighborhood names, and geographic references provides hyper-local relevance signals. Mentioning nearby points of interest helps search engines understand your service area and match with local searches.",
+    tips: [
+      "Name specific neighborhoods: 'Serving downtown Seattle, Capitol Hill, and Fremont'",
+      "Mention nearby landmarks: 'Located two blocks from Pike Place Market'",
+      "Reference local geography: 'We serve the Greater Boston area including Cambridge and Somerville'",
+      "Include city/region names in headers and body content naturally",
+      "Add local service area pages for each major city/region served",
+      "Use local terminology and dialect where appropriate"
+    ],
+    resources: [
+      { title: "Local Content Strategy", url: "https://moz.com/learn/seo/local" }
+    ],
+    estimatedTime: "8-40 hours",
+    difficulty: "Intermediate"
+  },
+
+  259: {
+    description: "Location page title tags and meta descriptions optimized with city/region names and primary services are critical for local search visibility. These should include geographic modifiers to match local search queries.",
+    tips: [
+      "Title format: 'Primary Service in City Name | Business Name'",
+      "Example: 'Plumbing Services in Denver, CO | ABC Plumbing'",
+      "Include neighborhood/region if targeting specific area: 'Downtown Seattle SEO Agency'",
+      "Meta description: 'Find [service] in [city]. We serve [neighborhoods] with [key benefits].'",
+      "Don't keyword stuff - keep natural and compelling",
+      "Make each location page title unique by changing city name"
+    ],
+    resources: [
+      { title: "Local Title Tag Optimization", url: "https://moz.com/learn/seo/title-tag" }
+    ],
+    estimatedTime: "8-40 hours",
+    difficulty: "Intermediate"
+  },
+
+  260: {
+    description: "Local business citations on major directories (Yelp, Apple Maps, Bing Places) with consistent NAP information build local authority and provide additional discovery channels. These citations act as votes of confidence for your business location.",
+    tips: [
+      "Priority directories: Google Business Profile, Apple Maps, Bing Places, Yelp, Facebook, YP.com",
+      "Ensure NAP matches exactly across all citations (same format as website)",
+      "Add complete business information: hours, website, categories, description",
+      "Upload photos to each directory profile",
+      "For Yelp: don't solicit reviews (against TOS), let them come naturally",
+      "Track all citations in a spreadsheet for ongoing management"
+    ],
+    resources: [
+      { title: "Local Citation Guide", url: "https://moz.com/learn/seo/local-citations" },
+      { title: "Citation Audit Tool", url: "https://whitespark.ca/local-citation-finder" }
+    ],
+    estimatedTime: "8-40 hours",
+    difficulty: "Intermediate"
+  },
+
+  261: {
+    description: "Industry-specific directories provide targeted local visibility and high-quality backlinks. Healthcare providers should be on Healthgrades, lawyers on Avvo, restaurants on TripAdvisor, etc. These niche directories often rank highly for industry searches.",
+    tips: [
+      "Research top directories in your industry: search '[your industry] directories'",
+      "Healthcare: Healthgrades, Zocdoc, Vitals, WebMD",
+      "Legal: Avvo, Martindale, Justia, FindLaw",
+      "Hospitality: TripAdvisor, Booking.com, Expedia",
+      "Home services: Angi, HomeAdvisor, Thumbtack",
+      "Prioritize free listings first, then consider paid enhanced profiles"
+    ],
+    resources: [
+      { title: "Industry Directory List", url: "https://whitespark.ca/blog/top-40-local-business-directories/" }
+    ],
+    estimatedTime: "8-40 hours",
+    difficulty: "Intermediate"
+  },
+
+  262: {
+    description: "A systematic review generation strategy encourages satisfied customers to leave Google reviews, which significantly impact local pack rankings and click-through rates. Responding to all reviews (positive and negative) within 48 hours shows active engagement.",
+    tips: [
+      "Send post-purchase/visit email 2-3 days later with direct review link",
+      "Include short review link: https://g.page/r/[your-place-id]/review",
+      "Don't incentivize reviews (violates Google policy)",
+      "Respond to all reviews within 48 hours with personalized responses",
+      "For negative reviews: acknowledge, apologize if appropriate, offer to resolve offline",
+      "Track review velocity and average rating in monthly reporting"
+    ],
+    resources: [
+      { title: "Google Review Guidelines", url: "https://support.google.com/business/answer/2622994" },
+      { title: "Review Generation Best Practices", url: "https://moz.com/blog/online-reviews" }
+    ],
+    estimatedTime: "2-8 hours",
+    difficulty: "Intermediate"
+  },
+
+  263: {
+    description: "Google Posts appear directly in your Business Profile and search results, providing fresh content signals and engagement opportunities. Weekly posts about updates, offers, events, and news keep your profile active and can improve visibility.",
+    tips: [
+      "Post types: Update (general news), Offer (promotions), Event (with date/time)",
+      "Post weekly minimum to maintain active profile status",
+      "Include: 100-300 words, high-quality image (1200x900px), clear CTA button",
+      "Use relevant keywords naturally in post text",
+      "Posts expire after 7 days (except events) - need ongoing publishing",
+      "Track engagement metrics in GBP Insights dashboard"
+    ],
+    resources: [
+      { title: "Google Posts Guide", url: "https://support.google.com/business/answer/7342169" }
+    ],
+    estimatedTime: "8-40 hours",
+    difficulty: "Beginner"
+  },
+
+  264: {
+    description: "Store locator functionality for multi-location businesses allows users to find their nearest location by zip code, city, or current location. This improves user experience and helps search engines discover all location pages.",
+    tips: [
+      "Implement search by: zip code, city, address, and 'use my location' (geolocation)",
+      "Display results with: distance, address, phone, hours, 'Get directions' link",
+      "Show results on embedded map with location markers",
+      "Link each result to dedicated location page",
+      "Include store locator link prominently in header/footer navigation",
+      "Ensure store locator page itself is indexed with proper schema"
+    ],
+    resources: [
+      { title: "Store Locator Best Practices", url: "https://www.searchenginejournal.com/store-locator-seo/" }
+    ],
+    estimatedTime: "40+ hours",
+    difficulty: "Advanced"
+  },
+
+  265: {
+    description: "Monthly citation audits monitor for inconsistent NAP information across the web and identify inaccurate listings that need correction. Inconsistent citations confuse search engines and dilute local authority.",
+    tips: [
+      "Use tools: Moz Local, Whitespark, BrightLocal for citation tracking",
+      "Search '[business name] [city]' to find citations manually",
+      "Check for: wrong address, old phone number, misspelled name, incorrect category",
+      "Claim and correct inaccurate listings immediately",
+      "Remove duplicate listings when possible",
+      "Document all citations in spreadsheet with last-checked date"
+    ],
+    resources: [
+      { title: "Citation Audit Guide", url: "https://moz.com/local/how-to-audit-local-seo-citations" }
+    ],
+    estimatedTime: "2-8 hours",
+    difficulty: "Intermediate"
+  },
+
+  266: {
+    description: "Faceted navigation (filtering by price, color, size, brand) in e-commerce creates massive duplicate content issues if not handled properly. Strategic use of canonicals, noindex, or AJAX prevents filter combinations from creating thousands of low-value indexed pages.",
+    tips: [
+      "Use canonicals to point filter combinations back to base category page",
+      "Alternative: Use noindex,follow on filter URLs to prevent indexing but allow crawling",
+      "Best: Use AJAX for filters so URLs don't change (no duplicate content)",
+      "Allow indexing for high-value filters: brand filters, popular categories",
+      "Use robots.txt to block filter parameters: Disallow: /*?filter=",
+      "Test approach in Search Console to avoid crawl waste"
+    ],
+    resources: [
+      { title: "Faceted Navigation SEO", url: "https://moz.com/blog/faceted-navigation-guide" },
+      { title: "Google's Guidance", url: "https://developers.google.com/search/docs/crawling-indexing/consolidate-duplicate-urls" }
+    ],
+    estimatedTime: "40+ hours",
+    difficulty: "Advanced"
+  },
+
+  267: {
+    description: "Product URL structure planning determines how products are organized in URLs and how variants (colors, sizes) are handled. Decisions impact crawlability, user experience, and ranking potential. This needs careful planning before development.",
+    tips: [
+      "Options: /category/subcategory/product vs /product vs /products/product-name",
+      "Include category in URL for context: /running-shoes/nike-air-max-2024",
+      "Keep URLs short: 3-4 segments maximum",
+      "Variants decision: Single page with dropdown vs separate URLs per variant",
+      "Recommendation: Single product page with variants as parameters: /shoes/nike-air?color=red&size=10",
+      "Use canonical to consolidate variant URLs if creating separate pages"
+    ],
+    resources: [
+      { title: "E-commerce URL Structure", url: "https://moz.com/learn/seo/url" },
+      { title: "Product Variant SEO", url: "https://www.searchenginejournal.com/ecommerce-seo-product-variants/" }
+    ],
+    estimatedTime: "8-40 hours",
+    difficulty: "Advanced"
+  },
+
+  268: {
+    description: "Product schema on every product page enables rich results showing price, availability, ratings, and product details directly in search results. This significantly improves click-through rates and product visibility.",
+    tips: [
+      "Required properties: name, image, description, sku, brand, offers (with price, priceCurrency, availability, url)",
+      "Add aggregateRating if you have reviews: 'aggregateRating': {'@type': 'AggregateRating', 'ratingValue': '4.5', 'reviewCount': '27'}",
+      "Mark availability: InStock, OutOfStock, PreOrder, LimitedAvailability",
+      "Include multiple images in array for image carousels",
+      "Add itemCondition: NewCondition, UsedCondition, RefurbishedCondition",
+      "Test with Google Rich Results Test before launch"
+    ],
+    resources: [
+      { title: "Product Schema Guide", url: "https://developers.google.com/search/docs/appearance/structured-data/product" },
+      { title: "Schema.org Product", url: "https://schema.org/Product" }
+    ],
+    estimatedTime: "8-40 hours",
+    difficulty: "Intermediate"
+  },
+
+  269: {
+    description: "Unique product descriptions of 300+ words are critical for e-commerce SEO. Manufacturer descriptions are duplicate content across thousands of sites. Original descriptions with specifications, benefits, and use cases help products rank and convert.",
+    tips: [
+      "Never use manufacturer descriptions verbatim (duplicate content penalty)",
+      "Write unique 300-500 words minimum per product",
+      "Structure: opening paragraph with primary keyword, specifications section, benefits, use cases",
+      "Include: dimensions, materials, compatibility, warranty, care instructions",
+      "Add comparison to similar products",
+      "For large catalogs, prioritize top-selling products first, then expand"
+    ],
+    resources: [
+      { title: "Product Description Best Practices", url: "https://www.shopify.com/blog/8211159-9-simple-ways-to-write-product-descriptions-that-sell" },
+      { title: "E-commerce Content Strategy", url: "https://moz.com/blog/ecommerce-seo-guide" }
+    ],
+    estimatedTime: "40+ hours",
+    difficulty: "Intermediate"
+  },
+
+  270: {
+    description: "Canonical tags on filtered and sorted product listing pages prevent duplicate content from faceted navigation. Category pages with different sort orders (price, popularity) or filters should canonicalize to the base category URL.",
+    tips: [
+      "Base category: /shoes (no canonical needed)",
+      "Filtered URL: /shoes?filter=brand:nike → canonical points to /shoes",
+      "Sorted URL: /shoes?sort=price-low-high → canonical points to /shoes",
+      "Combined: /shoes?filter=brand:nike&sort=price → canonical to /shoes",
+      "Exception: High-value filters might have unique canonical if targeting keywords",
+      "Implement in <head>: <link rel='canonical' href='https://example.com/shoes'>"
+    ],
+    resources: [
+      { title: "Canonical Tag Guide", url: "https://moz.com/learn/seo/canonicalization" },
+      { title: "Faceted Navigation Canonicals", url: "https://www.searchenginejournal.com/canonical-urls-ecommerce/" }
+    ],
+    estimatedTime: "8-40 hours",
+    difficulty: "Advanced"
+  },
+
+  271: {
+    description: "Out-of-stock products should remain live with 'notify me' options rather than returning 404 errors. Temporarily out-of-stock pages preserve rankings, backlinks, and user trust. Product schema should mark availability as OutOfStock.",
+    tips: [
+      "Keep page live with all product info visible",
+      "Add prominent 'Out of Stock' or 'Temporarily Unavailable' message",
+      "Implement 'Notify me when back in stock' email capture form",
+      "Update Product schema: 'availability': 'https://schema.org/OutOfStock'",
+      "Suggest similar in-stock products as alternatives",
+      "NEVER return 404 or 410 status code for temporarily out-of-stock items"
+    ],
+    resources: [
+      { title: "Out of Stock SEO", url: "https://www.searchenginejournal.com/out-of-stock-products-seo/" }
+    ],
+    estimatedTime: "2-8 hours",
+    difficulty: "Intermediate"
+  },
+
+  272: {
+    description: "Category descriptions (300-500 words) above or below product grids provide indexable content for thin category pages. Without descriptions, category pages are just lists of products (thin content) and struggle to rank.",
+    tips: [
+      "Write 300-500 words unique content per category",
+      "Place above product grid (visible) or below grid (less intrusive)",
+      "Include: what products are in category, who they're for, key features/benefits",
+      "Naturally incorporate target keywords (category name + modifiers)",
+      "Add H2 subheadings to break up text",
+      "Update seasonally or quarterly to keep fresh"
+    ],
+    resources: [
+      { title: "Category Page SEO", url: "https://moz.com/blog/ecommerce-category-pages" }
+    ],
+    estimatedTime: "40+ hours",
+    difficulty: "Intermediate"
+  },
+
+  273: {
+    description: "Review schema with individual Review markup for each customer review enables star ratings in search results and builds trust signals. Each review needs structured data with rating, author, date, and review text.",
+    tips: [
+      "Wrap each review in Review schema: {'@type': 'Review', 'reviewRating': {'@type': 'Rating', 'ratingValue': '5'}, 'author': {'@type': 'Person', 'name': 'John Doe'}, 'reviewBody': 'Great product!', 'datePublished': '2024-01-15'}",
+      "Also add AggregateRating to product for overall score",
+      "Only markup legitimate customer reviews (not fake/solicited)",
+      "Include both positive and negative reviews for authenticity",
+      "Mark helpful votes: 'positiveNotes': 10, 'negativeNotes': 2",
+      "Google may show review stars in organic results"
+    ],
+    resources: [
+      { title: "Review Schema Guide", url: "https://developers.google.com/search/docs/appearance/structured-data/review-snippet" },
+      { title: "Schema.org Review", url: "https://schema.org/Review" }
+    ],
+    estimatedTime: "8-40 hours",
+    difficulty: "Intermediate"
+  },
+
+  274: {
+    description: "Dynamic XML sitemaps for products automatically regenerate when products are added, removed, or updated. Sitemaps include product URLs, last modification dates, and image URLs, helping search engines discover and recrawl changed products quickly.",
+    tips: [
+      "Generate sitemap automatically from product database (don't maintain manually)",
+      "Include: <loc>, <lastmod>, <image:image> for each product",
+      "Split into multiple sitemaps if >50,000 URLs (use sitemap index)",
+      "Set <changefreq> based on how often products update (daily/weekly)",
+      "Include image URLs: <image:loc>https://example.com/product-image.jpg</image:loc>",
+      "Submit sitemap in Google Search Console and Bing Webmaster Tools"
+    ],
+    resources: [
+      { title: "XML Sitemap Protocol", url: "https://www.sitemaps.org/protocol.html" },
+      { title: "Google Sitemap Guidelines", url: "https://developers.google.com/search/docs/crawling-indexing/sitemaps/build-sitemap" }
+    ],
+    estimatedTime: "2-8 hours",
+    difficulty: "Intermediate"
+  },
+
+  275: {
+    description: "Discontinued products should redirect to similar products or category pages rather than showing 404 errors. This preserves link equity, maintains user experience, and prevents loss of organic traffic from backlinks or existing rankings.",
+    tips: [
+      "Best option: 301 redirect to most similar product still available",
+      "Second option: Redirect to parent category page",
+      "Leave live with 'This product is discontinued' message ONLY if no alternatives exist",
+      "Update internal links to point to new destination before implementing redirect",
+      "Document redirects in spreadsheet for future reference",
+      "Only 404/410 if product was never actually available or violates policy"
+    ],
+    resources: [
+      { title: "Handling Discontinued Products", url: "https://www.searchenginejournal.com/discontinued-products-seo/" }
+    ],
+    estimatedTime: "2-8 hours",
+    difficulty: "Intermediate"
+  },
+
+  276: {
+    description: "Optimized product images with multiple angles, zoom functionality, descriptive filenames, and detailed alt text improve both user experience and image search visibility. High-quality images significantly impact conversion rates.",
+    tips: [
+      "Minimum 800x800px (1200x1200px preferred) for zoom functionality",
+      "Provide 4-8 images per product: multiple angles, lifestyle shots, detail shots",
+      "Use descriptive filenames: nike-air-max-2024-blue-side-view.jpg (not IMG_1234.jpg)",
+      "Alt text formula: '[Brand] [Product Name] [Color/Variant] [Angle/Feature]'",
+      "Compress images: use WebP format or optimize JPG (aim for <100KB per image)",
+      "Implement zoom-on-hover or click-to-enlarge functionality"
+    ],
+    resources: [
+      { title: "Product Image SEO", url: "https://moz.com/learn/seo/image-optimization" },
+      { title: "Image Compression Tools", url: "https://tinypng.com/" }
+    ],
+    estimatedTime: "40+ hours",
+    difficulty: "Intermediate"
+  },
+
+  277: {
+    description: "Buying guides, how-to content, and educational resources support transactional product pages by capturing informational searches. Users researching products before purchase can discover your brand through helpful content that leads to product pages.",
+    tips: [
+      "Create 'Ultimate Guide to [Product Category]' pillar content",
+      "Write comparison guides: 'How to Choose the Right [Product Type]'",
+      "Add how-to content: 'How to Use [Product]', 'How to Care for [Product]'",
+      "Target top-of-funnel keywords: '[product] guide', 'best [product]', 'how to choose [product]'",
+      "Link internally from guides to relevant product pages",
+      "Place in /blog, /guides, or /resources section"
+    ],
+    resources: [
+      { title: "E-commerce Content Marketing", url: "https://www.shopify.com/blog/content-marketing-for-ecommerce" }
+    ],
+    estimatedTime: "40+ hours",
+    difficulty: "Intermediate"
+  },
+
+  278: {
+    description: "Google Merchant Center enables free product listings in Google Shopping tab and Shopping Graph features. A product feed with title, description, price, availability, and image data gets products into Google's shopping ecosystem without paid ads.",
+    tips: [
+      "Sign up at merchants.google.com",
+      "Create product feed: CSV, XML, or API with required fields (id, title, description, link, image_link, price, availability, condition)",
+      "Optimize product titles: [Brand] [Product Type] [Key Attributes] - [Color/Size]",
+      "Submit feed URL or schedule automatic uploads (daily recommended)",
+      "Verify and claim website in Merchant Center",
+      "Fix any feed errors flagged in diagnostics section"
+    ],
+    resources: [
+      { title: "Merchant Center Setup", url: "https://support.google.com/merchants/answer/188924" },
+      { title: "Product Feed Specification", url: "https://support.google.com/merchants/answer/7052112" }
+    ],
+    estimatedTime: "8-40 hours",
+    difficulty: "Intermediate"
+  },
+
+  279: {
+    description: "Product comparison pages targeting '[Product A] vs [Product B]' queries help users make purchase decisions while capturing high-intent search traffic. These pages rank well and often lead directly to conversions.",
+    tips: [
+      "Create pages for: your products vs competitors, different models within your catalog",
+      "Format: side-by-side comparison table with features, specs, pricing",
+      "Include: pros/cons lists, feature highlights, clear recommendation",
+      "Target keyword: '[Product A] vs [Product B]' in title and H1",
+      "Add schema: ComparisonPage or WebPage with mentions of both products",
+      "Link to both product pages with clear CTAs"
+    ],
+    resources: [
+      { title: "Comparison Page Best Practices", url: "https://www.searchenginejournal.com/comparison-pages-seo/" }
+    ],
+    estimatedTime: "8-40 hours",
+    difficulty: "Intermediate"
+  },
+
+  280: {
+    description: "Campaign landing page indexation strategy determines whether pages are indexed for organic search or noindexed for paid-only traffic. Indexed pages compete with main site; noindexed pages won't dilute domain authority but won't gain organic traffic.",
+    tips: [
+      "Noindex if: temporary campaign, very similar to existing pages, designed only for paid traffic",
+      "Index if: unique value proposition, distinct from main site, long-term campaign, targeting new keywords",
+      "Add to <head>: <meta name='robots' content='noindex,nofollow'> for noindex",
+      "For indexed pages: ensure unique title/meta/content vs main site",
+      "Consider canonicalizing similar campaign pages to main site equivalent",
+      "Review decision with SEO and PPC teams before launch"
+    ],
+    resources: [
+      { title: "Landing Page Indexation", url: "https://moz.com/blog/should-i-index-my-landing-pages" }
+    ],
+    estimatedTime: "<2 hours",
+    difficulty: "Intermediate"
+  },
+
+  281: {
+    description: "Removing global navigation from campaign landing pages eliminates distraction and exit points, keeping users focused on the conversion goal. This is a core landing page best practice that significantly improves conversion rates.",
+    tips: [
+      "Remove: main navigation menu, footer links (or minimal footer)",
+      "Keep only: logo (linked to homepage or not clickable), CTA button",
+      "Create separate landing page template without header/footer",
+      "Exception: Keep privacy policy and terms links in minimal footer for legal compliance",
+      "Test conversion rate with vs without navigation if stakeholders resist",
+      "Consider leaving logo unlinked to prevent easy exit"
+    ],
+    resources: [
+      { title: "Landing Page Best Practices", url: "https://unbounce.com/landing-page-articles/landing-page-best-practices/" }
+    ],
+    estimatedTime: "<2 hours",
+    difficulty: "Beginner"
+  },
+
+  282: {
+    description: "A single, prominent CTA (call-to-action) above the fold with contrasting color and action-oriented copy is essential for landing page conversion. Multiple CTAs or unclear primary action confuses users and reduces conversions.",
+    tips: [
+      "Place CTA above fold (visible without scrolling)",
+      "Use high-contrast color: if site is blue, make button orange/red",
+      "Action-oriented copy: 'Get Your Free Trial', 'Download Now', 'Start Saving Today'",
+      "Avoid generic: 'Submit', 'Click Here', 'Continue'",
+      "Make button large enough to see (minimum 44x44px for mobile)",
+      "Repeat CTA at bottom of long pages, but keep same action/destination"
+    ],
+    resources: [
+      { title: "CTA Best Practices", url: "https://www.hubspot.com/call-to-action" }
+    ],
+    estimatedTime: "<2 hours",
+    difficulty: "Beginner"
+  },
+
+  283: {
+    description: "Thank-you pages shown after conversions should be noindexed and nofollowed to prevent them from appearing in search results. These pages have no value to organic searchers and can create confusion if indexed.",
+    tips: [
+      "Add to <head>: <meta name='robots' content='noindex,nofollow'>",
+      "Typically at URLs like: /thank-you, /confirmation, /success",
+      "Include conversion confirmation and next steps on page",
+      "Add conversion tracking code (GA4 event, Google Ads conversion)",
+      "Don't redirect immediately - give users time to read confirmation",
+      "Never link to thank-you pages from anywhere on site (orphan pages)"
+    ],
+    resources: [
+      { title: "Thank You Page Optimization", url: "https://unbounce.com/conversion-rate-optimization/thank-you-page/" }
+    ],
+    estimatedTime: "<2 hours",
+    difficulty: "Beginner"
+  },
+
+  284: {
+    description: "Conversion tracking pixels (Google Ads, Meta Pixel, LinkedIn Insight Tag) measure campaign performance and enable remarketing. These must be implemented before launch to track conversions from day one.",
+    tips: [
+      "Google Ads: Add conversion tracking tag to thank-you page",
+      "Meta Pixel: Install pixel code in <head> on all landing pages, add conversion event on thank-you page",
+      "LinkedIn Insight Tag: Add to <head>, configure conversion tracking in Campaign Manager",
+      "Test all pixels with browser extensions: Facebook Pixel Helper, Google Tag Assistant",
+      "Use Google Tag Manager to manage all pixels centrally",
+      "Fire conversion events on thank-you page load or form submission"
+    ],
+    resources: [
+      { title: "Google Ads Conversion Tracking", url: "https://support.google.com/google-ads/answer/1722022" },
+      { title: "Meta Pixel Guide", url: "https://www.facebook.com/business/help/952192354843755" }
+    ],
+    estimatedTime: "2-8 hours",
+    difficulty: "Intermediate"
+  },
+
+  285: {
+    description: "UTM parameter naming conventions ensure consistent analytics tracking across all campaigns. A documented matrix prevents tracking errors and enables accurate performance analysis.",
+    tips: [
+      "Required parameters: utm_source (google, facebook), utm_medium (cpc, social, email), utm_campaign (campaign-name)",
+      "Optional: utm_term (keyword), utm_content (ad-variation)",
+      "Use lowercase and hyphens: utm_campaign=spring-sale-2024",
+      "Document in spreadsheet: campaign name, source, medium, URL structure",
+      "Use URL builder: ga-dev-tools.google/campaign-url-builder/",
+      "Never use spaces or special characters in UTM values"
+    ],
+    resources: [
+      { title: "UTM Parameters Guide", url: "https://support.google.com/analytics/answer/1033867" },
+      { title: "URL Builder", url: "https://ga-dev-tools.google/campaign-url-builder/" }
+    ],
+    estimatedTime: "<2 hours",
+    difficulty: "Beginner"
+  },
+
+  286: {
+    description: "Form abandonment tracking identifies users who start filling forms but don't submit, revealing friction points. This data helps optimize form fields and improve conversion rates.",
+    tips: [
+      "Track with Google Tag Manager: fire event when user focuses on any form field",
+      "Track which fields users complete vs abandon at",
+      "Use tools: Hotjar form analytics, Google Analytics events",
+      "Set up funnel: form view → form start → form submit",
+      "Monitor drop-off rate between form start and submit",
+      "Test: if abandonment is high, simplify form (fewer fields)"
+    ],
+    resources: [
+      { title: "Form Abandonment Tracking", url: "https://www.optimizely.com/optimization-glossary/form-abandonment/" }
+    ],
+    estimatedTime: "2-8 hours",
+    difficulty: "Intermediate"
+  },
+
+  287: {
+    description: "Scroll depth tracking measures how far users scroll down landing pages (25%, 50%, 75%, 100%), indicating content engagement. This shows which content sections users actually see and where they lose interest.",
+    tips: [
+      "Implement with Google Tag Manager using scroll depth variable",
+      "Track milestones: 25%, 50%, 75%, 100%",
+      "View in GA4 Events: scroll depth percentage as event parameter",
+      "If 50% of users never scroll past 50%, move key content up",
+      "Compare scroll depth between device types (mobile vs desktop)",
+      "Correlate scroll depth with conversion rate"
+    ],
+    resources: [
+      { title: "Scroll Tracking in GTM", url: "https://www.analyticsmania.com/post/scroll-depth-tracking-google-tag-manager/" }
+    ],
+    estimatedTime: "<2 hours",
+    difficulty: "Beginner"
+  },
+
+  288: {
+    description: "Heat mapping tools (Hotjar, Crazy Egg, Microsoft Clarity) visualize where users click, tap, move their cursor, and scroll. This behavioral data reveals usability issues and optimization opportunities.",
+    tips: [
+      "Free option: Microsoft Clarity (no session limits)",
+      "Paid options: Hotjar (50 sessions/day free), Crazy Egg",
+      "Track: heatmaps (clicks), scroll maps (how far users scroll), session recordings",
+      "Look for: rage clicks (clicking multiple times), dead clicks (clicking non-clickable elements)",
+      "Minimum 100 sessions before drawing conclusions",
+      "Filter by device type, traffic source for specific insights"
+    ],
+    resources: [
+      { title: "Microsoft Clarity", url: "https://clarity.microsoft.com/" },
+      { title: "Hotjar Guide", url: "https://www.hotjar.com/get-started/" }
+    ],
+    estimatedTime: "<2 hours",
+    difficulty: "Beginner"
+  },
+
+  289: {
+    description: "A dedicated landing page CMS template isolated from main site navigation ensures consistent conversion-focused design. This template should be reusable for all campaign landing pages with variable content sections.",
+    tips: [
+      "Create template with: hero section, benefits section, form section, social proof section",
+      "Make sections modular/reorderable in CMS",
+      "Remove global header/footer components",
+      "Include editable fields: headline, subheadline, CTA text, CTA link, hero image",
+      "Build responsive design optimized for mobile (50%+ of paid traffic)",
+      "Test template with multiple campaigns before rolling out"
+    ],
+    resources: [
+      { title: "Landing Page Templates", url: "https://unbounce.com/landing-page-template/" }
+    ],
+    estimatedTime: "2-8 hours",
+    difficulty: "Intermediate"
+  },
+
+  290: {
+    description: "Dynamic keyword insertion automatically replaces placeholders in landing page headlines and copy with the exact keyword the user searched for. This creates personalized experiences that increase relevance and conversion rates.",
+    tips: [
+      "Use URL parameters: /landing?keyword=seo-services populates 'keyword' variable",
+      "JavaScript to insert: document.getElementById('headline').innerHTML = urlParams.get('keyword')",
+      "Format properly: capitalize first letter, replace hyphens with spaces",
+      "Have fallback content if parameter is missing or invalid",
+      "PPC use case: Google Ads passes {keyword} to landing page URL",
+      "Test with various keyword lengths to ensure design doesn't break"
+    ],
+    resources: [
+      { title: "Dynamic Text Replacement", url: "https://unbounce.com/landing-page-optimization/dynamic-text-replacement/" }
+    ],
+    estimatedTime: "8-40 hours",
+    difficulty: "Intermediate"
+  },
+
+  291: {
+    description: "Indexed campaign landing pages need unique titles and meta descriptions different from ad copy to avoid duplicate content issues. Search engines may see identical organic and paid listings as spam.",
+    tips: [
+      "Ad copy: 'Get 50% Off SEO Services - Limited Time!' (promotional)",
+      "Organic title: 'Professional SEO Services | Company Name' (evergreen)",
+      "Make organic version more informational, less promotional",
+      "Include company brand in organic title, may omit from ads",
+      "Test organic title for target keywords separately from ad performance",
+      "Document both versions to prevent confusion"
+    ],
+    resources: [
+      { title: "PPC vs SEO Landing Pages", url: "https://www.searchenginejournal.com/ppc-seo-landing-pages/" }
+    ],
+    estimatedTime: "<2 hours",
+    difficulty: "Beginner"
+  },
+
+  292: {
+    description: "Canonical tags on similar campaign pages (seasonal variations, regional variants) consolidate SEO value to a primary version, preventing duplicate content issues while maintaining multiple campaign pages.",
+    tips: [
+      "Example: /spring-sale and /summer-sale canonical to /seasonal-sale",
+      "Regional pages: /landing-us and /landing-uk both canonical to /landing",
+      "Implement: <link rel='canonical' href='https://example.com/primary-page'>",
+      "Canonical target should be most comprehensive or evergreen version",
+      "Don't canonical if pages target different keywords - make content unique instead",
+      "Test canonical implementation in Google Search Console"
+    ],
+    resources: [
+      { title: "Canonical Tag Guide", url: "https://moz.com/learn/seo/canonicalization" }
+    ],
+    estimatedTime: "<2 hours",
+    difficulty: "Intermediate"
+  },
+
+  293: {
+    description: "Landing page URL structure planning determines organization and discoverability. Subdirectories (/landing/campaign) keep pages together; subdomains (campaign.example.com) fully isolate campaigns from main site.",
+    tips: [
+      "Subdirectory option: example.com/landing/spring-sale (inherits domain authority)",
+      "Subdomain option: spring-sale.example.com (separate from main site)",
+      "Recommendation: Use subdirectories for SEO benefit",
+      "Keep URLs short and descriptive: /landing/free-trial",
+      "Use hyphens not underscores: /campaign-name not /campaign_name",
+      "Decide on /landing vs /campaign vs /lp prefix consistently"
+    ],
+    resources: [
+      { title: "URL Structure Guide", url: "https://moz.com/learn/seo/url" }
+    ],
+    estimatedTime: "<2 hours",
+    difficulty: "Beginner"
+  },
+
+  294: {
+    description: "Campaign sunset strategy planning determines post-campaign handling: redirect to main site, archive the page, or remove entirely. This prevents broken links and preserves any SEO value gained.",
+    tips: [
+      "Option 1: 301 redirect to relevant main site page (preserves backlinks, SEO value)",
+      "Option 2: Leave live with updated content if page gained traction",
+      "Option 3: Noindex but keep live if campaign may return",
+      "Option 4: Remove entirely and 410 if temporary/irrelevant",
+      "Plan before launch - document sunset date and action",
+      "For recurring campaigns (annual events), keep URL and update content yearly"
+    ],
+    resources: [
+      { title: "301 Redirect Best Practices", url: "https://moz.com/learn/seo/redirection" }
+    ],
+    estimatedTime: "<2 hours",
+    difficulty: "Beginner"
+  },
+
+  295: {
+    description: "A/B testing roadmap with SEO guardrails ensures testing doesn't harm search rankings. Test variants must use canonical tags or noindex to prevent duplicate content, and cloaking must be avoided.",
+    tips: [
+      "Use canonical tags: all test variants canonical to primary version",
+      "Or noindex test variants so only control version is indexed",
+      "Never cloak (show different content to Googlebot vs users) - violates guidelines",
+      "Use client-side testing (JavaScript) not server-side URL variants when possible",
+      "Document all tests: which pages, duration, SEO treatment",
+      "Don't test title tags or meta descriptions visible to search engines"
+    ],
+    resources: [
+      { title: "Google A/B Testing Guidelines", url: "https://developers.google.com/search/docs/appearance/seo-testing" },
+      { title: "AB Testing SEO Impact", url: "https://moz.com/blog/ab-testing-seo-safe" }
+    ],
+    estimatedTime: "2-8 hours",
+    difficulty: "Intermediate"
+  },
+
+  296: {
+    description: "Exporting Google Search Console data for 16 months before a site refresh captures baseline performance for comparison. This data is critical for measuring post-launch impact and identifying any ranking losses.",
+    tips: [
+      "Export: Performance report with all queries, pages, dates for 16 months",
+      "Download: Pages report showing all indexed URLs with impressions/clicks",
+      "Save: CSV files with dates in filename (e.g., GSC-export-2024-01-15.csv)",
+      "Capture: top 1000 queries by impressions and clicks separately",
+      "Use Search Console API or Screaming Frog for full dataset (UI limits 1000 rows)",
+      "Store safely - you'll need this for post-launch comparison"
+    ],
+    resources: [
+      { title: "Search Console Export Guide", url: "https://support.google.com/webmasters/answer/9128669" }
+    ],
+    estimatedTime: "<2 hours",
+    difficulty: "Beginner"
+  },
+
+  297: {
+    description: "Documenting current keyword rankings before a site refresh provides a baseline for measuring ranking changes post-launch. Use rank tracking tools to capture positions for all target keywords before making any changes.",
+    tips: [
+      "Use tools: Semrush Position Tracking, Ahrefs Rank Tracker, or Google Search Console",
+      "Track: All target keywords (100-500+ depending on site size)",
+      "Capture: desktop and mobile rankings separately",
+      "Save snapshot with date: rankings-2024-01-15.csv",
+      "Set up ongoing tracking to monitor changes after launch",
+      "Include: local rankings if applicable (Google Business Profile pack positions)"
+    ],
+    resources: [
+      { title: "Rank Tracking Best Practices", url: "https://www.semrush.com/kb/1233-position-tracking" }
+    ],
+    estimatedTime: "2-8 hours",
+    difficulty: "Beginner"
+  },
+
+  298: {
+    description: "Identifying top-performing URLs (top 10% of traffic generators) ensures these critical pages are carefully preserved during a site refresh. These pages must maintain rankings or traffic will crater post-launch.",
+    tips: [
+      "Use Google Analytics: sort pages by sessions or entrances, last 12 months",
+      "Export top 10% by traffic (if 1000 pages, export top 100)",
+      "Document for each: current URL, target keyword, monthly traffic, conversion rate",
+      "Mark as 'MUST PRESERVE' in content inventory",
+      "These pages need: exact content migration or improvement, proper 1:1 URL mapping, extra QA testing",
+      "Monitor these URLs daily for first 30 days post-launch"
+    ],
+    resources: [
+      { title: "Site Migration Best Practices", url: "https://moz.com/blog/site-migration-guide" }
+    ],
+    estimatedTime: "2-8 hours",
+    difficulty: "Intermediate"
+  },
+
+  299: {
+    description: "Auditing existing backlink profiles identifies high-authority referring domains and important backlinks that must be preserved. Losing valuable backlinks during a refresh can significantly hurt domain authority.",
+    tips: [
+      "Use tools: Ahrefs Site Explorer, Semrush Backlink Analytics, Moz Link Explorer",
+      "Export: all backlinks with domain authority, URL rating, link type",
+      "Prioritize: DR/DA 50+ domains, .edu/.gov links, links from industry authorities",
+      "Document: which pages have most valuable backlinks",
+      "Ensure URL mapping preserves or 301s pages with strong backlink profiles",
+      "Consider reaching out to high-value linking sites if URLs must change"
+    ],
+    resources: [
+      { title: "Backlink Analysis Guide", url: "https://ahrefs.com/blog/backlinks/" },
+      { title: "Preserving Backlinks During Migration", url: "https://moz.com/blog/preserving-backlinks" }
+    ],
+    estimatedTime: "8-40 hours",
+    difficulty: "Intermediate"
+  },
+
+  300: {
+    description: "Documenting baseline domain authority metrics (Ahrefs DR, Moz DA, organic traffic, ranking keywords) provides comparison points post-refresh. Significant drops indicate migration issues requiring immediate attention.",
+    tips: [
+      "Capture: Ahrefs Domain Rating, Moz Domain Authority, organic traffic (GA4), ranking keywords (GSC)",
+      "Screenshot or export metrics with date",
+      "Record: total indexed pages, total backlinks, referring domains",
+      "Get data from: Ahrefs, Moz, Semrush, Google Analytics, Search Console",
+      "Save in migration documentation for easy reference",
+      "Re-check at 1 week, 1 month, 3 months post-launch"
+    ],
+    resources: [
+      { title: "Domain Authority Explained", url: "https://moz.com/learn/seo/domain-authority" }
+    ],
+    estimatedTime: "<2 hours",
+    difficulty: "Beginner"
+  },
+
+  301: {
+    description: "Exporting existing structured data implementations documents current schema types and markup for preservation or improvement. Losing working schema during a refresh can harm rich results visibility.",
+    tips: [
+      "Use Screaming Frog: crawl site, extract structured data, export to CSV",
+      "Document: which pages have schema, schema types used (Article, Product, FAQ, etc.)",
+      "Save JSON-LD code examples from key pages",
+      "Test current schema: Google Rich Results Test, Schema Markup Validator",
+      "Note which pages have rich results currently showing",
+      "Ensure new site maintains or improves schema implementation"
+    ],
+    resources: [
+      { title: "Schema Audit Guide", url: "https://www.screamingfrog.co.uk/how-to-audit-schema-org-structured-data/" }
+    ],
+    estimatedTime: "2-8 hours",
+    difficulty: "Intermediate"
+  },
+
+  302: {
+    description: "Identifying pages with rich results (featured snippets, People Also Ask, video carousels, image packs) ensures these high-visibility SERP features are preserved. Losing featured snippets dramatically reduces organic click-through rates.",
+    tips: [
+      "Manual check: Search for top keywords, note which pages have rich results",
+      "Use Semrush SERP Features report or Ahrefs Rank Tracker",
+      "Document: URL, keyword, SERP feature type, screenshot",
+      "Featured snippets: note content format (paragraph, list, table) that earned feature",
+      "Preserve exact content structure and schema that earned rich result",
+      "Monitor these specific keywords daily post-launch"
+    ],
+    resources: [
+      { title: "Featured Snippets Guide", url: "https://moz.com/learn/seo/featured-snippets" }
+    ],
+    estimatedTime: "2-8 hours",
+    difficulty: "Intermediate"
+  },
+
+  303: {
+    description: "Cataloging existing 301 redirects prevents redirect chains (redirect to redirect to redirect) which waste crawl budget and dilute page authority. New redirects should point directly to final destinations.",
+    tips: [
+      "Export current redirects from: .htaccess file, nginx.conf, or CMS redirect manager",
+      "Test each redirect: verify status code (should be 301), check destination",
+      "Document in spreadsheet: source URL, destination URL, reason, date implemented",
+      "For new redirects: ensure destination is final URL, not another redirect",
+      "Avoid chains: if A→B exists, and you're adding B→C, update A→C directly",
+      "Maximum 2 redirects in a chain (ideally 1)"
+    ],
+    resources: [
+      { title: "Redirect Chains Guide", url: "https://ahrefs.com/blog/redirect-chains/" }
+    ],
+    estimatedTime: "2-8 hours",
+    difficulty: "Intermediate"
+  },
+
+  304: {
+    description: "A complete content inventory with metadata (URL, H1, title, meta description, word count, last modified, organic traffic) is the foundation of a successful site refresh. This spreadsheet guides content strategy decisions.",
+    tips: [
+      "Use Screaming Frog to crawl: export URLs, H1s, titles, meta descriptions, word count",
+      "Add from Google Analytics: organic sessions/entrances per URL (12 months)",
+      "Add from Search Console: impressions, clicks per URL",
+      "Include: last modified date, author, content type (blog, product, landing page)",
+      "Format as Excel/Google Sheet with sortable columns",
+      "This becomes master doc for migration decisions"
+    ],
+    resources: [
+      { title: "Content Inventory Guide", url: "https://www.searchenginejournal.com/content-inventory/" },
+      { title: "Screaming Frog Exports", url: "https://www.screamingfrog.co.uk/seo-spider/user-guide/general/" }
+    ],
+    estimatedTime: "40+ hours",
+    difficulty: "Advanced"
+  },
+
+  305: {
+    description: "Identifying thin content (pages under 300 words or minimal traffic) flags pages for consolidation, expansion, or removal. Thin content can hurt domain-wide rankings and should be addressed during refreshes.",
+    tips: [
+      "Filter content inventory: word count <300 or organic sessions <10/month",
+      "Options: Consolidate (merge multiple thin pages), Expand (add 300+ words), Remove (redirect or 410)",
+      "Prioritize: high-impression but low-click pages (improve to gain clicks)",
+      "Check: do thin pages have backlinks? If yes, preserve and expand rather than remove",
+      "For product pages: 300 words may not be feasible, but ensure unique descriptions",
+      "Document decision for each thin page in inventory spreadsheet"
+    ],
+    resources: [
+      { title: "Thin Content Guide", url: "https://moz.com/learn/seo/thin-content" }
+    ],
+    estimatedTime: "8-40 hours",
+    difficulty: "Intermediate"
+  },
+
+  306: {
+    description: "Flagging duplicate or near-duplicate content (80%+ similarity) identifies pages for consolidation. Duplicate content confuses search engines about which version to rank and dilutes authority across multiple URLs.",
+    tips: [
+      "Use tools: Siteliner, Screaming Frog duplicate content report, Copyscape",
+      "Common causes: printer-friendly pages, session IDs in URLs, http vs https, www vs non-www",
+      "For duplicates: Choose canonical version, 301 redirect others, or use canonical tags",
+      "Check: product pages with only color/size differences (should be single page with variants)",
+      "Review: category pages with pagination (use rel=next/prev or canonical)",
+      "Consolidate: 5 similar blog posts into 1 comprehensive guide"
+    ],
+    resources: [
+      { title: "Duplicate Content Guide", url: "https://moz.com/learn/seo/duplicate-content" },
+      { title: "Siteliner Tool", url: "https://www.siteliner.com/" }
+    ],
+    estimatedTime: "8-40 hours",
+    difficulty: "Intermediate"
+  },
+
+  307: {
+    description: "Documenting content gaps (keywords without corresponding content) reveals opportunities to add new pages that can capture additional organic traffic. Competitor analysis often reveals gap keywords.",
+    tips: [
+      "Use Semrush Keyword Gap tool: your site vs top 3 competitors",
+      "Find keywords: competitors rank for but you don't",
+      "Use Ahrefs Content Gap: shows keywords competitors rank for",
+      "Check Search Console: queries with impressions but no/low clicks (missing content)",
+      "Prioritize: high volume, high relevance, low competition keywords",
+      "Create content plan: new pages needed, target keywords, content format"
+    ],
+    resources: [
+      { title: "Content Gap Analysis", url: "https://www.semrush.com/blog/content-gap-analysis/" },
+      { title: "Keyword Gap Tool Guide", url: "https://www.ahrefs.com/blog/content-gap-analysis/" }
+    ],
+    estimatedTime: "8-40 hours",
+    difficulty: "Intermediate"
+  },
+
+  308: {
+    description: "Prioritizing content strategy per page (rewrite, consolidate, archive, or preserve unchanged) ensures efficient resource allocation during site refresh. Each page needs a clear action plan based on performance and value.",
+    tips: [
+      "Categorize every page: 1) Preserve as-is, 2) Rewrite/expand, 3) Consolidate with others, 4) Archive/remove",
+      "Preserve: top traffic pages, pages with backlinks, pages with conversions",
+      "Rewrite: outdated content, thin content with potential, underperforming but important",
+      "Consolidate: multiple similar pages, thin pages on same topic",
+      "Archive: outdated content with no traffic, temporary campaigns",
+      "Add status column in content inventory with action plan per URL"
+    ],
+    resources: [
+      { title: "Content Audit Framework", url: "https://moz.com/blog/content-audit-tutorial" }
+    ],
+    estimatedTime: "40+ hours",
+    difficulty: "Advanced"
+  },
+
+  309: {
+    description: "A comprehensive 1:1 URL mapping document maps every old URL to its new destination. This is the most critical site refresh deliverable - missing mappings cause 404 errors and ranking losses.",
+    tips: [
+      "Format: spreadsheet with columns: Old URL, New URL, Redirect Type (301), Status, Notes",
+      "Include every single page: even low-traffic pages may have backlinks",
+      "Map old URLs to: most similar new page, or relevant category/section page",
+      "If no equivalent exists: map to homepage or most relevant parent page",
+      "Add priority: High (top traffic pages), Medium, Low",
+      "Review with SEO, content, and dev teams before implementing"
+    ],
+    resources: [
+      { title: "URL Mapping Best Practices", url: "https://moz.com/blog/url-mapping-for-site-migrations" },
+      { title: "Redirect Mapping Template", url: "https://www.screamingfrog.co.uk/website-migration-checklist/" }
+    ],
+    estimatedTime: "40+ hours",
+    difficulty: "Advanced"
+  },
+
+  310: {
+    description: "Testing ALL 301 redirects individually before launch ensures no broken redirects or incorrect destinations. Even one broken redirect for a high-value page can significantly impact traffic and revenue.",
+    tips: [
+      "Use Screaming Frog: crawl old URLs, check response codes (should be 301), verify destinations",
+      "Manual spot checks: test top 50 URLs manually in browser",
+      "Check for: redirect chains (A→B→C), redirect loops (A→B→A), 404 errors",
+      "Verify mobile and desktop redirect to same destination",
+      "Test on staging environment before production",
+      "Have QA team test in multiple browsers and devices"
+    ],
+    resources: [
+      { title: "Testing Redirects Guide", url: "https://www.screamingfrog.co.uk/how-to-check-redirects/" }
+    ],
+    estimatedTime: "40+ hours",
+    difficulty: "Advanced"
+  },
+
+  311: {
+    description: "Post-launch redirect monitoring tracks 404 errors and fixes broken redirects within 48 hours. Even perfect pre-launch testing can miss edge cases that only appear with real traffic.",
+    tips: [
+      "Set up: Google Search Console 404 monitoring, server error logs, Ahrefs 404 monitoring",
+      "Check daily for first week, then weekly for first month",
+      "Use Search Console: Crawl Errors report → Not Found (404)",
+      "Priority: Fix 404s with backlinks or historical traffic first",
+      "Document: all 404s found, redirects added, fix date",
+      "Set up alerts: email notification for new 404 errors above threshold"
+    ],
+    resources: [
+      { title: "404 Monitoring Guide", url: "https://www.searchenginejournal.com/find-404-errors/" }
+    ],
+    estimatedTime: "8-40 hours",
+    difficulty: "Intermediate"
+  },
+
+  312: {
+    description: "A crawl comparison report compares pre-launch vs post-launch sitemaps to catch missed URLs, indexation changes, or technical issues. Differences reveal pages that may have been accidentally excluded.",
+    tips: [
+      "Crawl with Screaming Frog: old site (pre-launch) and new site (post-launch)",
+      "Compare: total URLs, indexable URLs, canonicals, meta robots",
+      "Look for: URLs in old sitemap missing from new sitemap (potential 404s)",
+      "Check: pages that were indexable now have noindex (accidental demotion)",
+      "Verify: all high-value pages from old site appear in new site crawl",
+      "Generate report: URLs removed, URLs added, status changes"
+    ],
+    resources: [
+      { title: "Crawl Comparison Tutorial", url: "https://www.screamingfrog.co.uk/seo-spider/user-guide/features/crawl-comparison/" }
+    ],
+    estimatedTime: "2-8 hours",
+    difficulty: "Intermediate"
+  },
+
+  313: {
+    description: "Monitoring ranking volatility daily for 30 days post-launch identifies ranking drops requiring immediate investigation. Site refreshes commonly cause temporary ranking fluctuations that stabilize within 2-4 weeks.",
+    tips: [
+      "Use rank tracking: Semrush Position Tracking, Ahrefs Rank Tracker (daily updates)",
+      "Set alert threshold: flag any keyword dropping >10 positions",
+      "Investigate immediately: check if page 404s, redirect broken, content changed significantly",
+      "Normal: 5-10% of keywords fluctuate ±5 positions (Google algorithm)",
+      "Concerning: 20%+ of keywords drop >10 positions (indicates problem)",
+      "Track by category: branded vs non-branded, product vs blog pages"
+    ],
+    resources: [
+      { title: "Post-Migration Monitoring", url: "https://moz.com/blog/site-migration-monitoring" },
+      { title: "Ranking Drop Diagnosis", url: "https://www.semrush.com/blog/google-rankings-dropped/" }
+    ],
+    estimatedTime: "2-8 hours",
+    difficulty: "Intermediate"
   }
 };
 
