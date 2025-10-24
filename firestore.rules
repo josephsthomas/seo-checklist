@@ -1,0 +1,89 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Helper functions
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    function isOwner(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
+    }
+
+    function isProjectOwner() {
+      return isAuthenticated() &&
+             resource.data.ownerId == request.auth.uid;
+    }
+
+    function isTeamMember() {
+      return isAuthenticated() &&
+             (resource.data.ownerId == request.auth.uid ||
+              request.auth.uid in resource.data.teamMembers);
+    }
+
+    // Users collection - users can read/write their own profile
+    match /users/{userId} {
+      allow read: if isAuthenticated();
+      allow create: if isAuthenticated() && request.auth.uid == userId;
+      allow update: if isOwner(userId);
+      allow delete: if isOwner(userId);
+    }
+
+    // Projects collection - project owners and team members can access
+    match /projects/{projectId} {
+      allow read: if isTeamMember();
+      allow create: if isAuthenticated() &&
+                     request.resource.data.ownerId == request.auth.uid;
+      allow update: if isProjectOwner() || isTeamMember();
+      allow delete: if isProjectOwner();
+    }
+
+    // Checklist completions - linked to projects
+    match /checklist_completions/{completionId} {
+      allow read: if isAuthenticated();
+      allow write: if isAuthenticated();
+    }
+
+    // Custom items - project-specific checklist items
+    match /custom_items/{itemId} {
+      allow read: if isAuthenticated();
+      allow write: if isAuthenticated();
+    }
+
+    // Phase 6: Comments - team members can read/write comments on tasks
+    match /comments/{commentId} {
+      allow read: if isAuthenticated();
+      allow create: if isAuthenticated() &&
+                     request.resource.data.userId == request.auth.uid;
+      allow update, delete: if isAuthenticated() &&
+                              resource.data.userId == request.auth.uid;
+    }
+
+    // Phase 6: Notifications - users can read their own notifications
+    match /notifications/{notificationId} {
+      allow read, update: if isAuthenticated() &&
+                            resource.data.userId == request.auth.uid;
+      allow create: if isAuthenticated();
+      allow delete: if isAuthenticated() &&
+                     resource.data.userId == request.auth.uid;
+    }
+
+    // Phase 6: Activity Log - authenticated users can read, system can write
+    match /activity_log/{activityId} {
+      allow read: if isAuthenticated();
+      allow create: if isAuthenticated();
+    }
+
+    // Phase 6: Task Assignments - linked to projects
+    match /checklist_assignments/{assignmentId} {
+      allow read: if isAuthenticated();
+      allow write: if isAuthenticated();
+    }
+
+    // Default deny all other access
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
