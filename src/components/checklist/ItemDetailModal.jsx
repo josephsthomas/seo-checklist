@@ -8,6 +8,7 @@ import { useActivityLog } from '../../hooks/useActivityLog';
 import { useAuth } from '../../contexts/AuthContext';
 import { TASK_STATUS, TASK_STATUS_LABELS } from '../../utils/roles';
 import CommentThread from './CommentThread';
+import TimeTracker from './TimeTracker';
 import { format, parseISO } from 'date-fns';
 import {
   formatDate,
@@ -135,7 +136,7 @@ export default function ItemDetailModal({ item, projectId, isOpen, onClose, onTo
           {/* Tabs */}
           <div className="border-b">
             <div className="flex px-6">
-              {['details', 'comments', 'activity'].map(tab => (
+              {['details', 'time', 'comments', 'activity'].map(tab => (
                 <button
                   key={tab}
                   onClick={() => setActiveTab(tab)}
@@ -339,6 +340,14 @@ export default function ItemDetailModal({ item, projectId, isOpen, onClose, onTo
                   </div>
                 </div>
               </div>
+            )}
+
+            {activeTab === 'time' && (
+              <TimeTracker
+                projectId={projectId}
+                itemId={item.id}
+                estimatedHours={assignmentData.estimatedHours}
+              />
             )}
 
             {activeTab === 'comments' && (
