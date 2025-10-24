@@ -3260,6 +3260,519 @@ export const helpContent = {
     ],
     estimatedTime: "2-8 hours",
     difficulty: "Beginner"
+  },
+
+  // AI & GENERATIVE SEARCH OPTIMIZATION (Items 191-215)
+  191: {
+    description: "AI crawlers (GPTBot, Google-Extended, ClaudeBot, etc.) train AI models on web content. Configure robots.txt to allow/block based on content strategy and licensing preferences.",
+    tips: [
+      "Add rules in robots.txt: User-agent: GPTBot / Disallow: / (to block)",
+      "Google-Extended blocks Gemini training but allows Google Search",
+      "ClaudeBot (Anthropic), CCBot (Common Crawl), PerplexityBot can be blocked individually",
+      "Consider: blocking may reduce AI-generated traffic referrals",
+      "Allow crawlers for public content you want cited in AI answers",
+      "Block crawlers for proprietary/paid content requiring licensing"
+    ],
+    resources: [
+      { title: "AI Crawler Control", url: "https://developers.google.com/search/docs/crawling-indexing/overview-google-crawlers" }
+    ],
+    estimatedTime: "30 minutes",
+    difficulty: "Beginner"
+  },
+
+  192: {
+    description: "SpeakableSpecification schema marks sections of content for voice assistants to read aloud. Optimizes for voice search on Google Assistant, Alexa, and Siri.",
+    tips: [
+      "Add speakable schema to key content sections (summaries, headlines)",
+      "Use xpath or cssSelector to mark speakable regions",
+      "Keep speakable sections concise (100-200 words)",
+      "Focus on answer-style content voice assistants can read directly",
+      "Test with Google Assistant or schema validator",
+      "Prioritize FAQ answers and definitions for speakable markup"
+    ],
+    resources: [
+      { title: "Speakable Schema", url: "https://schema.org/speakable" }
+    ],
+    estimatedTime: "2-8 hours",
+    difficulty: "Intermediate"
+  },
+
+  193: {
+    description: "AI citation strategy structures content to be quotable and attributable by AI answer engines. Clear facts, statistics with sources, and well-defined terms earn citations.",
+    tips: [
+      "Create 20-40 word definitions for industry terms",
+      "Include statistics with inline source citations",
+      "Use structured format: 'According to [Source], [Statistic]'",
+      "Add publication dates to establish currency",
+      "Create quotable pull-quotes highlighting key facts",
+      "Structure content in clear, discrete facts AI can extract"
+    ],
+    resources: [
+      { title: "AI Answer Optimization", url: "https://www.semrush.com/blog/ai-overviews/" }
+    ],
+    estimatedTime: "8-40 hours",
+    difficulty: "Advanced"
+  },
+
+  194: {
+    description: "TL;DR and Key Takeaways sections provide AI-extractable summaries. Ordered lists of clear statements help AI understand and cite main points.",
+    tips: [
+      "Add TL;DR section at top of long articles (3+ screens)",
+      "Use ordered lists with 3-5 key takeaways",
+      "Write each takeaway as complete, quotable sentence",
+      "Avoid jargon in takeaways - clarity over cleverness",
+      "Format: '1. Key point stated clearly and concisely.'",
+      "Test: Can each takeaway stand alone without context?"
+    ],
+    resources: [
+      { title: "Content Summarization", url: "https://www.semrush.com/blog/content-writing/" }
+    ],
+    estimatedTime: "8-40 hours",
+    difficulty: "Intermediate"
+  },
+
+  195: {
+    description: "Natural language question optimization rewrites headings as questions matching voice search queries. Who, What, Where, When, Why, How questions align with conversational search.",
+    tips: [
+      "Convert H2/H3 from statements to questions: 'How to optimize images' not 'Image optimization'",
+      "Use question format: Who, What, Where, When, Why, How",
+      "Match how people actually speak: 'How do I...' not 'The method for...'",
+      "Include long-tail conversational queries",
+      "Answer question immediately after heading",
+      "Use FAQ schema for Q&A format content"
+    ],
+    resources: [
+      { title: "Voice Search Optimization", url: "https://www.semrush.com/blog/voice-search-optimization/" }
+    ],
+    estimatedTime: "8-40 hours",
+    difficulty: "Intermediate"
+  },
+
+  196: {
+    description: "Explicit source citations mark factual claims with supporting evidence. ClaimReview or Citation schema helps AI verify facts and attribute sources correctly.",
+    tips: [
+      "Add inline citations: [1], [2] with footnotes",
+      "Link directly to source when citing statistics",
+      "Use ClaimReview schema for fact-checked content",
+      "Include publication date of cited source",
+      "Cite primary sources over secondary sources",
+      "Format: 'According to [Organization] (Year), [Fact].'"
+    ],
+    resources: [
+      { title: "ClaimReview Schema", url: "https://schema.org/ClaimReview" }
+    ],
+    estimatedTime: "8-40 hours",
+    difficulty: "Advanced"
+  },
+
+  197: {
+    description: "DefinedTerm schema marks industry terminology and acronyms with definitions. Helps AI understand specialized vocabulary in context.",
+    tips: [
+      "Use DefinedTerm schema for technical terms and acronyms",
+      "Include term, definition, and optional termCode",
+      "Add first use explanation: 'Search Engine Optimization (SEO) is...'",
+      "Create glossary page with all terms and schema",
+      "Link term usage to glossary definitions",
+      "Keep definitions concise (20-40 words)"
+    ],
+    resources: [
+      { title: "DefinedTerm Schema", url: "https://schema.org/DefinedTerm" }
+    ],
+    estimatedTime: "2-8 hours",
+    difficulty: "Intermediate"
+  },
+
+  198: {
+    description: "QAPage schema structures question-answer content for AI extraction. Marks questions and accepted answers clearly for featured snippets and AI answers.",
+    tips: [
+      "Use QAPage schema on forum/Q&A content",
+      "Mark each question with Question type",
+      "Include acceptedAnswer or suggestedAnswer",
+      "Add upvoteCount and answerCount if available",
+      "Write answers in 40-60 words for snippet optimization",
+      "Include author schema for answerer credibility"
+    ],
+    resources: [
+      { title: "QAPage Schema", url: "https://schema.org/QAPage" }
+    ],
+    estimatedTime: "2-8 hours",
+    difficulty: "Intermediate"
+  },
+
+  199: {
+    description: "Comparison tables with proper HTML markup help AI extract and compare data. Use thead, tbody, th with scope attribute for maximum machine readability.",
+    tips: [
+      "Use semantic HTML: <table>, <thead>, <tbody>, <th scope='col'>",
+      "First column: product/feature names (row headers)",
+      "Header row: comparison attributes (column headers)",
+      "Keep cells concise - single values or short phrases",
+      "Add table caption describing what's being compared",
+      "Consider adding Table schema with about property"
+    ],
+    resources: [
+      { title: "HTML Tables", url: "https://developer.mozilla.org/en-US/docs/Web/HTML/Element/table" }
+    ],
+    estimatedTime: "8-40 hours",
+    difficulty: "Intermediate"
+  },
+
+  200: {
+    description: "Dataset schema marks tables, charts, and data files as machine-readable datasets. Helps AI find and extract structured data for analysis.",
+    tips: [
+      "Use Dataset schema on pages with data tables or downloads",
+      "Include name, description, and distribution (download URL)",
+      "Add temporal coverage (date range dataset covers)",
+      "Specify spatial coverage if data is location-specific",
+      "Include creator/publisher information",
+      "Link to data files (CSV, JSON, XML) in distribution"
+    ],
+    resources: [
+      { title: "Dataset Schema", url: "https://developers.google.com/search/docs/appearance/structured-data/dataset" }
+    ],
+    estimatedTime: "2-8 hours",
+    difficulty: "Intermediate"
+  },
+
+  201: {
+    description: "Conversational keyword research identifies natural language queries and question-based searches. People Also Ask and AnswerThePublic reveal how people actually search.",
+    tips: [
+      "Use AnswerThePublic to find question-based queries",
+      "Analyze People Also Ask boxes for related questions",
+      "Include long-tail conversational phrases (5-10 words)",
+      "Document voice search queries (how people speak vs type)",
+      "Use Quora/Reddit to find how people ask questions",
+      "Create content answering each question comprehensively"
+    ],
+    resources: [
+      { title: "AnswerThePublic", url: "https://answerthepublic.com/" }
+    ],
+    estimatedTime: "8-40 hours",
+    difficulty: "Intermediate"
+  },
+
+  202: {
+    description: "Step-by-step instructions in ordered lists with HowTo schema help AI parse and present procedural content. Clear numbered steps improve featured snippet opportunities.",
+    tips: [
+      "Use HowTo schema for instructional content",
+      "Number steps clearly: 1. First step, 2. Second step",
+      "Start each step with action verb (Mix, Pour, Click, Enter)",
+      "Include tools/supplies needed before steps",
+      "Add images to steps if available (improves schema)",
+      "Keep steps discrete - one action per step"
+    ],
+    resources: [
+      { title: "HowTo Schema", url: "https://developers.google.com/search/docs/appearance/structured-data/how-to" }
+    ],
+    estimatedTime: "8-40 hours",
+    difficulty: "Intermediate"
+  },
+
+  203: {
+    description: "LearningResource schema marks tutorials, courses, and educational guides as structured learning materials. Helps education-focused AI find instructional content.",
+    tips: [
+      "Use LearningResource schema for tutorials and guides",
+      "Include educationalLevel (beginner, intermediate, advanced)",
+      "Add timeRequired for completion estimates",
+      "Specify learningResourceType (lesson, course, assessment)",
+      "Include competencyRequired and teaches properties",
+      "Link to related learning resources in sequence"
+    ],
+    resources: [
+      { title: "LearningResource Schema", url: "https://schema.org/LearningResource" }
+    ],
+    estimatedTime: "1-2 hours",
+    difficulty: "Beginner"
+  },
+
+  204: {
+    description: "Entity relationship mapping connects people, places, organizations, products using schema relationships. SameAs, relatedLink, mentions properties build entity graph.",
+    tips: [
+      "Use sameAs to link entities to authoritative sources (Wikipedia, Wikidata)",
+      "Connect Person to Organization with affiliation or worksFor",
+      "Link Product to Brand with brand property",
+      "Use mentions to reference entities in content",
+      "Create relatedLink connections between entities",
+      "Build comprehensive knowledge graph of business entities"
+    ],
+    resources: [
+      { title: "Entity Linking", url: "https://schema.org/" }
+    ],
+    estimatedTime: "8-40 hours",
+    difficulty: "Advanced"
+  },
+
+  205: {
+    description: "Context annotations on links using schema:mentions or descriptive text help AI understand link relevance and relationship to surrounding content.",
+    tips: [
+      "Add descriptive text before links explaining what they link to",
+      "Use schema:mentions to mark entity references",
+      "Avoid generic 'click here' - use descriptive anchor text",
+      "Add title attributes to links for additional context",
+      "Group related links with explanatory intros",
+      "Use lists with descriptive labels for link collections"
+    ],
+    resources: [
+      { title: "Link Context", url: "https://developer.mozilla.org/en-US/docs/Web/HTML/Element/a" }
+    ],
+    estimatedTime: "2-8 hours",
+    difficulty: "Beginner"
+  },
+
+  206: {
+    description: "List-based content with proper HTML (ul, ol) and clear labels helps AI extract bullet points for answer boxes and summaries.",
+    tips: [
+      "Use <ul> for unordered lists, <ol> for ordered/sequential items",
+      "Introduce lists with descriptive heading or sentence",
+      "Keep list items concise (one idea per bullet)",
+      "Use parallel structure (all items start with verb or noun)",
+      "Avoid nested lists deeper than 2 levels",
+      "Format lists for easy scanning"
+    ],
+    resources: [
+      { title: "HTML Lists", url: "https://developer.mozilla.org/en-US/docs/Web/HTML/Element/ul" }
+    ],
+    estimatedTime: "8-40 hours",
+    difficulty: "Beginner"
+  },
+
+  207: {
+    description: "Statistical data in machine-readable format with proper units, dates, currencies using schema properties helps AI extract and verify numbers accurately.",
+    tips: [
+      "Mark numbers with units: '25 kg' not just '25'",
+      "Use ISO dates: '2024-03-15' for dates",
+      "Include currency codes: 'USD 50' or '$50 USD'",
+      "Add schema properties for quantitative values",
+      "Use QuantitativeValue schema for measurements",
+      "Include source citation for all statistics"
+    ],
+    resources: [
+      { title: "QuantitativeValue Schema", url: "https://schema.org/QuantitativeValue" }
+    ],
+    estimatedTime: "2-8 hours",
+    difficulty: "Intermediate"
+  },
+
+  208: {
+    description: "Contextual definitions for technical terms using inline explanations or tooltips help AI understand specialized vocabulary in context.",
+    tips: [
+      "Define technical terms on first use: 'Content Delivery Network (CDN) is...'",
+      "Add abbreviation/acronym markup: <abbr title='definition'>TERM</abbr>",
+      "Use DefinedTerm schema for formal definitions",
+      "Create hover tooltips for definitions",
+      "Link to glossary page for detailed definitions",
+      "Keep inline definitions concise (10-15 words)"
+    ],
+    resources: [
+      { title: "Abbreviation Element", url: "https://developer.mozilla.org/en-US/docs/Web/HTML/Element/abbr" }
+    ],
+    estimatedTime: "8-40 hours",
+    difficulty: "Intermediate"
+  },
+
+  209: {
+    description: "FactCheck schema marks verified claims, ratings, and sources for AI truth assessment. Builds content credibility for fact-checking applications.",
+    tips: [
+      "Use ClaimReview schema for fact-checked content",
+      "Include claim text, claimant, and reviewRating",
+      "Add datePublished and reviewBody with evidence",
+      "Use rating scale (True, False, Mostly True, etc.)",
+      "Link to supporting evidence and sources",
+      "Follow International Fact-Checking Network principles"
+    ],
+    resources: [
+      { title: "Fact Check Schema", url: "https://developers.google.com/search/docs/appearance/structured-data/factcheck" }
+    ],
+    estimatedTime: "1-2 hours",
+    difficulty: "Intermediate"
+  },
+
+  210: {
+    description: "Correction/update notices with CorrectionComment schema mark content changes transparently. Builds trust by showing content maintenance and accuracy commitment.",
+    tips: [
+      "Add visible correction notices at top of updated articles",
+      "Include date of correction and what was changed",
+      "Use CorrectionComment schema with text and datePublished",
+      "Explain why correction was made (error, new information)",
+      "Don't delete old versions - mark as corrected",
+      "Update dateModified in Article schema"
+    ],
+    resources: [
+      { title: "Corrections Transparency", url: "https://schema.org/CorrectionComment" }
+    ],
+    estimatedTime: "1 hour",
+    difficulty: "Beginner"
+  },
+
+  211: {
+    description: "AI-optimized meta descriptions answer specific questions as complete sentences rather than promotional copy. Helps AI extract and present accurate summaries.",
+    tips: [
+      "Write descriptions as complete sentences with subject, verb, object",
+      "Answer: 'What does this page explain?' not 'Why should you click?'",
+      "Avoid promotional language ('Best!', 'Amazing!', 'Don't miss!')",
+      "Include key facts or statistics in description",
+      "Use 150-160 characters for full display",
+      "Test: Does description accurately summarize content?"
+    ],
+    resources: [
+      { title: "Meta Descriptions", url: "https://moz.com/learn/seo/meta-description" }
+    ],
+    estimatedTime: "8-40 hours",
+    difficulty: "Intermediate"
+  },
+
+  212: {
+    description: "Pros/cons sections with clear labels structure advantages and disadvantages in lists AI can extract for comparison-based queries.",
+    tips: [
+      "Create separate sections labeled 'Pros' and 'Cons' or 'Advantages' and 'Disadvantages'",
+      "Use bullet lists for each pro/con point",
+      "Keep points parallel in structure",
+      "Be honest - include real cons, not fake weaknesses",
+      "Add context explaining trade-offs",
+      "Consider PositiveNote/NegativeNote schema"
+    ],
+    resources: [
+      { title: "Comparison Content", url: "https://www.semrush.com/blog/comparison-content/" }
+    ],
+    estimatedTime: "2-8 hours",
+    difficulty: "Beginner"
+  },
+
+  213: {
+    description: "Explicit date/time stamps with schema using ISO 8601 format help AI understand content currency and time-sensitive information accuracy.",
+    tips: [
+      "Use ISO 8601 format: 2024-03-15T14:30:00Z for dates",
+      "Add datePublished and dateModified in Article schema",
+      "Display human-readable dates on page: 'March 15, 2024'",
+      "Mark time-sensitive info: 'As of March 2024, ...'",
+      "Update dates when making substantial revisions",
+      "Include temporal coverage for historical content"
+    ],
+    resources: [
+      { title: "ISO 8601 Dates", url: "https://en.wikipedia.org/wiki/ISO_8601" }
+    ],
+    estimatedTime: "2-8 hours",
+    difficulty: "Intermediate"
+  },
+
+  214: {
+    description: "Monitor AI search visibility by tracking citations in ChatGPT, Perplexity, Gemini, and other AI answer engines. Measure effectiveness of AI optimization efforts.",
+    tips: [
+      "Manually search target queries in ChatGPT, Perplexity, Gemini monthly",
+      "Document which queries cite your content",
+      "Track citation format and attribution accuracy",
+      "Use tools like BrightEdge or Conductor for automated tracking",
+      "Monitor referral traffic from AI platforms in Analytics",
+      "Correlate AI citations with traditional search rankings"
+    ],
+    resources: [
+      { title: "AI Visibility Tracking", url: "https://www.semrush.com/blog/ai-overviews/" }
+    ],
+    estimatedTime: "2-8 hours",
+    difficulty: "Intermediate"
+  },
+
+  215: {
+    description: "Analyze AI-generated search queries in Search Console to identify zero-click searches and optimize for direct answers that AI systems extract.",
+    tips: [
+      "Review Search Console queries with high impressions, low clicks",
+      "Identify question-based queries (Who, What, Where, When, Why, How)",
+      "These may be answered by AI without clicks",
+      "Optimize content to be the cited source in AI answers",
+      "Track impressions growth even if clicks don't increase",
+      "Focus on brand visibility in AI answers"
+    ],
+    resources: [
+      { title: "Zero-Click Analysis", url: "https://www.semrush.com/blog/zero-click-searches/" }
+    ],
+    estimatedTime: "8-40 hours",
+    difficulty: "Intermediate"
+  },
+
+  // MACHINE READABILITY (Items 216-220)
+  216: {
+    description: "Validating JSON-LD schema with both Google Rich Results Test and Schema.org validator ensures no errors that could prevent rich results or AI parsing.",
+    tips: [
+      "Test all pages with Google Rich Results Test",
+      "Validate JSON-LD syntax with Schema.org validator",
+      "Fix all errors before launch - warnings are optional",
+      "Test each schema type separately",
+      "Verify required properties are present",
+      "Re-test after making changes"
+    ],
+    resources: [
+      { title: "Rich Results Test", url: "https://search.google.com/test/rich-results" },
+      { title: "Schema Validator", url: "https://validator.schema.org/" }
+    ],
+    estimatedTime: "2-8 hours",
+    difficulty: "Intermediate"
+  },
+
+  217: {
+    description: "Consistent JSON-LD placement in <head> or immediately after <body> ensures reliable parsing by all crawlers and AI systems.",
+    tips: [
+      "Place all JSON-LD in <head> section for consistency",
+      "Alternative: immediately after <body> opening tag",
+      "Don't scatter JSON-LD throughout page body",
+      "Group related schema types together",
+      "Use single <script type='application/ld+json'> per schema object",
+      "Verify placement doesn't affect page load performance"
+    ],
+    resources: [
+      { title: "JSON-LD Best Practices", url: "https://developers.google.com/search/docs/appearance/structured-data/intro-structured-data" }
+    ],
+    estimatedTime: "2-8 hours",
+    difficulty: "Intermediate"
+  },
+
+  218: {
+    description: "SameAs schema properties link entities to Wikipedia, Wikidata, and official profiles to disambiguate and establish entity authority.",
+    tips: [
+      "Add sameAs array to Organization and Person schemas",
+      "Link to Wikipedia page for entity",
+      "Include Wikidata URI (https://www.wikidata.org/wiki/Q...)",
+      "Add official social profiles (LinkedIn, Twitter, Facebook)",
+      "Include official company/person website",
+      "Use authoritative sources only - no fake profiles"
+    ],
+    resources: [
+      { title: "SameAs Property", url: "https://schema.org/sameAs" }
+    ],
+    estimatedTime: "2-8 hours",
+    difficulty: "Intermediate"
+  },
+
+  219: {
+    description: "ARIA landmarks (role attributes) define page structure for screen readers and AI parsers. Main, navigation, complementary, contentinfo roles clarify content hierarchy.",
+    tips: [
+      "Use role='main' on primary content container",
+      "Add role='navigation' to navigation menus",
+      "Use role='complementary' for sidebars and related content",
+      "Add role='contentinfo' to footer",
+      "Use role='search' for search forms",
+      "Don't use ARIA if semantic HTML5 elements exist (<main>, <nav>)"
+    ],
+    resources: [
+      { title: "ARIA Landmarks", url: "https://www.w3.org/WAI/ARIA/apg/patterns/landmarks/" }
+    ],
+    estimatedTime: "2-8 hours",
+    difficulty: "Intermediate"
+  },
+
+  220: {
+    description: "ARIA labels on interactive elements provide context for screen readers and AI parsing. Buttons, forms, and dynamic content need descriptive labels.",
+    tips: [
+      "Add aria-label to buttons without visible text: <button aria-label='Close modal'>",
+      "Use aria-labelledby to reference visible labels",
+      "Add aria-describedby for additional context",
+      "Label form inputs: <input aria-label='Email address'>",
+      "Describe dynamic content state: aria-live='polite' for updates",
+      "Test with screen reader (NVDA, JAWS) to verify labels"
+    ],
+    resources: [
+      { title: "ARIA Authoring Guide", url: "https://www.w3.org/WAI/ARIA/apg/" }
+    ],
+    estimatedTime: "8-40 hours",
+    difficulty: "Intermediate"
   }
 };
 
