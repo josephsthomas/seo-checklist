@@ -5572,6 +5572,220 @@ export const helpContent = {
     ],
     estimatedTime: "2-8 hours",
     difficulty: "Intermediate"
+  },
+
+  // LINK BUILDING & DIGITAL PR ITEMS (324-335)
+  324: {
+    description: "A comprehensive link building strategy defines goals, target metrics, outreach methods, and success criteria. Without strategy, link building efforts become scattered and ineffective, wasting time on low-quality opportunities.",
+    tips: [
+      "Set specific goals: X links from DR 50+ sites in 6 months, Y referring domains per quarter",
+      "Define target link profile: types of sites (news, industry blogs, directories), DA/DR thresholds",
+      "Choose tactics mix: guest posting 30%, digital PR 25%, broken link building 20%, resource pages 15%, unlinked mentions 10%",
+      "Document ideal link attributes: dofollow, contextual, relevant niche, quality content",
+      "Set KPIs beyond link count: referral traffic, rankings improvement, domain authority increase",
+      "Create timeline with monthly targets and quarterly reviews"
+    ],
+    resources: [
+      { title: "Link Building Strategy Guide", url: "https://moz.com/link-building" },
+      { title: "Link Building Best Practices", url: "https://ahrefs.com/blog/link-building/" }
+    ],
+    estimatedTime: "8-40 hours",
+    difficulty: "Advanced"
+  },
+
+  325: {
+    description: "Competitor backlink gap analysis reveals high-quality link opportunities competitors have captured that you haven't. These gaps represent proven link targets that have already shown willingness to link to similar content in your niche.",
+    tips: [
+      "Use Ahrefs or Semrush to compare your backlink profile against 3-5 top competitors",
+      "Filter for high-quality gaps: DR/DA 40+, dofollow, contextual links",
+      "Identify common link sources across multiple competitors (especially valuable targets)",
+      "Analyze the content that earned links - what made it linkable?",
+      "Create similar or better content to pitch to these proven link sources",
+      "Export gap analysis to spreadsheet, prioritize by DR and relevance, create outreach list"
+    ],
+    resources: [
+      { title: "Ahrefs Content Gap", url: "https://ahrefs.com/blog/content-gap-analysis/" },
+      { title: "Backlink Gap Analysis", url: "https://www.semrush.com/blog/backlink-gap-analysis/" }
+    ],
+    estimatedTime: "2-8 hours",
+    difficulty: "Intermediate"
+  },
+
+  326: {
+    description: "Linkable assets are content pieces specifically designed to attract backlinks naturally - original research, data visualizations, comprehensive guides, or useful tools. These evergreen assets continue earning links long after publication.",
+    tips: [
+      "Original research/surveys: Conduct industry surveys, publish data others will cite",
+      "Ultimate guides: 5000+ word definitive resources on core topics",
+      "Tools and calculators: Free tools that solve specific problems (ROI calculator, template generator)",
+      "Infographics with data: Visual representation of unique data or processes",
+      "Interactive content: Quizzes, assessments, comparison tools",
+      "Promote heavily: Outreach to 50-100 relevant sites per asset, HARO pitches, social amplification"
+    ],
+    resources: [
+      { title: "Link Building Content Types", url: "https://backlinko.com/hub/content/types" },
+      { title: "Creating Linkable Assets", url: "https://moz.com/blog/linkable-assets" }
+    ],
+    estimatedTime: "40+ hours",
+    difficulty: "Advanced"
+  },
+
+  327: {
+    description: "Digital PR earns brand mentions and backlinks from journalists, news sites, and major publications through newsworthy stories, expert commentary, and data releases. This builds brand authority while earning high-DR links.",
+    tips: [
+      "Build journalist database: Identify reporters covering your industry, track contact info",
+      "Monitor HARO (Help A Reporter Out) daily for relevant queries to provide expert quotes",
+      "Create newsworthy content: Original research data, industry trends, controversial opinions",
+      "Write press releases for significant company news, product launches, milestones",
+      "Pitch seasonal angles: Tie your expertise to trending news or seasonal topics",
+      "Build relationships: Follow journalists on Twitter, share their articles, engage before pitching"
+    ],
+    resources: [
+      { title: "Digital PR Guide", url: "https://www.searchenginejournal.com/digital-pr-seo/" },
+      { title: "HARO for SEO", url: "https://www.helpareporter.com/" }
+    ],
+    estimatedTime: "8-40 hours",
+    difficulty: "Intermediate"
+  },
+
+  328: {
+    description: "Broken link building finds dead links on relevant sites and offers your content as replacement. Site owners benefit from fixing broken UX, you earn relevant contextual links - win-win that yields high conversion rates.",
+    tips: [
+      "Use Ahrefs or Semrush to find broken outbound links on high-DR sites in your niche",
+      "Search for resource pages with broken links: 'inurl:resources [your topic]' + use Check My Links extension",
+      "Identify broken competitor links: find sites linking to competitors' 404s",
+      "Create replacement content that matches or improves on original broken page",
+      "Outreach email: Alert to broken link, briefly mention your alternative resource",
+      "Track conversion rate: broken link building often converts at 5-10% (higher than cold outreach)"
+    ],
+    resources: [
+      { title: "Broken Link Building Guide", url: "https://ahrefs.com/blog/broken-link-building/" },
+      { title: "Check My Links Extension", url: "https://chrome.google.com/webstore/detail/check-my-links/" }
+    ],
+    estimatedTime: "8-40 hours",
+    difficulty: "Intermediate"
+  },
+
+  329: {
+    description: "Guest posting on authoritative industry blogs builds backlinks, brand awareness, and establishes expertise. Strategic guest posting targets high-DR sites with engaged audiences aligned with your target market.",
+    tips: [
+      "Research target sites: DA 40+, active blogs accepting guest posts, relevant audience",
+      "Study their content: Understand tone, topics, what performs well before pitching",
+      "Pitch unique angles: Don't rehash their existing content, offer fresh perspectives",
+      "Follow guidelines strictly: Many sites have specific guest post submission requirements",
+      "Include 1-2 contextual links to your site (don't over-optimize or stuff links)",
+      "Quality over quantity: 1 post on DR 70 site > 10 posts on DR 20 sites"
+    ],
+    resources: [
+      { title: "Guest Posting Guide", url: "https://backlinko.com/guest-blogging" },
+      { title: "Finding Guest Post Opportunities", url: "https://www.semrush.com/blog/guest-blogging/" }
+    ],
+    estimatedTime: "2-8 hours",
+    difficulty: "Intermediate"
+  },
+
+  330: {
+    description: "Effective outreach email templates significantly improve response rates. Personalized, concise emails that offer genuine value convert 3-5x better than generic mass emails. Track performance to continuously improve templates.",
+    tips: [
+      "Subject line: Personalized, specific, benefit-focused: 'Quick question about [their article title]'",
+      "Opening: Reference specific content they've published, show you've actually read their site",
+      "Value proposition: Explain why your content/link benefits their audience (not you)",
+      "Keep brief: 75-150 words maximum, 3-4 sentences",
+      "One clear CTA: Ask for one specific action, make it easy to say yes",
+      "Track metrics: Use tools like BuzzStream or simple spreadsheet to track sent, opened, replied, converted"
+    ],
+    resources: [
+      { title: "Outreach Email Templates", url: "https://backlinko.com/outreach-email-templates" },
+      { title: "Email Outreach Best Practices", url: "https://ahrefs.com/blog/outreach/" }
+    ],
+    estimatedTime: "2-8 hours",
+    difficulty: "Beginner"
+  },
+
+  331: {
+    description: "Toxic backlinks from spammy, low-quality, or penalized sites can harm rankings. Regular backlink audits identify harmful links for disavowal, protecting domain authority and preventing Google penalties.",
+    tips: [
+      "Use Ahrefs, Semrush, or Google Search Console to export all backlinks",
+      "Identify toxic indicators: Adult content, gambling, pharma sites, obvious link farms, sites with excessive outbound links",
+      "Check spam score with Moz or Semrush - flag links with 60%+ spam score",
+      "Look for patterns: sudden spikes in low-quality links may indicate negative SEO attack",
+      "Create disavow file: domain:spammysite.com (disavow entire domain) or http://spammysite.com/page (specific URL)",
+      "Upload to Google Search Console Disavow Tool - use cautiously, only for genuinely harmful links"
+    ],
+    resources: [
+      { title: "Toxic Backlink Audit", url: "https://ahrefs.com/blog/google-disavow-tool/" },
+      { title: "Google Disavow Tool", url: "https://search.google.com/search-console/disavow-links" }
+    ],
+    estimatedTime: "8-40 hours",
+    difficulty: "Advanced"
+  },
+
+  332: {
+    description: "Link quality assessment criteria provide objective standards for evaluating link opportunities. Clear criteria prevent wasting time on low-value links and ensure resources focus on high-impact opportunities.",
+    tips: [
+      "Domain authority threshold: Set minimum DR/DA (e.g., DR 30+ for scalable tactics, DR 50+ for manual outreach)",
+      "Relevance score: Site must be in your industry or closely related niche",
+      "Traffic requirement: Use Ahrefs/Semrush to verify site gets real organic traffic (300+ monthly visits)",
+      "Link type: Prefer contextual links in content over footer/sidebar links",
+      "Spam indicators: Check for thin content, excessive ads, over-optimization",
+      "Create scoring rubric: Assign points for each factor, set minimum score for pursuit"
+    ],
+    resources: [
+      { title: "Link Quality Evaluation", url: "https://moz.com/learn/seo/link-quality" }
+    ],
+    estimatedTime: "<2 hours",
+    difficulty: "Beginner"
+  },
+
+  333: {
+    description: "Link tracking and attribution reveals which backlinks actually drive traffic, conversions, and revenue. This data enables ROI calculation and helps prioritize high-performing link sources for future outreach.",
+    tips: [
+      "Use UTM parameters in backlinks for tracking: utm_source=sitename&utm_medium=referral&utm_campaign=linkbuilding",
+      "Set up Google Analytics referral tracking to monitor traffic from each linking domain",
+      "Track conversions by referral source to identify high-value link sources",
+      "Monitor rankings for target keywords after earning links from specific domains",
+      "Calculate link ROI: (revenue from link traffic - outreach cost) / outreach cost",
+      "Document top performers: Double down on tactics and sources that drive real business results"
+    ],
+    resources: [
+      { title: "Link Attribution Tracking", url: "https://moz.com/blog/link-tracking" }
+    ],
+    estimatedTime: "2-8 hours",
+    difficulty: "Intermediate"
+  },
+
+  334: {
+    description: "Resource pages curate lists of helpful links on specific topics. Getting listed on relevant resource pages earns high-quality contextual links from pages specifically designed to send traffic outbound.",
+    tips: [
+      "Find resource pages: Search 'intitle:resources [your topic]', 'useful resources [topic]', 'helpful links [topic]'",
+      "Look for pages listing competitors or similar tools/content",
+      "Analyze what's already listed: Ensure your content is truly valuable addition",
+      "Pitch via email: Point out outdated links or gaps in their list, explain how your resource helps their audience",
+      "Offer exclusive content: Create resource page-specific content if needed",
+      "Target .edu and .gov resource pages for authoritative links"
+    ],
+    resources: [
+      { title: "Resource Page Link Building", url: "https://ahrefs.com/blog/resource-page-link-building/" }
+    ],
+    estimatedTime: "2-8 hours",
+    difficulty: "Intermediate"
+  },
+
+  335: {
+    description: "Unlinked brand mentions occur when sites mention your brand, product, or people but don't include a hyperlink. Reclaiming these mentions converts existing editorial mentions into valuable backlinks with high success rates.",
+    tips: [
+      "Set up Google Alerts for your brand name, product names, and key people",
+      "Use Ahrefs Content Explorer or Buzzsumo to find unlinked mentions: 'brand name' -site:yoursite.com",
+      "Monitor mentions with Brand24, Mention, or Ahrefs Alerts for real-time notifications",
+      "Reach out politely: Thank them for mention, ask if they'd consider adding link for readers' convenience",
+      "Prioritize high-DR mentions and recent articles (within 3 months)",
+      "Success rate typically 30-40% - much higher than cold outreach since they already know your brand"
+    ],
+    resources: [
+      { title: "Brand Mention Link Building", url: "https://ahrefs.com/blog/unlinked-mentions/" },
+      { title: "Google Alerts", url: "https://www.google.com/alerts" }
+    ],
+    estimatedTime: "8-40 hours",
+    difficulty: "Intermediate"
   }
 };
 
