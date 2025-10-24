@@ -1,0 +1,935 @@
+import React, { useState, useMemo } from 'react';
+import { Check, Filter, Download, Search } from 'lucide-react';
+
+const checklistData = [
+  { id: 1, phase: "Discovery", priority: "CRITICAL", item: "Conduct comprehensive SEO audit of existing site (if redesign) documenting current rankings, traffic, technical issues, and baseline metrics", owner: "SEO", category: "Foundation & Setup", projectTypes: ["Site Refresh", "Net New Site"], effortLevel: "Very High (40+h)", riskLevel: "HIGH RISK", deliverableType: "Documentation" },
+  { id: 2, phase: "Discovery", priority: "CRITICAL", item: "Perform competitive analysis of top 5-10 competitors' SEO strategies including keyword targeting, content depth, technical implementation, and backlink profiles", owner: "SEO", category: "Foundation & Setup", projectTypes: ["Net New Site", "Site Refresh", "Microsite"], effortLevel: "High (8-40h)", riskLevel: "HIGH RISK", deliverableType: "Documentation" },
+  { id: 3, phase: "Discovery", priority: "CRITICAL", item: "Complete comprehensive keyword research covering primary, secondary, and long-tail keywords with search volume, difficulty scores, and intent classification", owner: "SEO + Content", category: "Keyword Research", projectTypes: ["Net New Site", "Site Refresh", "Campaign Landing Page", "Microsite"], effortLevel: "Very High (40+h)", riskLevel: "HIGH RISK", deliverableType: "Documentation" },
+  { id: 4, phase: "Discovery", priority: "HIGH", item: "Map target keywords to specific pages and templates creating detailed keyword-to-page matrix with primary and secondary keyword assignments", owner: "SEO + Content", category: "Keyword Research", projectTypes: ["Net New Site", "Site Refresh", "Microsite"], effortLevel: "High (8-40h)", riskLevel: "MEDIUM", deliverableType: "Documentation" },
+  { id: 5, phase: "Discovery", priority: "HIGH", item: "Analyze current backlink profile using Search Console and identify link equity preservation needs for migration (if applicable)", owner: "SEO", category: "Foundation & Setup", projectTypes: ["Site Refresh"], effortLevel: "Medium (2-8h)", riskLevel: "HIGH RISK", deliverableType: "Documentation" },
+  { id: 6, phase: "Discovery", priority: "HIGH", item: "Review historical analytics data to identify top-performing content, high-value pages, and conversion paths requiring preservation", owner: "SEO + Analytics", category: "Foundation & Setup", projectTypes: ["Site Refresh"], effortLevel: "Medium (2-8h)", riskLevel: "HIGH RISK", deliverableType: "Documentation" },
+  { id: 7, phase: "Discovery", priority: "MEDIUM", item: "Document current URL structure and plan new SEO-friendly URL architecture with logical hierarchy and keyword inclusion", owner: "SEO + IA", category: "Foundation & Setup", projectTypes: ["Net New Site", "Site Refresh"], effortLevel: "High (8-40h)", riskLevel: "MEDIUM", deliverableType: "Documentation" },
+  { id: 8, phase: "Discovery", priority: "MEDIUM", item: "Identify E-E-A-T (Experience, Expertise, Authoritativeness, Trustworthiness) requirements for YMYL content areas", owner: "SEO + Content", category: "Content Strategy", projectTypes: ["Net New Site", "Site Refresh", "Microsite"], effortLevel: "Medium (2-8h)", riskLevel: "MEDIUM", deliverableType: "Documentation" },
+  { id: 9, phase: "Strategy", priority: "CRITICAL", item: "Define information architecture with flat structure ensuring all pages accessible within 3 clicks from homepage", owner: "IA + SEO", category: "Technical SEO", projectTypes: ["Net New Site", "Site Refresh"], effortLevel: "High (8-40h)", riskLevel: "HIGH RISK", deliverableType: "Documentation" },
+  { id: 10, phase: "Strategy", priority: "CRITICAL", item: "Create URL structure strategy using descriptive, keyword-rich URLs with hyphens as separators (not underscores) and lowercase letters", owner: "IA + SEO", category: "Technical SEO", projectTypes: ["Net New Site", "Site Refresh", "Campaign Landing Page", "Microsite"], effortLevel: "Medium (2-8h)", riskLevel: "HIGH RISK", deliverableType: "Documentation" },
+  { id: 11, phase: "Strategy", priority: "CRITICAL", item: "Plan internal linking strategy with hub pages, pillar content, and contextual linking to distribute page authority", owner: "SEO + Content", category: "Technical SEO", projectTypes: ["Net New Site", "Site Refresh"], effortLevel: "High (8-40h)", riskLevel: "MEDIUM", deliverableType: "Documentation" },
+  { id: 12, phase: "Strategy", priority: "CRITICAL", item: "Design navigation structure that is crawlable with HTML links (not JavaScript-only) and includes breadcrumb navigation", owner: "UX + Development", category: "Technical SEO", projectTypes: ["Net New Site", "Site Refresh", "Microsite"], effortLevel: "High (8-40h)", riskLevel: "HIGH RISK", deliverableType: "Code" },
+  { id: 13, phase: "Strategy", priority: "HIGH", item: "Plan content depth requirements - minimum 300 words for basic pages, 1000+ for pillar content, 500+ for service pages", owner: "Content + SEO", category: "Content Strategy", projectTypes: ["Net New Site", "Site Refresh", "Campaign Landing Page", "Microsite"], effortLevel: "Medium (2-8h)", riskLevel: "MEDIUM", deliverableType: "Documentation" },
+  { id: 14, phase: "Strategy", priority: "HIGH", item: "Create page template requirements document specifying SEO elements for each template (title tag patterns, meta descriptions, schema markup)", owner: "SEO + UX", category: "On-Page Optimization", projectTypes: ["Net New Site", "Site Refresh", "Campaign Landing Page", "Microsite"], effortLevel: "High (8-40h)", riskLevel: "HIGH RISK", deliverableType: "Documentation" },
+  { id: 15, phase: "Strategy", priority: "HIGH", item: "Plan schema markup strategy identifying which schema types needed (Organization, LocalBusiness, Article, FAQ, HowTo, Product, etc.)", owner: "SEO + Development", category: "Schema Markup", projectTypes: ["Net New Site", "Site Refresh", "Campaign Landing Page", "Microsite"], effortLevel: "High (8-40h)", riskLevel: "MEDIUM", deliverableType: "Documentation" },
+  { id: 16, phase: "Strategy", priority: "HIGH", item: "Design mobile-first responsive layouts ensuring content parity between desktop and mobile versions", owner: "UX + Development", category: "Mobile Optimization", projectTypes: ["Net New Site", "Site Refresh", "Campaign Landing Page", "Microsite"], effortLevel: "High (8-40h)", riskLevel: "HIGH RISK", deliverableType: "Code" },
+  { id: 17, phase: "Strategy", priority: "MEDIUM", item: "Plan content refresh and update schedule for maintaining freshness signals on key pages", owner: "Content + SEO", category: "Content Strategy", projectTypes: ["Net New Site", "Site Refresh"], effortLevel: "Low (<2h)", riskLevel: "LOW", deliverableType: "Documentation" },
+  { id: 18, phase: "Strategy", priority: "MEDIUM", item: "Create 301 redirect mapping document for all changed URLs preserving link equity (if migration/redesign)", owner: "SEO + Development", category: "Technical SEO", projectTypes: ["Site Refresh"], effortLevel: "Very High (40+h)", riskLevel: "BLOCKER", deliverableType: "Documentation" },
+  { id: 19, phase: "Build", priority: "CRITICAL", item: "Set up HTTPS/SSL certificate before launch - all pages must be secure as HTTPS is a ranking factor and browsers show warnings", owner: "Development", category: "Foundation & Setup", projectTypes: ["Net New Site", "Site Refresh", "Campaign Landing Page", "Microsite"], effortLevel: "Low (<2h)", riskLevel: "BLOCKER", deliverableType: "Configuration" },
+  { id: 20, phase: "Build", priority: "CRITICAL", item: "Implement one preferred domain version (www vs non-www) with 301 redirects from non-preferred to preferred version", owner: "Development", category: "Technical SEO", projectTypes: ["Net New Site", "Site Refresh", "Campaign Landing Page", "Microsite"], effortLevel: "Low (<2h)", riskLevel: "BLOCKER", deliverableType: "Configuration" },
+  { id: 21, phase: "Build", priority: "CRITICAL", item: "Implement canonical tags on every page pointing to the preferred version of that URL to prevent duplicate content issues", owner: "Development", category: "Technical SEO", projectTypes: ["Net New Site", "Site Refresh", "Campaign Landing Page", "Microsite"], effortLevel: "Medium (2-8h)", riskLevel: "BLOCKER", deliverableType: "Code" },
+  { id: 22, phase: "Build", priority: "CRITICAL", item: "Create robots.txt file in root directory with sitemap location and proper disallow rules for private/admin areas", owner: "Development", category: "Technical SEO", projectTypes: ["Net New Site", "Site Refresh", "Campaign Landing Page", "Microsite"], effortLevel: "Low (<2h)", riskLevel: "BLOCKER", deliverableType: "Configuration" },
+  { id: 23, phase: "Build", priority: "CRITICAL", item: "Generate XML sitemap with all indexable pages (exclude admin, thank-you, duplicate pages) updating automatically with new content", owner: "Development", category: "Technical SEO", projectTypes: ["Net New Site", "Site Refresh", "Campaign Landing Page", "Microsite"], effortLevel: "Medium (2-8h)", riskLevel: "BLOCKER", deliverableType: "Code" },
+  { id: 24, phase: "Build", priority: "CRITICAL", item: "Ensure all pages return proper HTTP status codes - 200 for live pages, 404 for missing, 301 for moved, 410 for permanently removed", owner: "Development", category: "Technical SEO", projectTypes: ["Net New Site", "Site Refresh", "Campaign Landing Page", "Microsite"], effortLevel: "Medium (2-8h)", riskLevel: "HIGH RISK", deliverableType: "Code" },
+  { id: 25, phase: "Build", priority: "CRITICAL", item: "Implement proper HTML5 semantic markup (header, nav, main, article, aside, footer) for better content understanding by crawlers", owner: "Development", category: "Technical SEO", projectTypes: ["Net New Site", "Site Refresh", "Campaign Landing Page", "Microsite"], effortLevel: "Medium (2-8h)", riskLevel: "MEDIUM", deliverableType: "Code" },
+  { id: 26, phase: "Build", priority: "CRITICAL", item: "Ensure site has crawlable HTML navigation - avoid navigation dependent solely on JavaScript without HTML fallbacks", owner: "Development", category: "Technical SEO", projectTypes: ["Net New Site", "Site Refresh", "Microsite"], effortLevel: "High (8-40h)", riskLevel: "BLOCKER", deliverableType: "Code" },
+  { id: 27, phase: "Build", priority: "CRITICAL", item: "Write unique title tags for every page (50-60 characters, approximately 600px width) with primary keyword in first 60 characters and brand name at end", owner: "Content + SEO", category: "On-Page Optimization", projectTypes: ["Net New Site", "Site Refresh", "Campaign Landing Page", "Microsite"], effortLevel: "High (8-40h)", riskLevel: "HIGH RISK", deliverableType: "Content" },
+  { id: 28, phase: "Build", priority: "CRITICAL", item: "Write unique meta descriptions for every page (150-160 characters) that accurately summarize content and include call-to-action", owner: "Content + SEO", category: "On-Page Optimization", projectTypes: ["Net New Site", "Site Refresh", "Campaign Landing Page", "Microsite"], effortLevel: "High (8-40h)", riskLevel: "HIGH RISK", deliverableType: "Content" },
+  { id: 29, phase: "Build", priority: "CRITICAL", item: "Implement single H1 tag per page containing primary keyword and accurately describing page content", owner: "Content + Development", category: "On-Page Optimization", projectTypes: ["Net New Site", "Site Refresh", "Campaign Landing Page", "Microsite"], effortLevel: "High (8-40h)", riskLevel: "HIGH RISK", deliverableType: "Content" },
+  { id: 30, phase: "Build", priority: "CRITICAL", item: "Use proper heading hierarchy (H1, H2, H3, H4) without skipping levels to structure content logically", owner: "Content + Development", category: "On-Page Optimization", projectTypes: ["Net New Site", "Site Refresh", "Campaign Landing Page", "Microsite"], effortLevel: "High (8-40h)", riskLevel: "MEDIUM", deliverableType: "Content" },
+  { id: 31, phase: "Build", priority: "CRITICAL", item: "Optimize all images with descriptive, keyword-rich filenames (e.g., blue-widget-product.jpg not IMG_1234.jpg)", owner: "Content + Development", category: "Image Optimization", projectTypes: ["Net New Site", "Site Refresh", "Campaign Landing Page", "Microsite"], effortLevel: "Medium (2-8h)", riskLevel: "MEDIUM", deliverableType: "Content" },
+  { id: 32, phase: "Build", priority: "CRITICAL", item: "Write descriptive alt text for all images (5-15 words) describing image content for accessibility and SEO", owner: "Content", category: "Image Optimization", projectTypes: ["Net New Site", "Site Refresh", "Campaign Landing Page", "Microsite"], effortLevel: "High (8-40h)", riskLevel: "HIGH RISK", deliverableType: "Content" },
+  { id: 33, phase: "Build", priority: "CRITICAL", item: "Compress all images to reduce file sizes (use WebP format with JPEG fallback) aiming for under 200KB per image", owner: "Development", category: "Image Optimization", projectTypes: ["Net New Site", "Site Refresh", "Campaign Landing Page", "Microsite"], effortLevel: "Medium (2-8h)", riskLevel: "HIGH RISK", deliverableType: "Code" },
+  { id: 34, phase: "Build", priority: "CRITICAL", item: "Implement lazy loading for images below the fold to improve initial page load time and Core Web Vitals", owner: "Development", category: "Performance", projectTypes: ["Net New Site", "Site Refresh", "Campaign Landing Page", "Microsite"], effortLevel: "Medium (2-8h)", riskLevel: "HIGH RISK", deliverableType: "Code" },
+  { id: 35, phase: "Build", priority: "CRITICAL", item: "Set appropriate image width and height attributes to prevent Cumulative Layout Shift (CLS) as images load", owner: "Development", category: "Performance", projectTypes: ["Net New Site", "Site Refresh", "Campaign Landing Page", "Microsite"], effortLevel: "Medium (2-8h)", riskLevel: "HIGH RISK", deliverableType: "Code" },
+  { id: 36, phase: "Build", priority: "CRITICAL", item: "Optimize Core Web Vitals to meet Google's thresholds: LCP < 2.5s, INP < 200ms, CLS < 0.1", owner: "Development", category: "Performance", projectTypes: ["Net New Site", "Site Refresh", "Campaign Landing Page", "Microsite"], effortLevel: "Very High (40+h)", riskLevel: "HIGH RISK", deliverableType: "Code" },
+  { id: 37, phase: "Build", priority: "CRITICAL", item: "Minify CSS, JavaScript, and HTML to reduce file sizes and improve page load speed", owner: "Development", category: "Performance", projectTypes: ["Net New Site", "Site Refresh", "Campaign Landing Page", "Microsite"], effortLevel: "Low (<2h)", riskLevel: "MEDIUM", deliverableType: "Configuration" },
+  { id: 38, phase: "Build", priority: "CRITICAL", item: "Enable gzip or Brotli compression on server to reduce bandwidth usage and speed up page delivery", owner: "Development", category: "Performance", projectTypes: ["Net New Site", "Site Refresh", "Campaign Landing Page", "Microsite"], effortLevel: "Low (<2h)", riskLevel: "MEDIUM", deliverableType: "Configuration" },
+  { id: 39, phase: "Build", priority: "CRITICAL", item: "Implement browser caching with appropriate cache headers for static assets (CSS, JS, images)", owner: "Development", category: "Performance", projectTypes: ["Net New Site", "Site Refresh", "Campaign Landing Page", "Microsite"], effortLevel: "Low (<2h)", riskLevel: "MEDIUM", deliverableType: "Configuration" },
+  { id: 40, phase: "Build", priority: "CRITICAL", item: "Ensure mobile viewport meta tag is properly configured: <meta name='viewport' content='width=device-width, initial-scale=1'>", owner: "Development", category: "Mobile Optimization", projectTypes: ["Net New Site", "Site Refresh", "Campaign Landing Page", "Microsite"], effortLevel: "Low (<2h)", riskLevel: "BLOCKER", deliverableType: "Code" },
+  { id: 41, phase: "Build", priority: "CRITICAL", item: "Test site on multiple devices and screen sizes ensuring content is accessible and buttons/links are tap-friendly (48x48px minimum)", owner: "Development + UX", category: "Mobile Optimization", projectTypes: ["Net New Site", "Site Refresh", "Campaign Landing Page", "Microsite"], effortLevel: "High (8-40h)", riskLevel: "HIGH RISK", deliverableType: "Review/Approval" },
+  { id: 42, phase: "Build", priority: "CRITICAL", item: "Avoid intrusive interstitials and pop-ups that cover main content on mobile devices (violates Google mobile guidelines)", owner: "UX + Development", category: "Mobile Optimization", projectTypes: ["Net New Site", "Site Refresh", "Campaign Landing Page", "Microsite"], effortLevel: "Low (<2h)", riskLevel: "MEDIUM", deliverableType: "Code" },
+  { id: 43, phase: "Build", priority: "CRITICAL", item: "Implement Organization schema on homepage with name, logo, social profiles, and contact information", owner: "Development", category: "Schema Markup", projectTypes: ["Net New Site", "Site Refresh", "Microsite"], effortLevel: "Low (<2h)", riskLevel: "MEDIUM", deliverableType: "Code" },
+  { id: 44, phase: "Build", priority: "CRITICAL", item: "Implement Breadcrumb schema on all pages showing navigation path from homepage to current page", owner: "Development", category: "Schema Markup", projectTypes: ["Net New Site", "Site Refresh", "Microsite"], effortLevel: "Medium (2-8h)", riskLevel: "MEDIUM", deliverableType: "Code" },
+  { id: 45, phase: "Build", priority: "HIGH", item: "Implement Article schema on blog posts with headline, author, datePublished, dateModified, and featured image", owner: "Development", category: "Schema Markup", projectTypes: ["Net New Site", "Site Refresh"], effortLevel: "Medium (2-8h)", riskLevel: "LOW", deliverableType: "Code" },
+  { id: 46, phase: "Build", priority: "HIGH", item: "Implement FAQ schema on pages with frequently asked questions to potentially earn rich results in SERPs", owner: "Development + Content", category: "Schema Markup", projectTypes: ["Net New Site", "Site Refresh", "Campaign Landing Page", "Microsite"], effortLevel: "Medium (2-8h)", riskLevel: "LOW", deliverableType: "Code" },
+  { id: 47, phase: "Build", priority: "HIGH", item: "Implement HowTo schema on instructional content with steps, tools, and estimated time", owner: "Development + Content", category: "Schema Markup", projectTypes: ["Net New Site", "Site Refresh"], effortLevel: "Medium (2-8h)", riskLevel: "LOW", deliverableType: "Code" },
+  { id: 48, phase: "Build", priority: "HIGH", item: "Implement LocalBusiness schema (if applicable) with address, phone, business hours, price range, and accepted payments", owner: "Development", category: "Schema Markup", projectTypes: ["Net New Site", "Site Refresh", "Microsite"], effortLevel: "Medium (2-8h)", riskLevel: "MEDIUM", deliverableType: "Code" },
+  { id: 49, phase: "Build", priority: "HIGH", item: "Implement Product schema (if applicable) with name, image, description, SKU, price, availability, and ratings", owner: "Development", category: "Schema Markup", projectTypes: ["Net New Site", "Site Refresh"], effortLevel: "High (8-40h)", riskLevel: "MEDIUM", deliverableType: "Code" },
+  { id: 50, phase: "Build", priority: "HIGH", item: "Create internal linking strategy connecting related content with descriptive anchor text (avoid 'click here' or generic phrases)", owner: "Content + SEO", category: "Link Architecture", projectTypes: ["Net New Site", "Site Refresh"], effortLevel: "High (8-40h)", riskLevel: "MEDIUM", deliverableType: "Content" },
+  { id: 51, phase: "Build", priority: "HIGH", item: "Ensure every page on site can be reached through internal links within 3 clicks from homepage", owner: "IA + Development", category: "Link Architecture", projectTypes: ["Net New Site", "Site Refresh"], effortLevel: "Medium (2-8h)", riskLevel: "HIGH RISK", deliverableType: "Code" },
+  { id: 52, phase: "Build", priority: "HIGH", item: "Add 3-5 relevant internal links on every content page pointing to related content, services, or product pages", owner: "Content", category: "Link Architecture", projectTypes: ["Net New Site", "Site Refresh"], effortLevel: "High (8-40h)", riskLevel: "MEDIUM", deliverableType: "Content" },
+  { id: 53, phase: "Build", priority: "HIGH", item: "Avoid excessive internal linking (15-20 links per page maximum) to prevent link dilution and maintain user focus", owner: "Content + SEO", category: "Link Architecture", projectTypes: ["Net New Site", "Site Refresh"], effortLevel: "Medium (2-8h)", riskLevel: "LOW", deliverableType: "Content" },
+  { id: 54, phase: "Build", priority: "HIGH", item: "Create 404 error page with helpful navigation, search functionality, and links to popular pages", owner: "Development + UX", category: "Technical SEO", projectTypes: ["Net New Site", "Site Refresh", "Microsite"], effortLevel: "Low (<2h)", riskLevel: "LOW", deliverableType: "Code" },
+  { id: 55, phase: "Build", priority: "HIGH", item: "Set up monitoring for 404 errors using Google Search Console and fix or redirect broken links monthly", owner: "SEO + Development", category: "Technical SEO", projectTypes: ["Net New Site", "Site Refresh", "Microsite"], effortLevel: "Medium (2-8h)", riskLevel: "MEDIUM", deliverableType: "Configuration" },
+  { id: 56, phase: "Build", priority: "HIGH", item: "Defer or async load non-critical JavaScript to prevent blocking page rendering and improve LCP scores", owner: "Development", category: "Performance", projectTypes: ["Net New Site", "Site Refresh", "Campaign Landing Page", "Microsite"], effortLevel: "Medium (2-8h)", riskLevel: "HIGH RISK", deliverableType: "Code" },
+  { id: 57, phase: "Build", priority: "HIGH", item: "Optimize CSS delivery by inlining critical CSS and deferring non-critical styles", owner: "Development", category: "Performance", projectTypes: ["Net New Site", "Site Refresh", "Campaign Landing Page", "Microsite"], effortLevel: "High (8-40h)", riskLevel: "HIGH RISK", deliverableType: "Code" },
+  { id: 58, phase: "Build", priority: "HIGH", item: "Reduce server response time (TTFB - Time to First Byte) to under 600ms through server optimization or better hosting", owner: "Development", category: "Performance", projectTypes: ["Net New Site", "Site Refresh", "Campaign Landing Page", "Microsite"], effortLevel: "High (8-40h)", riskLevel: "HIGH RISK", deliverableType: "Configuration" },
+  { id: 59, phase: "Build", priority: "HIGH", item: "Implement resource hints (preconnect, dns-prefetch, prefetch, preload) for critical resources to reduce latency", owner: "Development", category: "Performance", projectTypes: ["Net New Site", "Site Refresh", "Campaign Landing Page", "Microsite"], effortLevel: "Medium (2-8h)", riskLevel: "MEDIUM", deliverableType: "Code" },
+  { id: 60, phase: "Build", priority: "HIGH", item: "Optimize web fonts - use font-display: swap, subset fonts to include only needed characters, preload critical fonts", owner: "Development", category: "Performance", projectTypes: ["Net New Site", "Site Refresh", "Campaign Landing Page", "Microsite"], effortLevel: "Medium (2-8h)", riskLevel: "MEDIUM", deliverableType: "Code" },
+  { id: 61, phase: "Build", priority: "HIGH", item: "Implement CDN (Content Delivery Network) for faster global content delivery and improved Core Web Vitals scores", owner: "Development", category: "Performance", projectTypes: ["Net New Site", "Site Refresh", "Campaign Landing Page", "Microsite"], effortLevel: "Medium (2-8h)", riskLevel: "MEDIUM", deliverableType: "Configuration" },
+  { id: 62, phase: "Build", priority: "HIGH", item: "Add rel='noopener noreferrer' to external links opening in new tabs for security and performance", owner: "Development", category: "Technical SEO", projectTypes: ["Net New Site", "Site Refresh", "Campaign Landing Page", "Microsite"], effortLevel: "Low (<2h)", riskLevel: "LOW", deliverableType: "Code" },
+  { id: 63, phase: "Build", priority: "HIGH", item: "Implement breadcrumb navigation on all pages below homepage showing clear path from homepage to current page", owner: "Development + UX", category: "Technical SEO", projectTypes: ["Net New Site", "Site Refresh", "Microsite"], effortLevel: "Medium (2-8h)", riskLevel: "MEDIUM", deliverableType: "Code" },
+  { id: 64, phase: "Build", priority: "HIGH", item: "Ensure JavaScript-rendered content is accessible to Googlebot - test with Search Console URL Inspection tool", owner: "Development", category: "Technical SEO", projectTypes: ["Net New Site", "Site Refresh", "Campaign Landing Page", "Microsite"], effortLevel: "Medium (2-8h)", riskLevel: "HIGH RISK", deliverableType: "Review/Approval" },
+  { id: 65, phase: "Build", priority: "HIGH", item: "Implement dynamic rendering or server-side rendering if using heavy JavaScript frameworks to ensure crawlability", owner: "Development", category: "Technical SEO", projectTypes: ["Net New Site", "Site Refresh", "Microsite"], effortLevel: "Very High (40+h)", riskLevel: "HIGH RISK", deliverableType: "Code" },
+  { id: 66, phase: "Build", priority: "HIGH", item: "Handle pagination properly using rel='next'/rel='prev' or canonical to view-all page, or load more with URL parameters", owner: "Development", category: "Technical SEO", projectTypes: ["Net New Site", "Site Refresh"], effortLevel: "Medium (2-8h)", riskLevel: "MEDIUM", deliverableType: "Code" },
+  { id: 67, phase: "Build", priority: "HIGH", item: "Implement infinite scroll correctly with unique URLs for each page state or allow direct access to paginated content", owner: "Development", category: "Technical SEO", projectTypes: ["Net New Site", "Site Refresh"], effortLevel: "High (8-40h)", riskLevel: "MEDIUM", deliverableType: "Code" },
+  { id: 68, phase: "Build", priority: "HIGH", item: "Prevent duplicate content by using parameter handling in Search Console or canonical tags for URL parameters", owner: "Development + SEO", category: "Technical SEO", projectTypes: ["Net New Site", "Site Refresh"], effortLevel: "Medium (2-8h)", riskLevel: "HIGH RISK", deliverableType: "Configuration" },
+  { id: 69, phase: "Build", priority: "HIGH", item: "Implement hreflang tags for international/multi-language sites indicating language and regional targeting of pages", owner: "Development", category: "Technical SEO", projectTypes: ["Net New Site", "Site Refresh"], effortLevel: "High (8-40h)", riskLevel: "HIGH RISK", deliverableType: "Code" },
+  { id: 70, phase: "Build", priority: "HIGH", item: "Ensure all pages have unique, valuable content - minimum 300 words for standard pages, avoid thin content", owner: "Content", category: "Content Strategy", projectTypes: ["Net New Site", "Site Refresh", "Campaign Landing Page", "Microsite"], effortLevel: "Very High (40+h)", riskLevel: "HIGH RISK", deliverableType: "Content" },
+  { id: 71, phase: "Build", priority: "HIGH", item: "Write naturally for users first, then optimize for keywords - avoid keyword stuffing, maintain 1-2% keyword density", owner: "Content", category: "Content Strategy", projectTypes: ["Net New Site", "Site Refresh", "Campaign Landing Page", "Microsite"], effortLevel: "High (8-40h)", riskLevel: "MEDIUM", deliverableType: "Content" },
+  { id: 72, phase: "Build", priority: "HIGH", item: "Include primary keyword naturally in first 100 words of page content to signal topic relevance early", owner: "Content", category: "Content Strategy", projectTypes: ["Net New Site", "Site Refresh", "Campaign Landing Page", "Microsite"], effortLevel: "High (8-40h)", riskLevel: "MEDIUM", deliverableType: "Content" },
+  { id: 73, phase: "Build", priority: "HIGH", item: "Add author bios and credentials for content authors (especially YMYL content) to establish E-E-A-T signals", owner: "Content", category: "Content Strategy", projectTypes: ["Net New Site", "Site Refresh"], effortLevel: "High (8-40h)", riskLevel: "MEDIUM", deliverableType: "Content" },
+  { id: 74, phase: "Build", priority: "HIGH", item: "Include clear publish dates and last updated dates on time-sensitive content (news, blog posts, guides)", owner: "Development + Content", category: "Content Strategy", projectTypes: ["Net New Site", "Site Refresh"], effortLevel: "Medium (2-8h)", riskLevel: "LOW", deliverableType: "Code" },
+  { id: 75, phase: "Build", priority: "HIGH", item: "Create comprehensive 'About Us' page establishing business legitimacy, team expertise, and trust signals", owner: "Content", category: "Content Strategy", projectTypes: ["Net New Site", "Site Refresh", "Microsite"], effortLevel: "Medium (2-8h)", riskLevel: "MEDIUM", deliverableType: "Content" },
+  { id: 76, phase: "Build", priority: "HIGH", item: "Create detailed 'Contact' page with multiple contact methods, physical address (if applicable), and response expectations", owner: "Content", category: "Content Strategy", projectTypes: ["Net New Site", "Site Refresh", "Microsite"], effortLevel: "Low (<2h)", riskLevel: "MEDIUM", deliverableType: "Content" },
+  { id: 77, phase: "Build", priority: "HIGH", item: "Add privacy policy and terms of service pages linked in footer for trust signals and legal compliance", owner: "Content + Legal", category: "Content Strategy", projectTypes: ["Net New Site", "Site Refresh", "Campaign Landing Page", "Microsite"], effortLevel: "Medium (2-8h)", riskLevel: "MEDIUM", deliverableType: "Content" },
+  { id: 78, phase: "Build", priority: "MEDIUM", item: "Implement VideoObject schema on pages with videos including name, description, thumbnail URL, upload date, and duration", owner: "Development", category: "Schema Markup", projectTypes: ["Net New Site", "Site Refresh"], effortLevel: "Medium (2-8h)", riskLevel: "LOW", deliverableType: "Code" },
+  { id: 79, phase: "Build", priority: "MEDIUM", item: "Implement Review/AggregateRating schema (if applicable) showing star ratings and review counts in search results", owner: "Development", category: "Schema Markup", projectTypes: ["Net New Site", "Site Refresh"], effortLevel: "Medium (2-8h)", riskLevel: "LOW", deliverableType: "Code" },
+  { id: 80, phase: "Build", priority: "MEDIUM", item: "Implement Event schema (if applicable) with event name, date, location, and ticket information for event pages", owner: "Development", category: "Schema Markup", projectTypes: ["Net New Site", "Site Refresh"], effortLevel: "Low (<2h)", riskLevel: "LOW", deliverableType: "Code" },
+  { id: 81, phase: "Build", priority: "MEDIUM", item: "Add table of contents to long-form content (2000+ words) with anchor links for better user experience and featured snippets", owner: "Content + Development", category: "Content Strategy", projectTypes: ["Net New Site", "Site Refresh"], effortLevel: "Medium (2-8h)", riskLevel: "LOW", deliverableType: "Content" },
+  { id: 82, phase: "Build", priority: "MEDIUM", item: "Optimize content for featured snippets by including concise answers (40-60 words) to common questions", owner: "Content", category: "Content Strategy", projectTypes: ["Net New Site", "Site Refresh", "Microsite"], effortLevel: "High (8-40h)", riskLevel: "LOW", deliverableType: "Content" },
+  { id: 83, phase: "Build", priority: "MEDIUM", item: "Include relevant images, videos, and infographics to enhance content engagement and time on page", owner: "Content", category: "Content Strategy", projectTypes: ["Net New Site", "Site Refresh", "Campaign Landing Page", "Microsite"], effortLevel: "High (8-40h)", riskLevel: "LOW", deliverableType: "Content" },
+  { id: 84, phase: "Build", priority: "MEDIUM", item: "Link to authoritative external sources when citing statistics, studies, or factual claims to build trust", owner: "Content", category: "Content Strategy", projectTypes: ["Net New Site", "Site Refresh", "Campaign Landing Page", "Microsite"], effortLevel: "Medium (2-8h)", riskLevel: "LOW", deliverableType: "Content" },
+  { id: 85, phase: "Build", priority: "MEDIUM", item: "Create cornerstone/pillar content (2000+ words) for primary topics demonstrating comprehensive expertise", owner: "Content", category: "Content Strategy", projectTypes: ["Net New Site", "Site Refresh"], effortLevel: "Very High (40+h)", riskLevel: "MEDIUM", deliverableType: "Content" },
+  { id: 86, phase: "Build", priority: "MEDIUM", item: "Optimize URL parameters by keeping URLs short, avoiding unnecessary parameters, and using static URLs when possible", owner: "Development", category: "Technical SEO", projectTypes: ["Net New Site", "Site Refresh"], effortLevel: "Medium (2-8h)", riskLevel: "MEDIUM", deliverableType: "Code" },
+  { id: 87, phase: "Build", priority: "MEDIUM", item: "Implement proper trailing slash handling - choose consistent approach (with or without) and redirect accordingly", owner: "Development", category: "Technical SEO", projectTypes: ["Net New Site", "Site Refresh"], effortLevel: "Low (<2h)", riskLevel: "MEDIUM", deliverableType: "Configuration" },
+  { id: 88, phase: "Build", priority: "MEDIUM", item: "Create HTML sitemap page linked in footer for users and as supplementary navigation aid", owner: "Development", category: "Technical SEO", projectTypes: ["Net New Site", "Site Refresh"], effortLevel: "Low (<2h)", riskLevel: "LOW", deliverableType: "Code" },
+  { id: 89, phase: "Build", priority: "MEDIUM", item: "Optimize crawl budget by blocking low-value pages in robots.txt (search result pages, filter pages, admin areas)", owner: "SEO + Development", category: "Technical SEO", projectTypes: ["Net New Site", "Site Refresh"], effortLevel: "Medium (2-8h)", riskLevel: "MEDIUM", deliverableType: "Configuration" },
+  { id: 90, phase: "Build", priority: "MEDIUM", item: "Add Open Graph tags (og:title, og:description, og:image, og:url) for better social media sharing appearance", owner: "Development", category: "Technical SEO", projectTypes: ["Net New Site", "Site Refresh", "Campaign Landing Page", "Microsite"], effortLevel: "Low (<2h)", riskLevel: "LOW", deliverableType: "Code" },
+  { id: 91, phase: "Build", priority: "MEDIUM", item: "Add Twitter Card tags (twitter:card, twitter:title, twitter:description, twitter:image) for Twitter sharing optimization", owner: "Development", category: "Technical SEO", projectTypes: ["Net New Site", "Site Refresh", "Campaign Landing Page", "Microsite"], effortLevel: "Low (<2h)", riskLevel: "LOW", deliverableType: "Code" },
+  { id: 92, phase: "Build", priority: "MEDIUM", item: "Create favicon.ico (32x32 minimum) and Apple touch icon (180x180) for browser tabs and mobile bookmarks", owner: "Development", category: "Technical SEO", projectTypes: ["Net New Site", "Site Refresh", "Campaign Landing Page", "Microsite"], effortLevel: "Low (<2h)", riskLevel: "LOW", deliverableType: "Code" },
+  { id: 93, phase: "Build", priority: "MEDIUM", item: "Implement structured navigation with logical categories and subcategories reflecting target keyword themes", owner: "IA + UX", category: "Technical SEO", projectTypes: ["Net New Site", "Site Refresh"], effortLevel: "High (8-40h)", riskLevel: "MEDIUM", deliverableType: "Code" },
+  { id: 94, phase: "Build", priority: "MEDIUM", item: "Add search functionality to site with autocomplete and proper search results page (noindex search results)", owner: "Development", category: "Technical SEO", projectTypes: ["Net New Site", "Site Refresh"], effortLevel: "High (8-40h)", riskLevel: "LOW", deliverableType: "Code" },
+  { id: 95, phase: "Build", priority: "LOW", item: "Implement print stylesheets with print-friendly versions of key content pages", owner: "Development", category: "Technical SEO", projectTypes: ["Net New Site", "Site Refresh"], effortLevel: "Low (<2h)", riskLevel: "LOW", deliverableType: "Code" },
+  { id: 96, phase: "Build", priority: "LOW", item: "Add related/recommended content sections to pages to increase internal linking and time on site", owner: "Development + Content", category: "Content Strategy", projectTypes: ["Net New Site", "Site Refresh"], effortLevel: "Medium (2-8h)", riskLevel: "LOW", deliverableType: "Code" },
+  { id: 97, phase: "Build", priority: "LOW", item: "Implement progressive enhancement ensuring core content accessible even if JavaScript fails to load", owner: "Development", category: "Technical SEO", projectTypes: ["Net New Site", "Site Refresh", "Microsite"], effortLevel: "High (8-40h)", riskLevel: "MEDIUM", deliverableType: "Code" },
+  { id: 98, phase: "Pre-Launch", priority: "CRITICAL", item: "Test site thoroughly in Google Search Console URL Inspection tool to verify all critical pages render correctly", owner: "SEO + Development", category: "Testing & QA", projectTypes: ["Net New Site", "Site Refresh", "Campaign Landing Page", "Microsite"], effortLevel: "Medium (2-8h)", riskLevel: "BLOCKER", deliverableType: "Review/Approval" },
+  { id: 99, phase: "Pre-Launch", priority: "CRITICAL", item: "Validate all schema markup using Google Rich Results Test and Schema Markup Validator tools", owner: "SEO + Development", category: "Testing & QA", projectTypes: ["Net New Site", "Site Refresh", "Campaign Landing Page", "Microsite"], effortLevel: "Medium (2-8h)", riskLevel: "HIGH RISK", deliverableType: "Review/Approval" },
+  { id: 100, phase: "Pre-Launch", priority: "CRITICAL", item: "Run complete site crawl using Screaming Frog or similar tool to identify all technical issues before launch", owner: "SEO", category: "Testing & QA", projectTypes: ["Net New Site", "Site Refresh", "Microsite"], effortLevel: "High (8-40h)", riskLevel: "BLOCKER", deliverableType: "Review/Approval" },
+  { id: 101, phase: "Pre-Launch", priority: "CRITICAL", item: "Test all 301 redirects to verify they work correctly and point to appropriate destination pages", owner: "SEO + Development", category: "Testing & QA", projectTypes: ["Site Refresh"], effortLevel: "High (8-40h)", riskLevel: "BLOCKER", deliverableType: "Review/Approval" },
+  { id: 102, phase: "Pre-Launch", priority: "CRITICAL", item: "Verify robots.txt is not blocking important pages - test using Google Search Console robots.txt Tester", owner: "SEO + Development", category: "Testing & QA", projectTypes: ["Net New Site", "Site Refresh", "Campaign Landing Page", "Microsite"], effortLevel: "Low (<2h)", riskLevel: "BLOCKER", deliverableType: "Review/Approval" },
+  { id: 103, phase: "Pre-Launch", priority: "CRITICAL", item: "Test Core Web Vitals using PageSpeed Insights, Lighthouse, and Chrome DevTools for all page templates", owner: "Development", category: "Testing & QA", projectTypes: ["Net New Site", "Site Refresh", "Campaign Landing Page", "Microsite"], effortLevel: "High (8-40h)", riskLevel: "HIGH RISK", deliverableType: "Review/Approval" },
+  { id: 104, phase: "Pre-Launch", priority: "CRITICAL", item: "Test mobile responsiveness using Google Mobile-Friendly Test and real devices across different screen sizes", owner: "Development + UX", category: "Testing & QA", projectTypes: ["Net New Site", "Site Refresh", "Campaign Landing Page", "Microsite"], effortLevel: "Medium (2-8h)", riskLevel: "HIGH RISK", deliverableType: "Review/Approval" },
+  { id: 105, phase: "Pre-Launch", priority: "CRITICAL", item: "Verify all internal links work correctly with no 404 errors using crawler tool before launch", owner: "SEO + Development", category: "Testing & QA", projectTypes: ["Net New Site", "Site Refresh", "Campaign Landing Page", "Microsite"], effortLevel: "Medium (2-8h)", riskLevel: "BLOCKER", deliverableType: "Review/Approval" },
+  { id: 106, phase: "Pre-Launch", priority: "CRITICAL", item: "Double-check that staging site is blocked from search engines and will be unblocked at launch", owner: "Development", category: "Testing & QA", projectTypes: ["Net New Site", "Site Refresh", "Campaign Landing Page", "Microsite"], effortLevel: "Low (<2h)", riskLevel: "BLOCKER", deliverableType: "Review/Approval" },
+  { id: 107, phase: "Pre-Launch", priority: "HIGH", item: "Audit all title tags and meta descriptions for uniqueness, length, and keyword optimization", owner: "SEO + Content", category: "Testing & QA", projectTypes: ["Net New Site", "Site Refresh", "Campaign Landing Page", "Microsite"], effortLevel: "High (8-40h)", riskLevel: "HIGH RISK", deliverableType: "Review/Approval" },
+  { id: 108, phase: "Pre-Launch", priority: "HIGH", item: "Review all image alt text to ensure descriptive and accurate for accessibility and SEO", owner: "SEO + Content", category: "Testing & QA", projectTypes: ["Net New Site", "Site Refresh", "Campaign Landing Page", "Microsite"], effortLevel: "High (8-40h)", riskLevel: "MEDIUM", deliverableType: "Review/Approval" },
+  { id: 109, phase: "Pre-Launch", priority: "HIGH", item: "Test site speed on slow 3G connection to ensure acceptable mobile experience for all users", owner: "Development", category: "Testing & QA", projectTypes: ["Net New Site", "Site Refresh", "Campaign Landing Page", "Microsite"], effortLevel: "Medium (2-8h)", riskLevel: "MEDIUM", deliverableType: "Review/Approval" },
+  { id: 110, phase: "Pre-Launch", priority: "HIGH", item: "Verify canonical tags are correctly implemented on all pages and pointing to correct URLs", owner: "SEO + Development", category: "Testing & QA", projectTypes: ["Net New Site", "Site Refresh", "Campaign Landing Page", "Microsite"], effortLevel: "Medium (2-8h)", riskLevel: "HIGH RISK", deliverableType: "Review/Approval" },
+  { id: 111, phase: "Pre-Launch", priority: "HIGH", item: "Test HTTPS implementation to ensure no mixed content warnings and all resources load securely", owner: "Development", category: "Testing & QA", projectTypes: ["Net New Site", "Site Refresh", "Campaign Landing Page", "Microsite"], effortLevel: "Low (<2h)", riskLevel: "HIGH RISK", deliverableType: "Review/Approval" },
+  { id: 112, phase: "Pre-Launch", priority: "MEDIUM", item: "Review internal linking patterns to ensure strategic distribution of PageRank to important pages", owner: "SEO", category: "Testing & QA", projectTypes: ["Net New Site", "Site Refresh"], effortLevel: "Medium (2-8h)", riskLevel: "MEDIUM", deliverableType: "Review/Approval" },
+  { id: 113, phase: "Launch", priority: "CRITICAL", item: "Register and verify domain property in Google Search Console (use domain-level verification for complete coverage)", owner: "SEO", category: "Foundation & Setup", projectTypes: ["Net New Site", "Site Refresh", "Campaign Landing Page", "Microsite"], effortLevel: "Low (<2h)", riskLevel: "BLOCKER", deliverableType: "Configuration" },
+  { id: 114, phase: "Launch", priority: "CRITICAL", item: "Submit XML sitemap to Google Search Console immediately after launch to initiate crawling", owner: "SEO", category: "Foundation & Setup", projectTypes: ["Net New Site", "Site Refresh", "Campaign Landing Page", "Microsite"], effortLevel: "Low (<2h)", riskLevel: "BLOCKER", deliverableType: "Configuration" },
+  { id: 115, phase: "Launch", priority: "CRITICAL", item: "Set up Google Analytics 4 (GA4) with proper tracking and verify data is collecting correctly", owner: "SEO + Analytics", category: "Foundation & Setup", projectTypes: ["Net New Site", "Site Refresh", "Campaign Landing Page", "Microsite"], effortLevel: "Medium (2-8h)", riskLevel: "BLOCKER", deliverableType: "Configuration" },
+  { id: 116, phase: "Launch", priority: "CRITICAL", item: "Remove robots.txt disallow directives that block search engines if site was previously blocked during development", owner: "Development", category: "Foundation & Setup", projectTypes: ["Net New Site", "Site Refresh", "Campaign Landing Page", "Microsite"], effortLevel: "Low (<2h)", riskLevel: "BLOCKER", deliverableType: "Configuration" },
+  { id: 117, phase: "Launch", priority: "CRITICAL", item: "Request indexing of critical pages (homepage, key landing pages) using Google Search Console URL Inspection tool", owner: "SEO", category: "Foundation & Setup", projectTypes: ["Net New Site", "Site Refresh", "Campaign Landing Page", "Microsite"], effortLevel: "Low (<2h)", riskLevel: "HIGH RISK", deliverableType: "Configuration" },
+  { id: 118, phase: "Launch", priority: "HIGH", item: "Set up Bing Webmaster Tools account and submit sitemap for Microsoft search coverage", owner: "SEO", category: "Foundation & Setup", projectTypes: ["Net New Site", "Site Refresh", "Campaign Landing Page", "Microsite"], effortLevel: "Low (<2h)", riskLevel: "LOW", deliverableType: "Configuration" },
+  { id: 119, phase: "Launch", priority: "HIGH", item: "Register Google Business Profile if business has physical location or serves local customers", owner: "SEO + Marketing", category: "Foundation & Setup", projectTypes: ["Net New Site", "Site Refresh", "Microsite"], effortLevel: "Medium (2-8h)", riskLevel: "MEDIUM", deliverableType: "Configuration" },
+  { id: 120, phase: "Launch", priority: "HIGH", item: "Set up uptime monitoring service to alert team immediately if site goes down affecting search visibility", owner: "Development", category: "Monitoring", projectTypes: ["Net New Site", "Site Refresh", "Campaign Landing Page", "Microsite"], effortLevel: "Low (<2h)", riskLevel: "MEDIUM", deliverableType: "Configuration" },
+  { id: 121, phase: "Launch", priority: "MEDIUM", item: "Announce launch with press release or outreach to acquire initial backlinks and social signals", owner: "Marketing + SEO", category: "Foundation & Setup", projectTypes: ["Net New Site", "Site Refresh", "Microsite"], effortLevel: "High (8-40h)", riskLevel: "LOW", deliverableType: "Content" },
+  { id: 122, phase: "Post-Launch", priority: "CRITICAL", item: "Monitor Google Search Console for Coverage errors and fix any indexing issues within first 7 days", owner: "SEO + Development", category: "Monitoring", projectTypes: ["Net New Site", "Site Refresh", "Campaign Landing Page", "Microsite"], effortLevel: "Medium (2-8h)", riskLevel: "BLOCKER", deliverableType: "Review/Approval" },
+  { id: 123, phase: "Post-Launch", priority: "CRITICAL", item: "Monitor Core Web Vitals in Search Console and PageSpeed Insights - address any pages failing thresholds immediately", owner: "Development", category: "Monitoring", projectTypes: ["Net New Site", "Site Refresh", "Campaign Landing Page", "Microsite"], effortLevel: "High (8-40h)", riskLevel: "HIGH RISK", deliverableType: "Review/Approval" },
+  { id: 124, phase: "Post-Launch", priority: "CRITICAL", item: "Check for manual actions in Google Search Console that could impact rankings and resolve immediately if present", owner: "SEO", category: "Monitoring", projectTypes: ["Net New Site", "Site Refresh", "Campaign Landing Page", "Microsite"], effortLevel: "Low (<2h)", riskLevel: "HIGH RISK", deliverableType: "Review/Approval" },
+  { id: 125, phase: "Post-Launch", priority: "HIGH", item: "Set up rank tracking for target keywords to monitor SEO performance and visibility trends over time", owner: "SEO", category: "Monitoring", projectTypes: ["Net New Site", "Site Refresh", "Campaign Landing Page", "Microsite"], effortLevel: "Medium (2-8h)", riskLevel: "MEDIUM", deliverableType: "Configuration" },
+  { id: 126, phase: "Post-Launch", priority: "HIGH", item: "Monitor organic traffic in Google Analytics comparing to baseline and investigating any unexpected drops", owner: "SEO + Analytics", category: "Monitoring", projectTypes: ["Net New Site", "Site Refresh", "Campaign Landing Page", "Microsite"], effortLevel: "Medium (2-8h)", riskLevel: "HIGH RISK", deliverableType: "Review/Approval" },
+  { id: 127, phase: "Post-Launch", priority: "HIGH", item: "Review search query data in Search Console to identify new keyword opportunities and content gaps", owner: "SEO + Content", category: "Monitoring", projectTypes: ["Net New Site", "Site Refresh", "Campaign Landing Page", "Microsite"], effortLevel: "Medium (2-8h)", riskLevel: "MEDIUM", deliverableType: "Review/Approval" },
+  { id: 128, phase: "Post-Launch", priority: "HIGH", item: "Monitor backlink profile using Search Console Links report watching for negative SEO or unnatural links", owner: "SEO", category: "Monitoring", projectTypes: ["Net New Site", "Site Refresh", "Microsite"], effortLevel: "Low (<2h)", riskLevel: "MEDIUM", deliverableType: "Review/Approval" },
+  { id: 129, phase: "Post-Launch", priority: "HIGH", item: "Track click-through rates (CTR) in Search Console and optimize title tags and meta descriptions for low-performing pages", owner: "SEO + Content", category: "Monitoring", projectTypes: ["Net New Site", "Site Refresh", "Campaign Landing Page", "Microsite"], effortLevel: "High (8-40h)", riskLevel: "MEDIUM", deliverableType: "Review/Approval" },
+  { id: 130, phase: "Post-Launch", priority: "HIGH", item: "Review page experience report in Search Console identifying pages with mobile usability or security issues", owner: "SEO + Development", category: "Monitoring", projectTypes: ["Net New Site", "Site Refresh", "Campaign Landing Page", "Microsite"], effortLevel: "Medium (2-8h)", riskLevel: "HIGH RISK", deliverableType: "Review/Approval" },
+  { id: 131, phase: "Post-Launch", priority: "HIGH", item: "Analyze user engagement metrics (bounce rate, time on page, pages per session) and optimize poor-performing pages", owner: "SEO + Analytics + UX", category: "Monitoring", projectTypes: ["Net New Site", "Site Refresh", "Campaign Landing Page", "Microsite"], effortLevel: "High (8-40h)", riskLevel: "MEDIUM", deliverableType: "Review/Approval" },
+  { id: 132, phase: "Post-Launch", priority: "HIGH", item: "Conduct monthly content audits identifying outdated content requiring updates to maintain freshness", owner: "Content + SEO", category: "Ongoing Maintenance", projectTypes: ["Net New Site", "Site Refresh"], effortLevel: "High (8-40h)", riskLevel: "MEDIUM", deliverableType: "Review/Approval" },
+  { id: 133, phase: "Post-Launch", priority: "HIGH", item: "Update and refresh high-value content quarterly with new information, statistics, and examples", owner: "Content", category: "Ongoing Maintenance", projectTypes: ["Net New Site", "Site Refresh"], effortLevel: "High (8-40h)", riskLevel: "MEDIUM", deliverableType: "Content" },
+  { id: 134, phase: "Post-Launch", priority: "HIGH", item: "Build internal links to new content from relevant existing pages within 7 days of publishing", owner: "Content + SEO", category: "Ongoing Maintenance", projectTypes: ["Net New Site", "Site Refresh"], effortLevel: "Medium (2-8h)", riskLevel: "LOW", deliverableType: "Content" },
+  { id: 135, phase: "Post-Launch", priority: "MEDIUM", item: "Set up scheduled site crawls (monthly) to proactively identify technical issues before they impact rankings", owner: "SEO", category: "Monitoring", projectTypes: ["Net New Site", "Site Refresh"], effortLevel: "Medium (2-8h)", riskLevel: "MEDIUM", deliverableType: "Configuration" },
+  { id: 136, phase: "Post-Launch", priority: "MEDIUM", item: "Monitor rich results performance in Search Console tracking impressions and clicks for schema markup features", owner: "SEO", category: "Monitoring", projectTypes: ["Net New Site", "Site Refresh"], effortLevel: "Low (<2h)", riskLevel: "LOW", deliverableType: "Review/Approval" },
+  { id: 137, phase: "Post-Launch", priority: "MEDIUM", item: "Review and update XML sitemap when site structure changes ensuring accurate reflection of current site architecture", owner: "SEO + Development", category: "Ongoing Maintenance", projectTypes: ["Net New Site", "Site Refresh"], effortLevel: "Low (<2h)", riskLevel: "MEDIUM", deliverableType: "Configuration" },
+  { id: 138, phase: "Post-Launch", priority: "MEDIUM", item: "Conduct quarterly competitive analysis tracking competitor keyword rankings, content strategies, and technical changes", owner: "SEO", category: "Ongoing Maintenance", projectTypes: ["Net New Site", "Site Refresh", "Microsite"], effortLevel: "High (8-40h)", riskLevel: "LOW", deliverableType: "Documentation" },
+  { id: 139, phase: "Post-Launch", priority: "MEDIUM", item: "Review and optimize underperforming pages quarterly based on Search Console and Analytics data", owner: "SEO + Content", category: "Ongoing Maintenance", projectTypes: ["Net New Site", "Site Refresh", "Campaign Landing Page", "Microsite"], effortLevel: "High (8-40h)", riskLevel: "MEDIUM", deliverableType: "Content" },
+  { id: 140, phase: "Post-Launch", priority: "MEDIUM", item: "Monitor page load times and Core Web Vitals monthly addressing performance regressions immediately", owner: "Development", category: "Ongoing Maintenance", projectTypes: ["Net New Site", "Site Refresh", "Campaign Landing Page", "Microsite"], effortLevel: "Medium (2-8h)", riskLevel: "MEDIUM", deliverableType: "Review/Approval" },
+  { id: 141, phase: "Post-Launch", priority: "MEDIUM", item: "Create new content consistently (weekly or monthly) targeting additional keyword opportunities from research", owner: "Content", category: "Ongoing Maintenance", projectTypes: ["Net New Site", "Site Refresh"], effortLevel: "Very High (40+h)", riskLevel: "LOW", deliverableType: "Content" },
+  { id: 142, phase: "Post-Launch", priority: "MEDIUM", item: "Monitor for broken links monthly and fix or redirect broken pages to maintain site health", owner: "SEO + Development", category: "Ongoing Maintenance", projectTypes: ["Net New Site", "Site Refresh", "Microsite"], effortLevel: "Medium (2-8h)", riskLevel: "MEDIUM", deliverableType: "Configuration" },
+  { id: 143, phase: "Post-Launch", priority: "MEDIUM", item: "Review and improve internal linking structure quarterly adding strategic links to important pages", owner: "SEO + Content", category: "Ongoing Maintenance", projectTypes: ["Net New Site", "Site Refresh"], effortLevel: "High (8-40h)", riskLevel: "LOW", deliverableType: "Content" },
+  { id: 144, phase: "Post-Launch", priority: "MEDIUM", item: "Stay updated on Google algorithm updates and assess impact on site traffic and rankings", owner: "SEO", category: "Ongoing Maintenance", projectTypes: ["Net New Site", "Site Refresh", "Campaign Landing Page", "Microsite"], effortLevel: "Low (<2h)", riskLevel: "LOW", deliverableType: "Review/Approval" },
+  { id: 145, phase: "Post-Launch", priority: "LOW", item: "Explore opportunities for new schema markup types as Google introduces new structured data features", owner: "SEO + Development", category: "Ongoing Maintenance", projectTypes: ["Net New Site", "Site Refresh"], effortLevel: "Medium (2-8h)", riskLevel: "LOW", deliverableType: "Code" },
+  { id: 146, phase: "Post-Launch", priority: "LOW", item: "Test emerging SEO features and strategies (e.g., AI Overviews optimization, new search features) as they become available", owner: "SEO", category: "Ongoing Maintenance", projectTypes: ["Net New Site", "Site Refresh", "Microsite"], effortLevel: "Medium (2-8h)", riskLevel: "LOW", deliverableType: "Documentation" },
+  { id: 147, phase: "Post-Launch", priority: "LOW", item: "Participate in relevant online communities and forums to build brand awareness and acquire natural backlinks", owner: "Marketing + SEO", category: "Ongoing Maintenance", projectTypes: ["Net New Site", "Site Refresh", "Microsite"], effortLevel: "High (8-40h)", riskLevel: "LOW", deliverableType: "Content" },
+  { id: 148, phase: "Post-Launch", priority: "LOW", item: "Create and maintain documentation of SEO decisions, strategies, and changes for team reference and knowledge transfer", owner: "SEO", category: "Ongoing Maintenance", projectTypes: ["Net New Site", "Site Refresh", "Campaign Landing Page", "Microsite"], effortLevel: "Medium (2-8h)", riskLevel: "LOW", deliverableType: "Documentation" },
+  { id: 149, phase: "Build", priority: "HIGH", item: "Implement security headers (X-Content-Type-Options, X-Frame-Options, Content-Security-Policy, Strict-Transport-Security) for site protection", owner: "Development", category: "Technical SEO", projectTypes: ["Net New Site", "Site Refresh", "Campaign Landing Page", "Microsite"], effortLevel: "Medium (2-8h)", riskLevel: "MEDIUM", deliverableType: "Configuration" },
+  { id: 150, phase: "Build", priority: "MEDIUM", item: "Set up server-side logging and configure log file analysis to track crawl activity, errors, and identify SEO issues", owner: "Development + SEO", category: "Technical SEO", projectTypes: ["Net New Site", "Site Refresh"], effortLevel: "High (8-40h)", riskLevel: "MEDIUM", deliverableType: "Configuration" },
+  { id: 151, phase: "Strategy", priority: "HIGH", item: "Identify and plan for AI Overview/SGE optimization - create content that can be cited in AI-generated search results with clear definitions, statistics, and structured data", owner: "SEO + Content", category: "Technical SEO", projectTypes: ["Net New Site", "Site Refresh"], effortLevel: "High (8-40h)", riskLevel: "MEDIUM", deliverableType: "Documentation" },
+  { id: 152, phase: "Build", priority: "CRITICAL", item: "Implement Consent Mode v2 for Google Analytics to comply with privacy regulations - configure basic and advanced consent settings", owner: "Development", category: "Technical SEO", projectTypes: ["Net New Site", "Site Refresh", "Campaign Landing Page", "Microsite"], effortLevel: "Medium (2-8h)", riskLevel: "HIGH RISK", deliverableType: "Code" },
+  { id: 153, phase: "Build", priority: "HIGH", item: "Monitor and optimize Interaction to Next Paint (INP) metric - target < 200ms for good user experience (replaces deprecated FID)", owner: "Development", category: "Performance", projectTypes: ["Net New Site", "Site Refresh", "Campaign Landing Page", "Microsite"], effortLevel: "High (8-40h)", riskLevel: "HIGH RISK", deliverableType: "Code" },
+  { id: 154, phase: "Build", priority: "HIGH", item: "Optimize Time to First Byte (TTFB) - target < 800ms through server optimization, CDN configuration, and caching strategies", owner: "Development", category: "Performance", projectTypes: ["Net New Site", "Site Refresh", "Campaign Landing Page", "Microsite"], effortLevel: "High (8-40h)", riskLevel: "HIGH RISK", deliverableType: "Configuration" },
+  { id: 155, phase: "Build", priority: "HIGH", item: "Implement server-side tracking for privacy-compliant analytics as third-party cookies deprecate", owner: "Development + Analytics", category: "Technical SEO", projectTypes: ["Net New Site", "Site Refresh", "Campaign Landing Page", "Microsite"], effortLevel: "Very High (40+h)", riskLevel: "MEDIUM", deliverableType: "Code" },
+  { id: 156, phase: "Build", priority: "HIGH", item: "Implement Privacy Sandbox APIs (Topics API, Protected Audience API) for cookieless advertising and tracking", owner: "Development + Analytics", category: "Technical SEO", projectTypes: ["Net New Site", "Site Refresh", "Campaign Landing Page"], effortLevel: "Very High (40+h)", riskLevel: "MEDIUM", deliverableType: "Code" },
+  { id: 157, phase: "Build", priority: "MEDIUM", item: "Implement robots meta tags (noindex, nofollow, max-snippet, max-image-preview, max-video-preview) on appropriate pages", owner: "Development", category: "Technical SEO", projectTypes: ["Net New Site", "Site Refresh", "Campaign Landing Page", "Microsite"], effortLevel: "Medium (2-8h)", riskLevel: "MEDIUM", deliverableType: "Code" },
+  { id: 158, phase: "Build", priority: "MEDIUM", item: "Configure URL parameter handling strategy for faceted navigation - use robots.txt, canonical tags, or noindex to prevent duplicate content", owner: "Development + SEO", category: "Technical SEO", projectTypes: ["Net New Site", "Site Refresh"], effortLevel: "High (8-40h)", riskLevel: "HIGH RISK", deliverableType: "Configuration" },
+  { id: 159, phase: "Build", priority: "MEDIUM", item: "Optimize crawl budget by monitoring crawl stats in Search Console and prioritizing important pages through internal linking and sitemaps", owner: "SEO + Development", category: "Technical SEO", projectTypes: ["Net New Site", "Site Refresh"], effortLevel: "Medium (2-8h)", riskLevel: "MEDIUM", deliverableType: "Configuration" },
+  { id: 160, phase: "Build", priority: "MEDIUM", item: "Implement strategic link equity distribution - ensure important pages receive more internal links and PageRank flow", owner: "SEO + Content", category: "Link Architecture", projectTypes: ["Net New Site", "Site Refresh"], effortLevel: "High (8-40h)", riskLevel: "MEDIUM", deliverableType: "Documentation" },
+  { id: 161, phase: "Strategy", priority: "HIGH", item: "Develop entity optimization strategy - establish clear entities (people, places, things) and relationships using schema markup and structured content", owner: "SEO + Content", category: "Technical SEO", projectTypes: ["Net New Site", "Site Refresh"], effortLevel: "High (8-40h)", riskLevel: "MEDIUM", deliverableType: "Documentation" },
+  { id: 162, phase: "Build", priority: "MEDIUM", item: "Implement resource hints strategically - use dns-prefetch for external domains, preconnect for critical origins, prefetch for likely next navigations", owner: "Development", category: "Performance", projectTypes: ["Net New Site", "Site Refresh", "Campaign Landing Page", "Microsite"], effortLevel: "Medium (2-8h)", riskLevel: "LOW", deliverableType: "Code" },
+  { id: 163, phase: "Strategy", priority: "HIGH", item: "Define content depth benchmarks - conduct SERP analysis to identify average word count of top 10 results for target keywords (aim for 1.5x median)", owner: "SEO + Content", category: "Content Strategy", projectTypes: ["Net New Site", "Site Refresh", "Campaign Landing Page", "Microsite"], effortLevel: "High (8-40h)", riskLevel: "MEDIUM", deliverableType: "Documentation" },
+  { id: 164, phase: "Strategy", priority: "HIGH", item: "Set content quality standards - target 8th-10th grade reading level using Flesch-Kincaid readability score, minimum 1 custom image per 500 words", owner: "Content + SEO", category: "Content Strategy", projectTypes: ["Net New Site", "Site Refresh", "Microsite"], effortLevel: "Low (<2h)", riskLevel: "LOW", deliverableType: "Documentation" },
+  { id: 165, phase: "Strategy", priority: "HIGH", item: "Plan content freshness strategy - define quarterly review cycle for time-sensitive topics, annual refresh for evergreen content", owner: "Content + SEO", category: "Content Strategy", projectTypes: ["Net New Site", "Site Refresh"], effortLevel: "Low (<2h)", riskLevel: "LOW", deliverableType: "Documentation" },
+  { id: 166, phase: "Build", priority: "HIGH", item: "Implement topic cluster content strategy - create pillar pages for main topics with supporting cluster content linking back to pillar", owner: "Content + SEO", category: "Content Strategy", projectTypes: ["Net New Site", "Site Refresh"], effortLevel: "Very High (40+h)", riskLevel: "MEDIUM", deliverableType: "Content" },
+  { id: 167, phase: "Build", priority: "MEDIUM", item: "Add FAQ sections to service and product pages - use FAQ schema markup and answer common questions in 40-60 words for featured snippet optimization", owner: "Content + Development", category: "Content Strategy", projectTypes: ["Net New Site", "Site Refresh", "Campaign Landing Page", "Microsite"], effortLevel: "High (8-40h)", riskLevel: "LOW", deliverableType: "Content" },
+  { id: 168, phase: "Build", priority: "HIGH", item: "Implement author schema markup with credentials and affiliations on editorial content to establish E-E-A-T signals", owner: "Development + Content", category: "Schema Markup", projectTypes: ["Net New Site", "Site Refresh"], effortLevel: "Medium (2-8h)", riskLevel: "MEDIUM", deliverableType: "Code" },
+  { id: 169, phase: "Build", priority: "HIGH", item: "Create location-specific landing pages with unique content for each service area - include LocalBusiness schema, local keywords, maps, testimonials", owner: "Content + Development", category: "Content Strategy", projectTypes: ["Net New Site", "Site Refresh"], effortLevel: "Very High (40+h)", riskLevel: "HIGH RISK", deliverableType: "Content" },
+  { id: 170, phase: "Build", priority: "MEDIUM", item: "Develop comprehensive category/collection page content - add 300+ words of unique content above products, include filters, breadcrumbs, pagination", owner: "Content + Development", category: "Content Strategy", projectTypes: ["Net New Site", "Site Refresh"], effortLevel: "High (8-40h)", riskLevel: "MEDIUM", deliverableType: "Content" },
+  { id: 171, phase: "Build", priority: "HIGH", item: "Create detailed About page establishing company credibility - team bios, credentials, certifications, awards, company history, contact information", owner: "Content", category: "Content Strategy", projectTypes: ["Net New Site", "Site Refresh", "Microsite"], effortLevel: "Medium (2-8h)", riskLevel: "LOW", deliverableType: "Content" },
+  { id: 172, phase: "Build", priority: "MEDIUM", item: "Implement customer testimonials and reviews prominently - use Review schema markup and display ratings to build trust signals", owner: "Content + Development", category: "Content Strategy", projectTypes: ["Net New Site", "Site Refresh", "Campaign Landing Page"], effortLevel: "High (8-40h)", riskLevel: "MEDIUM", deliverableType: "Content" },
+  { id: 173, phase: "Build", priority: "MEDIUM", item: "Add case studies or success stories with measurable results - include specific metrics, challenges, solutions, and outcomes", owner: "Content", category: "Content Strategy", projectTypes: ["Net New Site", "Site Refresh", "Microsite"], effortLevel: "Very High (40+h)", riskLevel: "LOW", deliverableType: "Content" },
+  { id: 174, phase: "Build", priority: "HIGH", item: "Develop product page content with Product schema - unique descriptions (300+ words), specifications table, high-res images, price, availability, SKU, reviews", owner: "Content + Development", category: "Content Strategy", projectTypes: ["Net New Site", "Site Refresh"], effortLevel: "Very High (40+h)", riskLevel: "HIGH RISK", deliverableType: "Content" },
+  { id: 175, phase: "Build", priority: "HIGH", item: "Create service page content with Service schema - process/methodology, pricing, service area, case studies, team credentials, comparison to competitors", owner: "Content + Development", category: "Content Strategy", projectTypes: ["Net New Site", "Site Refresh", "Microsite"], effortLevel: "High (8-40h)", riskLevel: "MEDIUM", deliverableType: "Content" },
+  { id: 176, phase: "Build", priority: "MEDIUM", item: "Implement video transcript on pages with video content - improves accessibility, adds keyword relevance, and supports crawling", owner: "Content", category: "Content Strategy", projectTypes: ["Net New Site", "Site Refresh"], effortLevel: "High (8-40h)", riskLevel: "LOW", deliverableType: "Content" },
+  { id: 177, phase: "Build", priority: "MEDIUM", item: "Add chapter markers to video content - helps users navigate, improves user experience, and can appear in search results", owner: "Content + Development", category: "Content Strategy", projectTypes: ["Net New Site", "Site Refresh"], effortLevel: "Medium (2-8h)", riskLevel: "LOW", deliverableType: "Content" },
+  { id: 178, phase: "Strategy", priority: "MEDIUM", item: "Plan for content consolidation - identify thin or duplicate content that should be merged into comprehensive pages", owner: "SEO + Content", category: "Content Strategy", projectTypes: ["Site Refresh"], effortLevel: "High (8-40h)", riskLevel: "MEDIUM", deliverableType: "Documentation" },
+  { id: 179, phase: "Build", priority: "HIGH", item: "Include 3-5 authoritative external links per page to support claims with credible sources - signals expertise and builds trust", owner: "Content", category: "Content Strategy", projectTypes: ["Net New Site", "Site Refresh", "Campaign Landing Page", "Microsite"], effortLevel: "Medium (2-8h)", riskLevel: "LOW", deliverableType: "Content" },
+  { id: 180, phase: "Build", priority: "MEDIUM", item: "Optimize thumbnail images for video content - high contrast, text overlay highlighting benefit, minimum 1280x720px for YouTube", owner: "Content", category: "Content Strategy", projectTypes: ["Net New Site", "Site Refresh"], effortLevel: "Medium (2-8h)", riskLevel: "LOW", deliverableType: "Content" },
+  { id: 181, phase: "Strategy", priority: "HIGH", item: "Define project-specific KPI framework - set baseline metrics and 6-month targets for organic sessions, ranking keywords, indexed pages, conversion rate", owner: "SEO + Analytics", category: "Foundation & Setup", projectTypes: ["Net New Site", "Site Refresh", "Campaign Landing Page", "Microsite"], effortLevel: "Medium (2-8h)", riskLevel: "LOW", deliverableType: "Documentation" },
+  { id: 182, phase: "Post-Launch", priority: "HIGH", item: "Set up competitive monitoring - track 5-10 competitor domain metrics monthly (authority, backlinks, content velocity, keyword rankings)", owner: "SEO", category: "Monitoring", projectTypes: ["Net New Site", "Site Refresh", "Microsite"], effortLevel: "Medium (2-8h)", riskLevel: "LOW", deliverableType: "Configuration" },
+  { id: 183, phase: "Post-Launch", priority: "HIGH", item: "Monitor competitor featured snippet wins - identify opportunities where competitors have rich results for your target keywords", owner: "SEO + Content", category: "Monitoring", projectTypes: ["Net New Site", "Site Refresh"], effortLevel: "Medium (2-8h)", riskLevel: "LOW", deliverableType: "Review/Approval" },
+  { id: 184, phase: "Post-Launch", priority: "MEDIUM", item: "Track keyword ranking velocity - measure how quickly new keywords enter top 100, 50, and 10 positions to assess SEO momentum", owner: "SEO", category: "Monitoring", projectTypes: ["Net New Site"], effortLevel: "Low (<2h)", riskLevel: "LOW", deliverableType: "Review/Approval" },
+  { id: 185, phase: "Post-Launch", priority: "HIGH", item: "Measure indexation rate - track percentage of submitted URLs indexed within 30, 60, and 90 days to assess crawl efficiency", owner: "SEO", category: "Monitoring", projectTypes: ["Net New Site", "Site Refresh"], effortLevel: "Low (<2h)", riskLevel: "LOW", deliverableType: "Review/Approval" },
+  { id: 186, phase: "Post-Launch", priority: "HIGH", item: "Monitor time-to-recovery for site refresh - track when organic traffic returns to pre-launch levels (target: within 60 days)", owner: "SEO + Analytics", category: "Monitoring", projectTypes: ["Site Refresh"], effortLevel: "Low (<2h)", riskLevel: "HIGH RISK", deliverableType: "Review/Approval" },
+  { id: 187, phase: "Post-Launch", priority: "MEDIUM", item: "Analyze competitor content gaps - identify topics competitors are not covering to find low-competition content opportunities", owner: "SEO + Content", category: "Ongoing Maintenance", projectTypes: ["Net New Site", "Site Refresh"], effortLevel: "High (8-40h)", riskLevel: "LOW", deliverableType: "Documentation" },
+  { id: 188, phase: "Post-Launch", priority: "MEDIUM", item: "Review competitor backlink profiles quarterly - find link building opportunities from sites linking to competitors but not to you", owner: "SEO", category: "Ongoing Maintenance", projectTypes: ["Net New Site", "Site Refresh"], effortLevel: "Medium (2-8h)", riskLevel: "LOW", deliverableType: "Documentation" },
+  { id: 189, phase: "Post-Launch", priority: "HIGH", item: "Create SEO playbook document - comprehensive guide covering all implementations, rationale, and maintenance procedures for internal team reference", owner: "SEO", category: "Ongoing Maintenance", projectTypes: ["Net New Site", "Site Refresh"], effortLevel: "High (8-40h)", riskLevel: "LOW", deliverableType: "Documentation" },
+  { id: 190, phase: "Post-Launch", priority: "MEDIUM", item: "Develop troubleshooting guide - document common SEO issues and resolutions for non-SEO team members to reference", owner: "SEO", category: "Ongoing Maintenance", projectTypes: ["Net New Site", "Site Refresh"], effortLevel: "Medium (2-8h)", riskLevel: "LOW", deliverableType: "Documentation" },
+  { id: 191, phase: "Strategy", priority: "CRITICAL", item: "Configure AI crawler access in robots.txt - explicitly allow/block GPTBot, Google-Extended, ClaudeBot, CCBot, PerplexityBot, anthropic-ai based on content strategy", owner: "SEO + Development", category: "AI & Generative Search", projectTypes: ["Net New Site", "Site Refresh", "Campaign Landing Page", "Microsite"], effortLevel: "Low (<2h)", riskLevel: "HIGH RISK", deliverableType: "Configuration" },
+  { id: 192, phase: "Build", priority: "CRITICAL", item: "Implement SpeakableSpecification schema on key content for voice assistants - mark sections that should be read aloud by Google Assistant, Alexa, Siri", owner: "Development + Content", category: "AI & Generative Search", projectTypes: ["Net New Site", "Site Refresh"], effortLevel: "Medium (2-8h)", riskLevel: "MEDIUM", deliverableType: "Code" },
+  { id: 193, phase: "Strategy", priority: "HIGH", item: "Develop AI citation strategy - structure content with clear attributable facts, statistics with sources, and quotable definitions for AI answer engines", owner: "SEO + Content", category: "AI & Generative Search", projectTypes: ["Net New Site", "Site Refresh", "Microsite"], effortLevel: "High (8-40h)", riskLevel: "MEDIUM", deliverableType: "Documentation" },
+  { id: 194, phase: "Build", priority: "HIGH", item: "Add structured TL;DR/Key Takeaways sections at top of articles - use ordered lists with clear, quotable statements that AI can extract", owner: "Content", category: "AI & Generative Search", projectTypes: ["Net New Site", "Site Refresh"], effortLevel: "High (8-40h)", riskLevel: "MEDIUM", deliverableType: "Content" },
+  { id: 195, phase: "Build", priority: "HIGH", item: "Implement natural language question optimization - rephrase H2/H3 headings as questions that match voice search queries (Who, What, Where, When, Why, How)", owner: "Content + SEO", category: "AI & Generative Search", projectTypes: ["Net New Site", "Site Refresh", "Campaign Landing Page", "Microsite"], effortLevel: "High (8-40h)", riskLevel: "MEDIUM", deliverableType: "Content" },
+  { id: 196, phase: "Build", priority: "HIGH", item: "Add explicit source citations inline - use ClaimReview or Citation schema to mark factual claims with supporting evidence links", owner: "Development + Content", category: "AI & Generative Search", projectTypes: ["Net New Site", "Site Refresh"], effortLevel: "High (8-40h)", riskLevel: "MEDIUM", deliverableType: "Code" },
+  { id: 197, phase: "Build", priority: "HIGH", item: "Structure content with DefinedTerm schema for industry terminology - help AI understand specialized vocabulary and acronyms", owner: "Development + Content", category: "AI & Generative Search", projectTypes: ["Net New Site", "Site Refresh", "Microsite"], effortLevel: "Medium (2-8h)", riskLevel: "LOW", deliverableType: "Code" },
+  { id: 198, phase: "Build", priority: "MEDIUM", item: "Implement QAPage schema for Q&A content - structures question-answer pairs for AI extraction and featured snippets", owner: "Development", category: "AI & Generative Search", projectTypes: ["Net New Site", "Site Refresh"], effortLevel: "Medium (2-8h)", riskLevel: "LOW", deliverableType: "Code" },
+  { id: 199, phase: "Build", priority: "HIGH", item: "Add comparison tables with proper table markup (thead, tbody, th scope) - AI can extract and compare structured data", owner: "Content + Development", category: "AI & Generative Search", projectTypes: ["Net New Site", "Site Refresh"], effortLevel: "High (8-40h)", riskLevel: "MEDIUM", deliverableType: "Content" },
+  { id: 200, phase: "Build", priority: "MEDIUM", item: "Implement Dataset schema for data-heavy pages - mark tables, charts, and data files as machine-readable datasets", owner: "Development", category: "AI & Generative Search", projectTypes: ["Net New Site", "Site Refresh"], effortLevel: "Medium (2-8h)", riskLevel: "LOW", deliverableType: "Code" },
+  { id: 201, phase: "Strategy", priority: "HIGH", item: "Conduct conversational keyword research - identify natural language queries and question-based searches using People Also Ask, AnswerThePublic", owner: "SEO", category: "AI & Generative Search", projectTypes: ["Net New Site", "Site Refresh", "Microsite"], effortLevel: "High (8-40h)", riskLevel: "MEDIUM", deliverableType: "Documentation" },
+  { id: 202, phase: "Build", priority: "HIGH", item: "Add step-by-step instructions in ordered lists - use HowTo schema with clear numbered steps AI can parse and present", owner: "Content + Development", category: "AI & Generative Search", projectTypes: ["Net New Site", "Site Refresh"], effortLevel: "High (8-40h)", riskLevel: "MEDIUM", deliverableType: "Content" },
+  { id: 203, phase: "Build", priority: "MEDIUM", item: "Implement LearningResource schema for educational content - mark tutorials, courses, and guides as structured learning materials", owner: "Development", category: "AI & Generative Search", projectTypes: ["Net New Site", "Site Refresh"], effortLevel: "Low (<2h)", riskLevel: "LOW", deliverableType: "Code" },
+  { id: 204, phase: "Build", priority: "HIGH", item: "Create entity relationship mapping - link people, places, organizations, products using schema relationships (sameAs, relatedLink, mentions)", owner: "Development + SEO", category: "AI & Generative Search", projectTypes: ["Net New Site", "Site Refresh"], effortLevel: "High (8-40h)", riskLevel: "MEDIUM", deliverableType: "Code" },
+  { id: 205, phase: "Build", priority: "MEDIUM", item: "Add context annotations to links - use schema:mentions or contextual descriptions to help AI understand link relevance", owner: "Content", category: "AI & Generative Search", projectTypes: ["Net New Site", "Site Refresh"], effortLevel: "Medium (2-8h)", riskLevel: "LOW", deliverableType: "Content" },
+  { id: 206, phase: "Build", priority: "HIGH", item: "Implement list-based content sections - use proper HTML lists (ul, ol) with clear labels that AI can extract as bullets", owner: "Content + Development", category: "AI & Generative Search", projectTypes: ["Net New Site", "Site Refresh", "Campaign Landing Page", "Microsite"], effortLevel: "High (8-40h)", riskLevel: "MEDIUM", deliverableType: "Content" },
+  { id: 207, phase: "Build", priority: "MEDIUM", item: "Add statistical data in machine-readable format - mark numbers with proper units, dates, currencies using schema properties", owner: "Content + Development", category: "AI & Generative Search", projectTypes: ["Net New Site", "Site Refresh"], effortLevel: "Medium (2-8h)", riskLevel: "LOW", deliverableType: "Content" },
+  { id: 208, phase: "Build", priority: "HIGH", item: "Create contextual definitions for technical terms - add inline explanations or tooltips that AI can use for context", owner: "Content", category: "AI & Generative Search", projectTypes: ["Net New Site", "Site Refresh", "Microsite"], effortLevel: "High (8-40h)", riskLevel: "MEDIUM", deliverableType: "Content" },
+  { id: 209, phase: "Build", priority: "MEDIUM", item: "Implement FactCheck schema on fact-checking content - mark verified claims, ratings, and sources for AI truth assessment", owner: "Development + Content", category: "AI & Generative Search", projectTypes: ["Net New Site", "Site Refresh"], effortLevel: "Low (<2h)", riskLevel: "LOW", deliverableType: "Code" },
+  { id: 210, phase: "Build", priority: "MEDIUM", item: "Add correction/update notices with schema - use CorrectionComment schema to mark content updates and corrections transparently", owner: "Development + Content", category: "AI & Generative Search", projectTypes: ["Net New Site", "Site Refresh"], effortLevel: "Low (<2h)", riskLevel: "LOW", deliverableType: "Code" },
+  { id: 211, phase: "Strategy", priority: "MEDIUM", item: "Create AI-optimized meta descriptions - write descriptions as complete sentences answering specific questions (not promotional copy)", owner: "Content + SEO", category: "AI & Generative Search", projectTypes: ["Net New Site", "Site Refresh", "Campaign Landing Page", "Microsite"], effortLevel: "High (8-40h)", riskLevel: "LOW", deliverableType: "Content" },
+  { id: 212, phase: "Build", priority: "MEDIUM", item: "Implement pros/cons sections with clear labels - structure advantages/disadvantages in lists AI can extract for comparisons", owner: "Content", category: "AI & Generative Search", projectTypes: ["Net New Site", "Site Refresh"], effortLevel: "Medium (2-8h)", riskLevel: "LOW", deliverableType: "Content" },
+  { id: 213, phase: "Build", priority: "HIGH", item: "Add explicit date/time stamps with schema - use ISO 8601 format for dates, mark time-sensitive information clearly", owner: "Development + Content", category: "AI & Generative Search", projectTypes: ["Net New Site", "Site Refresh"], effortLevel: "Medium (2-8h)", riskLevel: "MEDIUM", deliverableType: "Code" },
+  { id: 214, phase: "Post-Launch", priority: "HIGH", item: "Monitor AI search visibility - track citations in ChatGPT, Perplexity, Gemini, and other AI answer engines monthly", owner: "SEO", category: "AI & Generative Search", projectTypes: ["Net New Site", "Site Refresh"], effortLevel: "Medium (2-8h)", riskLevel: "MEDIUM", deliverableType: "Review/Approval" },
+  { id: 215, phase: "Post-Launch", priority: "MEDIUM", item: "Analyze AI-generated search queries - review Search Console for zero-click searches and optimize for direct answers", owner: "SEO + Content", category: "AI & Generative Search", projectTypes: ["Net New Site", "Site Refresh"], effortLevel: "High (8-40h)", riskLevel: "LOW", deliverableType: "Review/Approval" },
+  { id: 216, phase: "Build", priority: "CRITICAL", item: "Validate all JSON-LD schema with Google Rich Results Test AND Schema.org validator - ensure zero errors in structured data", owner: "Development", category: "Machine Readability", projectTypes: ["Net New Site", "Site Refresh", "Campaign Landing Page", "Microsite"], effortLevel: "Medium (2-8h)", riskLevel: "HIGH RISK", deliverableType: "Review/Approval" },
+  { id: 217, phase: "Build", priority: "CRITICAL", item: "Implement consistent JSON-LD placement - place all structured data in <head> or immediately after <body> opening tag for reliable parsing", owner: "Development", category: "Machine Readability", projectTypes: ["Net New Site", "Site Refresh", "Campaign Landing Page", "Microsite"], effortLevel: "Medium (2-8h)", riskLevel: "HIGH RISK", deliverableType: "Code" },
+  { id: 218, phase: "Build", priority: "HIGH", item: "Add sameAs schema properties to entities - link to Wikipedia, Wikidata, official social profiles to disambiguate entities", owner: "Development + Content", category: "Machine Readability", projectTypes: ["Net New Site", "Site Refresh", "Microsite"], effortLevel: "Medium (2-8h)", riskLevel: "MEDIUM", deliverableType: "Code" },
+  { id: 219, phase: "Build", priority: "HIGH", item: "Implement proper ARIA landmarks - use role attributes (main, navigation, complementary, contentinfo) for content structure", owner: "Development", category: "Machine Readability", projectTypes: ["Net New Site", "Site Refresh", "Campaign Landing Page", "Microsite"], effortLevel: "Medium (2-8h)", riskLevel: "MEDIUM", deliverableType: "Code" },
+  { id: 220, phase: "Build", priority: "HIGH", item: "Add ARIA labels to interactive elements - provide context for buttons, forms, and dynamic content that screen readers and AI parse", owner: "Development", category: "Machine Readability", projectTypes: ["Net New Site", "Site Refresh", "Campaign Landing Page", "Microsite"], effortLevel: "High (8-40h)", riskLevel: "MEDIUM", deliverableType: "Code" },
+  { id: 221, phase: "Build", priority: "HIGH", item: "Implement skip links for navigation - add invisible 'Skip to main content' links for accessibility and content identification", owner: "Development", category: "Machine Readability", projectTypes: ["Net New Site", "Site Refresh", "Microsite"], effortLevel: "Low (<2h)", riskLevel: "LOW", deliverableType: "Code" },
+  { id: 222, phase: "Build", priority: "HIGH", item: "Use semantic HTML5 elements extensively - implement <article>, <section>, <aside>, <figure>, <figcaption>, <time>, <address> appropriately", owner: "Development", category: "Machine Readability", projectTypes: ["Net New Site", "Site Refresh", "Campaign Landing Page", "Microsite"], effortLevel: "High (8-40h)", riskLevel: "MEDIUM", deliverableType: "Code" },
+  { id: 223, phase: "Build", priority: "MEDIUM", item: "Add data attributes for structured information - use data-* attributes to provide machine-readable metadata on elements", owner: "Development", category: "Machine Readability", projectTypes: ["Net New Site", "Site Refresh"], effortLevel: "Medium (2-8h)", riskLevel: "LOW", deliverableType: "Code" },
+  { id: 224, phase: "Build", priority: "HIGH", item: "Implement proper heading outline - ensure document outline using headings creates logical hierarchy without skips", owner: "Content + Development", category: "Machine Readability", projectTypes: ["Net New Site", "Site Refresh", "Campaign Landing Page", "Microsite"], effortLevel: "High (8-40h)", riskLevel: "MEDIUM", deliverableType: "Content" },
+  { id: 225, phase: "Build", priority: "MEDIUM", item: "Add lang attribute to HTML tag and foreign language sections - specify language for proper text processing", owner: "Development", category: "Machine Readability", projectTypes: ["Net New Site", "Site Refresh", "Campaign Landing Page", "Microsite"], effortLevel: "Low (<2h)", riskLevel: "LOW", deliverableType: "Code" },
+  { id: 226, phase: "Build", priority: "MEDIUM", item: "Implement WebPage schema with comprehensive properties - add speakable, mainEntity, mentions, about properties", owner: "Development", category: "Machine Readability", projectTypes: ["Net New Site", "Site Refresh", "Campaign Landing Page", "Microsite"], effortLevel: "Medium (2-8h)", riskLevel: "LOW", deliverableType: "Code" },
+  { id: 227, phase: "Build", priority: "HIGH", item: "Add descriptive title attributes to links and images - provide additional context beyond alt text that tools can surface", owner: "Content", category: "Machine Readability", projectTypes: ["Net New Site", "Site Refresh", "Campaign Landing Page", "Microsite"], effortLevel: "High (8-40h)", riskLevel: "LOW", deliverableType: "Content" },
+  { id: 228, phase: "Build", priority: "HIGH", item: "Structure form fields with proper labels and fieldsets - use <label for=''>, <fieldset>, <legend> for accessible forms", owner: "Development", category: "Machine Readability", projectTypes: ["Net New Site", "Site Refresh", "Campaign Landing Page"], effortLevel: "Medium (2-8h)", riskLevel: "MEDIUM", deliverableType: "Code" },
+  { id: 229, phase: "Build", priority: "MEDIUM", item: "Implement structured pricing with PriceSpecification schema - mark prices with currency, valid dates, availability", owner: "Development", category: "Machine Readability", projectTypes: ["Net New Site", "Site Refresh"], effortLevel: "Medium (2-8h)", riskLevel: "LOW", deliverableType: "Code" },
+  { id: 230, phase: "Build", priority: "HIGH", item: "Add OpenGraph type property - specify og:type (article, product, website, etc.) for proper content classification", owner: "Development", category: "Machine Readability", projectTypes: ["Net New Site", "Site Refresh", "Campaign Landing Page", "Microsite"], effortLevel: "Low (<2h)", riskLevel: "MEDIUM", deliverableType: "Code" },
+  { id: 231, phase: "Build", priority: "MEDIUM", item: "Implement ItemList schema for collections - mark product listings, article archives, search results with proper ordering", owner: "Development", category: "Machine Readability", projectTypes: ["Net New Site", "Site Refresh"], effortLevel: "Medium (2-8h)", riskLevel: "LOW", deliverableType: "Code" },
+  { id: 232, phase: "Build", priority: "MEDIUM", item: "Add meaningful anchor text for all links - avoid 'click here', provide descriptive text that explains destination", owner: "Content", category: "Machine Readability", projectTypes: ["Net New Site", "Site Refresh", "Campaign Landing Page", "Microsite"], effortLevel: "High (8-40h)", riskLevel: "MEDIUM", deliverableType: "Content" },
+  { id: 233, phase: "Build", priority: "HIGH", item: "Structure addresses with PostalAddress schema - mark physical addresses with street, city, state, postal code, country properties", owner: "Development + Content", category: "Machine Readability", projectTypes: ["Net New Site", "Site Refresh", "Microsite"], effortLevel: "Low (<2h)", riskLevel: "LOW", deliverableType: "Code" },
+  { id: 234, phase: "Build", priority: "MEDIUM", item: "Implement ContactPoint schema for support/sales - mark phone, email, contact hours with proper structured data", owner: "Development", category: "Machine Readability", projectTypes: ["Net New Site", "Site Refresh", "Microsite"], effortLevel: "Low (<2h)", riskLevel: "LOW", deliverableType: "Code" },
+  { id: 235, phase: "Build", priority: "MEDIUM", item: "Add ImageObject schema to key images - mark image dimensions, license, creator, caption in structured format", owner: "Development", category: "Machine Readability", projectTypes: ["Net New Site", "Site Refresh"], effortLevel: "Medium (2-8h)", riskLevel: "LOW", deliverableType: "Code" },
+  { id: 236, phase: "Strategy", priority: "HIGH", item: "Map brand entities to knowledge bases - identify Wikipedia, Wikidata, Crunchbase, LinkedIn URLs for official entity linking", owner: "SEO", category: "Knowledge Graph", projectTypes: ["Net New Site", "Site Refresh", "Microsite"], effortLevel: "Medium (2-8h)", riskLevel: "MEDIUM", deliverableType: "Documentation" },
+  { id: 237, phase: "Build", priority: "HIGH", item: "Implement comprehensive Person schema for leadership - add credentials, jobTitle, worksFor, alumniOf, sameAs, knowsAbout properties", owner: "Development + Content", category: "Knowledge Graph", projectTypes: ["Net New Site", "Site Refresh", "Microsite"], effortLevel: "High (8-40h)", riskLevel: "MEDIUM", deliverableType: "Code" },
+  { id: 238, phase: "Build", priority: "HIGH", item: "Add brand sameAs links in Organization schema - link to all official social profiles (LinkedIn, Twitter, Facebook, Instagram, YouTube)", owner: "Development", category: "Knowledge Graph", projectTypes: ["Net New Site", "Site Refresh", "Microsite"], effortLevel: "Low (<2h)", riskLevel: "MEDIUM", deliverableType: "Code" },
+  { id: 239, phase: "Build", priority: "MEDIUM", item: "Implement parentOrganization relationships - connect subsidiary brands, divisions, parent companies in schema", owner: "Development", category: "Knowledge Graph", projectTypes: ["Net New Site", "Site Refresh"], effortLevel: "Low (<2h)", riskLevel: "LOW", deliverableType: "Code" },
+  { id: 240, phase: "Build", priority: "HIGH", item: "Add industry classification with schema - use knowsAbout, naics, industry properties to categorize organization", owner: "Development + Content", category: "Knowledge Graph", projectTypes: ["Net New Site", "Site Refresh", "Microsite"], effortLevel: "Low (<2h)", riskLevel: "MEDIUM", deliverableType: "Code" },
+  { id: 241, phase: "Build", priority: "MEDIUM", item: "Implement Place schema for physical locations - mark headquarters, offices, stores with geo coordinates and full address", owner: "Development + Content", category: "Knowledge Graph", projectTypes: ["Net New Site", "Site Refresh"], effortLevel: "Medium (2-8h)", riskLevel: "LOW", deliverableType: "Code" },
+  { id: 242, phase: "Build", priority: "HIGH", item: "Add founding/established dates to Organization - use foundingDate, foundingLocation properties for entity context", owner: "Development + Content", category: "Knowledge Graph", projectTypes: ["Net New Site", "Site Refresh", "Microsite"], effortLevel: "Low (<2h)", riskLevel: "LOW", deliverableType: "Code" },
+  { id: 243, phase: "Build", priority: "MEDIUM", item: "Implement award/recognition schema - mark certifications, awards, accreditations with Award schema and issuer", owner: "Development + Content", category: "Knowledge Graph", projectTypes: ["Net New Site", "Site Refresh", "Microsite"], effortLevel: "Medium (2-8h)", riskLevel: "LOW", deliverableType: "Code" },
+  { id: 244, phase: "Build", priority: "HIGH", item: "Add brand mentions with entity linking - mark company/product names with schema:mentions pointing to entity URLs", owner: "Content + Development", category: "Knowledge Graph", projectTypes: ["Net New Site", "Site Refresh"], effortLevel: "High (8-40h)", riskLevel: "MEDIUM", deliverableType: "Content" },
+  { id: 245, phase: "Build", priority: "MEDIUM", item: "Implement author connections - link authors to LinkedIn, Twitter, author website using sameAs in Person schema", owner: "Development + Content", category: "Knowledge Graph", projectTypes: ["Net New Site", "Site Refresh"], effortLevel: "Medium (2-8h)", riskLevel: "LOW", deliverableType: "Code" },
+  { id: 246, phase: "Build", priority: "HIGH", item: "Add product/service relationships - use offers, makesOffer, brand, manufacturer properties to connect entities", owner: "Development", category: "Knowledge Graph", projectTypes: ["Net New Site", "Site Refresh"], effortLevel: "Medium (2-8h)", riskLevel: "MEDIUM", deliverableType: "Code" },
+  { id: 247, phase: "Strategy", priority: "MEDIUM", item: "Create entity consistency guidelines - ensure brand name, leadership names, product names spelled identically across site", owner: "Content + SEO", category: "Knowledge Graph", projectTypes: ["Net New Site", "Site Refresh", "Microsite"], effortLevel: "Low (<2h)", riskLevel: "MEDIUM", deliverableType: "Documentation" },
+  { id: 248, phase: "Build", priority: "MEDIUM", item: "Implement EducationalOrganization schema (if applicable) - mark accreditation, courses, alumni with proper properties", owner: "Development", category: "Knowledge Graph", projectTypes: ["Net New Site", "Site Refresh"], effortLevel: "Low (<2h)", riskLevel: "LOW", deliverableType: "Code" },
+  { id: 249, phase: "Build", priority: "HIGH", item: "Add logo schema with image variations - provide logo in multiple sizes (60x60, 600x60, 600x600) for knowledge panels", owner: "Development", category: "Knowledge Graph", projectTypes: ["Net New Site", "Site Refresh", "Microsite"], effortLevel: "Low (<2h)", riskLevel: "HIGH RISK", deliverableType: "Code" },
+  { id: 250, phase: "Post-Launch", priority: "HIGH", item: "Monitor Knowledge Panel accuracy - regularly check Google Knowledge Panel and request corrections via Search Console", owner: "SEO", category: "Knowledge Graph", projectTypes: ["Net New Site", "Site Refresh", "Microsite"], effortLevel: "Low (<2h)", riskLevel: "MEDIUM", deliverableType: "Review/Approval" },
+  
+  // LOCAL SEO ITEMS (15 items: IDs 251-265)
+  { id: 251, phase: "Strategy", priority: "CRITICAL", item: "Claim and verify all Google Business Profile locations - complete setup for every physical business location", owner: "SEO + Marketing", category: "Local SEO", projectTypes: ["Net New Site", "Site Refresh", "Microsite"], effortLevel: "Medium (2-8h)", riskLevel: "HIGH RISK", deliverableType: "Configuration" },
+  { id: 252, phase: "Build", priority: "CRITICAL", item: "Complete all Google Business Profile fields - business description (750 chars), hours, categories (primary + 9 secondary), services, attributes, phone, website", owner: "Marketing + SEO", category: "Local SEO", projectTypes: ["Net New Site", "Site Refresh", "Microsite"], effortLevel: "High (8-40h)", riskLevel: "HIGH RISK", deliverableType: "Content" },
+  { id: 253, phase: "Build", priority: "HIGH", item: "Upload 10+ high-quality photos to each Google Business Profile location - exterior, interior, products, team, at work", owner: "Marketing + Content", category: "Local SEO", projectTypes: ["Net New Site", "Site Refresh", "Microsite"], effortLevel: "High (8-40h)", riskLevel: "MEDIUM", deliverableType: "Content" },
+  { id: 254, phase: "Build", priority: "HIGH", item: "Implement LocalBusiness schema on all location pages - include name, address, phone, geo coordinates, opening hours, price range, payment accepted", owner: "Development", category: "Local SEO", projectTypes: ["Net New Site", "Site Refresh", "Microsite"], effortLevel: "Medium (2-8h)", riskLevel: "MEDIUM", deliverableType: "Code" },
+  { id: 255, phase: "Build", priority: "CRITICAL", item: "Create dedicated location pages for each physical location with unique content (300+ words) - include NAP, directions, parking, neighborhood info, embedded map", owner: "Content + Development", category: "Local SEO", projectTypes: ["Net New Site", "Site Refresh", "Microsite"], effortLevel: "Very High (40+h)", riskLevel: "HIGH RISK", deliverableType: "Content" },
+  { id: 256, phase: "Build", priority: "CRITICAL", item: "Implement consistent NAP (Name, Address, Phone) across entire website - exact match format sitewide, typically in footer", owner: "Content + Development", category: "Local SEO", projectTypes: ["Net New Site", "Site Refresh", "Microsite"], effortLevel: "Low (<2h)", riskLevel: "HIGH RISK", deliverableType: "Content" },
+  { id: 257, phase: "Build", priority: "HIGH", item: "Embed Google Maps on location pages - use Google Maps Embed API with proper API key and location coordinates", owner: "Development", category: "Local SEO", projectTypes: ["Net New Site", "Site Refresh", "Microsite"], effortLevel: "Low (<2h)", riskLevel: "LOW", deliverableType: "Code" },
+  { id: 258, phase: "Build", priority: "HIGH", item: "Add location-specific content including local landmarks, neighborhoods, and geographic references for local relevance signals", owner: "Content", category: "Local SEO", projectTypes: ["Net New Site", "Site Refresh", "Microsite"], effortLevel: "High (8-40h)", riskLevel: "MEDIUM", deliverableType: "Content" },
+  { id: 259, phase: "Build", priority: "HIGH", item: "Optimize location page title tags and meta descriptions with city/region names and primary services", owner: "Content + SEO", category: "Local SEO", projectTypes: ["Net New Site", "Site Refresh", "Microsite"], effortLevel: "High (8-40h)", riskLevel: "HIGH RISK", deliverableType: "Content" },
+  { id: 260, phase: "Post-Launch", priority: "HIGH", item: "Build citations on top local directories - Yelp, Apple Maps, Bing Places, Yelp, YP.com, Facebook with consistent NAP", owner: "SEO + Marketing", category: "Local SEO", projectTypes: ["Net New Site", "Site Refresh", "Microsite"], effortLevel: "High (8-40h)", riskLevel: "MEDIUM", deliverableType: "Configuration" },
+  { id: 261, phase: "Post-Launch", priority: "HIGH", item: "Submit business to industry-specific directories (e.g., Healthgrades for medical, Avvo for legal, TripAdvisor for hospitality)", owner: "SEO + Marketing", category: "Local SEO", projectTypes: ["Net New Site", "Site Refresh", "Microsite"], effortLevel: "High (8-40h)", riskLevel: "MEDIUM", deliverableType: "Configuration" },
+  { id: 262, phase: "Post-Launch", priority: "HIGH", item: "Implement review generation strategy - post-purchase/visit email requesting Google reviews, respond to all reviews within 48 hours", owner: "Marketing + SEO", category: "Local SEO", projectTypes: ["Net New Site", "Site Refresh", "Microsite"], effortLevel: "Medium (2-8h)", riskLevel: "MEDIUM", deliverableType: "Documentation" },
+  { id: 263, phase: "Post-Launch", priority: "MEDIUM", item: "Set up Google Posts on Business Profile - weekly updates, offers, events, news to maintain active GBP presence", owner: "Marketing", category: "Local SEO", projectTypes: ["Net New Site", "Site Refresh", "Microsite"], effortLevel: "High (8-40h)", riskLevel: "LOW", deliverableType: "Content" },
+  { id: 264, phase: "Build", priority: "MEDIUM", item: "Create location finder/store locator functionality for multi-location businesses with search by zip code, city, or address", owner: "Development", category: "Local SEO", projectTypes: ["Net New Site", "Site Refresh"], effortLevel: "Very High (40+h)", riskLevel: "MEDIUM", deliverableType: "Code" },
+  { id: 265, phase: "Post-Launch", priority: "MEDIUM", item: "Conduct monthly citation audit - monitor for inconsistent NAP across web, correct inaccuracies found", owner: "SEO", category: "Local SEO", projectTypes: ["Net New Site", "Site Refresh", "Microsite"], effortLevel: "Medium (2-8h)", riskLevel: "MEDIUM", deliverableType: "Review/Approval" },
+
+  // E-COMMERCE SEO ITEMS (14 items: IDs 266-279)
+  { id: 266, phase: "Strategy", priority: "CRITICAL", item: "Plan faceted navigation strategy for e-commerce - decide which filters create new URLs vs. use AJAX, implement canonicals or noindex on filter combinations", owner: "SEO + Development", category: "E-Commerce SEO", projectTypes: ["Net New Site", "Site Refresh"], effortLevel: "Very High (40+h)", riskLevel: "BLOCKER", deliverableType: "Documentation" },
+  { id: 267, phase: "Strategy", priority: "HIGH", item: "Define product URL structure - decide subdirectory depth (/category/product vs /product), handle product variants (separate pages vs single page)", owner: "SEO + IA", category: "E-Commerce SEO", projectTypes: ["Net New Site", "Site Refresh"], effortLevel: "High (8-40h)", riskLevel: "HIGH RISK", deliverableType: "Documentation" },
+  { id: 268, phase: "Build", priority: "CRITICAL", item: "Implement Product schema on all product pages - name, image, description, SKU, brand, price, priceCurrency, availability, url, aggregateRating if reviews exist", owner: "Development", category: "E-Commerce SEO", projectTypes: ["Net New Site", "Site Refresh"], effortLevel: "High (8-40h)", riskLevel: "HIGH RISK", deliverableType: "Code" },
+  { id: 269, phase: "Build", priority: "CRITICAL", item: "Write unique product descriptions minimum 300 words - never use manufacturer descriptions, include specifications, benefits, use cases", owner: "Content", category: "E-Commerce SEO", projectTypes: ["Net New Site", "Site Refresh"], effortLevel: "Very High (40+h)", riskLevel: "HIGH RISK", deliverableType: "Content" },
+  { id: 270, phase: "Build", priority: "HIGH", item: "Implement canonical tags on filtered and sorted product listing pages to prevent duplicate content from faceted navigation", owner: "Development", category: "E-Commerce SEO", projectTypes: ["Net New Site", "Site Refresh"], effortLevel: "High (8-40h)", riskLevel: "BLOCKER", deliverableType: "Code" },
+  { id: 271, phase: "Build", priority: "HIGH", item: "Handle out-of-stock products properly - keep page live with 'notify me' option, maintain URL, mark availability as OutOfStock in schema, do NOT 404", owner: "Development + Content", category: "E-Commerce SEO", projectTypes: ["Net New Site", "Site Refresh"], effortLevel: "Medium (2-8h)", riskLevel: "HIGH RISK", deliverableType: "Code" },
+  { id: 272, phase: "Build", priority: "HIGH", item: "Add category descriptions (300-500 words) above or below product grid - explains category, includes keywords, helps with thin content issues", owner: "Content", category: "E-Commerce SEO", projectTypes: ["Net New Site", "Site Refresh"], effortLevel: "Very High (40+h)", riskLevel: "MEDIUM", deliverableType: "Content" },
+  { id: 273, phase: "Build", priority: "HIGH", item: "Implement review schema with individual Review markup - include reviewRating, author, reviewBody, datePublished for each review", owner: "Development", category: "E-Commerce SEO", projectTypes: ["Net New Site", "Site Refresh"], effortLevel: "High (8-40h)", riskLevel: "MEDIUM", deliverableType: "Code" },
+  { id: 274, phase: "Build", priority: "CRITICAL", item: "Configure dynamic XML sitemap for products - regenerates automatically when products added/removed, includes lastmod dates, image URLs", owner: "Development", category: "E-Commerce SEO", projectTypes: ["Net New Site", "Site Refresh"], effortLevel: "Medium (2-8h)", riskLevel: "HIGH RISK", deliverableType: "Code" },
+  { id: 275, phase: "Build", priority: "HIGH", item: "Handle discontinued products strategically - 301 redirect to similar product or category page, never 404 unless absolutely no alternative", owner: "SEO + Development", category: "E-Commerce SEO", projectTypes: ["Net New Site", "Site Refresh"], effortLevel: "Medium (2-8h)", riskLevel: "HIGH RISK", deliverableType: "Configuration" },
+  { id: 276, phase: "Build", priority: "HIGH", item: "Optimize product images - multiple angles, zoom functionality, min 800x800px, descriptive filenames, alt text with product name + color/variant", owner: "Content + Development", category: "E-Commerce SEO", projectTypes: ["Net New Site", "Site Refresh"], effortLevel: "Very High (40+h)", riskLevel: "MEDIUM", deliverableType: "Content" },
+  { id: 277, phase: "Build", priority: "MEDIUM", item: "Add buying guides and how-to content in blog or resource center - supports product pages, captures informational queries", owner: "Content", category: "E-Commerce SEO", projectTypes: ["Net New Site", "Site Refresh"], effortLevel: "Very High (40+h)", riskLevel: "LOW", deliverableType: "Content" },
+  { id: 278, phase: "Launch", priority: "HIGH", item: "Set up Google Merchant Center and product feed - enable free product listings in Google Shopping tab", owner: "SEO + Marketing", category: "E-Commerce SEO", projectTypes: ["Net New Site", "Site Refresh"], effortLevel: "High (8-40h)", riskLevel: "MEDIUM", deliverableType: "Configuration" },
+  { id: 279, phase: "Build", priority: "MEDIUM", item: "Create product comparison pages for competing products - helps users decide, captures '[product A] vs [product B]' queries", owner: "Content", category: "E-Commerce SEO", projectTypes: ["Net New Site", "Site Refresh"], effortLevel: "High (8-40h)", riskLevel: "LOW", deliverableType: "Content" },
+
+  // CAMPAIGN LANDING PAGE SPECIFIC ITEMS (16 items: IDs 280-295)
+  { id: 280, phase: "Strategy", priority: "CRITICAL", item: "Determine landing page indexation strategy - decide if page should be indexed for organic traffic or noindexed for paid-only traffic", owner: "SEO + Marketing", category: "Campaign Landing Pages", projectTypes: ["Campaign Landing Page"], effortLevel: "Low (<2h)", riskLevel: "HIGH RISK", deliverableType: "Documentation" },
+  { id: 281, phase: "Build", priority: "CRITICAL", item: "Remove global navigation from landing page to minimize exit points and maintain focus on conversion goal", owner: "UX + Development", category: "Campaign Landing Pages", projectTypes: ["Campaign Landing Page"], effortLevel: "Low (<2h)", riskLevel: "MEDIUM", deliverableType: "Code" },
+  { id: 282, phase: "Build", priority: "CRITICAL", item: "Implement single, clear CTA above fold - one primary conversion action with contrasting color button, action-oriented copy", owner: "UX + Development + Content", category: "Campaign Landing Pages", projectTypes: ["Campaign Landing Page"], effortLevel: "Low (<2h)", riskLevel: "HIGH RISK", deliverableType: "Content" },
+  { id: 283, phase: "Build", priority: "CRITICAL", item: "Configure thank-you page with noindex, nofollow tags - prevent indexing of post-conversion pages in search results", owner: "Development", category: "Campaign Landing Pages", projectTypes: ["Campaign Landing Page"], effortLevel: "Low (<2h)", riskLevel: "MEDIUM", deliverableType: "Code" },
+  { id: 284, phase: "Build", priority: "CRITICAL", item: "Set up conversion tracking pixels - Google Ads, Meta Pixel, LinkedIn Insight Tag for paid campaign attribution", owner: "Development + Analytics", category: "Campaign Landing Pages", projectTypes: ["Campaign Landing Page"], effortLevel: "Medium (2-8h)", riskLevel: "BLOCKER", deliverableType: "Code" },
+  { id: 285, phase: "Strategy", priority: "CRITICAL", item: "Create UTM parameter naming convention and tracking matrix - document all campaign parameters for consistent analytics tracking", owner: "Marketing + Analytics", category: "Campaign Landing Pages", projectTypes: ["Campaign Landing Page"], effortLevel: "Low (<2h)", riskLevel: "HIGH RISK", deliverableType: "Documentation" },
+  { id: 286, phase: "Build", priority: "HIGH", item: "Configure form abandonment tracking - track users who start but don't complete form submission", owner: "Development + Analytics", category: "Campaign Landing Pages", projectTypes: ["Campaign Landing Page"], effortLevel: "Medium (2-8h)", riskLevel: "MEDIUM", deliverableType: "Code" },
+  { id: 287, phase: "Build", priority: "HIGH", item: "Implement scroll depth tracking (25%, 50%, 75%, 100%) in Google Analytics to understand content engagement", owner: "Development + Analytics", category: "Campaign Landing Pages", projectTypes: ["Campaign Landing Page"], effortLevel: "Low (<2h)", riskLevel: "LOW", deliverableType: "Code" },
+  { id: 288, phase: "Build", priority: "HIGH", item: "Set up heat mapping (Hotjar, Crazy Egg, or Microsoft Clarity) to visualize clicks, taps, and scroll behavior for optimization", owner: "Development + Analytics", category: "Campaign Landing Pages", projectTypes: ["Campaign Landing Page"], effortLevel: "Low (<2h)", riskLevel: "LOW", deliverableType: "Configuration" },
+  { id: 289, phase: "Build", priority: "HIGH", item: "Create dedicated landing page template in CMS isolated from main site navigation structure", owner: "Development", category: "Campaign Landing Pages", projectTypes: ["Campaign Landing Page"], effortLevel: "Medium (2-8h)", riskLevel: "MEDIUM", deliverableType: "Code" },
+  { id: 290, phase: "Build", priority: "MEDIUM", item: "Implement dynamic keyword insertion for PPC landing pages - URL parameters populate headline/copy with searched keyword", owner: "Development + Marketing", category: "Campaign Landing Pages", projectTypes: ["Campaign Landing Page"], effortLevel: "High (8-40h)", riskLevel: "LOW", deliverableType: "Code" },
+  { id: 291, phase: "Build", priority: "MEDIUM", item: "For indexed landing pages create unique title/meta different from ad copy - avoid duplicate content between organic and paid", owner: "Content + SEO", category: "Campaign Landing Pages", projectTypes: ["Campaign Landing Page"], effortLevel: "Low (<2h)", riskLevel: "MEDIUM", deliverableType: "Content" },
+  { id: 292, phase: "Build", priority: "HIGH", item: "Set up canonical tags for similar campaign pages - seasonal variations should canonicalize to primary version to avoid duplicate content", owner: "Development", category: "Campaign Landing Pages", projectTypes: ["Campaign Landing Page"], effortLevel: "Low (<2h)", riskLevel: "MEDIUM", deliverableType: "Code" },
+  { id: 293, phase: "Strategy", priority: "MEDIUM", item: "Plan landing page URL structure - decide subdirectory (/landing/campaign-name) vs subdomain (campaign.example.com) strategy", owner: "SEO + Marketing", category: "Campaign Landing Pages", projectTypes: ["Campaign Landing Page"], effortLevel: "Low (<2h)", riskLevel: "MEDIUM", deliverableType: "Documentation" },
+  { id: 294, phase: "Strategy", priority: "HIGH", item: "Document campaign sunset strategy - plan for post-campaign: redirect to main site, archive page, or remove entirely", owner: "SEO + Marketing", category: "Campaign Landing Pages", projectTypes: ["Campaign Landing Page"], effortLevel: "Low (<2h)", riskLevel: "MEDIUM", deliverableType: "Documentation" },
+  { id: 295, phase: "Build", priority: "MEDIUM", item: "Create A/B testing roadmap with SEO guardrails - ensure test variants use proper canonical tags or are noindexed", owner: "Marketing + SEO", category: "Campaign Landing Pages", projectTypes: ["Campaign Landing Page"], effortLevel: "Medium (2-8h)", riskLevel: "MEDIUM", deliverableType: "Documentation" },
+
+  // WEBSITE REFRESH SPECIFIC ITEMS (19 items: IDs 296-314)
+  { id: 296, phase: "Discovery", priority: "CRITICAL", item: "Export Google Search Console data - last 16 months of impressions, clicks, CTR, position for all pages before refresh begins", owner: "SEO", category: "Site Refresh/Migration", projectTypes: ["Site Refresh"], effortLevel: "Low (<2h)", riskLevel: "BLOCKER", deliverableType: "Documentation" },
+  { id: 297, phase: "Discovery", priority: "CRITICAL", item: "Document all existing rankings for target keywords - use rank tracking tool to capture current positions before any changes", owner: "SEO", category: "Site Refresh/Migration", projectTypes: ["Site Refresh"], effortLevel: "Medium (2-8h)", riskLevel: "BLOCKER", deliverableType: "Documentation" },
+  { id: 298, phase: "Discovery", priority: "CRITICAL", item: "Identify and preserve top-performing URLs - document top 10% traffic generators that must maintain rankings post-refresh", owner: "SEO + Analytics", category: "Site Refresh/Migration", projectTypes: ["Site Refresh"], effortLevel: "Medium (2-8h)", riskLevel: "BLOCKER", deliverableType: "Documentation" },
+  { id: 299, phase: "Discovery", priority: "HIGH", item: "Audit existing backlink profile - identify high-authority referring domains, document important backlinks to preserve", owner: "SEO", category: "Site Refresh/Migration", projectTypes: ["Site Refresh"], effortLevel: "High (8-40h)", riskLevel: "HIGH RISK", deliverableType: "Documentation" },
+  { id: 300, phase: "Discovery", priority: "HIGH", item: "Document current domain authority metrics - baseline Ahrefs DR, Moz DA, organic traffic, ranking keywords for comparison post-refresh", owner: "SEO", category: "Site Refresh/Migration", projectTypes: ["Site Refresh"], effortLevel: "Low (<2h)", riskLevel: "MEDIUM", deliverableType: "Documentation" },
+  { id: 301, phase: "Discovery", priority: "HIGH", item: "Export all existing structured data implementations - document current schema types and markup for preservation or improvement", owner: "SEO + Development", category: "Site Refresh/Migration", projectTypes: ["Site Refresh"], effortLevel: "Medium (2-8h)", riskLevel: "MEDIUM", deliverableType: "Documentation" },
+  { id: 302, phase: "Discovery", priority: "HIGH", item: "Identify pages with rich results in SERPs - featured snippets, People Also Ask boxes, video carousels, image packs must be preserved", owner: "SEO", category: "Site Refresh/Migration", projectTypes: ["Site Refresh"], effortLevel: "Medium (2-8h)", riskLevel: "HIGH RISK", deliverableType: "Documentation" },
+  { id: 303, phase: "Discovery", priority: "MEDIUM", item: "Catalog all existing 301 redirects currently implemented - preserve redirect chain history, don't create redirect chains", owner: "SEO + Development", category: "Site Refresh/Migration", projectTypes: ["Site Refresh"], effortLevel: "Medium (2-8h)", riskLevel: "MEDIUM", deliverableType: "Documentation" },
+  { id: 304, phase: "Strategy", priority: "CRITICAL", item: "Create complete content inventory with metadata - URL, H1, title, meta description, word count, last modified date, organic traffic", owner: "SEO + Content", category: "Site Refresh/Migration", projectTypes: ["Site Refresh"], effortLevel: "Very High (40+h)", riskLevel: "BLOCKER", deliverableType: "Documentation" },
+  { id: 305, phase: "Strategy", priority: "HIGH", item: "Identify thin content requiring consolidation or expansion - flag pages under 300 words or low traffic for merge or enhancement", owner: "SEO + Content", category: "Site Refresh/Migration", projectTypes: ["Site Refresh"], effortLevel: "High (8-40h)", riskLevel: "MEDIUM", deliverableType: "Documentation" },
+  { id: 306, phase: "Strategy", priority: "HIGH", item: "Flag duplicate or near-duplicate content for deduplication - identify pages with 80%+ content similarity for consolidation", owner: "SEO + Content", category: "Site Refresh/Migration", projectTypes: ["Site Refresh"], effortLevel: "High (8-40h)", riskLevel: "MEDIUM", deliverableType: "Documentation" },
+  { id: 307, phase: "Strategy", priority: "MEDIUM", item: "Document content gaps - identify keywords without corresponding content, plan new pages to fill gaps", owner: "SEO + Content", category: "Site Refresh/Migration", projectTypes: ["Site Refresh"], effortLevel: "High (8-40h)", riskLevel: "LOW", deliverableType: "Documentation" },
+  { id: 308, phase: "Strategy", priority: "HIGH", item: "Prioritize content strategy per page - categorize as: rewrite, consolidate, archive, or preserve unchanged", owner: "SEO + Content", category: "Site Refresh/Migration", projectTypes: ["Site Refresh"], effortLevel: "Very High (40+h)", riskLevel: "HIGH RISK", deliverableType: "Documentation" },
+  { id: 309, phase: "Strategy", priority: "CRITICAL", item: "Create comprehensive 1:1 URL mapping document - every old URL mapped to new destination, no URL left unmapped", owner: "SEO", category: "Site Refresh/Migration", projectTypes: ["Site Refresh"], effortLevel: "Very High (40+h)", riskLevel: "BLOCKER", deliverableType: "Documentation" },
+  { id: 310, phase: "Pre-Launch", priority: "CRITICAL", item: "Test ALL 301 redirects individually - verify each redirect points to correct destination and returns proper 301 status code", owner: "SEO + Development", category: "Site Refresh/Migration", projectTypes: ["Site Refresh"], effortLevel: "Very High (40+h)", riskLevel: "BLOCKER", deliverableType: "Review/Approval" },
+  { id: 311, phase: "Post-Launch", priority: "CRITICAL", item: "Set up redirect monitoring - track 404 errors post-launch, fix any broken redirects within 48 hours of discovery", owner: "SEO + Development", category: "Site Refresh/Migration", projectTypes: ["Site Refresh"], effortLevel: "High (8-40h)", riskLevel: "BLOCKER", deliverableType: "Configuration" },
+  { id: 312, phase: "Post-Launch", priority: "CRITICAL", item: "Create crawl comparison report - diff pre-launch vs post-launch sitemap to catch any missed URLs or issues", owner: "SEO", category: "Site Refresh/Migration", projectTypes: ["Site Refresh"], effortLevel: "Medium (2-8h)", riskLevel: "HIGH RISK", deliverableType: "Review/Approval" },
+  { id: 313, phase: "Post-Launch", priority: "CRITICAL", item: "Monitor ranking volatility daily for first 30 days - flag any drops >10 positions immediately for investigation", owner: "SEO", category: "Site Refresh/Migration", projectTypes: ["Site Refresh"], effortLevel: "Medium (2-8h)", riskLevel: "HIGH RISK", deliverableType: "Review/Approval" },
+  { id: 314, phase: "Post-Launch", priority: "MEDIUM", item: "Configure Google Search Console address change tool if domain changes - signals Google about site move", owner: "SEO", category: "Site Refresh/Migration", projectTypes: ["Site Refresh"], effortLevel: "Low (<2h)", riskLevel: "MEDIUM", deliverableType: "Configuration" },
+
+  // MICROSITE SPECIFIC ITEMS (7 items: IDs 315-321)
+  { id: 315, phase: "Strategy", priority: "CRITICAL", item: "Determine microsite host strategy - subdomain (micro.example.com) vs subdirectory (example.com/micro/) vs separate domain (micro-site.com)", owner: "SEO + Development", category: "Microsite Strategy", projectTypes: ["Microsite"], effortLevel: "Low (<2h)", riskLevel: "HIGH RISK", deliverableType: "Documentation" },
+  { id: 316, phase: "Strategy", priority: "HIGH", item: "Document microsite integration strategy - how microsite connects to main domain, navigation approach, branding consistency", owner: "SEO + UX", category: "Microsite Strategy", projectTypes: ["Microsite"], effortLevel: "Low (<2h)", riskLevel: "MEDIUM", deliverableType: "Documentation" },
+  { id: 317, phase: "Strategy", priority: "HIGH", item: "Assess link equity flow strategy - determine if microsite should link back to main site and if main site should link to microsite", owner: "SEO", category: "Microsite Strategy", projectTypes: ["Microsite"], effortLevel: "Low (<2h)", riskLevel: "MEDIUM", deliverableType: "Documentation" },
+  { id: 318, phase: "Strategy", priority: "HIGH", item: "Define microsite lifespan - permanent asset or temporary 90-180 day campaign, plan sunset strategy accordingly", owner: "SEO + Marketing", category: "Microsite Strategy", projectTypes: ["Microsite"], effortLevel: "Low (<2h)", riskLevel: "MEDIUM", deliverableType: "Documentation" },
+  { id: 319, phase: "Strategy", priority: "MEDIUM", item: "Plan for microsite expansion potential - can microsite grow into larger property or is it permanently limited scope", owner: "SEO + Marketing", category: "Microsite Strategy", projectTypes: ["Microsite"], effortLevel: "Low (<2h)", riskLevel: "LOW", deliverableType: "Documentation" },
+  { id: 320, phase: "Strategy", priority: "HIGH", item: "Ensure microsite doesn't compete with main site for same keywords - avoid keyword cannibalization, differentiate target keywords", owner: "SEO", category: "Microsite Strategy", projectTypes: ["Microsite"], effortLevel: "Medium (2-8h)", riskLevel: "HIGH RISK", deliverableType: "Documentation" },
+  { id: 321, phase: "Strategy", priority: "MEDIUM", item: "Set up cross-domain tracking if microsite on separate domain - maintain user session data across domains in Google Analytics", owner: "Development + Analytics", category: "Microsite Strategy", projectTypes: ["Microsite"], effortLevel: "Medium (2-8h)", riskLevel: "MEDIUM", deliverableType: "Code" }
+];
+
+const SEOChecklist = () => {
+  const [completed, setCompleted] = useState(() => {
+    const saved = localStorage.getItem('seo-checklist-completed');
+    return saved ? JSON.parse(saved) : {};
+  });
+  
+  const [filters, setFilters] = useState({
+    projectType: 'All',
+    phase: 'All',
+    priority: 'All',
+    owner: 'All',
+    category: 'All',
+    effortLevel: 'All',
+    riskLevel: 'All',
+    deliverableType: 'All',
+    searchTerm: '',
+    hideCompleted: false
+  });
+
+  // Quick filter functions
+  const applyQuickFilter = (type) => {
+    switch(type) {
+      case 'blockers':
+        setFilters({ ...filters, riskLevel: 'BLOCKER', priority: 'All', phase: 'All' });
+        break;
+      case 'critical':
+        setFilters({ ...filters, priority: 'CRITICAL', riskLevel: 'All', phase: 'All' });
+        break;
+      case 'clearAll':
+        setFilters({
+          projectType: 'All',
+          phase: 'All',
+          priority: 'All',
+          owner: 'All',
+          category: 'All',
+          effortLevel: 'All',
+          riskLevel: 'All',
+          deliverableType: 'All',
+          searchTerm: '',
+          hideCompleted: false
+        });
+        break;
+    }
+  };
+
+
+  const [showFilters, setShowFilters] = useState(false);
+
+  // Extract unique values for filters
+  const projectTypes = ['All', 'Net New Site', 'Site Refresh', 'Campaign Landing Page', 'Microsite'];
+  const phases = ['All', ...new Set(checklistData.map(item => item.phase))];
+  const priorities = ['All', 'CRITICAL', 'HIGH', 'MEDIUM', 'LOW'];
+  const owners = ['All', ...new Set(checklistData.map(item => item.owner).sort())];
+  const categories = ['All', ...new Set(checklistData.map(item => item.category).sort())];
+  const effortLevels = ['All', 'Low (<2h)', 'Medium (2-8h)', 'High (8-40h)', 'Very High (40+h)'];
+  const riskLevels = ['All', 'BLOCKER', 'HIGH RISK', 'MEDIUM', 'LOW'];
+  const deliverableTypes = ['All', 'Documentation', 'Code', 'Content', 'Configuration', 'Review/Approval'];
+
+  // Save completed state to localStorage whenever it changes
+  const toggleComplete = (id) => {
+    const newCompleted = { ...completed, [id]: !completed[id] };
+    setCompleted(newCompleted);
+    localStorage.setItem('seo-checklist-completed', JSON.stringify(newCompleted));
+  };
+
+  // Filter the checklist
+  const filteredData = useMemo(() => {
+    return checklistData.filter(item => {
+      if (filters.projectType !== 'All' && !item.projectTypes.includes(filters.projectType)) return false;
+      if (filters.phase !== 'All' && item.phase !== filters.phase) return false;
+      if (filters.priority !== 'All' && item.priority !== filters.priority) return false;
+      if (filters.owner !== 'All' && item.owner !== filters.owner) return false;
+      if (filters.category !== 'All' && item.category !== filters.category) return false;
+      if (filters.effortLevel !== 'All' && item.effortLevel !== filters.effortLevel) return false;
+      if (filters.riskLevel !== 'All' && item.riskLevel !== filters.riskLevel) return false;
+      if (filters.deliverableType !== 'All' && item.deliverableType !== filters.deliverableType) return false;
+      if (filters.hideCompleted && completed[item.id]) return false;
+      if (filters.searchTerm && !item.item.toLowerCase().includes(filters.searchTerm.toLowerCase())) return false;
+      return true;
+    });
+  }, [filters, completed]);
+
+  // Calculate progress
+  const totalItems = checklistData.length;
+  const completedCount = Object.values(completed).filter(Boolean).length;
+  const progress = Math.round((completedCount / totalItems) * 100);
+
+  // Calculate filtered progress
+  const filteredCompletedCount = filteredData.filter(item => completed[item.id]).length;
+  const filteredProgress = filteredData.length > 0 ? Math.round((filteredCompletedCount / filteredData.length) * 100) : 0;
+
+  // Group by phase
+  const groupedData = useMemo(() => {
+    const groups = {};
+    filteredData.forEach(item => {
+      if (!groups[item.phase]) {
+        groups[item.phase] = [];
+      }
+      groups[item.phase].push(item);
+    });
+    return groups;
+  }, [filteredData]);
+
+  // Calculate project-type specific counts
+  const getProjectTypeStats = (projectType) => {
+    const items = checklistData.filter(item => item.projectTypes.includes(projectType));
+    const critical = items.filter(i => i.priority === 'CRITICAL').length;
+    const high = items.filter(i => i.priority === 'HIGH').length;
+    
+    // Calculate estimated hours
+    const effortHours = {
+      'Low (<2h)': 1,
+      'Medium (2-8h)': 5,
+      'High (8-40h)': 24,
+      'Very High (40+h)': 60
+    };
+    const estimatedHours = items.reduce((sum, item) => {
+      return sum + (effortHours[item.effortLevel] || 0);
+    }, 0);
+    
+    return { total: items.length, critical, high, estimatedHours };
+  };
+
+  // Generate PM Scope Report
+  const generatePMReport = () => {
+    const selectedType = filters.projectType !== 'All' ? filters.projectType : 'All Project Types';
+    const items = filters.projectType !== 'All' 
+      ? checklistData.filter(item => item.projectTypes.includes(filters.projectType))
+      : checklistData;
+    
+    // Group by priority
+    const byPriority = {
+      'CRITICAL': items.filter(i => i.priority === 'CRITICAL'),
+      'HIGH': items.filter(i => i.priority === 'HIGH'),
+      'MEDIUM': items.filter(i => i.priority === 'MEDIUM'),
+      'LOW': items.filter(i => i.priority === 'LOW')
+    };
+    
+    // Group by owner
+    const byOwner = items.reduce((acc, item) => {
+      if (!acc[item.owner]) acc[item.owner] = [];
+      acc[item.owner].push(item);
+      return acc;
+    }, {});
+    
+    // Group by phase
+    const byPhase = items.reduce((acc, item) => {
+      if (!acc[item.phase]) acc[item.phase] = [];
+      acc[item.phase].push(item);
+      return acc;
+    }, {});
+    
+    // Calculate total hours
+    const effortHours = {
+      'Low (<2h)': 1,
+      'Medium (2-8h)': 5,
+      'High (8-40h)': 24,
+      'Very High (40+h)': 60
+    };
+    const totalHours = items.reduce((sum, item) => sum + (effortHours[item.effortLevel] || 0), 0);
+    
+    // Generate report
+    let report = `SEO PROJECT SCOPE REPORT\n`;
+    report += `Generated: ${new Date().toLocaleDateString()}\n`;
+    report += `Project Type: ${selectedType}\n`;
+    report += `${'='.repeat(70)}\n\n`;
+    
+    report += `EXECUTIVE SUMMARY\n`;
+    report += `${'='.repeat(70)}\n`;
+    report += `Total Items: ${items.length}\n`;
+    report += `Estimated Total Hours: ${totalHours}h (${(totalHours/8).toFixed(1)} days)\n`;
+    report += `CRITICAL Items: ${byPriority.CRITICAL.length}\n`;
+    report += `HIGH Priority Items: ${byPriority.HIGH.length}\n\n`;
+    
+    report += `ITEMS BY PRIORITY\n`;
+    report += `${'='.repeat(70)}\n`;
+    Object.entries(byPriority).forEach(([priority, priorityItems]) => {
+      if (priorityItems.length > 0) {
+        report += `\n${priority} (${priorityItems.length} items)\n`;
+        report += `${'-'.repeat(70)}\n`;
+        priorityItems.forEach(item => {
+          report += `- [${item.phase}] ${item.item.substring(0, 100)}...\n`;
+          report += `  Owner: ${item.owner} | Effort: ${item.effortLevel}\n`;
+        });
+      }
+    });
+    
+    report += `\n\nITEMS BY OWNER\n`;
+    report += `${'='.repeat(70)}\n`;
+    Object.entries(byOwner).sort().forEach(([owner, ownerItems]) => {
+      const ownerHours = ownerItems.reduce((sum, item) => sum + (effortHours[item.effortLevel] || 0), 0);
+      report += `\n${owner} (${ownerItems.length} items, ${ownerHours}h)\n`;
+      report += `${'-'.repeat(70)}\n`;
+      ownerItems.forEach(item => {
+        report += `- [${item.priority}] ${item.item.substring(0, 100)}...\n`;
+      });
+    });
+    
+    report += `\n\nITEMS BY PHASE\n`;
+    report += `${'='.repeat(70)}\n`;
+    ['Discovery', 'Strategy', 'Build', 'Pre-Launch', 'Launch', 'Post-Launch'].forEach(phase => {
+      if (byPhase[phase] && byPhase[phase].length > 0) {
+        const phaseHours = byPhase[phase].reduce((sum, item) => sum + (effortHours[item.effortLevel] || 0), 0);
+        report += `\n${phase} (${byPhase[phase].length} items, ${phaseHours}h)\n`;
+        report += `${'-'.repeat(70)}\n`;
+        byPhase[phase].forEach(item => {
+          report += `- [${item.priority}] ${item.item.substring(0, 100)}...\n`;
+        });
+      }
+    });
+    
+    // Download as text file
+    const blob = new Blob([report], { type: 'text/plain' });
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `seo-pm-scope-report-${selectedType.toLowerCase().replace(/\s+/g, '-')}.txt`;
+    a.click();
+  };
+
+  // Export to CSV with new fields
+  const exportToCSV = () => {
+    const headers = ['Phase', 'Priority', 'Item', 'Owner', 'Category', 'Project Types', 'Effort Level', 'Risk Level', 'Deliverable Type', 'Completed'];
+    const rows = checklistData.map(item => [
+      item.phase,
+      item.priority,
+      `"${item.item}"`,
+      item.owner,
+      item.category,
+      `"${item.projectTypes.join(', ')}"`,
+      item.effortLevel,
+      item.riskLevel,
+      item.deliverableType,
+      completed[item.id] ? 'Yes' : 'No'
+    ]);
+    
+    const csv = [headers.join(','), ...rows.map(row => row.join(','))].join('\n');
+    const blob = new Blob([csv], { type: 'text/csv' });
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'seo-checklist-enhanced.csv';
+    a.click();
+  };
+
+  const getPriorityColor = (priority) => {
+    switch (priority) {
+      case 'CRITICAL': return 'bg-red-100 text-red-800 border-red-300';
+      case 'HIGH': return 'bg-orange-100 text-orange-800 border-orange-300';
+      case 'MEDIUM': return 'bg-yellow-100 text-yellow-800 border-yellow-300';
+      case 'LOW': return 'bg-blue-100 text-blue-800 border-blue-300';
+      default: return 'bg-gray-100 text-gray-800 border-gray-300';
+    }
+  };
+
+  const getRiskColor = (riskLevel) => {
+    switch (riskLevel) {
+      case 'BLOCKER': return 'bg-purple-100 text-purple-800';
+      case 'HIGH RISK': return 'bg-red-100 text-red-800';
+      case 'MEDIUM': return 'bg-yellow-100 text-yellow-800';
+      case 'LOW': return 'bg-green-100 text-green-800';
+      default: return 'bg-gray-100 text-gray-800';
+    }
+  };
+
+  return (
+    <div className="min-h-screen bg-gray-50 p-6">
+      <div className="max-w-7xl mx-auto">
+        {/* Header */}
+        <div className="bg-white rounded-lg shadow-lg p-6 mb-6">
+          <h1 className="text-3xl font-bold text-gray-900 mb-2">SEO Comprehensive Checklist</h1>
+          <p className="text-gray-600 mb-4">Enhanced with Project Type Filtering, Effort Levels, Risk Assessment & Deliverable Types</p>
+          
+          {/* Progress bars */}
+          <div className="mb-4">
+            <div className="flex justify-between mb-1">
+              <span className="text-sm font-medium text-gray-700">Overall Progress</span>
+              <span className="text-sm font-medium text-gray-700">{completedCount} / {totalItems} ({progress}%)</span>
+            </div>
+            <div className="w-full bg-gray-200 rounded-full h-3">
+              <div
+                className="bg-green-600 h-3 rounded-full transition-all duration-300"
+                style={{ width: `${progress}%` }}
+              />
+            </div>
+          </div>
+
+          {filters.projectType !== 'All' && (
+            <div className="mb-4">
+              <div className="flex justify-between mb-1">
+                <span className="text-sm font-medium text-gray-700">{filters.projectType} Progress</span>
+                <span className="text-sm font-medium text-gray-700">{filteredCompletedCount} / {filteredData.length} ({filteredProgress}%)</span>
+              </div>
+              <div className="w-full bg-gray-200 rounded-full h-3">
+                <div
+                  className="bg-blue-600 h-3 rounded-full transition-all duration-300"
+                  style={{ width: `${filteredProgress}%` }}
+                />
+              </div>
+            </div>
+          )}
+
+          {/* Project Type Quick Stats */}
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mt-6">
+            {['Net New Site', 'Site Refresh', 'Campaign Landing Page', 'Microsite'].map(type => {
+              const stats = getProjectTypeStats(type);
+              return (
+                <div key={type} className="bg-gray-50 p-4 rounded-lg border border-gray-200">
+                  <h3 className="font-semibold text-sm text-gray-700 mb-2">{type}</h3>
+                  <p className="text-2xl font-bold text-gray-900">{stats.total}</p>
+                  <p className="text-xs text-gray-600 mt-1">
+                    {stats.critical} Critical • {stats.high} High
+                  </p>
+                  <p className="text-xs text-blue-600 mt-1 font-semibold">
+                    ~{stats.estimatedHours}h estimated
+                  </p>
+                </div>
+              );
+            })}
+          </div>
+
+          {/* Controls */}
+          <div className="flex flex-wrap gap-3 mt-6">
+            <button
+              onClick={() => setShowFilters(!showFilters)}
+              className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+            >
+              <Filter size={18} />
+              {showFilters ? 'Hide Filters' : 'Show Filters'}
+            </button>
+            <button
+              onClick={generatePMReport}
+              className="flex items-center gap-2 px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors"
+            >
+              <Download size={18} />
+              Generate PM Report
+            </button>
+            <button
+              className="flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
+            >
+              <Download size={18} />
+              Export to CSV
+            </button>
+            <label className="flex items-center gap-2 px-4 py-2 bg-gray-200 text-gray-700 rounded-lg cursor-pointer hover:bg-gray-300 transition-colors">
+              <input
+                type="checkbox"
+                checked={filters.hideCompleted}
+                onChange={(e) => setFilters({ ...filters, hideCompleted: e.target.checked })}
+                className="w-4 h-4"
+              />
+              Hide Completed
+            </label>
+            
+            {/* Quick Filters */}
+            <div className="flex items-center gap-2">
+              <span className="text-sm text-gray-600">Quick:</span>
+              <button
+                onClick={() => applyQuickFilter('blockers')}
+                className="px-3 py-2 bg-purple-100 text-purple-800 rounded-lg hover:bg-purple-200 transition-colors text-sm"
+              >
+                Blockers Only
+              </button>
+              <button
+                onClick={() => applyQuickFilter('critical')}
+                className="px-3 py-2 bg-red-100 text-red-800 rounded-lg hover:bg-red-200 transition-colors text-sm"
+              >
+                Critical Only
+              </button>
+              <button
+                onClick={() => applyQuickFilter('clearAll')}
+                className="px-3 py-2 bg-gray-100 text-gray-800 rounded-lg hover:bg-gray-200 transition-colors text-sm"
+              >
+                Clear All
+              </button>
+            </div>
+          </div>
+
+        </div>
+
+        {/* Filters Panel */}
+        {showFilters && (
+          <div className="bg-white rounded-lg shadow-lg p-6 mb-6">
+            <h2 className="text-xl font-bold text-gray-900 mb-4">Filters</h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+              {/* Project Type Filter - Most Important */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Project Type</label>
+                <p className="text-xs text-gray-500 mb-2">Select your project type to see only relevant checklist items</p>
+                <select
+                  value={filters.projectType}
+                  onChange={(e) => setFilters({ ...filters, projectType: e.target.value })}
+                  className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                >
+                  {projectTypes.map(type => (
+                    <option key={type} value={type}>{type}</option>
+                  ))}
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Phase</label>
+                <select
+                  value={filters.phase}
+                  onChange={(e) => setFilters({ ...filters, phase: e.target.value })}
+                  className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                >
+                  {phases.map(phase => (
+                    <option key={phase} value={phase}>{phase}</option>
+                  ))}
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Priority</label>
+                <select
+                  value={filters.priority}
+                  onChange={(e) => setFilters({ ...filters, priority: e.target.value })}
+                  className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                >
+                  {priorities.map(priority => (
+                    <option key={priority} value={priority}>{priority}</option>
+                  ))}
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Risk Level</label>
+                <select
+                  value={filters.riskLevel}
+                  onChange={(e) => setFilters({ ...filters, riskLevel: e.target.value })}
+                  className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                >
+                  {riskLevels.map(level => (
+                    <option key={level} value={level}>{level}</option>
+                  ))}
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Effort Level</label>
+                <select
+                  value={filters.effortLevel}
+                  onChange={(e) => setFilters({ ...filters, effortLevel: e.target.value })}
+                  className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                >
+                  {effortLevels.map(level => (
+                    <option key={level} value={level}>{level}</option>
+                  ))}
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Owner</label>
+                <select
+                  value={filters.owner}
+                  onChange={(e) => setFilters({ ...filters, owner: e.target.value })}
+                  className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                >
+                  {owners.map(owner => (
+                    <option key={owner} value={owner}>{owner}</option>
+                  ))}
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Category</label>
+                <select
+                  value={filters.category}
+                  onChange={(e) => setFilters({ ...filters, category: e.target.value })}
+                  className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                >
+                  {categories.map(category => (
+                    <option key={category} value={category}>{category}</option>
+                  ))}
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Deliverable Type</label>
+                <select
+                  value={filters.deliverableType}
+                  onChange={(e) => setFilters({ ...filters, deliverableType: e.target.value })}
+                  className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                >
+                  {deliverableTypes.map(type => (
+                    <option key={type} value={type}>{type}</option>
+                  ))}
+                </select>
+              </div>
+            </div>
+
+            {/* Search */}
+            <div className="mt-4">
+              <label className="block text-sm font-medium text-gray-700 mb-2">Search Items</label>
+              <div className="relative">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={18} />
+                <input
+                  type="text"
+                  placeholder="Search checklist items..."
+                  value={filters.searchTerm}
+                  onChange={(e) => setFilters({ ...filters, searchTerm: e.target.value })}
+                  className="w-full pl-10 p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                />
+              </div>
+            </div>
+
+            {/* Clear Filters */}
+            <button
+              onClick={() => setFilters({
+                projectType: 'All',
+                phase: 'All',
+                priority: 'All',
+                owner: 'All',
+                category: 'All',
+                effortLevel: 'All',
+                riskLevel: 'All',
+                deliverableType: 'All',
+                searchTerm: '',
+                hideCompleted: false
+              })}
+              className="mt-4 px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors"
+            >
+              Clear All Filters
+            </button>
+          </div>
+        )}
+
+        {/* Checklist Items */}
+        {Object.keys(groupedData).length === 0 ? (
+          <div className="bg-white rounded-lg shadow-lg p-8 text-center">
+            <p className="text-gray-600">No items match your current filters.</p>
+          </div>
+        ) : (
+          Object.entries(groupedData).map(([phase, items]) => (
+            <div key={phase} className="bg-white rounded-lg shadow-lg p-6 mb-6">
+              <h2 className="text-2xl font-bold text-gray-900 mb-4">{phase}</h2>
+              <div className="space-y-3">
+                {items.map(item => (
+                  <div
+                    key={item.id}
+                    className={`border rounded-lg p-4 transition-all ${
+                      completed[item.id]
+                        ? 'bg-green-50 border-green-200'
+                        : 'bg-white border-gray-200 hover:border-blue-300'
+                    }`}
+                  >
+                    <div className="flex items-start gap-3">
+                      <button
+                        onClick={() => toggleComplete(item.id)}
+                        className={`mt-1 flex-shrink-0 w-5 h-5 rounded border-2 flex items-center justify-center transition-all ${
+                          completed[item.id]
+                            ? 'bg-green-600 border-green-600'
+                            : 'border-gray-300 hover:border-green-600'
+                        }`}
+                      >
+                        {completed[item.id] && <Check size={14} className="text-white" />}
+                      </button>
+                      <div className="flex-1">
+                        <p className={`text-gray-900 mb-2 ${completed[item.id] ? 'line-through' : ''}`}>
+                          {item.item}
+                        </p>
+                        <div className="flex flex-wrap gap-2">
+                          <span className={`text-xs px-2 py-1 rounded-full border ${getPriorityColor(item.priority)}`}>
+                            {item.priority}
+                          </span>
+                          <span className={`text-xs px-2 py-1 rounded-full ${getRiskColor(item.riskLevel)}`}>
+                            {item.riskLevel}
+                          </span>
+                          <span className="text-xs px-2 py-1 rounded-full bg-purple-100 text-purple-800">
+                            {item.effortLevel}
+                          </span>
+                          <span className="text-xs px-2 py-1 rounded-full bg-gray-100 text-gray-800">
+                            {item.owner}
+                          </span>
+                          <span className="text-xs px-2 py-1 rounded-full bg-blue-100 text-blue-800">
+                            {item.category}
+                          </span>
+                          <span className="text-xs px-2 py-1 rounded-full bg-indigo-100 text-indigo-800">
+                            {item.deliverableType}
+                          </span>
+                        </div>
+                        <div className="mt-2 text-xs text-gray-600">
+                          <strong>Applicable to:</strong> {item.projectTypes.join(', ')}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          ))
+        )}
+      </div>
+    </div>
+  );
+};
+
+export default SEOChecklist;
