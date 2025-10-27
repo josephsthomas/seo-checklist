@@ -216,7 +216,7 @@ export function generateChecklistPDF(options) {
         item.id.toString(),
         item.priority,
         completions[item.id] ? '✓' : '○',
-        item.item.substring(0, 80) + (item.item.length > 80 ? '...' : ''),
+        item.item, // Full text - autoTable will wrap automatically
         item.owner
       ]);
 
@@ -232,14 +232,15 @@ export function generateChecklistPDF(options) {
           fontSize: 9
         },
         bodyStyles: {
-          fontSize: 8
+          fontSize: 8,
+          cellPadding: 3
         },
         columnStyles: {
           0: { cellWidth: 15 },
           1: { cellWidth: 20 },
           2: { cellWidth: 15, halign: 'center' },
-          3: { cellWidth: 100 },
-          4: { cellWidth: 30 }
+          3: { cellWidth: 'auto', minCellWidth: 80 }, // Auto width with text wrapping
+          4: { cellWidth: 25 }
         },
         alternateRowStyles: { fillColor: [249, 250, 251] },
         margin: { left: 20, right: 20 },
