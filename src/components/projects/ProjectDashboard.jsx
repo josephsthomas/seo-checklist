@@ -70,11 +70,11 @@ export default function ProjectDashboard() {
         <div className="mb-8">
           <div className="flex justify-between items-center mb-6">
             <div>
-              <h1 className="text-3xl font-bold text-gray-900">Projects</h1>
-              <p className="text-gray-600 mt-1">Manage your SEO projects</p>
+              <h1 className="text-3xl font-bold text-gray-900">SEO Planner</h1>
+              <p className="text-gray-600 mt-1">Manage your SEO projects and checklists</p>
             </div>
             <button
-              onClick={() => navigate('/projects/new')}
+              onClick={() => navigate('/planner/new')}
               className="btn btn-primary flex items-center gap-2"
             >
               <Plus className="w-5 h-5" />
@@ -177,7 +177,7 @@ export default function ProjectDashboard() {
             </p>
             {projects.length === 0 && (
               <button
-                onClick={() => navigate('/projects/new')}
+                onClick={() => navigate('/planner/new')}
                 className="btn btn-primary inline-flex items-center gap-2"
               >
                 <Plus className="w-5 h-5" />

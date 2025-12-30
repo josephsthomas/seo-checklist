@@ -122,7 +122,7 @@ export default function ProjectCreationWizard() {
       };
 
       const projectId = await createProject(projectData);
-      navigate(`/projects/${projectId}`);
+      navigate(`/planner/projects/${projectId}`);
     } catch (error) {
       console.error('Error creating project:', error);
     } finally {
@@ -132,7 +132,7 @@ export default function ProjectCreationWizard() {
 
   const handleCancel = () => {
     if (window.confirm('Are you sure you want to cancel? All entered data will be lost.')) {
-      navigate('/projects');
+      navigate('/planner');
     }
   };
 
@@ -145,7 +145,7 @@ export default function ProjectCreationWizard() {
             className="text-gray-600 hover:text-gray-900 flex items-center gap-2 mb-4"
           >
             <ArrowLeft className="w-4 h-4" />
-            Back to Projects
+            Back to SEO Planner
           </button>
           <h1 className="text-3xl font-bold text-gray-900">Create New Project</h1>
           <p className="text-gray-600 mt-1">Set up your SEO project in 4 easy steps</p>

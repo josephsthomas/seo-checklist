@@ -9,10 +9,10 @@ export default function Footer() {
             <div className="w-6 h-6 bg-primary rounded flex items-center justify-center">
               <span className="text-white font-bold text-sm">F</span>
             </div>
-            <span className="font-semibold text-lg">Flipside SEO & MRI Center</span>
+            <span className="font-semibold text-lg">Flipside SEO Portal</span>
           </div>
           <p className="text-sm text-gray-400">
-            For Internal Flipside Group Use Only
+            All-in-one SEO suite for organic health & visibility
           </p>
           <p className="text-xs text-gray-500 mt-2">
             © {new Date().getFullYear()} Flipside Group. All rights reserved.
