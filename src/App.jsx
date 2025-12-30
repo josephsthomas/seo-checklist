@@ -30,6 +30,7 @@ import OnboardingWalkthrough from './components/help/OnboardingWalkthrough';
 
 // Audit Components
 import AuditPage from './components/audit/AuditPage';
+import SharedAuditView from './components/audit/shared/SharedAuditView';
 
 function App() {
   return (
@@ -109,6 +110,11 @@ function App() {
                     <AuditPage />
                   </ProtectedRoute>
                 }
+              />
+              {/* Shared audit view - public access */}
+              <Route
+                path="/audit/shared/:shareId"
+                element={<SharedAuditView />}
               />
 
               {/* ============================================ */}

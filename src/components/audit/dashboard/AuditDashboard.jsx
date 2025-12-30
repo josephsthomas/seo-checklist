@@ -1,5 +1,6 @@
 import React, { useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
+import toast from 'react-hot-toast';
 import {
   ArrowLeft,
   Download,
@@ -18,10 +19,16 @@ import {
   ListChecks,
   Table,
   FileSpreadsheet,
-  FileText
+  FileText,
+  Copy,
+  Check,
+  Lock,
+  X,
+  Loader2
 } from 'lucide-react';
 import { SEVERITY, PRIORITY, CATEGORIES } from '../../../lib/audit/auditEngine';
 import { exportToPDF, exportToExcel } from '../../../lib/audit/exportService';
+import { saveAudit, createShareLink } from '../../../lib/audit/auditStorageService';
 import IssueExplorer from '../explorer/IssueExplorer';
 import PageAuditView from '../explorer/PageAuditView';
 import UrlDataTable from '../explorer/UrlDataTable';
@@ -44,6 +51,14 @@ export default function AuditDashboard({ auditResults, domainInfo, urlData = [],
   const [searchQuery, setSearchQuery] = useState('');
   const [showExportMenu, setShowExportMenu] = useState(false);
   const [exporting, setExporting] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [savedAuditId, setSavedAuditId] = useState(null);
+  const [showShareModal, setShowShareModal] = useState(false);
+  const [shareUrl, setShareUrl] = useState(null);
+  const [sharePassword, setSharePassword] = useState('');
+  const [usePassword, setUsePassword] = useState(false);
+  const [sharingInProgress, setSharingInProgress] = useState(false);
+  const [copiedShareLink, setCopiedShareLink] = useState(false);
 
   const { issues, stats, healthScore, urlCount, timestamp } = auditResults;
 
@@ -202,6 +217,61 @@ export default function AuditDashboard({ auditResults, domainInfo, urlData = [],
     }
   };
 
+  // Save audit to Firestore
+  const handleSaveAudit = async () => {
+    if (savedAuditId) {
+      toast.success('Audit already saved');
+      return;
+    }
+
+    setSaving(true);
+    try {
+      const auditId = await saveAudit(auditResults, urlData, domainInfo);
+      setSavedAuditId(auditId);
+      toast.success('Audit saved successfully');
+    } catch (err) {
+      console.error('Save failed:', err);
+      toast.error(err.message || 'Failed to save audit');
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  // Create share link
+  const handleCreateShareLink = async () => {
+    if (!savedAuditId) {
+      toast.error('Please save the audit first');
+      return;
+    }
+
+    setSharingInProgress(true);
+    try {
+      const result = await createShareLink(savedAuditId, {
+        password: usePassword ? sharePassword : null
+      });
+      setShareUrl(result.shareUrl);
+      toast.success('Share link created');
+    } catch (err) {
+      console.error('Share failed:', err);
+      toast.error(err.message || 'Failed to create share link');
+    } finally {
+      setSharingInProgress(false);
+    }
+  };
+
+  // Copy share link to clipboard
+  const handleCopyShareLink = async () => {
+    if (!shareUrl) return;
+    try {
+      await navigator.clipboard.writeText(shareUrl);
+      setCopiedShareLink(true);
+      setTimeout(() => setCopiedShareLink(false), 2000);
+      toast.success('Link copied to clipboard');
+    } catch (err) {
+      console.error('Copy failed:', err);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
@@ -255,13 +325,30 @@ export default function AuditDashboard({ auditResults, domainInfo, urlData = [],
                   </div>
                 )}
               </div>
-              <button className="btn btn-secondary flex items-center gap-2">
+              <button
+                onClick={() => setShowShareModal(true)}
+                disabled={!savedAuditId}
+                className="btn btn-secondary flex items-center gap-2 disabled:opacity-50"
+                title={!savedAuditId ? 'Save the audit first to share' : 'Share audit'}
+              >
                 <Share2 className="w-4 h-4" />
                 <span className="hidden sm:inline">Share</span>
               </button>
-              <button className="btn btn-primary flex items-center gap-2">
-                <Save className="w-4 h-4" />
-                <span className="hidden sm:inline">Save Audit</span>
+              <button
+                onClick={handleSaveAudit}
+                disabled={saving || savedAuditId}
+                className="btn btn-primary flex items-center gap-2 disabled:opacity-70"
+              >
+                {saving ? (
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                ) : savedAuditId ? (
+                  <Check className="w-4 h-4" />
+                ) : (
+                  <Save className="w-4 h-4" />
+                )}
+                <span className="hidden sm:inline">
+                  {saving ? 'Saving...' : savedAuditId ? 'Saved' : 'Save Audit'}
+                </span>
               </button>
             </div>
           </div>
@@ -544,6 +631,116 @@ export default function AuditDashboard({ auditResults, domainInfo, urlData = [],
           )}
         </div>
       </div>
+      )}
+
+      {/* Share Modal */}
+      {showShareModal && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-xl w-full max-w-md">
+            <div className="px-6 py-4 border-b flex items-center justify-between">
+              <h3 className="text-lg font-semibold text-gray-900">Share Audit</h3>
+              <button
+                onClick={() => {
+                  setShowShareModal(false);
+                  setShareUrl(null);
+                  setSharePassword('');
+                  setUsePassword(false);
+                }}
+                className="p-1 hover:bg-gray-100 rounded"
+              >
+                <X className="w-5 h-5 text-gray-500" />
+              </button>
+            </div>
+
+            <div className="p-6">
+              {!shareUrl ? (
+                <>
+                  <p className="text-gray-600 mb-4">
+                    Create a shareable link for this audit. Anyone with the link can view the results.
+                  </p>
+
+                  <label className="flex items-center gap-3 mb-4 cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={usePassword}
+                      onChange={(e) => setUsePassword(e.target.checked)}
+                      className="rounded border-gray-300"
+                    />
+                    <Lock className="w-4 h-4 text-gray-500" />
+                    <span className="text-sm text-gray-700">Protect with password</span>
+                  </label>
+
+                  {usePassword && (
+                    <input
+                      type="text"
+                      value={sharePassword}
+                      onChange={(e) => setSharePassword(e.target.value)}
+                      placeholder="Enter password"
+                      className="input w-full mb-4"
+                    />
+                  )}
+
+                  <button
+                    onClick={handleCreateShareLink}
+                    disabled={sharingInProgress || (usePassword && !sharePassword.trim())}
+                    className="btn btn-primary w-full flex items-center justify-center gap-2"
+                  >
+                    {sharingInProgress ? (
+                      <Loader2 className="w-4 h-4 animate-spin" />
+                    ) : (
+                      <Share2 className="w-4 h-4" />
+                    )}
+                    {sharingInProgress ? 'Creating...' : 'Create Share Link'}
+                  </button>
+                </>
+              ) : (
+                <>
+                  <p className="text-gray-600 mb-4">
+                    Your share link is ready! Anyone with this link can view the audit.
+                  </p>
+
+                  <div className="flex gap-2 mb-4">
+                    <input
+                      type="text"
+                      value={shareUrl}
+                      readOnly
+                      className="input flex-1 bg-gray-50 text-sm"
+                    />
+                    <button
+                      onClick={handleCopyShareLink}
+                      className="btn btn-secondary flex items-center gap-2"
+                    >
+                      {copiedShareLink ? (
+                        <Check className="w-4 h-4 text-green-500" />
+                      ) : (
+                        <Copy className="w-4 h-4" />
+                      )}
+                    </button>
+                  </div>
+
+                  {usePassword && (
+                    <p className="text-sm text-gray-500 flex items-center gap-2 mb-4">
+                      <Lock className="w-4 h-4" />
+                      Password protected: {sharePassword}
+                    </p>
+                  )}
+
+                  <button
+                    onClick={() => {
+                      setShowShareModal(false);
+                      setShareUrl(null);
+                      setSharePassword('');
+                      setUsePassword(false);
+                    }}
+                    className="btn btn-secondary w-full"
+                  >
+                    Done
+                  </button>
+                </>
+              )}
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );
