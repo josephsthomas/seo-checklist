@@ -13,12 +13,22 @@ import {
   ChevronDown,
   ChevronUp,
   Search,
-  Filter
+  Filter,
+  LayoutDashboard,
+  ListChecks
 } from 'lucide-react';
 import { SEVERITY, PRIORITY, CATEGORIES } from '../../../lib/audit/auditEngine';
+import IssueExplorer from '../explorer/IssueExplorer';
+
+// View tabs
+const TABS = {
+  OVERVIEW: 'overview',
+  EXPLORER: 'explorer'
+};
 
 export default function AuditDashboard({ auditResults, domainInfo, onNewAudit }) {
   const navigate = useNavigate();
+  const [activeTab, setActiveTab] = useState(TABS.OVERVIEW);
   const [expandedIssues, setExpandedIssues] = useState({});
   const [filterSeverity, setFilterSeverity] = useState('all');
   const [filterCategory, setFilterCategory] = useState('all');
@@ -142,9 +152,42 @@ export default function AuditDashboard({ auditResults, domainInfo, onNewAudit })
               </button>
             </div>
           </div>
+
+          {/* Tab Navigation */}
+          <div className="flex gap-1 mt-4">
+            <button
+              onClick={() => setActiveTab(TABS.OVERVIEW)}
+              className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+                activeTab === TABS.OVERVIEW
+                  ? 'bg-cyan-100 text-cyan-700'
+                  : 'text-gray-600 hover:bg-gray-100'
+              }`}
+            >
+              <LayoutDashboard className="w-4 h-4" />
+              Overview
+            </button>
+            <button
+              onClick={() => setActiveTab(TABS.EXPLORER)}
+              className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+                activeTab === TABS.EXPLORER
+                  ? 'bg-cyan-100 text-cyan-700'
+                  : 'text-gray-600 hover:bg-gray-100'
+              }`}
+            >
+              <ListChecks className="w-4 h-4" />
+              Issue Explorer
+            </button>
+          </div>
         </div>
       </div>
 
+      {/* Conditionally render content based on active tab */}
+      {activeTab === TABS.EXPLORER ? (
+        <IssueExplorer
+          issues={issues}
+          onSelectUrl={(url) => console.log('Selected URL:', url)}
+        />
+      ) : (
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Health Score & Stats */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
@@ -365,6 +408,7 @@ export default function AuditDashboard({ auditResults, domainInfo, onNewAudit })
           )}
         </div>
       </div>
+      )}
     </div>
   );
 }
