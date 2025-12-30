@@ -16,9 +16,12 @@ import {
   Filter,
   LayoutDashboard,
   ListChecks,
-  Table
+  Table,
+  FileSpreadsheet,
+  FileText
 } from 'lucide-react';
 import { SEVERITY, PRIORITY, CATEGORIES } from '../../../lib/audit/auditEngine';
+import { exportToPDF, exportToExcel } from '../../../lib/audit/exportService';
 import IssueExplorer from '../explorer/IssueExplorer';
 import PageAuditView from '../explorer/PageAuditView';
 import UrlDataTable from '../explorer/UrlDataTable';
@@ -39,6 +42,8 @@ export default function AuditDashboard({ auditResults, domainInfo, urlData = [],
   const [filterSeverity, setFilterSeverity] = useState('all');
   const [filterCategory, setFilterCategory] = useState('all');
   const [searchQuery, setSearchQuery] = useState('');
+  const [showExportMenu, setShowExportMenu] = useState(false);
+  const [exporting, setExporting] = useState(false);
 
   const { issues, stats, healthScore, urlCount, timestamp } = auditResults;
 
@@ -139,6 +144,64 @@ export default function AuditDashboard({ auditResults, domainInfo, urlData = [],
     setActiveTab(TABS.EXPLORER);
   };
 
+  // Export handlers
+  const handleExportPDF = () => {
+    setExporting(true);
+    setShowExportMenu(false);
+    try {
+      const domain = domainInfo?.domain || 'audit';
+      const dateStr = new Date().toISOString().split('T')[0];
+      exportToPDF(
+        {
+          issues,
+          summary: {
+            healthScore,
+            errors: stats.errors,
+            warnings: stats.warnings,
+            info: stats.info,
+            urlsAnalyzed: urlCount
+          }
+        },
+        {
+          filename: `seo-audit-${domain}-${dateStr}.pdf`
+        }
+      );
+    } catch (err) {
+      console.error('PDF export failed:', err);
+    } finally {
+      setExporting(false);
+    }
+  };
+
+  const handleExportExcel = () => {
+    setExporting(true);
+    setShowExportMenu(false);
+    try {
+      const domain = domainInfo?.domain || 'audit';
+      const dateStr = new Date().toISOString().split('T')[0];
+      exportToExcel(
+        {
+          issues,
+          summary: {
+            healthScore,
+            errors: stats.errors,
+            warnings: stats.warnings,
+            info: stats.info,
+            urlsAnalyzed: urlCount
+          }
+        },
+        urlData,
+        {
+          filename: `seo-audit-${domain}-${dateStr}.xlsx`
+        }
+      );
+    } catch (err) {
+      console.error('Excel export failed:', err);
+    } finally {
+      setExporting(false);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
@@ -162,10 +225,36 @@ export default function AuditDashboard({ auditResults, domainInfo, urlData = [],
             </div>
 
             <div className="flex items-center gap-2">
-              <button className="btn btn-secondary flex items-center gap-2">
-                <Download className="w-4 h-4" />
-                <span className="hidden sm:inline">Export PDF</span>
-              </button>
+              <div className="relative">
+                <button
+                  onClick={() => setShowExportMenu(!showExportMenu)}
+                  disabled={exporting}
+                  className="btn btn-secondary flex items-center gap-2"
+                >
+                  <Download className={`w-4 h-4 ${exporting ? 'animate-pulse' : ''}`} />
+                  <span className="hidden sm:inline">{exporting ? 'Exporting...' : 'Export'}</span>
+                  <ChevronDown className="w-4 h-4" />
+                </button>
+
+                {showExportMenu && (
+                  <div className="absolute right-0 top-full mt-1 bg-white border rounded-lg shadow-lg py-1 z-20 w-48">
+                    <button
+                      onClick={handleExportPDF}
+                      className="w-full px-4 py-2 text-left text-sm hover:bg-gray-50 flex items-center gap-3"
+                    >
+                      <FileText className="w-4 h-4 text-red-500" />
+                      Export as PDF
+                    </button>
+                    <button
+                      onClick={handleExportExcel}
+                      className="w-full px-4 py-2 text-left text-sm hover:bg-gray-50 flex items-center gap-3"
+                    >
+                      <FileSpreadsheet className="w-4 h-4 text-green-500" />
+                      Export as Excel
+                    </button>
+                  </div>
+                )}
+              </div>
               <button className="btn btn-secondary flex items-center gap-2">
                 <Share2 className="w-4 h-4" />
                 <span className="hidden sm:inline">Share</span>
