@@ -16,6 +16,7 @@ import {
   Zap
 } from 'lucide-react';
 import { SEVERITY, PRIORITY } from '../../../lib/audit/auditEngine';
+import AISuggestions from '../ai/AISuggestions';
 
 export default function PageAuditView({ url, urlData, issues, onBack }) {
   const [copied, setCopied] = React.useState(false);
@@ -236,6 +237,13 @@ export default function PageAuditView({ url, urlData, issues, onBack }) {
                   </div>
                 )}
               </div>
+            </div>
+          )}
+
+          {/* AI Suggestions */}
+          {urlData && (
+            <div className="mb-6">
+              <AISuggestions pageData={{ url, ...urlData }} />
             </div>
           )}
 
