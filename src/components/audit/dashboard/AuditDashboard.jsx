@@ -15,16 +15,19 @@ import {
   Search,
   Filter,
   LayoutDashboard,
-  ListChecks
+  ListChecks,
+  Table
 } from 'lucide-react';
 import { SEVERITY, PRIORITY, CATEGORIES } from '../../../lib/audit/auditEngine';
 import IssueExplorer from '../explorer/IssueExplorer';
 import PageAuditView from '../explorer/PageAuditView';
+import UrlDataTable from '../explorer/UrlDataTable';
 
 // View tabs
 const TABS = {
   OVERVIEW: 'overview',
   EXPLORER: 'explorer',
+  URLS: 'urls',
   PAGE: 'page'
 };
 
@@ -198,6 +201,17 @@ export default function AuditDashboard({ auditResults, domainInfo, urlData = [],
               <ListChecks className="w-4 h-4" />
               Issue Explorer
             </button>
+            <button
+              onClick={() => setActiveTab(TABS.URLS)}
+              className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+                activeTab === TABS.URLS
+                  ? 'bg-cyan-100 text-cyan-700'
+                  : 'text-gray-600 hover:bg-gray-100'
+              }`}
+            >
+              <Table className="w-4 h-4" />
+              URL Data
+            </button>
           </div>
         </div>
       </div>
@@ -209,6 +223,11 @@ export default function AuditDashboard({ auditResults, domainInfo, urlData = [],
           urlData={selectedUrlData}
           issues={issues}
           onBack={handleBackFromPage}
+        />
+      ) : activeTab === TABS.URLS ? (
+        <UrlDataTable
+          urlData={urlData}
+          onSelectUrl={handleSelectUrl}
         />
       ) : activeTab === TABS.EXPLORER ? (
         <IssueExplorer
