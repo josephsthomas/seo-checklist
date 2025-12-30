@@ -1,36 +1,48 @@
-import React from 'react';
+import React, { Suspense, lazy } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { Toaster } from 'react-hot-toast';
 import { AuthProvider } from './contexts/AuthContext';
 
-// Auth Components
+// Auth Components (keep eager - needed for initial auth)
 import LoginForm from './components/auth/LoginForm';
 import RegisterForm from './components/auth/RegisterForm';
 import ProtectedRoute from './components/auth/ProtectedRoute';
 
-// Layout Components
+// Layout Components (keep eager - always needed)
 import Navigation from './components/shared/Navigation';
 import Footer from './components/shared/Footer';
 
-// Home Components
+// Home - eager load for fast initial render
 import HomePage from './components/home/HomePage';
 
-// SEO Planner Components (formerly Checklist)
-import ProjectDashboard from './components/projects/ProjectDashboard';
-import ProjectCreationWizard from './components/projects/ProjectCreationWizard';
-import MyTasksPage from './components/projects/MyTasksPage';
-import TeamManagementPage from './components/projects/TeamManagementPage';
-import SEOChecklist from './components/checklist/SEOChecklist';
+// Lazy loaded components for code splitting
+const ProjectDashboard = lazy(() => import('./components/projects/ProjectDashboard'));
+const ProjectCreationWizard = lazy(() => import('./components/projects/ProjectCreationWizard'));
+const MyTasksPage = lazy(() => import('./components/projects/MyTasksPage'));
+const TeamManagementPage = lazy(() => import('./components/projects/TeamManagementPage'));
+const SEOChecklist = lazy(() => import('./components/checklist/SEOChecklist'));
 
-// Help Components
-import ResourceLibrary from './components/help/ResourceLibrary';
-import GlossaryPage from './components/help/GlossaryPage';
+// Help Components - lazy load
+const ResourceLibrary = lazy(() => import('./components/help/ResourceLibrary'));
+const GlossaryPage = lazy(() => import('./components/help/GlossaryPage'));
 import KeyboardShortcuts from './components/help/KeyboardShortcuts';
 import OnboardingWalkthrough from './components/help/OnboardingWalkthrough';
 
-// Audit Components
-import AuditPage from './components/audit/AuditPage';
-import SharedAuditView from './components/audit/shared/SharedAuditView';
+// Audit Components - lazy load (heaviest components with xlsx, jspdf)
+const AuditPage = lazy(() => import('./components/audit/AuditPage'));
+const SharedAuditView = lazy(() => import('./components/audit/shared/SharedAuditView'));
+
+// Loading fallback component
+function PageLoader() {
+  return (
+    <div className="min-h-screen flex items-center justify-center">
+      <div className="text-center">
+        <div className="w-12 h-12 border-4 border-cyan-600 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+        <p className="text-gray-600">Loading...</p>
+      </div>
+    </div>
+  );
+}
 
 function App() {
   return (
@@ -44,10 +56,11 @@ function App() {
           <OnboardingWalkthrough />
           <KeyboardShortcuts />
           <main id="main-content" className="flex-1">
-            <Routes>
-              {/* Public Routes */}
-              <Route path="/login" element={<LoginForm />} />
-              <Route path="/register" element={<RegisterForm />} />
+            <Suspense fallback={<PageLoader />}>
+              <Routes>
+                {/* Public Routes */}
+                <Route path="/login" element={<LoginForm />} />
+                <Route path="/register" element={<RegisterForm />} />
 
               {/* Home - Portal Dashboard */}
               <Route
@@ -168,7 +181,8 @@ function App() {
                   </div>
                 }
               />
-            </Routes>
+              </Routes>
+            </Suspense>
           </main>
 
           {/* Footer */}
