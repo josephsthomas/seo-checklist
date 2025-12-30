@@ -19,16 +19,19 @@ import {
 } from 'lucide-react';
 import { SEVERITY, PRIORITY, CATEGORIES } from '../../../lib/audit/auditEngine';
 import IssueExplorer from '../explorer/IssueExplorer';
+import PageAuditView from '../explorer/PageAuditView';
 
 // View tabs
 const TABS = {
   OVERVIEW: 'overview',
-  EXPLORER: 'explorer'
+  EXPLORER: 'explorer',
+  PAGE: 'page'
 };
 
-export default function AuditDashboard({ auditResults, domainInfo, onNewAudit }) {
+export default function AuditDashboard({ auditResults, domainInfo, urlData = [], onNewAudit }) {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState(TABS.OVERVIEW);
+  const [selectedUrl, setSelectedUrl] = useState(null);
   const [expandedIssues, setExpandedIssues] = useState({});
   const [filterSeverity, setFilterSeverity] = useState('all');
   const [filterCategory, setFilterCategory] = useState('all');
@@ -115,6 +118,24 @@ export default function AuditDashboard({ auditResults, domainInfo, onNewAudit })
     return [...new Set(issues.map(i => i.category))].sort();
   }, [issues]);
 
+  // Find URL data for selected URL
+  const selectedUrlData = useMemo(() => {
+    if (!selectedUrl || !urlData.length) return null;
+    return urlData.find(row => row.address === selectedUrl);
+  }, [selectedUrl, urlData]);
+
+  // Handle URL selection from Issue Explorer
+  const handleSelectUrl = (url) => {
+    setSelectedUrl(url);
+    setActiveTab(TABS.PAGE);
+  };
+
+  // Handle back from Page Audit View
+  const handleBackFromPage = () => {
+    setSelectedUrl(null);
+    setActiveTab(TABS.EXPLORER);
+  };
+
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
@@ -182,10 +203,17 @@ export default function AuditDashboard({ auditResults, domainInfo, onNewAudit })
       </div>
 
       {/* Conditionally render content based on active tab */}
-      {activeTab === TABS.EXPLORER ? (
+      {activeTab === TABS.PAGE && selectedUrl ? (
+        <PageAuditView
+          url={selectedUrl}
+          urlData={selectedUrlData}
+          issues={issues}
+          onBack={handleBackFromPage}
+        />
+      ) : activeTab === TABS.EXPLORER ? (
         <IssueExplorer
           issues={issues}
-          onSelectUrl={(url) => console.log('Selected URL:', url)}
+          onSelectUrl={handleSelectUrl}
         />
       ) : (
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">

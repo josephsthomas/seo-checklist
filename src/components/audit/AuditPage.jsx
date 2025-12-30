@@ -23,6 +23,7 @@ export default function AuditPage() {
   const [fileName, setFileName] = useState('');
   const [auditResults, setAuditResults] = useState(null);
   const [domainInfo, setDomainInfo] = useState(null);
+  const [urlData, setUrlData] = useState([]);
   const [error, setError] = useState(null);
 
   const handleFileSelect = useCallback(async (file) => {
@@ -67,6 +68,9 @@ export default function AuditPage() {
       // Extract domain info
       const domain = extractDomainInfo(internalData.rows);
       setDomainInfo(domain);
+
+      // Store URL data for page-level analysis
+      setUrlData(internalData.rows);
 
       // Parse other files for additional data
       setProgress(60);
@@ -120,6 +124,7 @@ export default function AuditPage() {
     setFileName('');
     setAuditResults(null);
     setDomainInfo(null);
+    setUrlData([]);
     setError(null);
   }, []);
 
@@ -143,6 +148,7 @@ export default function AuditPage() {
         <AuditDashboard
           auditResults={auditResults}
           domainInfo={domainInfo}
+          urlData={urlData}
           onNewAudit={handleNewAudit}
         />
       );
