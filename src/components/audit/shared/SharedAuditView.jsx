@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import {
   Lock,
@@ -29,11 +29,7 @@ export default function SharedAuditView() {
   const [auditData, setAuditData] = useState(null);
   const [expandedIssues, setExpandedIssues] = useState({});
 
-  useEffect(() => {
-    loadAudit();
-  }, [shareId]);
-
-  const loadAudit = async (pwd = null) => {
+  const loadAudit = useCallback(async (pwd = null) => {
     setLoading(true);
     setError(null);
     setPasswordError(null);
@@ -58,7 +54,11 @@ export default function SharedAuditView() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [shareId]);
+
+  useEffect(() => {
+    loadAudit();
+  }, [loadAudit]);
 
   const handlePasswordSubmit = (e) => {
     e.preventDefault();
@@ -93,7 +93,7 @@ export default function SharedAuditView() {
     };
     return (
       <span className={`px-2 py-0.5 text-xs font-medium rounded ${styles[priority] || styles[PRIORITY.COULD]}`}>
-        {priority.toUpperCase()}
+        {(priority || 'could').toUpperCase()}
       </span>
     );
   };

@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
 import {
@@ -59,6 +59,25 @@ export default function AuditDashboard({ auditResults, domainInfo, urlData = [],
   const [usePassword, setUsePassword] = useState(false);
   const [sharingInProgress, setSharingInProgress] = useState(false);
   const [copiedShareLink, setCopiedShareLink] = useState(false);
+
+  // Ref for export menu dropdown
+  const exportMenuRef = useRef(null);
+
+  // Close export menu when clicking outside
+  useEffect(() => {
+    function handleClickOutside(event) {
+      if (exportMenuRef.current && !exportMenuRef.current.contains(event.target)) {
+        setShowExportMenu(false);
+      }
+    }
+
+    if (showExportMenu) {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [showExportMenu]);
 
   const { issues, stats, healthScore, urlCount, timestamp } = auditResults;
 
@@ -124,7 +143,7 @@ export default function AuditDashboard({ auditResults, domainInfo, urlData = [],
     };
     return (
       <span className={`px-2 py-0.5 text-xs font-medium rounded ${styles[priority] || styles[PRIORITY.COULD]}`}>
-        {priority.toUpperCase()}
+        {(priority || 'could').toUpperCase()}
       </span>
     );
   };
@@ -295,7 +314,7 @@ export default function AuditDashboard({ auditResults, domainInfo, urlData = [],
             </div>
 
             <div className="flex items-center gap-2">
-              <div className="relative">
+              <div className="relative" ref={exportMenuRef}>
                 <button
                   onClick={() => setShowExportMenu(!showExportMenu)}
                   disabled={exporting}

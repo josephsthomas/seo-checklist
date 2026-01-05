@@ -114,7 +114,7 @@ export function exportToPDF(auditResults, options = {}) {
         body: groupedIssues.errors.map(issue => [
           issue.title,
           issue.category,
-          issue.priority.toUpperCase(),
+          (issue.priority || 'could').toUpperCase(),
           issue.affectedUrls?.length || 0
         ]),
         theme: 'striped',
@@ -140,7 +140,7 @@ export function exportToPDF(auditResults, options = {}) {
         body: groupedIssues.warnings.map(issue => [
           issue.title,
           issue.category,
-          issue.priority.toUpperCase(),
+          (issue.priority || 'could').toUpperCase(),
           issue.affectedUrls?.length || 0
         ]),
         theme: 'striped',
@@ -166,7 +166,7 @@ export function exportToPDF(auditResults, options = {}) {
         body: groupedIssues.info.map(issue => [
           issue.title,
           issue.category,
-          issue.priority.toUpperCase(),
+          (issue.priority || 'could').toUpperCase(),
           issue.affectedUrls?.length || 0
         ]),
         theme: 'striped',
@@ -202,7 +202,7 @@ export function exportToPDF(auditResults, options = {}) {
 
       doc.setFontSize(9);
       doc.setTextColor(107, 114, 128);
-      doc.text(`Category: ${issue.category} | Priority: ${issue.priority.toUpperCase()} | Affected: ${issue.affectedUrls?.length || 0} URLs`, 14, yPos);
+      doc.text(`Category: ${issue.category} | Priority: ${(issue.priority || 'could').toUpperCase()} | Affected: ${issue.affectedUrls?.length || 0} URLs`, 14, yPos);
       yPos += 5;
 
       // Description

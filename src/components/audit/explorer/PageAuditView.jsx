@@ -67,7 +67,7 @@ export default function PageAuditView({ url, urlData, issues, onBack }) {
     };
     return (
       <span className={`px-2 py-0.5 text-xs font-medium rounded ${styles[priority] || styles[PRIORITY.COULD]}`}>
-        {priority.toUpperCase()}
+        {(priority || 'could').toUpperCase()}
       </span>
     );
   };
