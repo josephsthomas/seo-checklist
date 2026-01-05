@@ -280,7 +280,7 @@ export default function Navigation() {
                 <Link
                   to="/audit"
                   onClick={() => setMobileMenuOpen(false)}
-                  className={`nav-link ${isToolActive('/audit') ? 'bg-cyan-50 text-cyan-700' : ''}`}
+                  className={`nav-link ${isToolActive('/audit') ? 'nav-link-active' : ''}`}
                 >
                   <Search className="w-5 h-5" />
                   <span>Technical Audit</span>
