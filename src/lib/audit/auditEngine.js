@@ -169,10 +169,12 @@ function calculateHealthScore(issues, totalUrls) {
 
   issues.forEach(issue => {
     const severityPenalties = penalties[issue.severity] || penalties[SEVERITY.INFO];
-    const penalty = severityPenalties[issue.priority] || 0.1;
+    const priorityKey = issue.priority || PRIORITY.COULD;
+    const penalty = severityPenalties[priorityKey] || 0.1;
 
     // Scale penalty by affected URL count relative to total
-    const affectedRatio = (issue.affectedUrls?.length || 1) / totalUrls;
+    const affectedCount = Array.isArray(issue.affectedUrls) ? issue.affectedUrls.length : (issue.count || 1);
+    const affectedRatio = affectedCount / totalUrls;
     totalPenalty += penalty * Math.min(affectedRatio * 100, 10); // Cap per-issue penalty
   });
 

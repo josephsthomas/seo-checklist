@@ -11,6 +11,7 @@ import ProtectedRoute from './components/auth/ProtectedRoute';
 // Layout Components (keep eager - always needed)
 import Navigation from './components/shared/Navigation';
 import Footer from './components/shared/Footer';
+import ErrorBoundary from './components/shared/ErrorBoundary';
 
 // Home - eager load for fast initial render
 import HomePage from './components/home/HomePage';
@@ -56,8 +57,9 @@ function App() {
           <OnboardingWalkthrough />
           <KeyboardShortcuts />
           <main id="main-content" className="flex-1">
-            <Suspense fallback={<PageLoader />}>
-              <Routes>
+            <ErrorBoundary message="Failed to load this page. This might be a temporary issue.">
+              <Suspense fallback={<PageLoader />}>
+                <Routes>
                 {/* Public Routes */}
                 <Route path="/login" element={<LoginForm />} />
                 <Route path="/register" element={<RegisterForm />} />
@@ -181,8 +183,9 @@ function App() {
                   </div>
                 }
               />
-              </Routes>
-            </Suspense>
+                </Routes>
+              </Suspense>
+            </ErrorBoundary>
           </main>
 
           {/* Footer */}

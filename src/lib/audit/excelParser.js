@@ -277,8 +277,9 @@ export function extractDomainInfo(rows) {
       if (parts.length > 2) {
         subdomains.add(parts[0]);
       }
-    } catch {
-      // Invalid URL, skip
+    } catch (err) {
+      // Log invalid URLs for debugging
+      console.warn('Invalid URL during domain extraction:', url, err.message);
     }
   });
 

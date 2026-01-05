@@ -1,32 +1,71 @@
 /**
  * AI Suggestion Service for SEO Content Optimization
  * Uses Claude API to generate title, meta description, and heading suggestions
+ *
+ * SECURITY NOTE: In production, API calls should be proxied through a backend
+ * to avoid exposing the API key. Set VITE_AI_PROXY_URL to use a backend proxy.
  */
 
 const CLAUDE_API_URL = 'https://api.anthropic.com/v1/messages';
 
 /**
- * Get Claude API key from environment
+ * Get API configuration
+ * Prefers backend proxy if configured, falls back to direct API (dev only)
  */
-function getApiKey() {
-  const key = import.meta.env.VITE_CLAUDE_API_KEY;
-  if (!key) {
-    throw new Error('VITE_CLAUDE_API_KEY is not configured. Add it to your .env file.');
+function getApiConfig() {
+  const proxyUrl = import.meta.env.VITE_AI_PROXY_URL;
+  const apiKey = import.meta.env.VITE_CLAUDE_API_KEY;
+
+  if (proxyUrl) {
+    // Production: Use backend proxy (recommended)
+    return { useProxy: true, proxyUrl };
   }
-  return key;
+
+  if (apiKey) {
+    // Development only: Direct API access
+    if (import.meta.env.PROD) {
+      console.warn('⚠️ Direct Claude API access in production is not recommended. Configure VITE_AI_PROXY_URL for security.');
+    }
+    return { useProxy: false, apiKey };
+  }
+
+  throw new Error('AI not configured. Set VITE_AI_PROXY_URL (recommended) or VITE_CLAUDE_API_KEY in your .env file.');
 }
 
 /**
- * Call Claude API
+ * Call Claude API (via proxy or direct)
  */
 async function callClaude(prompt, maxTokens = 1024) {
-  const apiKey = getApiKey();
+  const config = getApiConfig();
 
+  if (config.useProxy) {
+    // Use backend proxy (secure, recommended for production)
+    const response = await fetch(config.proxyUrl, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        prompt,
+        maxTokens
+      })
+    });
+
+    if (!response.ok) {
+      const error = await response.json().catch(() => ({}));
+      throw new Error(error.error?.message || `Proxy request failed: ${response.status}`);
+    }
+
+    const data = await response.json();
+    return data.content || data.text || data.response;
+  }
+
+  // Direct API access (development only)
   const response = await fetch(CLAUDE_API_URL, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
-      'x-api-key': apiKey,
+      'x-api-key': config.apiKey,
       'anthropic-version': '2023-06-01',
       'anthropic-dangerous-direct-browser-access': 'true'
     },
@@ -239,11 +278,11 @@ Respond in JSON format only:
 }
 
 /**
- * Check if AI features are available (API key configured)
+ * Check if AI features are available (proxy or API key configured)
  */
 export function isAIAvailable() {
   try {
-    return !!import.meta.env.VITE_CLAUDE_API_KEY;
+    return !!(import.meta.env.VITE_AI_PROXY_URL || import.meta.env.VITE_CLAUDE_API_KEY);
   } catch {
     return false;
   }

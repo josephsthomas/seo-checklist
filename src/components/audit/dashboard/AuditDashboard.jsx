@@ -26,7 +26,7 @@ import {
   X,
   Loader2
 } from 'lucide-react';
-import { SEVERITY, PRIORITY, CATEGORIES } from '../../../lib/audit/auditEngine';
+import { SEVERITY, PRIORITY } from '../../../lib/audit/auditEngine';
 import { exportToPDF, exportToExcel } from '../../../lib/audit/exportService';
 import { saveAudit, createShareLink } from '../../../lib/audit/auditStorageService';
 import IssueExplorer from '../explorer/IssueExplorer';
@@ -200,8 +200,10 @@ export default function AuditDashboard({ auditResults, domainInfo, urlData = [],
           filename: `seo-audit-${domain}-${dateStr}.pdf`
         }
       );
+      toast.success('PDF exported successfully');
     } catch (err) {
       console.error('PDF export failed:', err);
+      toast.error('Failed to export PDF. Please try again.');
     } finally {
       setExporting(false);
     }
@@ -229,8 +231,10 @@ export default function AuditDashboard({ auditResults, domainInfo, urlData = [],
           filename: `seo-audit-${domain}-${dateStr}.xlsx`
         }
       );
+      toast.success('Excel exported successfully');
     } catch (err) {
       console.error('Excel export failed:', err);
+      toast.error('Failed to export Excel. Please try again.');
     } finally {
       setExporting(false);
     }
@@ -301,6 +305,7 @@ export default function AuditDashboard({ auditResults, domainInfo, urlData = [],
               <button
                 onClick={onNewAudit}
                 className="flex items-center gap-2 text-gray-600 hover:text-gray-900"
+                aria-label="Start new audit"
               >
                 <ArrowLeft className="w-4 h-4" />
                 <span className="hidden sm:inline">New Audit</span>
@@ -349,6 +354,7 @@ export default function AuditDashboard({ auditResults, domainInfo, urlData = [],
                 disabled={!savedAuditId}
                 className="btn btn-secondary flex items-center gap-2 disabled:opacity-50"
                 title={!savedAuditId ? 'Save the audit first to share' : 'Share audit'}
+                aria-label={!savedAuditId ? 'Save the audit first to share' : 'Share audit'}
               >
                 <Share2 className="w-4 h-4" />
                 <span className="hidden sm:inline">Share</span>
@@ -357,6 +363,7 @@ export default function AuditDashboard({ auditResults, domainInfo, urlData = [],
                 onClick={handleSaveAudit}
                 disabled={saving || savedAuditId}
                 className="btn btn-primary flex items-center gap-2 disabled:opacity-70"
+                aria-label={saving ? 'Saving audit' : savedAuditId ? 'Audit saved' : 'Save audit'}
               >
                 {saving ? (
                   <Loader2 className="w-4 h-4 animate-spin" />
@@ -740,7 +747,7 @@ export default function AuditDashboard({ auditResults, domainInfo, urlData = [],
                   {usePassword && (
                     <p className="text-sm text-gray-500 flex items-center gap-2 mb-4">
                       <Lock className="w-4 h-4" />
-                      Password protected: {sharePassword}
+                      Password protected: {'•'.repeat(sharePassword.length)}
                     </p>
                   )}
 

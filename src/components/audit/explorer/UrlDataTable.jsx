@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useRef, useEffect, useDeferredValue } from 'react';
 import {
   Search,
   ArrowUpDown,
@@ -34,8 +34,9 @@ const COLUMNS = [
 
 const PAGE_SIZES = [25, 50, 100, 250];
 
-export default function UrlDataTable({ urlData, onSelectUrl }) {
+export default function UrlDataTable({ urlData, onSelectUrl, isLoading = false }) {
   const [searchQuery, setSearchQuery] = useState('');
+  const deferredSearchQuery = useDeferredValue(searchQuery);
   const [sortColumn, setSortColumn] = useState('address');
   const [sortDirection, setSortDirection] = useState('asc');
   const [currentPage, setCurrentPage] = useState(1);
@@ -45,14 +46,28 @@ export default function UrlDataTable({ urlData, onSelectUrl }) {
   );
   const [showColumnPicker, setShowColumnPicker] = useState(false);
   const [statusFilter, setStatusFilter] = useState('all');
+  const columnPickerRef = useRef(null);
+
+  // Click outside handler for column picker
+  useEffect(() => {
+    function handleClickOutside(event) {
+      if (columnPickerRef.current && !columnPickerRef.current.contains(event.target)) {
+        setShowColumnPicker(false);
+      }
+    }
+    if (showColumnPicker) {
+      document.addEventListener('mousedown', handleClickOutside);
+      return () => document.removeEventListener('mousedown', handleClickOutside);
+    }
+  }, [showColumnPicker]);
 
   // Filter and sort data
   const filteredData = useMemo(() => {
     let result = urlData || [];
 
     // Search filter
-    if (searchQuery) {
-      const query = searchQuery.toLowerCase();
+    if (deferredSearchQuery) {
+      const query = deferredSearchQuery.toLowerCase();
       result = result.filter(row =>
         row.address?.toLowerCase().includes(query) ||
         row.title1?.toLowerCase().includes(query)
@@ -96,7 +111,7 @@ export default function UrlDataTable({ urlData, onSelectUrl }) {
     });
 
     return result;
-  }, [urlData, searchQuery, statusFilter, sortColumn, sortDirection]);
+  }, [urlData, deferredSearchQuery, statusFilter, sortColumn, sortDirection]);
 
   // Pagination
   const totalPages = Math.ceil(filteredData.length / pageSize);
@@ -108,7 +123,7 @@ export default function UrlDataTable({ urlData, onSelectUrl }) {
   // Reset page when filters change
   React.useEffect(() => {
     setCurrentPage(1);
-  }, [searchQuery, statusFilter, pageSize]);
+  }, [deferredSearchQuery, statusFilter, pageSize]);
 
   const handleSort = (columnId) => {
     if (sortColumn === columnId) {
@@ -227,7 +242,7 @@ export default function UrlDataTable({ urlData, onSelectUrl }) {
             <option value="non-indexable">Non-Indexable</option>
           </select>
 
-          <div className="relative">
+          <div className="relative" ref={columnPickerRef}>
             <button
               onClick={() => setShowColumnPicker(!showColumnPicker)}
               className="btn btn-secondary flex items-center gap-2"
@@ -292,7 +307,17 @@ export default function UrlDataTable({ urlData, onSelectUrl }) {
             </tr>
           </thead>
           <tbody className="bg-white divide-y divide-gray-200">
-            {paginatedData.length === 0 ? (
+            {isLoading ? (
+              <tr>
+                <td
+                  colSpan={visibleColumns.length}
+                  className="px-4 py-12 text-center text-gray-500"
+                >
+                  <div className="w-8 h-8 border-4 border-cyan-600 border-t-transparent rounded-full animate-spin mx-auto mb-2"></div>
+                  Loading URL data...
+                </td>
+              </tr>
+            ) : paginatedData.length === 0 ? (
               <tr>
                 <td
                   colSpan={visibleColumns.length}
@@ -340,6 +365,7 @@ export default function UrlDataTable({ urlData, onSelectUrl }) {
             onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
             disabled={currentPage === 1}
             className="p-2 rounded hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed"
+            aria-label="Previous page"
           >
             <ChevronLeft className="w-5 h-5" />
           </button>
@@ -352,6 +378,7 @@ export default function UrlDataTable({ urlData, onSelectUrl }) {
             onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
             disabled={currentPage >= totalPages}
             className="p-2 rounded hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed"
+            aria-label="Next page"
           >
             <ChevronRight className="w-5 h-5" />
           </button>

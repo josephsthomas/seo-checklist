@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useDeferredValue } from 'react';
 import {
   Search,
   Filter,
@@ -21,6 +21,7 @@ import { SEVERITY, PRIORITY } from '../../../lib/audit/auditEngine';
 export default function IssueExplorer({ issues, onSelectUrl, onClose }) {
   // Filter state
   const [searchQuery, setSearchQuery] = useState('');
+  const deferredSearchQuery = useDeferredValue(searchQuery);
   const [filterSeverity, setFilterSeverity] = useState('all');
   const [filterCategory, setFilterCategory] = useState('all');
   const [filterPriority, setFilterPriority] = useState('all');
@@ -46,12 +47,13 @@ export default function IssueExplorer({ issues, onSelectUrl, onClose }) {
       if (filterSeverity !== 'all' && issue.severity !== filterSeverity) return false;
       if (filterCategory !== 'all' && issue.category !== filterCategory) return false;
       if (filterPriority !== 'all' && issue.priority !== filterPriority) return false;
-      if (searchQuery) {
-        const query = searchQuery.toLowerCase();
+      if (deferredSearchQuery) {
+        const query = deferredSearchQuery.toLowerCase();
         return (
           issue.title.toLowerCase().includes(query) ||
           issue.description.toLowerCase().includes(query) ||
-          issue.category.toLowerCase().includes(query)
+          issue.category.toLowerCase().includes(query) ||
+          issue.affectedUrls?.some(url => url.toLowerCase().includes(query))
         );
       }
       return true;
@@ -82,7 +84,7 @@ export default function IssueExplorer({ issues, onSelectUrl, onClose }) {
     });
 
     return result;
-  }, [issues, filterSeverity, filterCategory, filterPriority, searchQuery, sortBy, sortOrder]);
+  }, [issues, filterSeverity, filterCategory, filterPriority, deferredSearchQuery, sortBy, sortOrder]);
 
   // Calculate stats for filtered results
   const stats = useMemo(() => ({
@@ -204,12 +206,12 @@ export default function IssueExplorer({ issues, onSelectUrl, onClose }) {
 
   const getPriorityBadge = (priority) => {
     const styles = {
-      [PRIORITY.MUST]: 'bg-red-100 text-red-700 border-red-200',
-      [PRIORITY.SHOULD]: 'bg-amber-100 text-amber-700 border-amber-200',
-      [PRIORITY.COULD]: 'bg-blue-100 text-blue-700 border-blue-200'
+      [PRIORITY.MUST]: 'bg-red-100 text-red-700',
+      [PRIORITY.SHOULD]: 'bg-amber-100 text-amber-700',
+      [PRIORITY.COULD]: 'bg-blue-100 text-blue-700'
     };
     return (
-      <span className={`px-2 py-0.5 text-xs font-medium rounded border ${styles[priority] || styles[PRIORITY.COULD]}`}>
+      <span className={`px-2 py-0.5 text-xs font-medium rounded ${styles[priority] || styles[PRIORITY.COULD]}`}>
         {(priority || 'could').toUpperCase()}
       </span>
     );
@@ -318,6 +320,7 @@ export default function IssueExplorer({ issues, onSelectUrl, onClose }) {
               onClick={() => setViewMode('list')}
               className={`p-1.5 rounded ${viewMode === 'list' ? 'bg-gray-100' : 'hover:bg-gray-50'}`}
               title="List view"
+              aria-label="Switch to list view"
             >
               <List className="w-4 h-4" />
             </button>
@@ -325,6 +328,7 @@ export default function IssueExplorer({ issues, onSelectUrl, onClose }) {
               onClick={() => setViewMode('grid')}
               className={`p-1.5 rounded ${viewMode === 'grid' ? 'bg-gray-100' : 'hover:bg-gray-50'}`}
               title="Grid view"
+              aria-label="Switch to grid view"
             >
               <LayoutGrid className="w-4 h-4" />
             </button>
@@ -441,6 +445,11 @@ export default function IssueExplorer({ issues, onSelectUrl, onClose }) {
                 </div>
 
                 {/* Expanded Details */}
+                <div
+                  className={`overflow-hidden transition-all duration-300 ease-in-out ${
+                    expandedIssues[issue.id] ? 'max-h-[500px] opacity-100' : 'max-h-0 opacity-0'
+                  }`}
+                >
                 {expandedIssues[issue.id] && (
                   <div className="px-4 pb-4 border-t bg-gray-50">
                     <div className="pt-4 grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -501,6 +510,7 @@ export default function IssueExplorer({ issues, onSelectUrl, onClose }) {
                     </div>
                   </div>
                 )}
+                </div>
               </div>
             ))}
           </div>
