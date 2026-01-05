@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { X, User, Calendar, Clock, MessageSquare, Activity, Check, AlertCircle, CalendarClock } from 'lucide-react';
+import { X, User, Calendar, Clock, MessageSquare, Activity, Check, AlertCircle, CalendarClock, HelpCircle, Info } from 'lucide-react';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 import { useComments } from '../../hooks/useComments';
@@ -19,6 +19,39 @@ import {
   getDueDateColor,
   getDueDateBadgeColor
 } from '../../utils/dateHelpers';
+
+// Help tooltips for form fields
+const FIELD_HELP = {
+  assignedTo: 'Enter team member email addresses or user IDs separated by commas. These users will receive notifications about this task.',
+  startDate: 'When work should begin on this item. Leave blank if the team can start immediately.',
+  dueDate: 'Target completion date for this item. Setting a due date helps track project timeline and triggers reminders.',
+  estimatedHours: 'Expected time to complete this item. Used for workload planning and time tracking comparison.',
+  notes: 'Internal notes visible to all team members. Use for special instructions, blockers, or context.',
+  status: 'Current workflow state of this item. Use to track progress through your process.'
+};
+
+// Tooltip component
+function Tooltip({ text, children }) {
+  const [show, setShow] = useState(false);
+
+  return (
+    <span className="relative inline-block">
+      <span
+        onMouseEnter={() => setShow(true)}
+        onMouseLeave={() => setShow(false)}
+        className="cursor-help"
+      >
+        {children}
+      </span>
+      {show && (
+        <span className="absolute z-50 w-64 p-2 text-xs text-white bg-charcoal-800 rounded-lg shadow-lg -top-2 left-6 transform">
+          {text}
+          <span className="absolute w-2 h-2 bg-charcoal-800 transform rotate-45 -left-1 top-3" />
+        </span>
+      )}
+    </span>
+  );
+}
 
 export default function ItemDetailModal({ item, projectId, isOpen, onClose, onToggleComplete, isCompleted }) {
   const [activeTab, setActiveTab] = useState('details');
@@ -213,12 +246,15 @@ export default function ItemDetailModal({ item, projectId, isOpen, onClose, onTo
 
                   <div className="space-y-4">
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                      <label className="block text-sm font-medium text-gray-700 mb-2 flex items-center gap-2">
                         Assigned To
+                        <Tooltip text={FIELD_HELP.assignedTo}>
+                          <HelpCircle className="w-4 h-4 text-gray-400 hover:text-gray-600" />
+                        </Tooltip>
                       </label>
                       <input
                         type="text"
-                        placeholder="Enter user IDs (comma-separated)"
+                        placeholder="Enter user IDs or emails (comma-separated)"
                         value={assignmentData.assignedTo.join(', ')}
                         onChange={(e) => setAssignmentData(prev => ({
                           ...prev,
@@ -226,14 +262,20 @@ export default function ItemDetailModal({ item, projectId, isOpen, onClose, onTo
                         }))}
                         className="input"
                       />
+                      <p className="mt-1 text-xs text-gray-500">
+                        Team members responsible for completing this item
+                      </p>
                     </div>
 
                     {/* Timeline Fields */}
                     <div className="grid grid-cols-2 gap-4">
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
-                          <Calendar className="inline w-4 h-4 mr-1" />
+                        <label className="block text-sm font-medium text-gray-700 mb-2 flex items-center gap-2">
+                          <Calendar className="inline w-4 h-4" />
                           Start Date
+                          <Tooltip text={FIELD_HELP.startDate}>
+                            <HelpCircle className="w-3.5 h-3.5 text-gray-400 hover:text-gray-600" />
+                          </Tooltip>
                         </label>
                         <DatePicker
                           selected={assignmentData.startDate}
@@ -249,11 +291,14 @@ export default function ItemDetailModal({ item, projectId, isOpen, onClose, onTo
                       </div>
 
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2 flex items-center">
-                          <CalendarClock className="inline w-4 h-4 mr-1" />
+                        <label className="block text-sm font-medium text-gray-700 mb-2 flex items-center gap-2">
+                          <CalendarClock className="inline w-4 h-4" />
                           Due Date
+                          <Tooltip text={FIELD_HELP.dueDate}>
+                            <HelpCircle className="w-3.5 h-3.5 text-gray-400 hover:text-gray-600" />
+                          </Tooltip>
                           {assignmentData.dueDate && isOverdue(assignmentData.dueDate, isCompleted) && (
-                            <AlertCircle className="inline w-4 h-4 ml-2 text-red-600" />
+                            <AlertCircle className="inline w-4 h-4 text-red-600" />
                           )}
                         </label>
                         <DatePicker
@@ -280,9 +325,12 @@ export default function ItemDetailModal({ item, projectId, isOpen, onClose, onTo
 
                     <div className="grid grid-cols-2 gap-4">
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
-                          <Clock className="inline w-4 h-4 mr-1" />
+                        <label className="block text-sm font-medium text-gray-700 mb-2 flex items-center gap-2">
+                          <Clock className="inline w-4 h-4" />
                           Estimated Hours
+                          <Tooltip text={FIELD_HELP.estimatedHours}>
+                            <HelpCircle className="w-3.5 h-3.5 text-gray-400 hover:text-gray-600" />
+                          </Tooltip>
                         </label>
                         <input
                           type="number"
@@ -300,8 +348,8 @@ export default function ItemDetailModal({ item, projectId, isOpen, onClose, onTo
 
                       {assignmentData.completedDate && (
                         <div>
-                          <label className="block text-sm font-medium text-gray-700 mb-2">
-                            <Check className="inline w-4 h-4 mr-1 text-green-600" />
+                          <label className="block text-sm font-medium text-gray-700 mb-2 flex items-center gap-2">
+                            <Check className="inline w-4 h-4 text-green-600" />
                             Completed Date
                           </label>
                           <div className="input bg-green-50 text-green-800 font-medium">
@@ -313,8 +361,11 @@ export default function ItemDetailModal({ item, projectId, isOpen, onClose, onTo
 
                     {/* Notes Field */}
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                      <label className="block text-sm font-medium text-gray-700 mb-2 flex items-center gap-2">
                         Notes
+                        <Tooltip text={FIELD_HELP.notes}>
+                          <HelpCircle className="w-3.5 h-3.5 text-gray-400 hover:text-gray-600" />
+                        </Tooltip>
                       </label>
                       <textarea
                         value={assignmentData.notes}
@@ -322,17 +373,20 @@ export default function ItemDetailModal({ item, projectId, isOpen, onClose, onTo
                           ...prev,
                           notes: e.target.value
                         }))}
-                        placeholder="Add timeline notes..."
+                        placeholder="Add notes about this task (blockers, special instructions, etc.)"
                         rows={3}
                         className="input w-full"
                       />
                     </div>
 
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                      <label className="block text-sm font-medium text-gray-700 mb-2 flex items-center gap-2">
                         Status
+                        <Tooltip text={FIELD_HELP.status}>
+                          <HelpCircle className="w-3.5 h-3.5 text-gray-400 hover:text-gray-600" />
+                        </Tooltip>
                       </label>
-                      <div className="flex gap-2">
+                      <div className="flex flex-wrap gap-2">
                         {Object.entries(TASK_STATUS_LABELS).map(([value, label]) => (
                           <button
                             key={value}
@@ -347,6 +401,12 @@ export default function ItemDetailModal({ item, projectId, isOpen, onClose, onTo
                           </button>
                         ))}
                       </div>
+                      <p className="mt-2 text-xs text-gray-500">
+                        {assignmentData.status === 'not_started' && 'Task has not been worked on yet'}
+                        {assignmentData.status === 'in_progress' && 'Work is actively being done on this task'}
+                        {assignmentData.status === 'in_review' && 'Task is complete and awaiting review/approval'}
+                        {assignmentData.status === 'completed' && 'Task has been finished and approved'}
+                      </p>
                     </div>
 
                     <button
@@ -390,9 +450,15 @@ export default function ItemDetailModal({ item, projectId, isOpen, onClose, onTo
               <div className="space-y-3">
                 <h4 className="text-sm font-medium text-gray-900 mb-3">Recent Activity</h4>
                 {itemActivities.length === 0 ? (
-                  <p className="text-sm text-gray-500 text-center py-8">
-                    No activity yet
-                  </p>
+                  <div className="text-center py-8">
+                    <div className="w-12 h-12 bg-gray-100 rounded-xl flex items-center justify-center mx-auto mb-3">
+                      <Activity className="w-6 h-6 text-gray-400" />
+                    </div>
+                    <p className="text-sm font-medium text-gray-700 mb-1">No activity recorded</p>
+                    <p className="text-xs text-gray-500 max-w-xs mx-auto">
+                      Activity will appear here when team members make changes like updating status, leaving comments, or tracking time.
+                    </p>
+                  </div>
                 ) : (
                   <div className="space-y-3">
                     {itemActivities.map((activity, index) => (

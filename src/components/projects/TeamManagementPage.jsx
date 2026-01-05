@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { collection, getDocs, updateDoc, doc } from 'firebase/firestore';
 import { db } from '../../lib/firebase';
 import { useAuth } from '../../contexts/AuthContext';
-import { User, Mail, Calendar, Edit2, Shield } from 'lucide-react';
+import { User, Mail, Calendar, Edit2, Shield, Users, Info, UserPlus } from 'lucide-react';
 import { USER_ROLES, ROLE_LABELS, hasPermission } from '../../utils/roles';
 import { format } from 'date-fns';
 import toast from 'react-hot-toast';
@@ -63,11 +63,26 @@ export default function TeamManagementPage() {
 
   if (!canManageTeam) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-center">
-          <Shield className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-          <h2 className="text-2xl font-bold text-gray-900 mb-2">Access Denied</h2>
-          <p className="text-gray-600">You don't have permission to manage team members.</p>
+      <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white flex items-center justify-center">
+        <div className="text-center max-w-md px-4">
+          <div className="w-20 h-20 bg-gradient-to-br from-purple-100 to-purple-200 rounded-2xl flex items-center justify-center mx-auto mb-6">
+            <Shield className="w-10 h-10 text-purple-500" />
+          </div>
+          <h2 className="text-2xl font-bold text-gray-900 mb-3">Access Restricted</h2>
+          <p className="text-gray-600 mb-6">
+            Team management is available to Administrators and Project Managers.
+            Contact your team admin if you need access.
+          </p>
+          <div className="p-4 bg-gray-50 rounded-lg text-left">
+            <h4 className="text-sm font-semibold text-gray-700 mb-2 flex items-center gap-2">
+              <Info className="w-4 h-4" />
+              Your current role: {ROLE_LABELS[userProfile?.role] || 'Unknown'}
+            </h4>
+            <p className="text-sm text-gray-500">
+              With this role, you can view and complete assigned tasks. To manage team members,
+              ask an admin to update your role to Project Manager or Administrator.
+            </p>
+          </div>
         </div>
       </div>
     );
@@ -145,6 +160,28 @@ export default function TeamManagementPage() {
 
         {/* Team List */}
         <div className="bg-white rounded-lg shadow-md overflow-hidden">
+          {users.length === 0 ? (
+            <div className="p-12 text-center">
+              <div className="w-16 h-16 bg-gradient-to-br from-gray-100 to-gray-200 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                <Users className="w-8 h-8 text-gray-400" />
+              </div>
+              <h3 className="text-lg font-semibold text-gray-900 mb-2">No team members yet</h3>
+              <p className="text-gray-600 mb-6 max-w-md mx-auto">
+                Team members will appear here when they create an account and join your organization.
+              </p>
+              <div className="p-4 bg-gray-50 rounded-lg text-left max-w-md mx-auto">
+                <h4 className="text-sm font-semibold text-gray-700 mb-2 flex items-center gap-2">
+                  <UserPlus className="w-4 h-4" />
+                  How to add team members:
+                </h4>
+                <ul className="text-sm text-gray-600 space-y-1">
+                  <li>1. Share the registration link with your team</li>
+                  <li>2. They create an account using their work email</li>
+                  <li>3. Update their role from this page once they join</li>
+                </ul>
+              </div>
+            </div>
+          ) : (
           <div className="overflow-x-auto">
             <table className="min-w-full divide-y divide-gray-200">
               <thead className="bg-gray-50">
@@ -246,6 +283,7 @@ export default function TeamManagementPage() {
               </tbody>
             </table>
           </div>
+          )}
         </div>
 
         {/* Info Card */}

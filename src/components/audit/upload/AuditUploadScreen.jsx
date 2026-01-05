@@ -10,13 +10,27 @@ import {
   Sparkles,
   BarChart3,
   Zap,
-  FileText
+  FileText,
+  CheckCircle2,
+  Circle,
+  PlayCircle,
+  ChevronDown,
+  ChevronUp,
+  Info,
+  Lightbulb
 } from 'lucide-react';
 import { validateFile } from '../../../lib/audit/zipProcessor';
 
 export default function AuditUploadScreen({ onFileSelect }) {
   const [validationResult, setValidationResult] = useState(null);
   const [selectedFile, setSelectedFile] = useState(null);
+  const [showTutorial, setShowTutorial] = useState(true);
+  const [checklist, setChecklist] = useState({
+    screamingFrogInstalled: false,
+    crawlCompleted: false,
+    excelFormat: false,
+    includesInternal: false
+  });
 
   const onDrop = useCallback((acceptedFiles) => {
     if (acceptedFiles.length === 0) return;
@@ -188,6 +202,172 @@ export default function AuditUploadScreen({ onFileSelect }) {
               <span className="text-sm font-medium text-charcoal-700">{feature.label}</span>
             </div>
           ))}
+        </div>
+
+        {/* Pre-flight Checklist */}
+        <div className="card p-6 mb-6 bg-gradient-to-br from-cyan-50/50 to-white border-cyan-100">
+          <div className="flex items-center gap-3 mb-4">
+            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-cyan-500 to-cyan-600 flex items-center justify-center shadow-lg">
+              <CheckCircle2 className="w-5 h-5 text-white" />
+            </div>
+            <div>
+              <h4 className="font-bold text-charcoal-900">Pre-flight Checklist</h4>
+              <p className="text-sm text-charcoal-500">Confirm these items before uploading</p>
+            </div>
+          </div>
+
+          <div className="space-y-3">
+            {[
+              { key: 'screamingFrogInstalled', label: 'Screaming Frog SEO Spider installed', hint: 'Free version works for up to 500 URLs' },
+              { key: 'crawlCompleted', label: 'Website crawl completed', hint: 'Wait for the crawl to finish before exporting' },
+              { key: 'excelFormat', label: 'Export set to Excel (.xlsx) format', hint: 'CSV format is not supported' },
+              { key: 'includesInternal', label: 'Internal tab included in export', hint: 'Required for URL analysis' }
+            ].map((item) => (
+              <label
+                key={item.key}
+                className={`flex items-start gap-3 p-3 rounded-xl cursor-pointer transition-all ${
+                  checklist[item.key]
+                    ? 'bg-emerald-50 border border-emerald-200'
+                    : 'bg-charcoal-50 border border-transparent hover:bg-charcoal-100'
+                }`}
+              >
+                <input
+                  type="checkbox"
+                  checked={checklist[item.key]}
+                  onChange={(e) => setChecklist(prev => ({ ...prev, [item.key]: e.target.checked }))}
+                  className="sr-only"
+                />
+                <div className={`w-5 h-5 rounded-md flex items-center justify-center flex-shrink-0 mt-0.5 transition-colors ${
+                  checklist[item.key]
+                    ? 'bg-emerald-500 text-white'
+                    : 'bg-white border-2 border-charcoal-300'
+                }`}>
+                  {checklist[item.key] && <CheckCircle2 className="w-4 h-4" />}
+                </div>
+                <div className="flex-1">
+                  <span className={`text-sm font-medium ${checklist[item.key] ? 'text-emerald-800' : 'text-charcoal-700'}`}>
+                    {item.label}
+                  </span>
+                  <p className="text-xs text-charcoal-500 mt-0.5">{item.hint}</p>
+                </div>
+              </label>
+            ))}
+          </div>
+
+          {Object.values(checklist).every(Boolean) && (
+            <div className="mt-4 p-3 rounded-xl bg-emerald-100 border border-emerald-200">
+              <p className="text-sm text-emerald-800 font-medium flex items-center gap-2">
+                <CheckCircle className="w-4 h-4" />
+                You're ready to upload! Drag and drop your ZIP file above.
+              </p>
+            </div>
+          )}
+        </div>
+
+        {/* Tutorial Section */}
+        <div className="card p-6 mb-6">
+          <button
+            onClick={() => setShowTutorial(!showTutorial)}
+            className="w-full flex items-center justify-between"
+          >
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-purple-500 to-purple-600 flex items-center justify-center shadow-lg">
+                <PlayCircle className="w-5 h-5 text-white" />
+              </div>
+              <div className="text-left">
+                <h4 className="font-bold text-charcoal-900">Getting Started Tutorial</h4>
+                <p className="text-sm text-charcoal-500">Learn how to use the Technical Audit tool</p>
+              </div>
+            </div>
+            {showTutorial ? (
+              <ChevronUp className="w-5 h-5 text-charcoal-400" />
+            ) : (
+              <ChevronDown className="w-5 h-5 text-charcoal-400" />
+            )}
+          </button>
+
+          {showTutorial && (
+            <div className="mt-6 space-y-6">
+              {/* What is this tool */}
+              <div className="p-4 rounded-xl bg-primary-50 border border-primary-100">
+                <div className="flex items-start gap-3">
+                  <Info className="w-5 h-5 text-primary-600 flex-shrink-0 mt-0.5" />
+                  <div>
+                    <h5 className="font-semibold text-primary-900 mb-1">What is this tool?</h5>
+                    <p className="text-sm text-primary-800">
+                      The Technical Audit tool analyzes your Screaming Frog export to identify SEO issues
+                      across 31 categories including indexability, content quality, page speed, and more.
+                      You'll get actionable recommendations with AI-powered suggestions to fix each issue.
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              {/* What you'll need */}
+              <div>
+                <h5 className="font-semibold text-charcoal-900 mb-3 flex items-center gap-2">
+                  <span className="w-6 h-6 rounded-lg bg-charcoal-100 flex items-center justify-center text-xs font-bold text-charcoal-600">1</span>
+                  What you'll need
+                </h5>
+                <ul className="space-y-2 text-sm text-charcoal-600 ml-8">
+                  <li className="flex items-start gap-2">
+                    <span className="w-1.5 h-1.5 rounded-full bg-charcoal-400 mt-2 flex-shrink-0" />
+                    <span><strong>Screaming Frog SEO Spider</strong> - Free version available at screamingfrog.co.uk</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <span className="w-1.5 h-1.5 rounded-full bg-charcoal-400 mt-2 flex-shrink-0" />
+                    <span>A completed crawl of your website (can take 5-60 minutes depending on site size)</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <span className="w-1.5 h-1.5 rounded-full bg-charcoal-400 mt-2 flex-shrink-0" />
+                    <span>Multi Export ZIP file in Excel format (up to 500MB)</span>
+                  </li>
+                </ul>
+              </div>
+
+              {/* What you'll get */}
+              <div>
+                <h5 className="font-semibold text-charcoal-900 mb-3 flex items-center gap-2">
+                  <span className="w-6 h-6 rounded-lg bg-charcoal-100 flex items-center justify-center text-xs font-bold text-charcoal-600">2</span>
+                  What you'll get from the audit
+                </h5>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 ml-8">
+                  {[
+                    { title: 'Health Score', desc: 'Overall site health percentage' },
+                    { title: 'Issue Breakdown', desc: 'Errors, warnings, and notices' },
+                    { title: '31 Audit Categories', desc: 'From titles to Core Web Vitals' },
+                    { title: 'AI Suggestions', desc: 'Fix recommendations for each issue' },
+                    { title: 'URL-Level Analysis', desc: 'See issues for each page' },
+                    { title: 'Export Reports', desc: 'PDF and Excel downloads' }
+                  ].map((item, idx) => (
+                    <div key={idx} className="flex items-start gap-2 text-sm">
+                      <CheckCircle className="w-4 h-4 text-emerald-500 flex-shrink-0 mt-0.5" />
+                      <div>
+                        <span className="font-medium text-charcoal-800">{item.title}</span>
+                        <span className="text-charcoal-500"> - {item.desc}</span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Pro Tips */}
+              <div className="p-4 rounded-xl bg-amber-50 border border-amber-100">
+                <div className="flex items-start gap-3">
+                  <Lightbulb className="w-5 h-5 text-amber-600 flex-shrink-0 mt-0.5" />
+                  <div>
+                    <h5 className="font-semibold text-amber-900 mb-2">Pro Tips</h5>
+                    <ul className="space-y-1 text-sm text-amber-800">
+                      <li>• Run regular audits (monthly or after major site changes) to track progress</li>
+                      <li>• Focus on errors first, then warnings, then notices for maximum impact</li>
+                      <li>• Save and share audit reports with your team using the share link feature</li>
+                      <li>• Use the AI suggestions as a starting point, then customize for your site</li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
         </div>
 
         {/* Help Section */}

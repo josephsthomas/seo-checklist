@@ -1,8 +1,41 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useProjects } from '../../hooks/useProjects';
-import { ArrowLeft, ArrowRight, Check, X } from 'lucide-react';
+import { ArrowLeft, ArrowRight, Check, X, HelpCircle, Info, Lightbulb } from 'lucide-react';
 import { format } from 'date-fns';
+
+// Help content for each project type
+const PROJECT_TYPE_HELP = {
+  'Net New Site': {
+    description: 'A brand new website being built from the ground up.',
+    bestFor: 'New businesses, rebranding projects, or replacing legacy sites',
+    seoFocus: 'Foundation setup, site architecture, technical SEO from day one'
+  },
+  'Site Refresh': {
+    description: 'An existing website getting design and/or content updates.',
+    bestFor: 'Outdated sites needing modernization while preserving SEO equity',
+    seoFocus: 'URL preservation, redirect mapping, content migration'
+  },
+  'Campaign Landing Page': {
+    description: 'Focused pages for specific marketing campaigns or promotions.',
+    bestFor: 'PPC campaigns, product launches, seasonal promotions',
+    seoFocus: 'Conversion optimization, page speed, targeted keywords'
+  },
+  'Microsite': {
+    description: 'A small, standalone site for a specific purpose or brand initiative.',
+    bestFor: 'Events, specific products, partner programs',
+    seoFocus: 'Domain strategy, cross-linking, brand consistency'
+  }
+};
+
+// Help content for each status
+const STATUS_HELP = {
+  'Planning': 'Initial phase for gathering requirements and defining scope',
+  'Active': 'Project is currently being worked on by the team',
+  'On Hold': 'Temporarily paused - work will resume later',
+  'Completed': 'All work finished and deliverables handed off',
+  'Archived': 'Historical reference - no longer actively managed'
+};
 
 const STEPS = [
   { id: 1, name: 'Basic Information', description: 'Project name and type' },
@@ -195,7 +228,21 @@ export default function ProjectCreationWizard() {
         <div className="bg-white rounded-lg shadow-md p-8">
           {currentStep === 1 && (
             <div className="space-y-6">
-              <h2 className="text-xl font-semibold text-gray-900 mb-4">Basic Information</h2>
+              <div className="flex items-start justify-between">
+                <h2 className="text-xl font-semibold text-gray-900">Basic Information</h2>
+                <div className="text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded">Step 1 of 4</div>
+              </div>
+
+              {/* Step 1 Help Tip */}
+              <div className="p-4 rounded-lg bg-primary-50 border border-primary-100">
+                <div className="flex items-start gap-3">
+                  <Lightbulb className="w-5 h-5 text-primary-600 flex-shrink-0 mt-0.5" />
+                  <div className="text-sm text-primary-800">
+                    <strong>Getting started:</strong> Choose a descriptive project name that includes the client and project scope.
+                    The project type determines which checklist items are most relevant for your workflow.
+                  </div>
+                </div>
+              </div>
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -209,6 +256,9 @@ export default function ProjectCreationWizard() {
                   className={`input ${errors.name ? 'border-red-500' : ''}`}
                   placeholder="e.g., Acme Corp Website Redesign"
                 />
+                <p className="mt-1 text-xs text-gray-500">
+                  Use a clear, descriptive name. Example: "ClientName - ProjectType - Year"
+                </p>
                 {errors.name && <p className="mt-1 text-sm text-red-600">{errors.name}</p>}
               </div>
 
@@ -224,6 +274,9 @@ export default function ProjectCreationWizard() {
                   className={`input ${errors.clientName ? 'border-red-500' : ''}`}
                   placeholder="e.g., Acme Corporation"
                 />
+                <p className="mt-1 text-xs text-gray-500">
+                  The company or organization this project is for
+                </p>
                 {errors.clientName && <p className="mt-1 text-sm text-red-600">{errors.clientName}</p>}
               </div>
 
@@ -241,13 +294,43 @@ export default function ProjectCreationWizard() {
                     <option key={type} value={type}>{type}</option>
                   ))}
                 </select>
+
+                {/* Project Type Help Card */}
+                {formData.projectType && PROJECT_TYPE_HELP[formData.projectType] && (
+                  <div className="mt-3 p-4 rounded-lg bg-gray-50 border border-gray-200">
+                    <div className="flex items-start gap-3">
+                      <Info className="w-4 h-4 text-gray-500 flex-shrink-0 mt-0.5" />
+                      <div className="text-sm">
+                        <p className="text-gray-700 mb-2">{PROJECT_TYPE_HELP[formData.projectType].description}</p>
+                        <div className="space-y-1 text-xs text-gray-600">
+                          <p><strong>Best for:</strong> {PROJECT_TYPE_HELP[formData.projectType].bestFor}</p>
+                          <p><strong>SEO Focus:</strong> {PROJECT_TYPE_HELP[formData.projectType].seoFocus}</p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
           )}
 
           {currentStep === 2 && (
             <div className="space-y-6">
-              <h2 className="text-xl font-semibold text-gray-900 mb-4">Timeline</h2>
+              <div className="flex items-start justify-between">
+                <h2 className="text-xl font-semibold text-gray-900">Timeline</h2>
+                <div className="text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded">Step 2 of 4</div>
+              </div>
+
+              {/* Step 2 Help Tip */}
+              <div className="p-4 rounded-lg bg-primary-50 border border-primary-100">
+                <div className="flex items-start gap-3">
+                  <Lightbulb className="w-5 h-5 text-primary-600 flex-shrink-0 mt-0.5" />
+                  <div className="text-sm text-primary-800">
+                    <strong>Setting expectations:</strong> The target launch date helps track progress and prioritize tasks.
+                    You can update these dates later as the project evolves.
+                  </div>
+                </div>
+              </div>
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -260,6 +343,9 @@ export default function ProjectCreationWizard() {
                   onChange={handleChange}
                   className={`input ${errors.startDate ? 'border-red-500' : ''}`}
                 />
+                <p className="mt-1 text-xs text-gray-500">
+                  When the project officially begins (defaults to today)
+                </p>
                 {errors.startDate && <p className="mt-1 text-sm text-red-600">{errors.startDate}</p>}
               </div>
 
@@ -274,6 +360,9 @@ export default function ProjectCreationWizard() {
                   onChange={handleChange}
                   className={`input ${errors.targetLaunchDate ? 'border-red-500' : ''}`}
                 />
+                <p className="mt-1 text-xs text-gray-500">
+                  The deadline for completing all SEO deliverables (can be adjusted later)
+                </p>
                 {errors.targetLaunchDate && <p className="mt-1 text-sm text-red-600">{errors.targetLaunchDate}</p>}
               </div>
 
@@ -291,13 +380,35 @@ export default function ProjectCreationWizard() {
                     <option key={status} value={status}>{status}</option>
                   ))}
                 </select>
+
+                {/* Status Help */}
+                {formData.status && STATUS_HELP[formData.status] && (
+                  <p className="mt-2 text-xs text-gray-500 flex items-center gap-1">
+                    <Info className="w-3 h-3" />
+                    {STATUS_HELP[formData.status]}
+                  </p>
+                )}
               </div>
             </div>
           )}
 
           {currentStep === 3 && (
             <div className="space-y-6">
-              <h2 className="text-xl font-semibold text-gray-900 mb-4">Budget & Team</h2>
+              <div className="flex items-start justify-between">
+                <h2 className="text-xl font-semibold text-gray-900">Budget & Team</h2>
+                <div className="text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded">Step 3 of 4</div>
+              </div>
+
+              {/* Step 3 Help Tip */}
+              <div className="p-4 rounded-lg bg-primary-50 border border-primary-100">
+                <div className="flex items-start gap-3">
+                  <Lightbulb className="w-5 h-5 text-primary-600 flex-shrink-0 mt-0.5" />
+                  <div className="text-sm text-primary-800">
+                    <strong>Optional but helpful:</strong> Budget information helps track project scope and resource allocation.
+                    You can leave these blank and fill them in later.
+                  </div>
+                </div>
+              </div>
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -313,12 +424,14 @@ export default function ProjectCreationWizard() {
                   min="0"
                   step="0.5"
                 />
-                <p className="mt-1 text-sm text-gray-500">Total estimated hours for the project</p>
+                <p className="mt-1 text-xs text-gray-500">
+                  Total estimated hours for all SEO work on this project
+                </p>
               </div>
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Budget (in hours or dollars)
+                  Budget (in dollars)
                 </label>
                 <input
                   type="number"
@@ -330,14 +443,44 @@ export default function ProjectCreationWizard() {
                   min="0"
                   step="0.01"
                 />
-                <p className="mt-1 text-sm text-gray-500">Project budget in your preferred currency</p>
+                <p className="mt-1 text-xs text-gray-500">
+                  Optional: Project budget for tracking and reporting
+                </p>
+              </div>
+
+              {/* Budget Guide */}
+              <div className="p-4 rounded-lg bg-gray-50 border border-gray-200">
+                <h4 className="text-sm font-medium text-gray-700 mb-2 flex items-center gap-2">
+                  <HelpCircle className="w-4 h-4" />
+                  Typical SEO Project Hours
+                </h4>
+                <div className="grid grid-cols-2 gap-2 text-xs text-gray-600">
+                  <div>• Campaign Landing Page: 20-40 hrs</div>
+                  <div>• Microsite: 40-80 hrs</div>
+                  <div>• Site Refresh: 80-160 hrs</div>
+                  <div>• Net New Site: 120-300+ hrs</div>
+                </div>
               </div>
             </div>
           )}
 
           {currentStep === 4 && (
             <div className="space-y-6">
-              <h2 className="text-xl font-semibold text-gray-900 mb-4">Details</h2>
+              <div className="flex items-start justify-between">
+                <h2 className="text-xl font-semibold text-gray-900">Details</h2>
+                <div className="text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded">Step 4 of 4</div>
+              </div>
+
+              {/* Step 4 Help Tip */}
+              <div className="p-4 rounded-lg bg-emerald-50 border border-emerald-100">
+                <div className="flex items-start gap-3">
+                  <Lightbulb className="w-5 h-5 text-emerald-600 flex-shrink-0 mt-0.5" />
+                  <div className="text-sm text-emerald-800">
+                    <strong>Almost done!</strong> Add any additional context that will help your team understand this project.
+                    All fields on this page are optional.
+                  </div>
+                </div>
+              </div>
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -350,10 +493,16 @@ export default function ProjectCreationWizard() {
                   className="input min-h-[100px]"
                   placeholder="Brief description of the project..."
                 />
+                <p className="mt-1 text-xs text-gray-500">
+                  Include project goals, target audience, or key deliverables
+                </p>
               </div>
 
               <div className="border-t pt-6">
-                <h3 className="text-lg font-medium text-gray-900 mb-4">Primary Contact</h3>
+                <h3 className="text-lg font-medium text-gray-900 mb-2">Primary Contact</h3>
+                <p className="text-sm text-gray-500 mb-4">
+                  The main point of contact at the client organization
+                </p>
 
                 <div className="space-y-4">
                   <div>
@@ -411,6 +560,9 @@ export default function ProjectCreationWizard() {
                   className="input min-h-[80px]"
                   placeholder="Any special requirements or notes..."
                 />
+                <p className="mt-1 text-xs text-gray-500">
+                  Include any special requirements, constraints, or context for the team
+                </p>
               </div>
             </div>
           )}

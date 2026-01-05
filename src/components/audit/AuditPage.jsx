@@ -1,5 +1,5 @@
 import React, { useState, useCallback } from 'react';
-import { AlertTriangle, ArrowLeft, RotateCcw } from 'lucide-react';
+import { AlertTriangle, ArrowLeft, RotateCcw, HelpCircle, FileWarning, FileX, Database, Lightbulb } from 'lucide-react';
 import AuditUploadScreen from './upload/AuditUploadScreen';
 import ProcessingScreen from './upload/ProcessingScreen';
 import AuditDashboard from './dashboard/AuditDashboard';
@@ -7,6 +7,61 @@ import { processZipFile } from '../../lib/audit/zipProcessor';
 import { parseInternalAll, extractDomainInfo, parseAllFiles } from '../../lib/audit/excelParser';
 import { runAudit } from '../../lib/audit/auditEngine';
 import toast from 'react-hot-toast';
+
+// Error guidance mapping
+const ERROR_GUIDANCE = {
+  'internal_all.xlsx not found': {
+    title: 'Missing Required File',
+    icon: FileX,
+    description: 'The internal_all.xlsx file is required but was not found in your export.',
+    steps: [
+      'Open Screaming Frog SEO Spider',
+      'Go to File → Export → Multi Export',
+      'Make sure "Internal" is checked in the export options',
+      'Select Excel (.xlsx) format and export again'
+    ]
+  },
+  'Invalid file type': {
+    title: 'Unsupported File Format',
+    icon: FileWarning,
+    description: 'The uploaded file is not a valid ZIP archive.',
+    steps: [
+      'Ensure you\'re uploading the ZIP file created by Screaming Frog',
+      'Do not rename or modify the file after export',
+      'The file should have a .zip extension'
+    ]
+  },
+  'File too large': {
+    title: 'File Size Exceeded',
+    icon: Database,
+    description: 'The file exceeds the maximum allowed size of 500MB.',
+    steps: [
+      'Export fewer tabs from Screaming Frog',
+      'Focus on the essential tabs (Internal, Page Titles, Meta Description)',
+      'For very large sites, consider crawling a specific section'
+    ]
+  },
+  'default': {
+    title: 'Processing Error',
+    icon: AlertTriangle,
+    description: 'An error occurred while processing your audit file.',
+    steps: [
+      'Verify your export is from Screaming Frog Multi Export',
+      'Ensure the export completed successfully without errors',
+      'Try exporting again with Excel format selected',
+      'If the problem persists, check the Screaming Frog documentation'
+    ]
+  }
+};
+
+function getErrorGuidance(errorMessage) {
+  for (const [key, value] of Object.entries(ERROR_GUIDANCE)) {
+    if (key !== 'default' && errorMessage.toLowerCase().includes(key.toLowerCase())) {
+      return value;
+    }
+  }
+  return ERROR_GUIDANCE.default;
+}
 
 // View states
 const VIEWS = {
@@ -155,21 +210,61 @@ export default function AuditPage() {
       );
 
     case VIEWS.ERROR:
+      const guidance = getErrorGuidance(error || '');
+      const ErrorIcon = guidance.icon;
       return (
         <div className="min-h-screen bg-gradient-to-b from-charcoal-50 to-white flex items-center justify-center">
-          <div className="max-w-md mx-auto px-4 text-center">
-            <div className="w-20 h-20 bg-gradient-to-br from-red-500 to-red-600 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-xl shadow-red-500/25">
-              <AlertTriangle className="w-10 h-10 text-white" />
+          <div className="max-w-lg mx-auto px-4">
+            <div className="text-center mb-8">
+              <div className="w-20 h-20 bg-gradient-to-br from-red-500 to-red-600 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-xl shadow-red-500/25">
+                <ErrorIcon className="w-10 h-10 text-white" />
+              </div>
+              <h2 className="text-2xl font-bold text-charcoal-900 mb-3">{guidance.title}</h2>
+              <p className="text-charcoal-600">{guidance.description}</p>
             </div>
-            <h2 className="text-2xl font-bold text-charcoal-900 mb-3">Processing Error</h2>
-            <p className="text-charcoal-600 mb-8">{error}</p>
-            <button
-              onClick={handleNewAudit}
-              className="btn btn-primary inline-flex items-center gap-2"
-            >
-              <RotateCcw className="w-4 h-4" />
-              Try Again
-            </button>
+
+            {/* Error Details */}
+            <div className="bg-red-50 border border-red-200 rounded-xl p-4 mb-6">
+              <p className="text-sm text-red-800 font-medium mb-1">Error Details:</p>
+              <p className="text-sm text-red-700">{error}</p>
+            </div>
+
+            {/* How to Fix */}
+            <div className="bg-white rounded-xl border border-charcoal-200 p-6 mb-6">
+              <h3 className="text-sm font-semibold text-charcoal-900 mb-4 flex items-center gap-2">
+                <Lightbulb className="w-4 h-4 text-amber-500" />
+                How to fix this:
+              </h3>
+              <ol className="space-y-3">
+                {guidance.steps.map((step, idx) => (
+                  <li key={idx} className="flex items-start gap-3 text-sm text-charcoal-600">
+                    <span className="w-6 h-6 rounded-lg bg-primary-100 text-primary-700 flex items-center justify-center text-xs font-bold flex-shrink-0">
+                      {idx + 1}
+                    </span>
+                    <span>{step}</span>
+                  </li>
+                ))}
+              </ol>
+            </div>
+
+            <div className="flex gap-3 justify-center">
+              <button
+                onClick={handleNewAudit}
+                className="btn btn-primary inline-flex items-center gap-2"
+              >
+                <RotateCcw className="w-4 h-4" />
+                Try Again
+              </button>
+              <a
+                href="https://www.screamingfrog.co.uk/seo-spider/user-guide/general/#multi-export"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="btn btn-secondary inline-flex items-center gap-2"
+              >
+                <HelpCircle className="w-4 h-4" />
+                View Documentation
+              </a>
+            </div>
           </div>
         </div>
       );
