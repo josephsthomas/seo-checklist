@@ -1,6 +1,6 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowRight } from 'lucide-react';
+import { ArrowRight, Lock, Sparkles } from 'lucide-react';
 
 export default function ToolCard({
   icon: Icon,
@@ -14,45 +14,54 @@ export default function ToolCard({
 }) {
   const navigate = useNavigate();
 
-  const colorClasses = {
+  const colorVariants = {
     primary: {
-      bg: 'bg-primary-50',
-      border: 'border-primary-200 hover:border-primary-400',
-      icon: 'bg-primary-100 text-primary-600',
-      button: 'bg-primary-600 hover:bg-primary-700 text-white',
-      badge: 'bg-primary-100 text-primary-700'
+      gradient: 'from-primary-500 to-primary-600',
+      lightGradient: 'from-primary-50 to-primary-100/50',
+      icon: 'from-primary-500 to-primary-600',
+      iconBg: 'bg-primary-50',
+      text: 'text-primary-600',
+      badge: 'bg-primary-100 text-primary-700 border-primary-200',
+      button: 'from-primary-500 to-primary-600 hover:from-primary-600 hover:to-primary-700',
+      glow: 'group-hover:shadow-primary-500/20',
+      ring: 'ring-primary-500/20'
     },
     cyan: {
-      bg: 'bg-cyan-50',
-      border: 'border-cyan-200 hover:border-cyan-400',
-      icon: 'bg-cyan-100 text-cyan-600',
-      button: 'bg-cyan-600 hover:bg-cyan-700 text-white',
-      badge: 'bg-cyan-100 text-cyan-700'
+      gradient: 'from-cyan-500 to-cyan-600',
+      lightGradient: 'from-cyan-50 to-cyan-100/50',
+      icon: 'from-cyan-500 to-cyan-600',
+      iconBg: 'bg-cyan-50',
+      text: 'text-cyan-600',
+      badge: 'bg-cyan-100 text-cyan-700 border-cyan-200',
+      button: 'from-cyan-500 to-cyan-600 hover:from-cyan-600 hover:to-cyan-700',
+      glow: 'group-hover:shadow-cyan-500/20',
+      ring: 'ring-cyan-500/20'
     },
     purple: {
-      bg: 'bg-purple-50',
-      border: 'border-purple-200 hover:border-purple-400',
-      icon: 'bg-purple-100 text-purple-600',
-      button: 'bg-purple-600 hover:bg-purple-700 text-white',
-      badge: 'bg-purple-100 text-purple-700'
+      gradient: 'from-purple-500 to-purple-600',
+      lightGradient: 'from-purple-50 to-purple-100/50',
+      icon: 'from-purple-500 to-purple-600',
+      iconBg: 'bg-purple-50',
+      text: 'text-purple-600',
+      badge: 'bg-purple-100 text-purple-700 border-purple-200',
+      button: 'from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700',
+      glow: 'group-hover:shadow-purple-500/20',
+      ring: 'ring-purple-500/20'
     },
     emerald: {
-      bg: 'bg-emerald-50',
-      border: 'border-emerald-200 hover:border-emerald-400',
-      icon: 'bg-emerald-100 text-emerald-600',
-      button: 'bg-emerald-600 hover:bg-emerald-700 text-white',
-      badge: 'bg-emerald-100 text-emerald-700'
-    },
-    gray: {
-      bg: 'bg-gray-50',
-      border: 'border-gray-200',
-      icon: 'bg-gray-100 text-gray-400',
-      button: 'bg-gray-400 cursor-not-allowed text-white',
-      badge: 'bg-gray-100 text-gray-500'
+      gradient: 'from-emerald-500 to-emerald-600',
+      lightGradient: 'from-emerald-50 to-emerald-100/50',
+      icon: 'from-emerald-500 to-emerald-600',
+      iconBg: 'bg-emerald-50',
+      text: 'text-emerald-600',
+      badge: 'bg-emerald-100 text-emerald-700 border-emerald-200',
+      button: 'from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700',
+      glow: 'group-hover:shadow-emerald-500/20',
+      ring: 'ring-emerald-500/20'
     }
   };
 
-  const colors = colorClasses[comingSoon ? 'gray' : color];
+  const colors = colorVariants[color] || colorVariants.primary;
 
   const handleClick = () => {
     if (!comingSoon && path) {
@@ -60,70 +69,102 @@ export default function ToolCard({
     }
   };
 
+  if (comingSoon) {
+    return (
+      <div className="group relative card bg-gradient-to-br from-charcoal-50 to-charcoal-100/50 p-6 opacity-75">
+        {/* Coming Soon Badge */}
+        <div className="absolute top-4 right-4 flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-charcoal-200/80 text-charcoal-500">
+          <Lock className="w-3 h-3" />
+          <span className="text-xs font-medium">Coming Soon</span>
+        </div>
+
+        {/* Icon */}
+        <div className="w-14 h-14 rounded-2xl bg-charcoal-200/70 flex items-center justify-center mb-5">
+          <Icon className="w-7 h-7 text-charcoal-400" />
+        </div>
+
+        {/* Title */}
+        <h3 className="text-xl font-bold text-charcoal-400 mb-2">
+          {title}
+        </h3>
+
+        {/* Description */}
+        <p className="text-sm text-charcoal-400 leading-relaxed mb-6">
+          {description}
+        </p>
+
+        {/* Disabled Button */}
+        <button
+          disabled
+          className="w-full flex items-center justify-center gap-2 px-4 py-3 rounded-xl font-medium text-sm bg-charcoal-200 text-charcoal-400 cursor-not-allowed"
+        >
+          Coming Soon
+        </button>
+      </div>
+    );
+  }
+
   return (
     <div
-      className={`relative rounded-xl border-2 ${colors.border} ${colors.bg} p-6 transition-all duration-200 ${
-        comingSoon ? 'opacity-75' : 'cursor-pointer hover:shadow-lg hover:-translate-y-1'
-      }`}
       onClick={handleClick}
+      className={`group relative card card-hover cursor-pointer overflow-hidden bg-gradient-to-br ${colors.lightGradient} p-6`}
     >
+      {/* Hover Glow Effect */}
+      <div className={`absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 bg-gradient-to-br ${colors.lightGradient}`} />
+
       {/* Badge */}
       {badge && (
-        <span className={`absolute top-4 right-4 px-2 py-1 text-xs font-medium rounded-full ${colors.badge}`}>
-          {badge}
-        </span>
-      )}
-
-      {/* Coming Soon Overlay */}
-      {comingSoon && (
-        <span className="absolute top-4 right-4 px-2 py-1 text-xs font-medium rounded-full bg-gray-200 text-gray-600">
-          Coming Soon
-        </span>
-      )}
-
-      {/* Icon */}
-      <div className={`w-14 h-14 rounded-xl ${colors.icon} flex items-center justify-center mb-4`}>
-        <Icon className="w-7 h-7" />
-      </div>
-
-      {/* Title */}
-      <h3 className={`text-xl font-bold mb-2 ${comingSoon ? 'text-gray-400' : 'text-gray-900'}`}>
-        {title}
-      </h3>
-
-      {/* Description */}
-      <p className={`text-sm mb-4 ${comingSoon ? 'text-gray-400' : 'text-gray-600'}`}>
-        {description}
-      </p>
-
-      {/* Stats */}
-      {stats && stats.length > 0 && (
-        <div className="flex gap-4 mb-4">
-          {stats.map((stat, index) => (
-            <div key={index} className="text-center">
-              <p className={`text-2xl font-bold ${comingSoon ? 'text-gray-400' : 'text-gray-900'}`}>
-                {stat.value}
-              </p>
-              <p className={`text-xs ${comingSoon ? 'text-gray-400' : 'text-gray-500'}`}>
-                {stat.label}
-              </p>
-            </div>
-          ))}
+        <div className={`absolute top-4 right-4 flex items-center gap-1.5 px-2.5 py-1 rounded-full border ${colors.badge}`}>
+          {badge === 'New' && <Sparkles className="w-3 h-3" />}
+          <span className="text-xs font-medium">{badge}</span>
         </div>
       )}
 
-      {/* Action Button */}
-      <button
-        className={`w-full flex items-center justify-center gap-2 px-4 py-3 rounded-lg font-medium transition-colors ${colors.button}`}
-        disabled={comingSoon}
-        onClick={(e) => {
-          e.stopPropagation();
-          handleClick();
-        }}
-      >
-        {comingSoon ? 'Coming Soon' : 'Open Tool'}
-        {!comingSoon && <ArrowRight className="w-4 h-4" />}
-      </button>
+      {/* Content */}
+      <div className="relative z-10">
+        {/* Icon */}
+        <div className={`w-14 h-14 rounded-2xl bg-gradient-to-br ${colors.icon} flex items-center justify-center mb-5 shadow-lg ${colors.glow} group-hover:shadow-xl group-hover:scale-105 transition-all duration-300`}>
+          <Icon className="w-7 h-7 text-white" />
+        </div>
+
+        {/* Title */}
+        <h3 className="text-xl font-bold text-charcoal-900 mb-2 group-hover:text-charcoal-800 transition-colors">
+          {title}
+        </h3>
+
+        {/* Description */}
+        <p className="text-sm text-charcoal-600 leading-relaxed mb-5">
+          {description}
+        </p>
+
+        {/* Stats */}
+        {stats && stats.length > 0 && (
+          <div className="flex items-center gap-6 mb-5 pb-5 border-b border-charcoal-200/50">
+            {stats.map((stat, index) => (
+              <div key={index} className="text-center">
+                <p className="text-2xl font-bold text-charcoal-900">
+                  {stat.value}
+                </p>
+                <p className="text-xs text-charcoal-500 font-medium">
+                  {stat.label}
+                </p>
+              </div>
+            ))}
+          </div>
+        )}
+
+        {/* Action Button */}
+        <button
+          onClick={(e) => {
+            e.stopPropagation();
+            handleClick();
+          }}
+          className={`w-full flex items-center justify-center gap-2 px-4 py-3 rounded-xl font-medium text-sm text-white bg-gradient-to-r ${colors.button} shadow-sm hover:shadow-md transition-all duration-200 group/btn`}
+        >
+          Open Tool
+          <ArrowRight className="w-4 h-4 group-hover/btn:translate-x-0.5 transition-transform" />
+        </button>
+      </div>
     </div>
   );
 }

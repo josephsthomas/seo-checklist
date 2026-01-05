@@ -1,4 +1,5 @@
 import React, { useState, useCallback } from 'react';
+import { AlertTriangle, ArrowLeft, RotateCcw } from 'lucide-react';
 import AuditUploadScreen from './upload/AuditUploadScreen';
 import ProcessingScreen from './upload/ProcessingScreen';
 import AuditDashboard from './dashboard/AuditDashboard';
@@ -155,20 +156,21 @@ export default function AuditPage() {
 
     case VIEWS.ERROR:
       return (
-        <div className="max-w-2xl mx-auto px-4 py-12 text-center">
-          <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
-            <svg className="w-8 h-8 text-red-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-            </svg>
+        <div className="min-h-screen bg-gradient-to-b from-charcoal-50 to-white flex items-center justify-center">
+          <div className="max-w-md mx-auto px-4 text-center">
+            <div className="w-20 h-20 bg-gradient-to-br from-red-500 to-red-600 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-xl shadow-red-500/25">
+              <AlertTriangle className="w-10 h-10 text-white" />
+            </div>
+            <h2 className="text-2xl font-bold text-charcoal-900 mb-3">Processing Error</h2>
+            <p className="text-charcoal-600 mb-8">{error}</p>
+            <button
+              onClick={handleNewAudit}
+              className="btn btn-primary inline-flex items-center gap-2"
+            >
+              <RotateCcw className="w-4 h-4" />
+              Try Again
+            </button>
           </div>
-          <h2 className="text-xl font-bold text-gray-900 mb-2">Processing Error</h2>
-          <p className="text-gray-600 mb-6">{error}</p>
-          <button
-            onClick={handleNewAudit}
-            className="btn btn-primary"
-          >
-            Try Again
-          </button>
         </div>
       );
 
