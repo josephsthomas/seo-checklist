@@ -59,7 +59,11 @@ export default function Navigation() {
   if (!currentUser) return null;
 
   return (
-    <nav className="sticky top-0 z-50 bg-white/80 backdrop-blur-xl border-b border-charcoal-100/50 shadow-sm">
+    <nav
+      className="sticky top-0 z-50 bg-white/80 backdrop-blur-xl border-b border-charcoal-100/50 shadow-sm"
+      role="navigation"
+      aria-label="Main navigation"
+    >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
           {/* Logo/Brand */}
@@ -86,8 +90,9 @@ export default function Navigation() {
             <Link
               to="/"
               className={`nav-link ${isActive('/') ? 'nav-link-active' : ''}`}
+              aria-current={isActive('/') ? 'page' : undefined}
             >
-              <Home className="w-4 h-4" />
+              <Home className="w-4 h-4" aria-hidden="true" />
               <span>Home</span>
             </Link>
 
@@ -96,20 +101,24 @@ export default function Navigation() {
               <button
                 onClick={() => setToolsMenuOpen(!toolsMenuOpen)}
                 className={`nav-link ${isToolActive('/planner') || isToolActive('/audit') ? 'nav-link-active' : ''}`}
+                aria-expanded={toolsMenuOpen}
+                aria-haspopup="menu"
+                aria-label="Tools menu"
               >
-                <Wrench className="w-4 h-4" />
+                <Wrench className="w-4 h-4" aria-hidden="true" />
                 <span>Tools</span>
-                <ChevronDown className={`w-4 h-4 transition-transform duration-200 ${toolsMenuOpen ? 'rotate-180' : ''}`} />
+                <ChevronDown className={`w-4 h-4 transition-transform duration-200 ${toolsMenuOpen ? 'rotate-180' : ''}`} aria-hidden="true" />
               </button>
 
               {toolsMenuOpen && (
-                <div className="dropdown-menu left-0 mt-2 w-72 p-2">
+                <div className="dropdown-menu left-0 mt-2 w-72 p-2" role="menu" aria-label="Tools">
                   <Link
                     to="/planner"
                     onClick={() => setToolsMenuOpen(false)}
                     className={`dropdown-item group ${isToolActive('/planner') ? 'dropdown-item-active' : ''}`}
+                    role="menuitem"
                   >
-                    <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary-100 to-primary-50 flex items-center justify-center group-hover:from-primary-200 group-hover:to-primary-100 transition-colors">
+                    <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary-100 to-primary-50 flex items-center justify-center group-hover:from-primary-200 group-hover:to-primary-100 transition-colors" aria-hidden="true">
                       <ClipboardList className="w-5 h-5 text-primary-600" />
                     </div>
                     <div className="flex-1">
@@ -121,8 +130,9 @@ export default function Navigation() {
                     to="/audit"
                     onClick={() => setToolsMenuOpen(false)}
                     className={`dropdown-item group mt-1 ${isToolActive('/audit') ? 'dropdown-item-active' : ''}`}
+                    role="menuitem"
                   >
-                    <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-cyan-100 to-cyan-50 flex items-center justify-center group-hover:from-cyan-200 group-hover:to-cyan-100 transition-colors">
+                    <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-cyan-100 to-cyan-50 flex items-center justify-center group-hover:from-cyan-200 group-hover:to-cyan-100 transition-colors" aria-hidden="true">
                       <Search className="w-5 h-5 text-cyan-600" />
                     </div>
                     <div className="flex-1">
@@ -140,8 +150,9 @@ export default function Navigation() {
             <Link
               to="/my-tasks"
               className={`nav-link ${isActive('/my-tasks') ? 'nav-link-active' : ''}`}
+              aria-current={isActive('/my-tasks') ? 'page' : undefined}
             >
-              <CheckSquare className="w-4 h-4" />
+              <CheckSquare className="w-4 h-4" aria-hidden="true" />
               <span>My Tasks</span>
             </Link>
 
@@ -149,8 +160,9 @@ export default function Navigation() {
               <Link
                 to="/team"
                 className={`nav-link ${isActive('/team') ? 'nav-link-active' : ''}`}
+                aria-current={isActive('/team') ? 'page' : undefined}
               >
-                <Users className="w-4 h-4" />
+                <Users className="w-4 h-4" aria-hidden="true" />
                 <span>Team</span>
               </Link>
             )}
@@ -163,20 +175,24 @@ export default function Navigation() {
               <button
                 onClick={() => setHelpMenuOpen(!helpMenuOpen)}
                 className="nav-link"
+                aria-expanded={helpMenuOpen}
+                aria-haspopup="menu"
+                aria-label="Help menu"
               >
-                <HelpCircle className="w-4 h-4" />
+                <HelpCircle className="w-4 h-4" aria-hidden="true" />
                 <span>Help</span>
-                <ChevronDown className={`w-4 h-4 transition-transform duration-200 ${helpMenuOpen ? 'rotate-180' : ''}`} />
+                <ChevronDown className={`w-4 h-4 transition-transform duration-200 ${helpMenuOpen ? 'rotate-180' : ''}`} aria-hidden="true" />
               </button>
 
               {helpMenuOpen && (
-                <div className="dropdown-menu right-0 mt-2 w-56">
+                <div className="dropdown-menu right-0 mt-2 w-56" role="menu" aria-label="Help">
                   <Link
                     to="/help/resources"
                     onClick={() => setHelpMenuOpen(false)}
                     className="dropdown-item"
+                    role="menuitem"
                   >
-                    <Sparkles className="w-4 h-4 text-purple-500" />
+                    <Sparkles className="w-4 h-4 text-purple-500" aria-hidden="true" />
                     <div>
                       <div className="font-medium text-charcoal-900">Resource Library</div>
                       <div className="text-xs text-charcoal-500">Guides & tutorials</div>
@@ -186,22 +202,24 @@ export default function Navigation() {
                     to="/help/glossary"
                     onClick={() => setHelpMenuOpen(false)}
                     className="dropdown-item"
+                    role="menuitem"
                   >
-                    <FolderOpen className="w-4 h-4 text-amber-500" />
+                    <FolderOpen className="w-4 h-4 text-amber-500" aria-hidden="true" />
                     <div>
                       <div className="font-medium text-charcoal-900">SEO Glossary</div>
                       <div className="text-xs text-charcoal-500">Term definitions</div>
                     </div>
                   </Link>
-                  <div className="h-px bg-charcoal-100 my-1" />
+                  <div className="h-px bg-charcoal-100 my-1" role="separator" />
                   <button
                     onClick={() => {
                       setHelpMenuOpen(false);
                       window.dispatchEvent(new KeyboardEvent('keydown', { key: '?' }));
                     }}
                     className="dropdown-item w-full"
+                    role="menuitem"
                   >
-                    <div className="w-4 h-4 flex items-center justify-center text-charcoal-400">
+                    <div className="w-4 h-4 flex items-center justify-center text-charcoal-400" aria-hidden="true">
                       <kbd className="text-xs font-mono">?</kbd>
                     </div>
                     <div>
@@ -244,55 +262,65 @@ export default function Navigation() {
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
             className="md:hidden p-2 rounded-xl text-charcoal-600 hover:bg-charcoal-100 transition-colors"
             aria-label={mobileMenuOpen ? 'Close menu' : 'Open menu'}
+            aria-expanded={mobileMenuOpen}
+            aria-controls="mobile-menu"
           >
             {mobileMenuOpen ? (
-              <X className="w-6 h-6" />
+              <X className="w-6 h-6" aria-hidden="true" />
             ) : (
-              <Menu className="w-6 h-6" />
+              <Menu className="w-6 h-6" aria-hidden="true" />
             )}
           </button>
         </div>
 
         {/* Mobile Menu */}
         {mobileMenuOpen && (
-          <div className="md:hidden py-4 border-t border-charcoal-100 animate-fade-in-down">
-            <div className="space-y-1">
+          <div id="mobile-menu" className="md:hidden py-4 border-t border-charcoal-100 animate-fade-in-down">
+            <div className="space-y-1" role="menu">
               <Link
                 to="/"
                 onClick={() => setMobileMenuOpen(false)}
                 className={`nav-link ${isActive('/') ? 'nav-link-active' : ''}`}
+                role="menuitem"
+                aria-current={isActive('/') ? 'page' : undefined}
               >
-                <Home className="w-5 h-5" />
+                <Home className="w-5 h-5" aria-hidden="true" />
                 <span>Home</span>
               </Link>
 
               {/* Mobile Tools Section */}
               <div className="px-3 py-2 mt-3">
-                <p className="text-xs font-semibold text-charcoal-400 uppercase tracking-wider mb-2">Tools</p>
-                <Link
-                  to="/planner"
-                  onClick={() => setMobileMenuOpen(false)}
-                  className={`nav-link mb-1 ${isToolActive('/planner') ? 'nav-link-active' : ''}`}
-                >
-                  <ClipboardList className="w-5 h-5" />
-                  <span>SEO Planner</span>
-                </Link>
-                <Link
-                  to="/audit"
-                  onClick={() => setMobileMenuOpen(false)}
-                  className={`nav-link ${isToolActive('/audit') ? 'nav-link-active' : ''}`}
-                >
-                  <Search className="w-5 h-5" />
-                  <span>Technical Audit</span>
-                </Link>
+                <p className="text-xs font-semibold text-charcoal-400 uppercase tracking-wider mb-2" id="mobile-tools-label">Tools</p>
+                <div role="group" aria-labelledby="mobile-tools-label">
+                  <Link
+                    to="/planner"
+                    onClick={() => setMobileMenuOpen(false)}
+                    className={`nav-link mb-1 ${isToolActive('/planner') ? 'nav-link-active' : ''}`}
+                    role="menuitem"
+                  >
+                    <ClipboardList className="w-5 h-5" aria-hidden="true" />
+                    <span>SEO Planner</span>
+                  </Link>
+                  <Link
+                    to="/audit"
+                    onClick={() => setMobileMenuOpen(false)}
+                    className={`nav-link ${isToolActive('/audit') ? 'nav-link-active' : ''}`}
+                    role="menuitem"
+                  >
+                    <Search className="w-5 h-5" aria-hidden="true" />
+                    <span>Technical Audit</span>
+                  </Link>
+                </div>
               </div>
 
               <Link
                 to="/my-tasks"
                 onClick={() => setMobileMenuOpen(false)}
                 className={`nav-link ${isActive('/my-tasks') ? 'nav-link-active' : ''}`}
+                role="menuitem"
+                aria-current={isActive('/my-tasks') ? 'page' : undefined}
               >
-                <CheckSquare className="w-5 h-5" />
+                <CheckSquare className="w-5 h-5" aria-hidden="true" />
                 <span>My Tasks</span>
               </Link>
 
@@ -301,15 +329,17 @@ export default function Navigation() {
                   to="/team"
                   onClick={() => setMobileMenuOpen(false)}
                   className={`nav-link ${isActive('/team') ? 'nav-link-active' : ''}`}
+                  role="menuitem"
+                  aria-current={isActive('/team') ? 'page' : undefined}
                 >
-                  <Users className="w-5 h-5" />
+                  <Users className="w-5 h-5" aria-hidden="true" />
                   <span>Team</span>
                 </Link>
               )}
 
               <div className="px-3 py-4 border-t border-charcoal-100 mt-3">
                 <div className="flex items-center gap-3 mb-4">
-                  <div className="avatar">
+                  <div className="avatar" aria-hidden="true">
                     <User className="w-4 h-4" />
                   </div>
                   <div>
@@ -325,8 +355,9 @@ export default function Navigation() {
                 <button
                   onClick={handleLogout}
                   className="w-full flex items-center gap-2 px-4 py-2.5 rounded-xl text-red-600 hover:bg-red-50 transition-colors font-medium"
+                  role="menuitem"
                 >
-                  <LogOut className="w-5 h-5" />
+                  <LogOut className="w-5 h-5" aria-hidden="true" />
                   <span>Logout</span>
                 </button>
               </div>
