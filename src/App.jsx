@@ -37,6 +37,15 @@ const SharedAuditView = lazy(() => import('./components/audit/shared/SharedAudit
 // Accessibility Components - lazy load
 const AccessibilityAuditPage = lazy(() => import('./components/accessibility/AccessibilityAuditPage'));
 
+// Image Alt Generator - lazy load
+const ImageAltGeneratorPage = lazy(() => import('./components/image-alt-generator/ImageAltGeneratorPage'));
+
+// Meta Data Generator - lazy load
+const MetaGeneratorPage = lazy(() => import('./components/meta-generator/MetaGeneratorPage'));
+
+// Structured Data Generator - lazy load
+const SchemaGeneratorPage = lazy(() => import('./components/schema-generator/SchemaGeneratorPage'));
+
 /**
  * Enhanced Loading Fallback with Skeleton
  */
@@ -193,6 +202,48 @@ function App() {
                       <ProtectedRoute>
                         <ToolErrorBoundary toolName="Accessibility Analyzer" toolColor="purple">
                           <AccessibilityAuditPage />
+                        </ToolErrorBoundary>
+                      </ProtectedRoute>
+                    }
+                  />
+
+                  {/* ============================================ */}
+                  {/* IMAGE ALT TEXT GENERATOR ROUTES             */}
+                  {/* ============================================ */}
+                  <Route
+                    path="/image-alt"
+                    element={
+                      <ProtectedRoute>
+                        <ToolErrorBoundary toolName="Image Alt Text Generator" toolColor="emerald">
+                          <ImageAltGeneratorPage />
+                        </ToolErrorBoundary>
+                      </ProtectedRoute>
+                    }
+                  />
+
+                  {/* ============================================ */}
+                  {/* META DATA GENERATOR ROUTES                  */}
+                  {/* ============================================ */}
+                  <Route
+                    path="/meta-generator"
+                    element={
+                      <ProtectedRoute>
+                        <ToolErrorBoundary toolName="Meta Data Generator" toolColor="amber">
+                          <MetaGeneratorPage />
+                        </ToolErrorBoundary>
+                      </ProtectedRoute>
+                    }
+                  />
+
+                  {/* ============================================ */}
+                  {/* STRUCTURED DATA GENERATOR ROUTES            */}
+                  {/* ============================================ */}
+                  <Route
+                    path="/schema-generator"
+                    element={
+                      <ProtectedRoute>
+                        <ToolErrorBoundary toolName="Structured Data Generator" toolColor="rose">
+                          <SchemaGeneratorPage />
                         </ToolErrorBoundary>
                       </ProtectedRoute>
                     }

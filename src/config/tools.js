@@ -14,7 +14,10 @@ import {
   Target,
   Globe,
   Zap,
-  Accessibility
+  Accessibility,
+  Image,
+  Tags,
+  Code2
 } from 'lucide-react';
 
 /**
@@ -113,13 +116,82 @@ export const tools = [
     order: 3
   },
   {
+    id: 'image-alt',
+    name: 'Image Alt Text Generator',
+    shortName: 'Alt Text',
+    description: 'AI-powered alt text generation for images. Analyze single images or batch process up to 100, with EXIF embedding and SEO-friendly filenames.',
+    icon: Image,
+    path: '/image-alt',
+    color: TOOL_COLORS.EMERALD,
+    status: TOOL_STATUS.ACTIVE,
+    badge: 'New',
+    features: [
+      'Claude Vision AI analysis',
+      'Batch processing (100 images)',
+      'EXIF metadata embedding',
+      'SEO filename generation'
+    ],
+    statsConfig: [
+      { key: 'imagesProcessed', label: 'Processed' },
+      { key: 'formats', label: 'Formats', static: '6' }
+    ],
+    permissions: ['canGenerateAltText'],
+    order: 4
+  },
+  {
+    id: 'meta-generator',
+    name: 'Meta Data Generator',
+    shortName: 'Meta Gen',
+    description: 'AI-powered SEO metadata generation from documents. Generate titles, descriptions, OG tags, and Twitter Cards from DOCX, PDF, HTML, or text files.',
+    icon: Tags,
+    path: '/meta-generator',
+    color: TOOL_COLORS.AMBER,
+    status: TOOL_STATUS.ACTIVE,
+    badge: 'New',
+    features: [
+      'Multi-format support',
+      'SERP preview',
+      'Social card preview',
+      'HTML code generation'
+    ],
+    statsConfig: [
+      { key: 'documentsProcessed', label: 'Processed' },
+      { key: 'formats', label: 'Formats', static: '5' }
+    ],
+    permissions: ['canGenerateMetadata'],
+    order: 5
+  },
+  {
+    id: 'schema-generator',
+    name: 'Structured Data Generator',
+    shortName: 'Schema',
+    description: 'AI-powered JSON-LD schema markup generator. Analyze HTML content and generate production-ready schema.org structured data.',
+    icon: Code2,
+    path: '/schema-generator',
+    color: TOOL_COLORS.ROSE,
+    status: TOOL_STATUS.ACTIVE,
+    badge: 'New',
+    features: [
+      '50+ schema types',
+      'Rich snippet preview',
+      'Google validation',
+      'Batch processing'
+    ],
+    statsConfig: [
+      { key: 'schemasGenerated', label: 'Generated' },
+      { key: 'schemaTypes', label: 'Types', static: '50+' }
+    ],
+    permissions: ['canGenerateSchema'],
+    order: 6
+  },
+  {
     id: 'analytics',
     name: 'Analytics Dashboard',
     shortName: 'Analytics',
     description: 'Unified analytics view combining data from Google Analytics, Search Console, and other sources.',
     icon: BarChart3,
     path: '/analytics',
-    color: TOOL_COLORS.AMBER,
+    color: TOOL_COLORS.CYAN,
     status: TOOL_STATUS.COMING_SOON,
     badge: null,
     features: [
@@ -130,7 +202,7 @@ export const tools = [
     ],
     statsConfig: [],
     permissions: ['canViewAnalytics'],
-    order: 4
+    order: 7
   },
   {
     id: 'content',
@@ -139,7 +211,7 @@ export const tools = [
     description: 'AI-powered content analysis and optimization recommendations for better search rankings.',
     icon: FileText,
     path: '/content',
-    color: TOOL_COLORS.EMERALD,
+    color: TOOL_COLORS.PURPLE,
     status: TOOL_STATUS.COMING_SOON,
     badge: null,
     features: [
@@ -150,7 +222,7 @@ export const tools = [
     ],
     statsConfig: [],
     permissions: ['canOptimizeContent'],
-    order: 5
+    order: 8
   }
 ];
 
