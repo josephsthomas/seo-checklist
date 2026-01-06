@@ -306,7 +306,7 @@ export default function UrlDataTable({ urlData, onSelectUrl, isLoading = false }
               ))}
             </tr>
           </thead>
-          <tbody className="bg-white divide-y divide-gray-200">
+          <tbody className="bg-white divide-y divide-charcoal-200">
             {isLoading ? (
               <tr>
                 <td

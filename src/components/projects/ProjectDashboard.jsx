@@ -214,7 +214,7 @@ export default function ProjectDashboard() {
               </>
             ) : (
               <>
-                <div className="w-16 h-16 bg-gradient-to-br from-gray-100 to-gray-200 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                <div className="w-16 h-16 bg-gradient-to-br from-charcoal-100 to-charcoal-200 rounded-2xl flex items-center justify-center mx-auto mb-4">
                   <Search className="w-8 h-8 text-charcoal-400" />
                 </div>
                 <h3 className="text-lg font-bold text-charcoal-900 mb-2">No projects found</h3>

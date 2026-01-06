@@ -63,7 +63,7 @@ export default function TeamManagementPage() {
 
   if (!canManageTeam) {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white flex items-center justify-center">
+      <div className="min-h-screen bg-gradient-to-b from-charcoal-50 to-white flex items-center justify-center">
         <div className="text-center max-w-md px-4">
           <div className="w-20 h-20 bg-gradient-to-br from-purple-100 to-purple-200 rounded-2xl flex items-center justify-center mx-auto mb-6">
             <Shield className="w-10 h-10 text-purple-500" />
@@ -162,7 +162,7 @@ export default function TeamManagementPage() {
         <div className="bg-white rounded-lg shadow-md overflow-hidden">
           {users.length === 0 ? (
             <div className="p-12 text-center">
-              <div className="w-16 h-16 bg-gradient-to-br from-gray-100 to-gray-200 rounded-2xl flex items-center justify-center mx-auto mb-4">
+              <div className="w-16 h-16 bg-gradient-to-br from-charcoal-100 to-charcoal-200 rounded-2xl flex items-center justify-center mx-auto mb-4">
                 <Users className="w-8 h-8 text-charcoal-400" />
               </div>
               <h3 className="text-lg font-semibold text-charcoal-900 mb-2">No team members yet</h3>
@@ -183,7 +183,7 @@ export default function TeamManagementPage() {
             </div>
           ) : (
           <div className="overflow-x-auto">
-            <table className="min-w-full divide-y divide-gray-200">
+            <table className="min-w-full divide-y divide-charcoal-200">
               <thead className="bg-charcoal-50">
                 <tr>
                   <th className="px-6 py-3 text-left text-xs font-medium text-charcoal-500 uppercase tracking-wider">
@@ -200,7 +200,7 @@ export default function TeamManagementPage() {
                   </th>
                 </tr>
               </thead>
-              <tbody className="bg-white divide-y divide-gray-200">
+              <tbody className="bg-white divide-y divide-charcoal-200">
                 {users.map((user) => (
                   <tr key={user.id} className="hover:bg-charcoal-50">
                     <td className="px-6 py-4 whitespace-nowrap">
