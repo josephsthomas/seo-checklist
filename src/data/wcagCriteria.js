@@ -1,6 +1,7 @@
 /**
  * WCAG 2.2 Success Criteria Reference Data
- * Complete mapping of all 87 WCAG 2.2 success criteria
+ * Complete mapping of all 86 WCAG 2.2 success criteria
+ * (Note: 4.1.1 Parsing was removed in WCAG 2.2)
  *
  * Based on: https://www.w3.org/WAI/WCAG22/quickref/
  */
@@ -12,27 +13,35 @@ export const WCAG_LEVELS = {
   AAA: 'AAA'
 };
 
-// WCAG Principles (POUR)
+// WCAG Principles (POUR) - Simple name mapping for UI
 export const WCAG_PRINCIPLES = {
-  PERCEIVABLE: {
+  perceivable: 'Perceivable',
+  operable: 'Operable',
+  understandable: 'Understandable',
+  robust: 'Robust'
+};
+
+// WCAG Principles (POUR) - Detailed info
+export const WCAG_PRINCIPLES_DETAIL = {
+  perceivable: {
     id: 'perceivable',
     number: '1',
     name: 'Perceivable',
     description: 'Information and user interface components must be presentable to users in ways they can perceive.'
   },
-  OPERABLE: {
+  operable: {
     id: 'operable',
     number: '2',
     name: 'Operable',
     description: 'User interface components and navigation must be operable.'
   },
-  UNDERSTANDABLE: {
+  understandable: {
     id: 'understandable',
     number: '3',
     name: 'Understandable',
     description: 'Information and the operation of the user interface must be understandable.'
   },
-  ROBUST: {
+  robust: {
     id: 'robust',
     number: '4',
     name: 'Robust',
@@ -73,7 +82,7 @@ export const WCAG_GUIDELINES = {
 
 /**
  * Complete WCAG 2.2 Success Criteria
- * All 87 criteria with metadata
+ * All 86 criteria with metadata (4.1.1 removed in 2.2)
  */
 export const WCAG_CRITERIA = {
   // ========================================
@@ -165,6 +174,58 @@ export const WCAG_CRITERIA = {
     description: 'Audio description is provided for all prerecorded video content.',
     understanding: 'https://www.w3.org/WAI/WCAG22/Understanding/audio-description-prerecorded.html',
     techniques: ['G8', 'G78', 'G173', 'G203'],
+    axeRules: []
+  },
+
+  '1.2.6': {
+    id: '1.2.6',
+    name: 'Sign Language (Prerecorded)',
+    level: WCAG_LEVELS.AAA,
+    guideline: '1.2',
+    principle: 'perceivable',
+    automation: AUTOMATION_STATUS.MANUAL,
+    description: 'Sign language interpretation is provided for all prerecorded audio content.',
+    understanding: 'https://www.w3.org/WAI/WCAG22/Understanding/sign-language-prerecorded.html',
+    techniques: ['G54', 'G81'],
+    axeRules: []
+  },
+
+  '1.2.7': {
+    id: '1.2.7',
+    name: 'Extended Audio Description (Prerecorded)',
+    level: WCAG_LEVELS.AAA,
+    guideline: '1.2',
+    principle: 'perceivable',
+    automation: AUTOMATION_STATUS.MANUAL,
+    description: 'Extended audio description is provided for all prerecorded video content.',
+    understanding: 'https://www.w3.org/WAI/WCAG22/Understanding/extended-audio-description-prerecorded.html',
+    techniques: ['G8'],
+    axeRules: []
+  },
+
+  '1.2.8': {
+    id: '1.2.8',
+    name: 'Media Alternative (Prerecorded)',
+    level: WCAG_LEVELS.AAA,
+    guideline: '1.2',
+    principle: 'perceivable',
+    automation: AUTOMATION_STATUS.MANUAL,
+    description: 'An alternative for time-based media is provided for all prerecorded synchronized media.',
+    understanding: 'https://www.w3.org/WAI/WCAG22/Understanding/media-alternative-prerecorded.html',
+    techniques: ['G69', 'G159'],
+    axeRules: []
+  },
+
+  '1.2.9': {
+    id: '1.2.9',
+    name: 'Audio-only (Live)',
+    level: WCAG_LEVELS.AAA,
+    guideline: '1.2',
+    principle: 'perceivable',
+    automation: AUTOMATION_STATUS.MANUAL,
+    description: 'An alternative for time-based media is provided for all live audio-only content.',
+    understanding: 'https://www.w3.org/WAI/WCAG22/Understanding/audio-only-live.html',
+    techniques: ['G151', 'G157'],
     axeRules: []
   },
 
@@ -340,6 +401,45 @@ export const WCAG_CRITERIA = {
     axeRules: ['text_requires_higher_color_contrast_to_background']
   },
 
+  '1.4.7': {
+    id: '1.4.7',
+    name: 'Low or No Background Audio',
+    level: WCAG_LEVELS.AAA,
+    guideline: '1.4',
+    principle: 'perceivable',
+    automation: AUTOMATION_STATUS.MANUAL,
+    description: 'Prerecorded audio-only content has no or low background sounds.',
+    understanding: 'https://www.w3.org/WAI/WCAG22/Understanding/low-or-no-background-audio.html',
+    techniques: ['G56'],
+    axeRules: []
+  },
+
+  '1.4.8': {
+    id: '1.4.8',
+    name: 'Visual Presentation',
+    level: WCAG_LEVELS.AAA,
+    guideline: '1.4',
+    principle: 'perceivable',
+    automation: AUTOMATION_STATUS.MANUAL,
+    description: 'For text blocks: colors, width, justification, spacing, and sizing are customizable.',
+    understanding: 'https://www.w3.org/WAI/WCAG22/Understanding/visual-presentation.html',
+    techniques: ['C19', 'C20', 'C21', 'G146', 'G148', 'G156', 'G175'],
+    axeRules: []
+  },
+
+  '1.4.9': {
+    id: '1.4.9',
+    name: 'Images of Text (No Exception)',
+    level: WCAG_LEVELS.AAA,
+    guideline: '1.4',
+    principle: 'perceivable',
+    automation: AUTOMATION_STATUS.MANUAL,
+    description: 'Images of text are only used for decoration or where essential.',
+    understanding: 'https://www.w3.org/WAI/WCAG22/Understanding/images-of-text-no-exception.html',
+    techniques: ['C22', 'C30', 'G140'],
+    axeRules: []
+  },
+
   '1.4.10': {
     id: '1.4.10',
     name: 'Reflow',
@@ -427,6 +527,19 @@ export const WCAG_CRITERIA = {
     axeRules: []
   },
 
+  '2.1.3': {
+    id: '2.1.3',
+    name: 'Keyboard (No Exception)',
+    level: WCAG_LEVELS.AAA,
+    guideline: '2.1',
+    principle: 'operable',
+    automation: AUTOMATION_STATUS.MANUAL,
+    description: 'All functionality is operable through a keyboard interface without exception.',
+    understanding: 'https://www.w3.org/WAI/WCAG22/Understanding/keyboard-no-exception.html',
+    techniques: ['G202'],
+    axeRules: []
+  },
+
   '2.1.4': {
     id: '2.1.4',
     name: 'Character Key Shortcuts',
@@ -473,6 +586,58 @@ export const WCAG_CRITERIA = {
     ]
   },
 
+  '2.2.3': {
+    id: '2.2.3',
+    name: 'No Timing',
+    level: WCAG_LEVELS.AAA,
+    guideline: '2.2',
+    principle: 'operable',
+    automation: AUTOMATION_STATUS.MANUAL,
+    description: 'Timing is not an essential part of the event or activity presented by the content.',
+    understanding: 'https://www.w3.org/WAI/WCAG22/Understanding/no-timing.html',
+    techniques: ['G5'],
+    axeRules: []
+  },
+
+  '2.2.4': {
+    id: '2.2.4',
+    name: 'Interruptions',
+    level: WCAG_LEVELS.AAA,
+    guideline: '2.2',
+    principle: 'operable',
+    automation: AUTOMATION_STATUS.MANUAL,
+    description: 'Interruptions can be postponed or suppressed by the user.',
+    understanding: 'https://www.w3.org/WAI/WCAG22/Understanding/interruptions.html',
+    techniques: ['G75', 'G76'],
+    axeRules: []
+  },
+
+  '2.2.5': {
+    id: '2.2.5',
+    name: 'Re-authenticating',
+    level: WCAG_LEVELS.AAA,
+    guideline: '2.2',
+    principle: 'operable',
+    automation: AUTOMATION_STATUS.MANUAL,
+    description: 'Data is saved when an authenticated session expires.',
+    understanding: 'https://www.w3.org/WAI/WCAG22/Understanding/re-authenticating.html',
+    techniques: ['G105', 'G181'],
+    axeRules: []
+  },
+
+  '2.2.6': {
+    id: '2.2.6',
+    name: 'Timeouts',
+    level: WCAG_LEVELS.AAA,
+    guideline: '2.2',
+    principle: 'operable',
+    automation: AUTOMATION_STATUS.MANUAL,
+    description: 'Users are warned of the duration of any user inactivity that could cause data loss.',
+    understanding: 'https://www.w3.org/WAI/WCAG22/Understanding/timeouts.html',
+    techniques: ['G180', 'G198'],
+    axeRules: []
+  },
+
   // 2.3 Seizures
   '2.3.1': {
     id: '2.3.1',
@@ -484,6 +649,32 @@ export const WCAG_CRITERIA = {
     description: 'Content does not flash more than three times per second.',
     understanding: 'https://www.w3.org/WAI/WCAG22/Understanding/three-flashes-or-below-threshold.html',
     techniques: ['G15', 'G19', 'G176'],
+    axeRules: []
+  },
+
+  '2.3.2': {
+    id: '2.3.2',
+    name: 'Three Flashes',
+    level: WCAG_LEVELS.AAA,
+    guideline: '2.3',
+    principle: 'operable',
+    automation: AUTOMATION_STATUS.MANUAL,
+    description: 'Web pages do not contain anything that flashes more than three times in any one second period.',
+    understanding: 'https://www.w3.org/WAI/WCAG22/Understanding/three-flashes.html',
+    techniques: ['G19'],
+    axeRules: []
+  },
+
+  '2.3.3': {
+    id: '2.3.3',
+    name: 'Animation from Interactions',
+    level: WCAG_LEVELS.AAA,
+    guideline: '2.3',
+    principle: 'operable',
+    automation: AUTOMATION_STATUS.MANUAL,
+    description: 'Motion animation triggered by interaction can be disabled.',
+    understanding: 'https://www.w3.org/WAI/WCAG22/Understanding/animation-from-interactions.html',
+    techniques: ['C39'],
     axeRules: []
   },
 
@@ -588,6 +779,19 @@ export const WCAG_CRITERIA = {
     axeRules: []
   },
 
+  '2.4.8': {
+    id: '2.4.8',
+    name: 'Location',
+    level: WCAG_LEVELS.AAA,
+    guideline: '2.4',
+    principle: 'operable',
+    automation: AUTOMATION_STATUS.MANUAL,
+    description: 'Information about the user\'s location within a set of Web pages is available.',
+    understanding: 'https://www.w3.org/WAI/WCAG22/Understanding/location.html',
+    techniques: ['G63', 'G65', 'G128'],
+    axeRules: []
+  },
+
   '2.4.9': {
     id: '2.4.9',
     name: 'Link Purpose (Link Only)',
@@ -624,6 +828,32 @@ export const WCAG_CRITERIA = {
     description: 'The component with keyboard focus is not entirely hidden by author-created content.',
     understanding: 'https://www.w3.org/WAI/WCAG22/Understanding/focus-not-obscured-minimum.html',
     techniques: ['C43'],
+    axeRules: []
+  },
+
+  '2.4.12': {
+    id: '2.4.12',
+    name: 'Focus Not Obscured (Enhanced)',
+    level: WCAG_LEVELS.AAA,
+    guideline: '2.4',
+    principle: 'operable',
+    automation: AUTOMATION_STATUS.MANUAL,
+    description: 'No part of the component with keyboard focus is hidden by author-created content.',
+    understanding: 'https://www.w3.org/WAI/WCAG22/Understanding/focus-not-obscured-enhanced.html',
+    techniques: ['C43'],
+    axeRules: []
+  },
+
+  '2.4.13': {
+    id: '2.4.13',
+    name: 'Focus Appearance',
+    level: WCAG_LEVELS.AAA,
+    guideline: '2.4',
+    principle: 'operable',
+    automation: AUTOMATION_STATUS.MANUAL,
+    description: 'Focus indicators have sufficient size, contrast, and are not obscured.',
+    understanding: 'https://www.w3.org/WAI/WCAG22/Understanding/focus-appearance.html',
+    techniques: ['C40', 'C41'],
     axeRules: []
   },
 
@@ -680,6 +910,32 @@ export const WCAG_CRITERIA = {
     description: 'Functions triggered by device motion have UI alternatives and can be disabled.',
     understanding: 'https://www.w3.org/WAI/WCAG22/Understanding/motion-actuation.html',
     techniques: ['G213'],
+    axeRules: []
+  },
+
+  '2.5.5': {
+    id: '2.5.5',
+    name: 'Target Size (Enhanced)',
+    level: WCAG_LEVELS.AAA,
+    guideline: '2.5',
+    principle: 'operable',
+    automation: AUTOMATION_STATUS.MANUAL,
+    description: 'Interactive targets are at least 44 by 44 CSS pixels.',
+    understanding: 'https://www.w3.org/WAI/WCAG22/Understanding/target-size-enhanced.html',
+    techniques: [],
+    axeRules: []
+  },
+
+  '2.5.6': {
+    id: '2.5.6',
+    name: 'Concurrent Input Mechanisms',
+    level: WCAG_LEVELS.AAA,
+    guideline: '2.5',
+    principle: 'operable',
+    automation: AUTOMATION_STATUS.MANUAL,
+    description: 'Content does not restrict use of input modalities available on a platform.',
+    understanding: 'https://www.w3.org/WAI/WCAG22/Understanding/concurrent-input-mechanisms.html',
+    techniques: ['G212'],
     axeRules: []
   },
 
@@ -744,6 +1000,58 @@ export const WCAG_CRITERIA = {
     ]
   },
 
+  '3.1.3': {
+    id: '3.1.3',
+    name: 'Unusual Words',
+    level: WCAG_LEVELS.AAA,
+    guideline: '3.1',
+    principle: 'understandable',
+    automation: AUTOMATION_STATUS.MANUAL,
+    description: 'A mechanism is available for identifying definitions of unusual words or phrases.',
+    understanding: 'https://www.w3.org/WAI/WCAG22/Understanding/unusual-words.html',
+    techniques: ['G55', 'G62', 'G70', 'G101', 'G112', 'H40', 'H60'],
+    axeRules: []
+  },
+
+  '3.1.4': {
+    id: '3.1.4',
+    name: 'Abbreviations',
+    level: WCAG_LEVELS.AAA,
+    guideline: '3.1',
+    principle: 'understandable',
+    automation: AUTOMATION_STATUS.MANUAL,
+    description: 'A mechanism for identifying the expanded form of abbreviations is available.',
+    understanding: 'https://www.w3.org/WAI/WCAG22/Understanding/abbreviations.html',
+    techniques: ['G55', 'G62', 'G70', 'G97', 'G102', 'H28'],
+    axeRules: []
+  },
+
+  '3.1.5': {
+    id: '3.1.5',
+    name: 'Reading Level',
+    level: WCAG_LEVELS.AAA,
+    guideline: '3.1',
+    principle: 'understandable',
+    automation: AUTOMATION_STATUS.MANUAL,
+    description: 'Supplemental content or simpler versions are available for complex text.',
+    understanding: 'https://www.w3.org/WAI/WCAG22/Understanding/reading-level.html',
+    techniques: ['G79', 'G86', 'G103', 'G153', 'G160'],
+    axeRules: []
+  },
+
+  '3.1.6': {
+    id: '3.1.6',
+    name: 'Pronunciation',
+    level: WCAG_LEVELS.AAA,
+    guideline: '3.1',
+    principle: 'understandable',
+    automation: AUTOMATION_STATUS.MANUAL,
+    description: 'A mechanism is available for identifying pronunciation of words.',
+    understanding: 'https://www.w3.org/WAI/WCAG22/Understanding/pronunciation.html',
+    techniques: ['G62', 'G120', 'G121', 'G163', 'H62'],
+    axeRules: []
+  },
+
   // 3.2 Predictable
   '3.2.1': {
     id: '3.2.1',
@@ -794,6 +1102,19 @@ export const WCAG_CRITERIA = {
     description: 'Components with the same functionality are identified consistently.',
     understanding: 'https://www.w3.org/WAI/WCAG22/Understanding/consistent-identification.html',
     techniques: ['G197'],
+    axeRules: []
+  },
+
+  '3.2.5': {
+    id: '3.2.5',
+    name: 'Change on Request',
+    level: WCAG_LEVELS.AAA,
+    guideline: '3.2',
+    principle: 'understandable',
+    automation: AUTOMATION_STATUS.MANUAL,
+    description: 'Changes of context are initiated only by user request or a mechanism is available to turn them off.',
+    understanding: 'https://www.w3.org/WAI/WCAG22/Understanding/change-on-request.html',
+    techniques: ['G76', 'G110', 'H32', 'H76', 'H83'],
     axeRules: []
   },
 
@@ -868,6 +1189,32 @@ export const WCAG_CRITERIA = {
     axeRules: []
   },
 
+  '3.3.5': {
+    id: '3.3.5',
+    name: 'Help',
+    level: WCAG_LEVELS.AAA,
+    guideline: '3.3',
+    principle: 'understandable',
+    automation: AUTOMATION_STATUS.MANUAL,
+    description: 'Context-sensitive help is available.',
+    understanding: 'https://www.w3.org/WAI/WCAG22/Understanding/help.html',
+    techniques: ['G71', 'G89', 'G184', 'G193', 'G194'],
+    axeRules: []
+  },
+
+  '3.3.6': {
+    id: '3.3.6',
+    name: 'Error Prevention (All)',
+    level: WCAG_LEVELS.AAA,
+    guideline: '3.3',
+    principle: 'understandable',
+    automation: AUTOMATION_STATUS.MANUAL,
+    description: 'Submissions are reversible, checked, or confirmed for all user input.',
+    understanding: 'https://www.w3.org/WAI/WCAG22/Understanding/error-prevention-all.html',
+    techniques: ['G98', 'G99', 'G155', 'G164', 'G168'],
+    axeRules: []
+  },
+
   '3.3.7': {
     id: '3.3.7',
     name: 'Redundant Entry',
@@ -890,6 +1237,19 @@ export const WCAG_CRITERIA = {
     automation: AUTOMATION_STATUS.MANUAL,
     description: 'Cognitive function tests are not required for authentication unless alternatives exist.',
     understanding: 'https://www.w3.org/WAI/WCAG22/Understanding/accessible-authentication-minimum.html',
+    techniques: ['G218'],
+    axeRules: []
+  },
+
+  '3.3.9': {
+    id: '3.3.9',
+    name: 'Accessible Authentication (Enhanced)',
+    level: WCAG_LEVELS.AAA,
+    guideline: '3.3',
+    principle: 'understandable',
+    automation: AUTOMATION_STATUS.MANUAL,
+    description: 'No cognitive function test is required for any step in an authentication process.',
+    understanding: 'https://www.w3.org/WAI/WCAG22/Understanding/accessible-authentication-enhanced.html',
     techniques: ['G218'],
     axeRules: []
   },
