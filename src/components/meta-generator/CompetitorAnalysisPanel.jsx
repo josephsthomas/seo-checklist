@@ -15,9 +15,13 @@ import {
   Lightbulb,
   TrendingUp,
   TrendingDown,
-  Minus
+  Minus,
+  Download
 } from 'lucide-react';
+import { format } from 'date-fns';
 import toast from 'react-hot-toast';
+import jsPDF from 'jspdf';
+import 'jspdf-autotable';
 
 export default function CompetitorAnalysisPanel({ currentMeta, onClose, onApplyInsight }) {
   const [competitorUrl, setCompetitorUrl] = useState('');
@@ -99,6 +103,111 @@ export default function CompetitorAnalysisPanel({ currentMeta, onClose, onApplyI
     if (comparison === 'better') return <TrendingUp className="w-4 h-4 text-emerald-500" />;
     if (comparison === 'worse') return <TrendingDown className="w-4 h-4 text-red-500" />;
     return <Minus className="w-4 h-4 text-charcoal-400" />;
+  };
+
+  // Export comparison report as PDF
+  const exportComparisonPDF = () => {
+    if (!competitorMeta) {
+      toast.error('No competitor data to export');
+      return;
+    }
+
+    const doc = new jsPDF();
+    const pageWidth = doc.internal.pageSize.getWidth();
+
+    // Title
+    doc.setFontSize(20);
+    doc.setTextColor(31, 41, 55);
+    doc.text('SEO Competitor Analysis Report', pageWidth / 2, 20, { align: 'center' });
+
+    // Subtitle
+    doc.setFontSize(11);
+    doc.setTextColor(107, 114, 128);
+    doc.text(`Generated: ${format(new Date(), 'MMMM d, yyyy h:mm a')}`, pageWidth / 2, 28, { align: 'center' });
+
+    // Competitor URL
+    doc.setFontSize(10);
+    doc.text(`Competitor: ${competitorMeta.url}`, 20, 45);
+
+    // Title Comparison Table
+    doc.setFontSize(14);
+    doc.setTextColor(31, 41, 55);
+    doc.text('Title Tag Comparison', 20, 60);
+
+    doc.autoTable({
+      startY: 65,
+      head: [['', 'Your Site', 'Competitor']],
+      body: [
+        ['Title', currentMeta?.title || 'Not set', competitorMeta.title],
+        ['Length', `${currentMeta?.title?.length || 0} chars`, `${competitorMeta.titleLength} chars`],
+        ['Optimal (50-60)', currentMeta?.title?.length >= 50 && currentMeta?.title?.length <= 60 ? 'Yes' : 'No', competitorMeta.titleLength >= 50 && competitorMeta.titleLength <= 60 ? 'Yes' : 'No']
+      ],
+      headStyles: { fillColor: [245, 158, 11], textColor: 255, fontSize: 9 },
+      bodyStyles: { fontSize: 8 },
+      columnStyles: { 0: { fontStyle: 'bold' } }
+    });
+
+    // Description Comparison Table
+    let yPos = doc.lastAutoTable.finalY + 15;
+    doc.setFontSize(14);
+    doc.text('Meta Description Comparison', 20, yPos);
+
+    doc.autoTable({
+      startY: yPos + 5,
+      head: [['', 'Your Site', 'Competitor']],
+      body: [
+        ['Description', (currentMeta?.description || 'Not set').substring(0, 50) + '...', competitorMeta.description.substring(0, 50) + '...'],
+        ['Length', `${currentMeta?.description?.length || 0} chars`, `${competitorMeta.descriptionLength} chars`],
+        ['Optimal (150-160)', currentMeta?.description?.length >= 150 && currentMeta?.description?.length <= 160 ? 'Yes' : 'No', competitorMeta.descriptionLength >= 150 && competitorMeta.descriptionLength <= 160 ? 'Yes' : 'No']
+      ],
+      headStyles: { fillColor: [245, 158, 11], textColor: 255, fontSize: 9 },
+      bodyStyles: { fontSize: 8 },
+      columnStyles: { 0: { fontStyle: 'bold' } }
+    });
+
+    // Social Meta Comparison
+    yPos = doc.lastAutoTable.finalY + 15;
+    doc.setFontSize(14);
+    doc.text('Social Meta Tags', 20, yPos);
+
+    doc.autoTable({
+      startY: yPos + 5,
+      head: [['Tag', 'Competitor Has']],
+      body: [
+        ['OG Title', competitorMeta.ogTitle ? 'Yes' : 'No'],
+        ['OG Image', competitorMeta.ogImage ? 'Yes' : 'No'],
+        ['Twitter Card', competitorMeta.twitterCard || 'No']
+      ],
+      headStyles: { fillColor: [245, 158, 11], textColor: 255, fontSize: 9 },
+      bodyStyles: { fontSize: 8 }
+    });
+
+    // Keywords
+    yPos = doc.lastAutoTable.finalY + 15;
+    doc.setFontSize(14);
+    doc.text('Keywords Detected in Competitor Content', 20, yPos);
+    doc.setFontSize(10);
+    doc.setTextColor(107, 114, 128);
+    doc.text(competitorMeta.keywords.join(', '), 20, yPos + 8);
+
+    // Insights
+    yPos = yPos + 20;
+    doc.setFontSize(14);
+    doc.setTextColor(31, 41, 55);
+    doc.text('Key Insights', 20, yPos);
+    doc.setFontSize(10);
+    doc.setTextColor(107, 114, 128);
+    const insights = [
+      '• Competitor uses action-oriented language in their title',
+      '• Their description includes social proof ("10,000+ satisfied customers")',
+      '• They have complete Open Graph implementation for social sharing'
+    ];
+    insights.forEach((insight, i) => {
+      doc.text(insight, 20, yPos + 8 + (i * 6));
+    });
+
+    doc.save(`competitor_analysis_${format(new Date(), 'yyyy-MM-dd')}.pdf`);
+    toast.success('Competitor analysis exported as PDF');
   };
 
   return (
@@ -373,6 +482,17 @@ export default function CompetitorAnalysisPanel({ currentMeta, onClose, onApplyI
                   </ul>
                 </div>
               </div>
+            </div>
+
+            {/* Export Button */}
+            <div className="pt-4 border-t border-charcoal-100 dark:border-charcoal-700">
+              <button
+                onClick={exportComparisonPDF}
+                className="btn btn-primary w-full flex items-center justify-center gap-2"
+              >
+                <Download className="w-4 h-4" />
+                Export Comparison Report (PDF)
+              </button>
             </div>
           </div>
         )}

@@ -18,11 +18,13 @@ import {
   ChevronDown,
   ArrowUpRight,
   ArrowDownRight,
-  Minus
+  Minus,
+  FileText
 } from 'lucide-react';
 import { format, subDays, startOfWeek, startOfMonth, eachDayOfInterval } from 'date-fns';
 import { collection, query, where, orderBy, getDocs, Timestamp } from 'firebase/firestore';
 import { db } from '../../lib/firebase';
+import toast from 'react-hot-toast';
 
 const TOOL_ICONS = {
   planner: ClipboardList,
@@ -160,6 +162,59 @@ export default function UsageAnalyticsDashboard() {
     return Math.max(...stats.dailyActivity.map(d => d.actions));
   }, [stats?.dailyActivity]);
 
+  // Export analytics data as CSV
+  const exportAnalyticsData = () => {
+    if (!stats) {
+      toast.error('No data to export');
+      return;
+    }
+
+    // Build CSV content
+    let csvContent = 'Usage Analytics Report\n';
+    csvContent += `Date Range: ${dateRangeConfig.label}\n`;
+    csvContent += `Generated: ${format(new Date(), 'yyyy-MM-dd HH:mm:ss')}\n\n`;
+
+    // Overview section
+    csvContent += 'OVERVIEW\n';
+    csvContent += 'Metric,Value,Change\n';
+    csvContent += `Total Users,${stats.overview.totalUsers},${stats.overview.userChange}%\n`;
+    csvContent += `Active Users,${stats.overview.activeUsers},${stats.overview.activeChange}%\n`;
+    csvContent += `Total Actions,${stats.overview.totalActions},${stats.overview.actionsChange}%\n`;
+    csvContent += `Exports,${stats.overview.exportCount},${stats.overview.exportChange}%\n\n`;
+
+    // Tool usage section
+    csvContent += 'TOOL USAGE\n';
+    csvContent += 'Tool,Count,Percentage\n';
+    Object.entries(stats.toolUsage).forEach(([tool, data]) => {
+      csvContent += `${tool},${data.count},${data.percentage}%\n`;
+    });
+    csvContent += '\n';
+
+    // Daily activity section
+    csvContent += 'DAILY ACTIVITY\n';
+    csvContent += 'Date,Actions,Users\n';
+    stats.dailyActivity.forEach(day => {
+      csvContent += `${format(day.date, 'yyyy-MM-dd')},${day.actions},${day.users}\n`;
+    });
+    csvContent += '\n';
+
+    // Popular features section
+    csvContent += 'POPULAR FEATURES\n';
+    csvContent += 'Feature,Count,Tool\n';
+    stats.popularFeatures.forEach(feature => {
+      csvContent += `${feature.name},${feature.count},${feature.tool}\n`;
+    });
+
+    // Download
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    link.download = `usage_analytics_${format(new Date(), 'yyyy-MM-dd')}.csv`;
+    link.click();
+    URL.revokeObjectURL(link.href);
+    toast.success('Analytics data exported to CSV');
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen bg-gradient-to-b from-charcoal-50 to-white dark:from-charcoal-900 dark:to-charcoal-950 p-8">
@@ -213,6 +268,13 @@ export default function UsageAnalyticsDashboard() {
             >
               <RefreshCcw className="w-4 h-4" />
               Refresh
+            </button>
+            <button
+              onClick={exportAnalyticsData}
+              className="btn btn-primary flex items-center gap-2"
+            >
+              <Download className="w-4 h-4" />
+              Export
             </button>
           </div>
         </div>

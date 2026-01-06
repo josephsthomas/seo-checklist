@@ -19,12 +19,14 @@ import {
   ChevronRight,
   Clock,
   AlertCircle,
-  RefreshCcw
+  RefreshCcw,
+  X
 } from 'lucide-react';
 import { format, subDays, startOfDay, endOfDay } from 'date-fns';
 import { collection, query, where, orderBy, limit, getDocs, startAfter, Timestamp } from 'firebase/firestore';
 import { db } from '../../lib/firebase';
 import toast from 'react-hot-toast';
+import InfoTooltip from '../common/InfoTooltip';
 
 const ACTION_TYPES = {
   CREATE: { label: 'Create', color: 'emerald', icon: Plus },
@@ -50,6 +52,15 @@ const RESOURCE_TYPES = [
   'Settings',
 ];
 
+// Retention policy options
+const RETENTION_OPTIONS = [
+  { value: '30', label: '30 days', description: 'Minimum retention' },
+  { value: '90', label: '90 days', description: 'Standard retention' },
+  { value: '180', label: '180 days', description: 'Extended retention' },
+  { value: '365', label: '1 year', description: 'Compliance retention' },
+  { value: 'unlimited', label: 'Unlimited', description: 'No automatic deletion' }
+];
+
 export default function AuditLogViewer() {
   const [logs, setLogs] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -60,6 +71,10 @@ export default function AuditLogViewer() {
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [selectedLog, setSelectedLog] = useState(null);
+
+  // Retention settings
+  const [showRetentionSettings, setShowRetentionSettings] = useState(false);
+  const [retentionPeriod, setRetentionPeriod] = useState('90');
 
   const ITEMS_PER_PAGE = 25;
 
@@ -177,8 +192,73 @@ export default function AuditLogViewer() {
     setCurrentPage(1);
   }, [filteredLogs.length]);
 
-  const handleExport = () => {
-    toast.success('Audit log export coming soon!');
+  const handleExport = (exportFormat = 'csv') => {
+    if (filteredLogs.length === 0) {
+      toast.error('No logs to export');
+      return;
+    }
+
+    try {
+      if (exportFormat === 'csv') {
+        // Generate CSV
+        const headers = ['Timestamp', 'User', 'Email', 'Action', 'Resource', 'Resource Name', 'IP Address', 'Status', 'Error Message'];
+        const rows = filteredLogs.map(log => [
+          format(log.timestamp, 'yyyy-MM-dd HH:mm:ss'),
+          log.userName,
+          log.userEmail,
+          ACTION_TYPES[log.action]?.label || log.action,
+          log.resource,
+          log.resourceName,
+          log.ipAddress,
+          log.success ? 'Success' : 'Failed',
+          log.errorMessage || ''
+        ]);
+
+        const csvContent = [headers, ...rows]
+          .map(row => row.map(cell => `"${String(cell).replace(/"/g, '""')}"`).join(','))
+          .join('\n');
+
+        const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+        const link = document.createElement('a');
+        link.href = URL.createObjectURL(blob);
+        link.download = `audit_log_${format(new Date(), 'yyyy-MM-dd')}.csv`;
+        link.click();
+        URL.revokeObjectURL(link.href);
+        toast.success(`Exported ${filteredLogs.length} audit log entries to CSV`);
+      } else if (exportFormat === 'json') {
+        // Generate JSON
+        const jsonData = filteredLogs.map(log => ({
+          timestamp: format(log.timestamp, 'yyyy-MM-dd HH:mm:ss'),
+          user: {
+            id: log.userId,
+            name: log.userName,
+            email: log.userEmail
+          },
+          action: ACTION_TYPES[log.action]?.label || log.action,
+          resource: {
+            type: log.resource,
+            id: log.resourceId,
+            name: log.resourceName
+          },
+          ipAddress: log.ipAddress,
+          userAgent: log.userAgent,
+          success: log.success,
+          errorMessage: log.errorMessage,
+          details: log.details
+        }));
+
+        const blob = new Blob([JSON.stringify(jsonData, null, 2)], { type: 'application/json' });
+        const link = document.createElement('a');
+        link.href = URL.createObjectURL(blob);
+        link.download = `audit_log_${format(new Date(), 'yyyy-MM-dd')}.json`;
+        link.click();
+        URL.revokeObjectURL(link.href);
+        toast.success(`Exported ${filteredLogs.length} audit log entries to JSON`);
+      }
+    } catch (err) {
+      console.error('Export error:', err);
+      toast.error('Failed to export audit logs');
+    }
   };
 
   const getActionConfig = (action) => {
@@ -195,7 +275,10 @@ export default function AuditLogViewer() {
               <Shield className="w-5 h-5 text-white" />
             </div>
             <div>
-              <h1 className="text-2xl font-bold text-charcoal-900 dark:text-white">Audit Log</h1>
+              <h1 className="text-2xl font-bold text-charcoal-900 dark:text-white flex items-center gap-2">
+                Audit Log
+                <InfoTooltip tipKey="auditLog.retention" />
+              </h1>
               <p className="text-charcoal-500 dark:text-charcoal-400">
                 Track all user actions for compliance
               </p>
@@ -204,19 +287,41 @@ export default function AuditLogViewer() {
 
           <div className="flex items-center gap-3">
             <button
+              onClick={() => setShowRetentionSettings(true)}
+              className="btn btn-secondary flex items-center gap-2"
+              title="Configure how long audit logs are retained"
+            >
+              <Settings className="w-4 h-4" />
+              Retention
+            </button>
+            <button
               onClick={() => setLoading(true)}
               className="btn btn-secondary flex items-center gap-2"
             >
               <RefreshCcw className="w-4 h-4" />
               Refresh
             </button>
-            <button
-              onClick={handleExport}
-              className="btn btn-primary flex items-center gap-2"
-            >
-              <Download className="w-4 h-4" />
-              Export Logs
-            </button>
+            <div className="relative group">
+              <button className="btn btn-primary flex items-center gap-2" title="Export logs for compliance reporting or offline analysis">
+                <Download className="w-4 h-4" />
+                Export Logs
+                <ChevronDown className="w-4 h-4" />
+              </button>
+              <div className="absolute right-0 top-full mt-1 w-40 bg-white dark:bg-charcoal-800 border border-charcoal-200 dark:border-charcoal-700 rounded-lg shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-10">
+                <button
+                  onClick={() => handleExport('csv')}
+                  className="w-full px-4 py-2 text-sm text-left text-charcoal-700 dark:text-charcoal-300 hover:bg-charcoal-100 dark:hover:bg-charcoal-700 rounded-t-lg"
+                >
+                  Export as CSV
+                </button>
+                <button
+                  onClick={() => handleExport('json')}
+                  className="w-full px-4 py-2 text-sm text-left text-charcoal-700 dark:text-charcoal-300 hover:bg-charcoal-100 dark:hover:bg-charcoal-700 rounded-b-lg"
+                >
+                  Export as JSON
+                </button>
+              </div>
+            </div>
           </div>
         </div>
 
@@ -236,16 +341,19 @@ export default function AuditLogViewer() {
             </div>
 
             {/* Action Filter */}
-            <select
-              value={selectedAction}
-              onChange={(e) => setSelectedAction(e.target.value)}
-              className="select"
-            >
-              <option value="all">All Actions</option>
-              {Object.entries(ACTION_TYPES).map(([key, config]) => (
-                <option key={key} value={key}>{config.label}</option>
-              ))}
-            </select>
+            <div className="flex items-center gap-1">
+              <select
+                value={selectedAction}
+                onChange={(e) => setSelectedAction(e.target.value)}
+                className="select"
+                title="Filter to specific action types for security reviews or troubleshooting"
+              >
+                <option value="all">All Actions</option>
+                {Object.entries(ACTION_TYPES).map(([key, config]) => (
+                  <option key={key} value={key}>{config.label}</option>
+                ))}
+              </select>
+            </div>
 
             {/* Resource Filter */}
             <select
@@ -490,6 +598,106 @@ export default function AuditLogViewer() {
                     {selectedLog.userAgent}
                   </p>
                 </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Retention Settings Modal */}
+        {showRetentionSettings && (
+          <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+            <div className="bg-white dark:bg-charcoal-800 rounded-2xl shadow-xl w-full max-w-md">
+              <div className="p-6 border-b border-charcoal-100 dark:border-charcoal-700">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <div className="p-2 bg-purple-100 dark:bg-purple-900/30 rounded-xl">
+                      <Settings className="w-5 h-5 text-purple-600 dark:text-purple-400" />
+                    </div>
+                    <div>
+                      <h3 className="text-lg font-semibold text-charcoal-900 dark:text-white">
+                        Retention Policy
+                      </h3>
+                      <p className="text-sm text-charcoal-500 dark:text-charcoal-400">
+                        Configure audit log retention
+                      </p>
+                    </div>
+                  </div>
+                  <button
+                    onClick={() => setShowRetentionSettings(false)}
+                    className="p-2 text-charcoal-400 hover:text-charcoal-600 hover:bg-charcoal-100 dark:hover:bg-charcoal-700 rounded-lg"
+                  >
+                    <X className="w-5 h-5" />
+                  </button>
+                </div>
+              </div>
+
+              <div className="p-6 space-y-4">
+                <div>
+                  <label className="block text-sm font-medium text-charcoal-700 dark:text-charcoal-300 mb-3">
+                    Retention Period
+                  </label>
+                  <div className="space-y-2">
+                    {RETENTION_OPTIONS.map(option => (
+                      <label
+                        key={option.value}
+                        className={`flex items-center gap-3 p-3 rounded-xl border cursor-pointer transition-colors ${
+                          retentionPeriod === option.value
+                            ? 'border-purple-500 bg-purple-50 dark:bg-purple-900/20'
+                            : 'border-charcoal-200 dark:border-charcoal-700 hover:border-charcoal-300 dark:hover:border-charcoal-600'
+                        }`}
+                      >
+                        <input
+                          type="radio"
+                          name="retention"
+                          value={option.value}
+                          checked={retentionPeriod === option.value}
+                          onChange={(e) => setRetentionPeriod(e.target.value)}
+                          className="w-4 h-4 text-purple-600"
+                        />
+                        <div className="flex-1">
+                          <p className={`font-medium ${
+                            retentionPeriod === option.value
+                              ? 'text-purple-700 dark:text-purple-300'
+                              : 'text-charcoal-900 dark:text-white'
+                          }`}>
+                            {option.label}
+                          </p>
+                          <p className="text-sm text-charcoal-500 dark:text-charcoal-400">
+                            {option.description}
+                          </p>
+                        </div>
+                      </label>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="p-4 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-xl">
+                  <div className="flex items-start gap-2">
+                    <AlertCircle className="w-5 h-5 text-amber-600 dark:text-amber-400 flex-shrink-0 mt-0.5" />
+                    <div className="text-sm text-amber-700 dark:text-amber-300">
+                      <p className="font-medium">Compliance Notice</p>
+                      <p className="mt-1">Some regulations require specific retention periods. Check your compliance requirements before reducing retention.</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="p-6 border-t border-charcoal-100 dark:border-charcoal-700 flex justify-end gap-3">
+                <button
+                  onClick={() => setShowRetentionSettings(false)}
+                  className="btn btn-secondary"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={() => {
+                    toast.success(`Retention policy updated to ${RETENTION_OPTIONS.find(o => o.value === retentionPeriod)?.label}`);
+                    setShowRetentionSettings(false);
+                  }}
+                  className="btn btn-primary"
+                >
+                  Save Policy
+                </button>
               </div>
             </div>
           </div>

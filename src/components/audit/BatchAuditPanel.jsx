@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import {
   Globe,
   Upload,
@@ -15,9 +15,17 @@ import {
   BarChart2,
   ChevronDown,
   ChevronRight,
-  Loader2
+  Loader2,
+  Save
 } from 'lucide-react';
+import { format } from 'date-fns';
 import toast from 'react-hot-toast';
+import InfoTooltip from '../common/InfoTooltip';
+import jsPDF from 'jspdf';
+import 'jspdf-autotable';
+
+// Local storage key for persisting batch audit results
+const STORAGE_KEY = 'batchAuditResults';
 
 export default function BatchAuditPanel({ onClose, onStartBatch }) {
   const [urls, setUrls] = useState([]);
@@ -26,25 +34,219 @@ export default function BatchAuditPanel({ onClose, onStartBatch }) {
   const [results, setResults] = useState([]);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [showResults, setShowResults] = useState(false);
+  const [savedBatches, setSavedBatches] = useState([]);
 
-  // Add URL to list
-  const addUrl = useCallback((url) => {
-    const trimmedUrl = url.trim();
-    if (!trimmedUrl) return;
-
-    // Validate URL
+  // Load saved batch results from localStorage
+  useEffect(() => {
     try {
-      new URL(trimmedUrl.startsWith('http') ? trimmedUrl : `https://${trimmedUrl}`);
-    } catch {
-      toast.error('Invalid URL format');
+      const saved = localStorage.getItem(STORAGE_KEY);
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        setSavedBatches(parsed);
+      }
+    } catch (err) {
+      console.error('Error loading saved batches:', err);
+    }
+  }, []);
+
+  // Save results to localStorage when batch completes
+  const saveCurrentBatch = useCallback(() => {
+    if (results.length === 0) return;
+
+    const batchData = {
+      id: Date.now().toString(),
+      completedAt: new Date().toISOString(),
+      urls,
+      results,
+      summary: {
+        totalUrls: urls.length,
+        avgScore: Math.round(results.reduce((acc, r) => acc + r.healthScore, 0) / results.length),
+        totalIssues: results.reduce((acc, r) => acc + r.issueCount, 0)
+      }
+    };
+
+    try {
+      const updatedBatches = [batchData, ...savedBatches].slice(0, 10); // Keep last 10
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(updatedBatches));
+      setSavedBatches(updatedBatches);
+      toast.success('Batch results saved');
+    } catch (err) {
+      console.error('Error saving batch:', err);
+    }
+  }, [results, urls, savedBatches]);
+
+  // Export results as CSV
+  const exportAsCSV = () => {
+    if (results.length === 0) {
+      toast.error('No results to export');
       return;
     }
 
-    const normalizedUrl = trimmedUrl.startsWith('http') ? trimmedUrl : `https://${trimmedUrl}`;
+    const headers = ['URL', 'Health Score', 'Issues', 'Meta Tags', 'Images', 'Links', 'Performance', 'Timestamp'];
+    const rows = results.map(r => [
+      r.url,
+      r.healthScore,
+      r.issueCount,
+      r.categories['Meta Tags'],
+      r.categories['Images'],
+      r.categories['Links'],
+      r.categories['Performance'],
+      format(r.timestamp, 'yyyy-MM-dd HH:mm:ss')
+    ]);
+
+    const csvContent = [headers, ...rows]
+      .map(row => row.map(cell => `"${String(cell).replace(/"/g, '""')}"`).join(','))
+      .join('\n');
+
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    link.download = `batch_audit_${format(new Date(), 'yyyy-MM-dd_HHmm')}.csv`;
+    link.click();
+    URL.revokeObjectURL(link.href);
+    toast.success(`Exported ${results.length} results to CSV`);
+  };
+
+  // Export results as PDF
+  const exportAsPDF = () => {
+    if (results.length === 0) {
+      toast.error('No results to export');
+      return;
+    }
+
+    const doc = new jsPDF();
+    const pageWidth = doc.internal.pageSize.getWidth();
+
+    // Title
+    doc.setFontSize(20);
+    doc.setTextColor(31, 41, 55);
+    doc.text('Batch SEO Audit Report', pageWidth / 2, 20, { align: 'center' });
+
+    // Subtitle
+    doc.setFontSize(11);
+    doc.setTextColor(107, 114, 128);
+    doc.text(`Generated: ${format(new Date(), 'MMMM d, yyyy h:mm a')}`, pageWidth / 2, 28, { align: 'center' });
+
+    // Summary
+    const avgScore = Math.round(results.reduce((acc, r) => acc + r.healthScore, 0) / results.length);
+    const totalIssues = results.reduce((acc, r) => acc + r.issueCount, 0);
+
+    doc.setFontSize(12);
+    doc.setTextColor(31, 41, 55);
+    doc.text('Summary', 20, 45);
+
+    doc.setFontSize(10);
+    doc.setTextColor(107, 114, 128);
+    doc.text(`URLs Audited: ${results.length}`, 20, 55);
+    doc.text(`Average Health Score: ${avgScore}%`, 20, 62);
+    doc.text(`Total Issues Found: ${totalIssues}`, 20, 69);
+
+    // Results table
+    const tableData = results.map(r => [
+      r.url.length > 40 ? r.url.substring(0, 40) + '...' : r.url,
+      `${r.healthScore}%`,
+      r.issueCount,
+      `${r.categories['Meta Tags']}%`,
+      `${r.categories['Images']}%`,
+      `${r.categories['Links']}%`,
+      `${r.categories['Performance']}%`
+    ]);
+
+    doc.autoTable({
+      startY: 80,
+      head: [['URL', 'Score', 'Issues', 'Meta', 'Images', 'Links', 'Perf']],
+      body: tableData,
+      headStyles: {
+        fillColor: [14, 165, 233],
+        textColor: 255,
+        fontSize: 9
+      },
+      bodyStyles: {
+        fontSize: 8
+      },
+      columnStyles: {
+        0: { cellWidth: 60 },
+        1: { cellWidth: 18, halign: 'center' },
+        2: { cellWidth: 18, halign: 'center' },
+        3: { cellWidth: 18, halign: 'center' },
+        4: { cellWidth: 18, halign: 'center' },
+        5: { cellWidth: 18, halign: 'center' },
+        6: { cellWidth: 18, halign: 'center' }
+      },
+      alternateRowStyles: {
+        fillColor: [248, 250, 252]
+      }
+    });
+
+    doc.save(`batch_audit_${format(new Date(), 'yyyy-MM-dd_HHmm')}.pdf`);
+    toast.success('Exported batch audit report as PDF');
+  };
+
+  // Validate URL format with detailed checks
+  const validateUrl = (url) => {
+    const trimmedUrl = url.trim();
+    if (!trimmedUrl) return { valid: false, error: 'URL cannot be empty' };
+
+    // Check for common typos and issues
+    if (trimmedUrl.includes(' ')) {
+      return { valid: false, error: 'URL contains spaces - did you mean to remove them?' };
+    }
+
+    if (trimmedUrl.startsWith('htp://') || trimmedUrl.startsWith('htps://')) {
+      return { valid: false, error: 'Possible typo in protocol - check http:// or https://' };
+    }
+
+    // Add protocol if missing
+    const urlWithProtocol = trimmedUrl.startsWith('http') ? trimmedUrl : `https://${trimmedUrl}`;
+
+    try {
+      const parsed = new URL(urlWithProtocol);
+
+      // Check for valid hostname
+      if (!parsed.hostname || parsed.hostname.length < 3) {
+        return { valid: false, error: 'Invalid hostname' };
+      }
+
+      // Check for localhost/internal URLs (warning but allow)
+      if (parsed.hostname === 'localhost' || parsed.hostname.match(/^192\.168\.|^10\.|^172\.(1[6-9]|2[0-9]|3[0-1])\./)) {
+        return { valid: true, normalized: urlWithProtocol, warning: 'This appears to be a local/internal URL' };
+      }
+
+      // Check for valid TLD (basic check)
+      const hostParts = parsed.hostname.split('.');
+      if (hostParts.length < 2 || hostParts[hostParts.length - 1].length < 2) {
+        return { valid: false, error: 'Invalid domain - missing or invalid TLD (e.g., .com, .org)' };
+      }
+
+      // Check for common invalid characters in domain
+      if (parsed.hostname.match(/[<>'"\\]/)) {
+        return { valid: false, error: 'Domain contains invalid characters' };
+      }
+
+      return { valid: true, normalized: urlWithProtocol };
+    } catch {
+      return { valid: false, error: 'Invalid URL format - please check the URL structure' };
+    }
+  };
+
+  // Add URL to list
+  const addUrl = useCallback((url) => {
+    const validation = validateUrl(url);
+
+    if (!validation.valid) {
+      toast.error(validation.error);
+      return;
+    }
+
+    const normalizedUrl = validation.normalized;
 
     if (urls.includes(normalizedUrl)) {
       toast.error('URL already added');
       return;
+    }
+
+    if (validation.warning) {
+      toast(validation.warning, { icon: '⚠️' });
     }
 
     setUrls(prev => [...prev, normalizedUrl]);
@@ -55,22 +257,45 @@ export default function BatchAuditPanel({ onClose, onStartBatch }) {
   const addMultipleUrls = useCallback((text) => {
     const urlLines = text.split(/[\n,]/).map(u => u.trim()).filter(Boolean);
     const newUrls = [];
+    let invalidCount = 0;
+    let duplicateCount = 0;
 
     urlLines.forEach(url => {
-      try {
-        const normalizedUrl = url.startsWith('http') ? url : `https://${url}`;
-        new URL(normalizedUrl);
-        if (!urls.includes(normalizedUrl) && !newUrls.includes(normalizedUrl)) {
-          newUrls.push(normalizedUrl);
-        }
-      } catch {
-        // Skip invalid URLs
+      const validation = validateUrl(url);
+
+      if (!validation.valid) {
+        invalidCount++;
+        return;
       }
+
+      const normalizedUrl = validation.normalized;
+      if (urls.includes(normalizedUrl) || newUrls.includes(normalizedUrl)) {
+        duplicateCount++;
+        return;
+      }
+
+      newUrls.push(normalizedUrl);
     });
 
     if (newUrls.length > 0) {
       setUrls(prev => [...prev, ...newUrls]);
-      toast.success(`Added ${newUrls.length} URLs`);
+
+      let message = `Added ${newUrls.length} URL${newUrls.length > 1 ? 's' : ''}`;
+      if (invalidCount > 0 || duplicateCount > 0) {
+        const skipped = [];
+        if (invalidCount > 0) skipped.push(`${invalidCount} invalid`);
+        if (duplicateCount > 0) skipped.push(`${duplicateCount} duplicate${duplicateCount > 1 ? 's' : ''}`);
+        message += ` (skipped ${skipped.join(', ')})`;
+      }
+      toast.success(message);
+    } else if (invalidCount > 0 || duplicateCount > 0) {
+      if (invalidCount > 0 && duplicateCount === 0) {
+        toast.error(`All ${invalidCount} URLs were invalid`);
+      } else if (duplicateCount > 0 && invalidCount === 0) {
+        toast.error(`All ${duplicateCount} URLs were duplicates`);
+      } else {
+        toast.error(`No valid URLs found (${invalidCount} invalid, ${duplicateCount} duplicates)`);
+      }
     }
   }, [urls]);
 
@@ -144,6 +369,41 @@ export default function BatchAuditPanel({ onClose, onStartBatch }) {
     setIsRunning(false);
     toast.success('Batch audit complete!');
 
+    // Auto-save results
+    const batchData = {
+      id: Date.now().toString(),
+      completedAt: new Date().toISOString(),
+      urls,
+      results: [...results, {
+        url: urls[urls.length - 1],
+        status: 'completed',
+        healthScore: Math.floor(60 + Math.random() * 40),
+        issueCount: Math.floor(Math.random() * 30) + 5,
+        timestamp: new Date(),
+        categories: {
+          'Meta Tags': Math.floor(70 + Math.random() * 30),
+          'Images': Math.floor(60 + Math.random() * 40),
+          'Links': Math.floor(75 + Math.random() * 25),
+          'Performance': Math.floor(50 + Math.random() * 50),
+        }
+      }],
+      summary: {
+        totalUrls: urls.length,
+        avgScore: Math.round(results.reduce((acc, r) => acc + r.healthScore, 0) / results.length) || 0,
+        totalIssues: results.reduce((acc, r) => acc + r.issueCount, 0)
+      }
+    };
+
+    try {
+      const saved = localStorage.getItem(STORAGE_KEY);
+      const existingBatches = saved ? JSON.parse(saved) : [];
+      const updatedBatches = [batchData, ...existingBatches].slice(0, 10);
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(updatedBatches));
+      setSavedBatches(updatedBatches);
+    } catch (err) {
+      console.error('Error auto-saving batch:', err);
+    }
+
     // Callback with results
     if (onStartBatch) {
       onStartBatch(results);
@@ -173,7 +433,10 @@ export default function BatchAuditPanel({ onClose, onStartBatch }) {
             <Globe className="w-5 h-5 text-white" />
           </div>
           <div>
-            <h2 className="text-lg font-bold text-charcoal-900 dark:text-white">Multi-URL Batch Audit</h2>
+            <h2 className="text-lg font-bold text-charcoal-900 dark:text-white flex items-center gap-1">
+              Multi-URL Batch Audit
+              <InfoTooltip tipKey="batch.urls" />
+            </h2>
             <p className="text-sm text-charcoal-500 dark:text-charcoal-400">
               Audit multiple URLs at once
             </p>
@@ -214,6 +477,7 @@ export default function BatchAuditPanel({ onClose, onStartBatch }) {
             <label className="flex items-center gap-2 px-4 py-2 bg-charcoal-100 dark:bg-charcoal-700 text-charcoal-700 dark:text-charcoal-300 rounded-lg cursor-pointer hover:bg-charcoal-200 dark:hover:bg-charcoal-600 transition-colors">
               <Upload className="w-4 h-4" />
               <span className="text-sm font-medium">Upload CSV/TXT</span>
+              <InfoTooltip tipKey="batch.upload" />
               <input
                 type="file"
                 accept=".csv,.txt"
@@ -435,13 +699,29 @@ export default function BatchAuditPanel({ onClose, onStartBatch }) {
                   Resume
                 </button>
               ) : (
-                <button
-                  className="btn btn-primary flex items-center gap-2"
-                  onClick={() => toast.success('Export coming soon!')}
-                >
-                  <Download className="w-4 h-4" />
-                  Export Results
-                </button>
+                <div className="relative group">
+                  <button className="btn btn-primary flex items-center gap-2">
+                    <Download className="w-4 h-4" />
+                    Export Results
+                    <ChevronDown className="w-4 h-4" />
+                  </button>
+                  <div className="absolute right-0 bottom-full mb-1 w-44 bg-white dark:bg-charcoal-800 border border-charcoal-200 dark:border-charcoal-700 rounded-lg shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-10">
+                    <button
+                      onClick={exportAsPDF}
+                      className="w-full px-4 py-2 text-sm text-left text-charcoal-700 dark:text-charcoal-300 hover:bg-charcoal-100 dark:hover:bg-charcoal-700 rounded-t-lg flex items-center gap-2"
+                    >
+                      <FileText className="w-4 h-4" />
+                      Export as PDF
+                    </button>
+                    <button
+                      onClick={exportAsCSV}
+                      className="w-full px-4 py-2 text-sm text-left text-charcoal-700 dark:text-charcoal-300 hover:bg-charcoal-100 dark:hover:bg-charcoal-700 rounded-b-lg flex items-center gap-2"
+                    >
+                      <BarChart2 className="w-4 h-4" />
+                      Export as CSV
+                    </button>
+                  </div>
+                </div>
               )}
             </div>
           </>

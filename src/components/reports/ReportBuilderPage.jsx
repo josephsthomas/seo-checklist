@@ -39,6 +39,9 @@ import {
 } from 'lucide-react';
 import { format } from 'date-fns';
 import toast from 'react-hot-toast';
+import InfoTooltip from '../common/InfoTooltip';
+import jsPDF from 'jspdf';
+import html2canvas from 'html2canvas';
 import useReportBuilder, {
   DATA_SOURCES,
   WIDGET_TYPES,
@@ -288,10 +291,120 @@ export default function ReportBuilderPage() {
   }, [currentReport, reportName, reportDescription, widgets, createReport, updateReport]);
 
   // Export report
-  const exportReport = useCallback((format) => {
-    toast.success(`Exporting as ${format.toUpperCase()}...`);
-    // TODO: Implement actual export
-  }, []);
+  const exportReport = useCallback(async (exportFormat) => {
+    const reportGrid = document.getElementById('report-grid');
+    if (!reportGrid) {
+      toast.error('No report content to export');
+      return;
+    }
+
+    const loadingToast = toast.loading(`Exporting as ${exportFormat.toUpperCase()}...`);
+
+    try {
+      if (exportFormat === 'pdf') {
+        // Capture the report grid as canvas
+        const canvas = await html2canvas(reportGrid, {
+          scale: 2,
+          useCORS: true,
+          logging: false,
+          backgroundColor: '#ffffff'
+        });
+
+        const imgData = canvas.toDataURL('image/png');
+        const pdf = new jsPDF({
+          orientation: canvas.width > canvas.height ? 'landscape' : 'portrait',
+          unit: 'px',
+          format: [canvas.width, canvas.height]
+        });
+
+        // Add title
+        pdf.setFontSize(20);
+        pdf.text(reportName || 'Custom Report', 40, 40);
+        pdf.setFontSize(10);
+        pdf.setTextColor(128);
+        pdf.text(`Generated: ${format(new Date(), 'MMMM d, yyyy h:mm a')}`, 40, 60);
+
+        // Add the report image
+        const imgWidth = pdf.internal.pageSize.getWidth() - 80;
+        const imgHeight = (canvas.height * imgWidth) / canvas.width;
+        pdf.addImage(imgData, 'PNG', 40, 80, imgWidth, imgHeight);
+
+        pdf.save(`${reportName || 'report'}_${format(new Date(), 'yyyy-MM-dd')}.pdf`);
+        toast.success('Report exported as PDF', { id: loadingToast });
+      } else if (exportFormat === 'png') {
+        // Export as PNG image
+        const canvas = await html2canvas(reportGrid, {
+          scale: 2,
+          useCORS: true,
+          logging: false,
+          backgroundColor: '#ffffff'
+        });
+
+        const link = document.createElement('a');
+        link.download = `${reportName || 'report'}_${format(new Date(), 'yyyy-MM-dd')}.png`;
+        link.href = canvas.toDataURL('image/png');
+        link.click();
+        toast.success('Report exported as PNG', { id: loadingToast });
+      } else if (exportFormat === 'json') {
+        // Export report configuration as JSON
+        const reportData = {
+          name: reportName,
+          description: reportDescription,
+          widgets: widgets,
+          exportedAt: new Date().toISOString()
+        };
+        const blob = new Blob([JSON.stringify(reportData, null, 2)], { type: 'application/json' });
+        const link = document.createElement('a');
+        link.href = URL.createObjectURL(blob);
+        link.download = `${reportName || 'report'}_${format(new Date(), 'yyyy-MM-dd')}.json`;
+        link.click();
+        URL.revokeObjectURL(link.href);
+        toast.success('Report configuration exported as JSON', { id: loadingToast });
+      } else if (exportFormat === 'html') {
+        // Export as standalone HTML
+        const canvas = await html2canvas(reportGrid, {
+          scale: 2,
+          useCORS: true,
+          logging: false,
+          backgroundColor: '#ffffff'
+        });
+
+        const imgData = canvas.toDataURL('image/png');
+        const htmlContent = `<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>${reportName || 'Custom Report'}</title>
+  <style>
+    body { font-family: system-ui, sans-serif; margin: 0; padding: 40px; background: #f9fafb; }
+    .report-container { max-width: 1200px; margin: 0 auto; background: white; padding: 40px; border-radius: 16px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+    h1 { color: #1f2937; margin-bottom: 8px; }
+    .date { color: #6b7280; margin-bottom: 24px; }
+    img { max-width: 100%; height: auto; }
+  </style>
+</head>
+<body>
+  <div class="report-container">
+    <h1>${reportName || 'Custom Report'}</h1>
+    <p class="date">Generated: ${format(new Date(), 'MMMM d, yyyy h:mm a')}</p>
+    <img src="${imgData}" alt="Report" />
+  </div>
+</body>
+</html>`;
+
+        const blob = new Blob([htmlContent], { type: 'text/html' });
+        const link = document.createElement('a');
+        link.href = URL.createObjectURL(blob);
+        link.download = `${reportName || 'report'}_${format(new Date(), 'yyyy-MM-dd')}.html`;
+        link.click();
+        URL.revokeObjectURL(link.href);
+        toast.success('Report exported as HTML', { id: loadingToast });
+      }
+    } catch (error) {
+      console.error('Export error:', error);
+      toast.error('Failed to export report', { id: loadingToast });
+    }
+  }, [reportName, reportDescription, widgets]);
 
   // Get selected widget data
   const selectedWidgetData = useMemo(() =>
@@ -350,8 +463,9 @@ export default function ReportBuilderPage() {
             {/* Templates View */}
             {showTemplates && (
               <div className="p-4 space-y-3">
-                <h3 className="text-xs font-semibold text-charcoal-500 dark:text-charcoal-400 uppercase tracking-wide">
+                <h3 className="text-xs font-semibold text-charcoal-500 dark:text-charcoal-400 uppercase tracking-wide flex items-center gap-1">
                   Start with a Template
+                  <InfoTooltip tipKey="report.template" />
                 </h3>
                 {REPORT_TEMPLATES.map(template => {
                   const Icon = ICONS[template.icon] || FileText;
@@ -437,8 +551,9 @@ export default function ReportBuilderPage() {
             {!showTemplates && !showSavedReports && (
               <>
                 <div className="p-4 border-b border-charcoal-200 dark:border-charcoal-700">
-                  <h3 className="text-xs font-semibold text-charcoal-500 dark:text-charcoal-400 uppercase tracking-wide mb-3">
+                  <h3 className="text-xs font-semibold text-charcoal-500 dark:text-charcoal-400 uppercase tracking-wide mb-3 flex items-center gap-1">
                     Add Widgets
+                    <InfoTooltip tipKey="report.widget.add" />
                   </h3>
                   <div className="grid grid-cols-2 gap-2">
                     {Object.entries(WIDGET_TYPES).map(([type, config]) => {
@@ -461,8 +576,9 @@ export default function ReportBuilderPage() {
 
                 {/* Data Sources */}
                 <div className="p-4">
-                  <h3 className="text-xs font-semibold text-charcoal-500 dark:text-charcoal-400 uppercase tracking-wide mb-3">
+                  <h3 className="text-xs font-semibold text-charcoal-500 dark:text-charcoal-400 uppercase tracking-wide mb-3 flex items-center gap-1">
                     Data Sources
+                    <InfoTooltip tipKey="report.dataSource" />
                   </h3>
                   <div className="space-y-4">
                     {Object.entries(groupedDataSources).map(([category, sources]) => (
@@ -546,6 +662,7 @@ export default function ReportBuilderPage() {
                     ? 'bg-primary-100 text-primary-700 dark:bg-primary-900/30 dark:text-primary-300'
                     : 'text-charcoal-600 dark:text-charcoal-400 hover:bg-charcoal-100 dark:hover:bg-charcoal-700'
                 }`}
+                title="Preview shows exactly how the report will appear when exported or shared"
               >
                 {isPreviewMode ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                 {isPreviewMode ? 'Edit' : 'Preview'}
@@ -557,6 +674,7 @@ export default function ReportBuilderPage() {
                 onClick={saveReport}
                 disabled={!hasUnsavedChanges && currentReport}
                 className="px-3 py-2 text-sm bg-primary-500 text-white rounded-lg hover:bg-primary-600 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+                title="Save your report layout to reuse and schedule for automatic delivery"
               >
                 <Save className="w-4 h-4" />
                 Save
@@ -619,7 +737,8 @@ export default function ReportBuilderPage() {
               </div>
             ) : (
               <div
-                className="relative"
+                id="report-grid"
+                className="relative bg-white dark:bg-charcoal-800 p-4 rounded-xl"
                 style={{
                   display: 'grid',
                   gridTemplateColumns: `repeat(${GRID_COLS}, 1fr)`,

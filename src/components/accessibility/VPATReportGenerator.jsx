@@ -15,10 +15,14 @@ import {
   Building,
   Calendar,
   User,
-  ExternalLink
+  ExternalLink,
+  Save
 } from 'lucide-react';
 import { format } from 'date-fns';
 import toast from 'react-hot-toast';
+import InfoTooltip from '../common/InfoTooltip';
+import jsPDF from 'jspdf';
+import 'jspdf-autotable';
 
 // VPAT Conformance Levels
 const CONFORMANCE_LEVELS = {
@@ -82,9 +86,19 @@ const WCAG_CRITERIA = [
   { id: '3.3.3', title: 'Error Suggestion', level: 'AA', principle: 'Understandable' },
   { id: '3.3.4', title: 'Error Prevention (Legal, Financial, Data)', level: 'AA', principle: 'Understandable' },
   // Robust
-  { id: '4.1.1', title: 'Parsing', level: 'A', principle: 'Robust' },
+  { id: '4.1.1', title: 'Parsing', level: 'A', principle: 'Robust', note: 'Obsolete in WCAG 2.2' },
   { id: '4.1.2', title: 'Name, Role, Value', level: 'A', principle: 'Robust' },
   { id: '4.1.3', title: 'Status Messages', level: 'AA', principle: 'Robust' },
+  // WCAG 2.2 New Criteria (W3C Recommendation October 2023)
+  { id: '2.4.11', title: 'Focus Not Obscured (Minimum)', level: 'AA', principle: 'Operable', version: '2.2' },
+  { id: '2.4.12', title: 'Focus Not Obscured (Enhanced)', level: 'AAA', principle: 'Operable', version: '2.2' },
+  { id: '2.4.13', title: 'Focus Appearance', level: 'AAA', principle: 'Operable', version: '2.2' },
+  { id: '2.5.7', title: 'Dragging Movements', level: 'AA', principle: 'Operable', version: '2.2' },
+  { id: '2.5.8', title: 'Target Size (Minimum)', level: 'AA', principle: 'Operable', version: '2.2' },
+  { id: '3.2.6', title: 'Consistent Help', level: 'A', principle: 'Understandable', version: '2.2' },
+  { id: '3.3.7', title: 'Redundant Entry', level: 'A', principle: 'Understandable', version: '2.2' },
+  { id: '3.3.8', title: 'Accessible Authentication (Minimum)', level: 'AA', principle: 'Understandable', version: '2.2' },
+  { id: '3.3.9', title: 'Accessible Authentication (Enhanced)', level: 'AAA', principle: 'Understandable', version: '2.2' },
 ];
 
 export default function VPATReportGenerator({ auditResults, productInfo, onClose }) {
@@ -159,8 +173,107 @@ export default function VPATReportGenerator({ auditResults, productInfo, onClose
   };
 
   const handleExport = () => {
-    // In production, this would generate a proper VPAT document
-    toast.success('VPAT Report export coming soon!');
+    const doc = new jsPDF();
+    const pageWidth = doc.internal.pageSize.getWidth();
+
+    // Title Page
+    doc.setFontSize(24);
+    doc.setTextColor(31, 41, 55);
+    doc.text('Voluntary Product Accessibility Template', pageWidth / 2, 40, { align: 'center' });
+    doc.setFontSize(16);
+    doc.text('WCAG 2.2 Conformance Report', pageWidth / 2, 52, { align: 'center' });
+
+    doc.setFontSize(12);
+    doc.setTextColor(107, 114, 128);
+    doc.text(`Report Date: ${format(new Date(), 'MMMM d, yyyy')}`, pageWidth / 2, 70, { align: 'center' });
+    doc.text(`Product: ${productInfo?.name || 'Not specified'}`, pageWidth / 2, 80, { align: 'center' });
+    doc.text(`Version: ${productInfo?.version || 'Not specified'}`, pageWidth / 2, 90, { align: 'center' });
+
+    // Summary Statistics
+    doc.setFontSize(14);
+    doc.setTextColor(31, 41, 55);
+    doc.text('Conformance Summary', 20, 120);
+
+    doc.setFontSize(11);
+    doc.setTextColor(107, 114, 128);
+    doc.text(`Supports: ${summary.supports} criteria`, 20, 132);
+    doc.text(`Partially Supports: ${summary.partiallySupports} criteria`, 20, 142);
+    doc.text(`Does Not Support: ${summary.doesNotSupport} criteria`, 20, 152);
+    doc.text(`Not Applicable: ${summary.notApplicable} criteria`, 20, 162);
+    doc.text(`Not Evaluated: ${summary.notEvaluated} criteria`, 20, 172);
+
+    // Add new page for criteria tables
+    doc.addPage();
+
+    // Generate tables for each principle
+    const principles = ['Perceivable', 'Operable', 'Understandable', 'Robust'];
+    let yPosition = 20;
+
+    principles.forEach((principle, pIndex) => {
+      const criteriaForPrinciple = WCAG_CRITERIA.filter(c => c.principle === principle);
+
+      if (yPosition > 250) {
+        doc.addPage();
+        yPosition = 20;
+      }
+
+      doc.setFontSize(14);
+      doc.setTextColor(31, 41, 55);
+      doc.text(`${principle}`, 20, yPosition);
+      yPosition += 8;
+
+      const tableData = criteriaForPrinciple.map(criterion => {
+        const data = evaluationData[criterion.id];
+        return [
+          criterion.id,
+          criterion.title,
+          criterion.level,
+          CONFORMANCE_LEVELS[data.conformance]?.label || 'Not Evaluated',
+          data.remarks || '-'
+        ];
+      });
+
+      doc.autoTable({
+        startY: yPosition,
+        head: [['ID', 'Criterion', 'Level', 'Conformance', 'Remarks']],
+        body: tableData,
+        headStyles: {
+          fillColor: [59, 130, 246],
+          textColor: 255,
+          fontSize: 9
+        },
+        bodyStyles: {
+          fontSize: 8,
+          cellPadding: 2
+        },
+        columnStyles: {
+          0: { cellWidth: 15 },
+          1: { cellWidth: 45 },
+          2: { cellWidth: 15 },
+          3: { cellWidth: 30 },
+          4: { cellWidth: 'auto' }
+        },
+        margin: { left: 20, right: 20 },
+        didDrawPage: (data) => {
+          // Footer
+          doc.setFontSize(8);
+          doc.setTextColor(156, 163, 175);
+          doc.text(
+            `Page ${doc.internal.getNumberOfPages()}`,
+            pageWidth / 2,
+            doc.internal.pageSize.getHeight() - 10,
+            { align: 'center' }
+          );
+        }
+      });
+
+      yPosition = doc.lastAutoTable.finalY + 15;
+    });
+
+    // Save the PDF
+    const fileName = `VPAT_Report_${format(new Date(), 'yyyy-MM-dd')}.pdf`;
+    doc.save(fileName);
+    toast.success(`VPAT Report exported as ${fileName}`);
   };
 
   return (
@@ -172,7 +285,10 @@ export default function VPATReportGenerator({ auditResults, productInfo, onClose
             <FileText className="w-5 h-5 text-white" />
           </div>
           <div>
-            <h2 className="text-lg font-bold text-charcoal-900 dark:text-white">VPAT Report Generator</h2>
+            <h2 className="text-lg font-bold text-charcoal-900 dark:text-white flex items-center gap-1">
+              VPAT Report Generator
+              <InfoTooltip tipKey="vpat.version" />
+            </h2>
             <p className="text-sm text-charcoal-500 dark:text-charcoal-400">
               Voluntary Product Accessibility Template (WCAG 2.1)
             </p>
@@ -182,6 +298,7 @@ export default function VPATReportGenerator({ auditResults, productInfo, onClose
           <button
             onClick={handleExport}
             className="btn btn-primary flex items-center gap-2"
+            title="Generate a PDF VPAT report suitable for procurement documentation"
           >
             <Download className="w-4 h-4" />
             Export VPAT
