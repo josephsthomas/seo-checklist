@@ -4,15 +4,15 @@ import { X, ChevronLeft, ChevronRight, Check } from 'lucide-react';
 const onboardingSteps = [
   {
     id: 1,
-    title: "Welcome to Flipside SEO & MRI Center!",
-    description: "Let's take a quick tour of your internal marketing resource portal. This will only take 2 minutes.",
+    title: "Welcome to Content Strategy Portal!",
+    description: "Let's take a quick tour of your content strategy portal. This will only take 2 minutes.",
     image: "🎉",
     target: null
   },
   {
     id: 2,
     title: "Projects Dashboard",
-    description: "Create and manage multiple SEO projects. Each project tracks 321 professional checklist items tailored to your project type.",
+    description: "Create and manage multiple content projects. Each project tracks 321 professional checklist items tailored to your project type.",
     image: "📁",
     target: "#projects-page"
   },
@@ -25,7 +25,7 @@ const onboardingSteps = [
   },
   {
     id: 4,
-    title: "SEO Checklist",
+    title: "Content Checklist",
     description: "Each project has a comprehensive 321-item checklist covering Discovery, Strategy, Build, Pre-Launch, Launch, and Post-Launch phases.",
     image: "✅",
     target: "#checklist-view"
@@ -68,7 +68,7 @@ const onboardingSteps = [
   {
     id: 10,
     title: "You're All Set!",
-    description: "You're ready to start managing your SEO projects like a pro. Create your first project to begin!",
+    description: "You're ready to start managing your content projects like a pro. Create your first project to begin!",
     image: "🚀",
     target: null
   }

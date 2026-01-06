@@ -1,7 +1,7 @@
 /**
  * Centralized Tool Configuration
  *
- * This registry manages all tools in the Flipside SEO Portal.
+ * This registry manages all tools in the Content Strategy Portal.
  * Adding a new tool only requires adding an entry here.
  */
 
@@ -44,16 +44,16 @@ export const TOOL_COLORS = {
 export const tools = [
   {
     id: 'planner',
-    name: 'SEO Planner',
+    name: 'Content Planner',
     shortName: 'Planner',
-    description: 'Comprehensive 321-item SEO checklist for website launches and refreshes. Track progress, assign tasks, and ensure nothing is missed.',
+    description: 'Comprehensive 321-item content and SEO checklist for website launches and refreshes. Track progress, assign tasks, and ensure nothing is missed.',
     icon: ClipboardList,
     path: '/planner',
     color: TOOL_COLORS.PRIMARY,
     status: TOOL_STATUS.ACTIVE,
     badge: null, // Dynamic - set based on project count
     features: [
-      '321 SEO checklist items',
+      '321 content checklist items',
       'Project tracking',
       'Team collaboration',
       'PDF & Excel export'

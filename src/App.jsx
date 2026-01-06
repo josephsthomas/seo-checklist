@@ -110,13 +110,13 @@ function App() {
                   />
 
                   {/* ============================================ */}
-                  {/* SEO PLANNER ROUTES (formerly Checklist)     */}
+                  {/* CONTENT PLANNER ROUTES                      */}
                   {/* ============================================ */}
                   <Route
                     path="/planner"
                     element={
                       <ProtectedRoute>
-                        <ToolErrorBoundary toolName="SEO Planner" toolColor="primary">
+                        <ToolErrorBoundary toolName="Content Planner" toolColor="primary">
                           <ProjectDashboard />
                         </ToolErrorBoundary>
                       </ProtectedRoute>
@@ -136,7 +136,7 @@ function App() {
                     path="/planner/projects/:projectId"
                     element={
                       <ProtectedRoute>
-                        <ToolErrorBoundary toolName="SEO Checklist" toolColor="primary">
+                        <ToolErrorBoundary toolName="Content Checklist" toolColor="primary">
                           <SEOChecklist />
                         </ToolErrorBoundary>
                       </ProtectedRoute>

@@ -1,7 +1,7 @@
 {
-  "name": "flipside-seo-portal",
+  "name": "content-strategy-portal",
   "version": "3.0.0",
-  "description": "Flipside SEO Portal - All-in-one SEO suite for managing organic health and visibility",
+  "description": "Content Strategy Portal - All-in-one content and SEO suite for managing organic health and visibility",
   "type": "module",
   "scripts": {
     "dev": "vite",

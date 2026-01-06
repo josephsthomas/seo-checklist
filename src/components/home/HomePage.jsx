@@ -22,7 +22,7 @@ export default function HomePage() {
   const { projects, loading: projectsLoading } = useProjects();
   const { audits, loading: auditsLoading, stats: auditStats } = useAudits();
 
-  // Calculate SEO Planner stats
+  // Calculate Content Planner stats
   const activeProjects = projects.filter(p => p.status === 'Active').length;
   const completedProjects = projects.filter(p => p.status === 'Completed').length;
   const totalProjects = projects.length;
@@ -93,7 +93,7 @@ export default function HomePage() {
               </span>
             </h1>
             <p className="text-lg text-charcoal-600 max-w-2xl">
-              Welcome to the Flipside SEO Portal. Your all-in-one hub for SEO planning, technical audits, and optimization.
+              Welcome to the Content Strategy Portal. Your all-in-one hub for content planning, technical audits, and optimization.
             </p>
           </div>
 
@@ -164,8 +164,8 @@ export default function HomePage() {
         <section className="mb-12" aria-labelledby="tools-heading">
           <div className="flex items-center justify-between mb-6">
             <div>
-              <h2 id="tools-heading" className="text-2xl font-bold text-charcoal-900">SEO Tools</h2>
-              <p className="text-charcoal-500 mt-1">Professional tools for SEO excellence</p>
+              <h2 id="tools-heading" className="text-2xl font-bold text-charcoal-900">Content Tools</h2>
+              <p className="text-charcoal-500 mt-1">Professional tools for content excellence</p>
             </div>
           </div>
 
@@ -352,7 +352,7 @@ export default function HomePage() {
                   <ul className="text-sm text-charcoal-600 space-y-2">
                     <li className="flex items-start gap-2">
                       <span className="text-primary-500 mt-1" aria-hidden="true">•</span>
-                      Use the <strong className="text-charcoal-900">SEO Planner</strong> to track progress on website launches and refreshes
+                      Use the <strong className="text-charcoal-900">Content Planner</strong> to track progress on website launches and refreshes
                     </li>
                     <li className="flex items-start gap-2">
                       <span className="text-cyan-500 mt-1" aria-hidden="true">•</span>

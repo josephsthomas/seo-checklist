@@ -23,22 +23,22 @@ export default function Footer() {
             <Link to="/" className="flex items-center gap-3 mb-4 group">
               <div className="relative">
                 <div className="w-10 h-10 bg-gradient-to-br from-primary-500 to-primary-600 rounded-xl flex items-center justify-center shadow-lg shadow-primary-500/20 group-hover:shadow-primary-500/40 transition-shadow duration-300">
-                  <span className="text-white font-bold text-lg">F</span>
+                  <span className="text-white font-bold text-sm">CS</span>
                 </div>
                 <div className="absolute -top-1 -right-1 w-3 h-3 bg-gradient-to-br from-cyan-400 to-cyan-500 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
               </div>
               <div>
                 <span className="text-xl font-semibold text-white tracking-tight">
-                  Flipside
+                  Content Strategy
                 </span>
                 <span className="text-xl font-semibold text-primary-400 tracking-tight ml-1">
-                  SEO
+                  Portal
                 </span>
               </div>
             </Link>
             <p className="text-charcoal-300 text-sm max-w-md leading-relaxed mb-6">
-              Your all-in-one SEO suite for organic health & visibility.
-              Streamline your workflow with powerful tools designed for modern SEO professionals.
+              Your all-in-one content and SEO suite for organic health & visibility.
+              Streamline your workflow with powerful tools designed for modern content professionals.
             </p>
 
             {/* Social Links */}
@@ -80,7 +80,7 @@ export default function Footer() {
             <ul className="space-y-2.5">
               <li>
                 <Link to="/planner" className="text-charcoal-400 hover:text-white text-sm transition-colors duration-200 flex items-center gap-2 group">
-                  SEO Planner
+                  Content Planner
                   <ExternalLink className="w-3 h-3 opacity-0 group-hover:opacity-100 transition-opacity" />
                 </Link>
               </li>
@@ -116,7 +116,7 @@ export default function Footer() {
               </li>
               <li>
                 <Link to="/help/glossary" className="text-charcoal-400 hover:text-white text-sm transition-colors duration-200">
-                  SEO Glossary
+                  Content Glossary
                 </Link>
               </li>
               <li>
@@ -135,7 +135,7 @@ export default function Footer() {
         {/* Bottom Bar */}
         <div className="pt-8 flex flex-col sm:flex-row items-center justify-between gap-4">
           <p className="text-charcoal-500 text-sm">
-            © {currentYear} Flipside Group. All rights reserved.
+            © {currentYear} Content Strategy Portal. All rights reserved.
           </p>
           <div className="flex items-center gap-6">
             <a href="#" className="text-charcoal-500 hover:text-charcoal-300 text-sm transition-colors">

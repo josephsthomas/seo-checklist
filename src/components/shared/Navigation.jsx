@@ -70,16 +70,16 @@ export default function Navigation() {
           <Link to="/" className="flex items-center gap-3 group">
             <div className="relative">
               <div className="w-9 h-9 bg-gradient-to-br from-primary-500 to-primary-600 rounded-xl flex items-center justify-center shadow-sm group-hover:shadow-md group-hover:shadow-primary-500/25 transition-all duration-300">
-                <span className="text-white font-bold text-lg">F</span>
+                <span className="text-white font-bold text-sm">CS</span>
               </div>
               <div className="absolute -top-1 -right-1 w-3 h-3 bg-gradient-to-br from-cyan-400 to-cyan-500 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
             </div>
             <div className="hidden sm:block">
               <span className="text-lg font-semibold text-charcoal-900 tracking-tight">
-                Flipside
+                Content Strategy
               </span>
               <span className="text-lg font-semibold text-primary-500 tracking-tight ml-1">
-                SEO
+                Portal
               </span>
             </div>
           </Link>
@@ -122,7 +122,7 @@ export default function Navigation() {
                       <ClipboardList className="w-5 h-5 text-primary-600" />
                     </div>
                     <div className="flex-1">
-                      <div className="font-medium text-charcoal-900">SEO Planner</div>
+                      <div className="font-medium text-charcoal-900">Content Planner</div>
                       <div className="text-xs text-charcoal-500">321-item comprehensive checklist</div>
                     </div>
                   </Link>
@@ -206,7 +206,7 @@ export default function Navigation() {
                   >
                     <FolderOpen className="w-4 h-4 text-amber-500" aria-hidden="true" />
                     <div>
-                      <div className="font-medium text-charcoal-900">SEO Glossary</div>
+                      <div className="font-medium text-charcoal-900">Content Glossary</div>
                       <div className="text-xs text-charcoal-500">Term definitions</div>
                     </div>
                   </Link>
@@ -299,7 +299,7 @@ export default function Navigation() {
                     role="menuitem"
                   >
                     <ClipboardList className="w-5 h-5" aria-hidden="true" />
-                    <span>SEO Planner</span>
+                    <span>Content Planner</span>
                   </Link>
                   <Link
                     to="/audit"

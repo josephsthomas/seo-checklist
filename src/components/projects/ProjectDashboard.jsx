@@ -70,8 +70,8 @@ export default function ProjectDashboard() {
         <div className="mb-8">
           <div className="flex justify-between items-center mb-6">
             <div>
-              <h1 className="text-3xl font-bold text-gray-900">SEO Planner</h1>
-              <p className="text-gray-600 mt-1">Manage your SEO projects and checklists</p>
+              <h1 className="text-3xl font-bold text-gray-900">Content Planner</h1>
+              <p className="text-gray-600 mt-1">Manage your content projects and checklists</p>
             </div>
             <button
               onClick={() => navigate('/planner/new')}
@@ -169,9 +169,9 @@ export default function ProjectDashboard() {
                 <div className="w-20 h-20 bg-gradient-to-br from-primary-100 to-primary-200 rounded-2xl flex items-center justify-center mx-auto mb-6">
                   <ClipboardList className="w-10 h-10 text-primary-500" />
                 </div>
-                <h3 className="text-xl font-bold text-gray-900 mb-2">Welcome to SEO Planner</h3>
+                <h3 className="text-xl font-bold text-gray-900 mb-2">Welcome to Content Planner</h3>
                 <p className="text-gray-600 mb-6 max-w-md mx-auto">
-                  Create your first project to access the comprehensive 321-item SEO checklist
+                  Create your first project to access the comprehensive 321-item content checklist
                   and start tracking your optimization progress.
                 </p>
                 <button

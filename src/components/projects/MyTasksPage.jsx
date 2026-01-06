@@ -251,7 +251,7 @@ export default function MyTasksPage() {
                   No tasks assigned yet
                 </h3>
                 <p className="text-gray-600 mb-6 max-w-md mx-auto">
-                  When team members assign tasks to you from SEO projects, they'll appear here.
+                  When team members assign tasks to you from content projects, they'll appear here.
                   You can also assign tasks to yourself from any project checklist.
                 </p>
                 <div className="flex flex-col sm:flex-row gap-3 justify-center">
@@ -260,7 +260,7 @@ export default function MyTasksPage() {
                     className="btn btn-primary inline-flex items-center gap-2"
                   >
                     <ClipboardList className="w-4 h-4" />
-                    View SEO Projects
+                    View Projects
                     <ArrowRight className="w-4 h-4" />
                   </Link>
                 </div>
@@ -269,7 +269,7 @@ export default function MyTasksPage() {
                   <ul className="text-sm text-gray-600 space-y-1">
                     <li className="flex items-start gap-2">
                       <span className="text-primary-500 mt-0.5">1.</span>
-                      Open a project from the SEO Planner
+                      Open a project from the Content Planner
                     </li>
                     <li className="flex items-start gap-2">
                       <span className="text-primary-500 mt-0.5">2.</span>
