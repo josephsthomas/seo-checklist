@@ -1,5 +1,5 @@
 /**
- * PDF Generator for SEO Checklist
+ * PDF Generator for Content Checklist
  * Creates professional PDFs for client reporting
  * Phase 9 - Batch 4
  */
@@ -17,7 +17,7 @@ export function generateChecklistPDF(options) {
   const {
     items,
     completions = {},
-    projectName = 'SEO Checklist',
+    projectName = 'Content Checklist',
     clientName = '',
     exportType = 'executive', // 'executive' or 'detailed'
     includeCompleted = true,
@@ -70,7 +70,7 @@ export function generateChecklistPDF(options) {
   doc.setFontSize(24);
   doc.setTextColor(40);
   doc.setFont('helvetica', 'bold');
-  doc.text('SEO Checklist Report', pageWidth / 2, yPosition, { align: 'center' });
+  doc.text('Content Checklist Report', pageWidth / 2, yPosition, { align: 'center' });
   yPosition += 15;
 
   // Project name

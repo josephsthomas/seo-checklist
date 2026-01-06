@@ -80,13 +80,13 @@ export default function ProjectCard({ project }) {
 
       <div className="flex gap-2">
         <button
-          onClick={() => navigate(`/projects/${project.id}`)}
+          onClick={() => navigate(`/planner/projects/${project.id}`)}
           className="flex-1 btn btn-primary text-sm"
         >
           View Checklist
         </button>
         <button
-          onClick={() => navigate(`/projects/${project.id}/settings`)}
+          onClick={() => navigate(`/planner/projects/${project.id}/settings`)}
           className="btn btn-secondary text-sm p-2"
           title="Settings"
         >

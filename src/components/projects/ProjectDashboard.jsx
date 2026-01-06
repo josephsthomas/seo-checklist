@@ -1,7 +1,7 @@
 import React, { useState, useMemo } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { useProjects } from '../../hooks/useProjects';
-import { Plus, Search, Calendar, TrendingUp, AlertCircle, FolderOpen } from 'lucide-react';
+import { Plus, Search, Calendar, TrendingUp, AlertCircle, FolderOpen, CheckCircle, ClipboardList, Users, RefreshCw, HelpCircle, Lightbulb, BarChart3 } from 'lucide-react';
 import ProjectCard from './ProjectCard';
 import { format } from 'date-fns';
 
@@ -70,16 +70,25 @@ export default function ProjectDashboard() {
         <div className="mb-8">
           <div className="flex justify-between items-center mb-6">
             <div>
-              <h1 className="text-3xl font-bold text-gray-900">Projects</h1>
-              <p className="text-gray-600 mt-1">Manage your SEO projects</p>
+              <h1 className="text-3xl font-bold text-gray-900">Content Planner</h1>
+              <p className="text-gray-600 mt-1">Manage your content projects and checklists</p>
             </div>
-            <button
-              onClick={() => navigate('/projects/new')}
-              className="btn btn-primary flex items-center gap-2"
-            >
-              <Plus className="w-5 h-5" />
-              New Project
-            </button>
+            <div className="flex items-center gap-3">
+              <Link
+                to="/planner/progress"
+                className="btn btn-secondary flex items-center gap-2"
+              >
+                <BarChart3 className="w-5 h-5" />
+                <span className="hidden sm:inline">Progress Dashboard</span>
+              </Link>
+              <button
+                onClick={() => navigate('/planner/new')}
+                className="btn btn-primary flex items-center gap-2"
+              >
+                <Plus className="w-5 h-5" />
+                New Project
+              </button>
+            </div>
           </div>
 
           {/* Stats Cards */}
@@ -164,25 +173,66 @@ export default function ProjectDashboard() {
         {/* Projects List */}
         {filteredProjects.length === 0 ? (
           <div className="text-center py-12">
-            <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-gray-100 mb-4">
-              <FolderOpen className="w-8 h-8 text-gray-400" />
-            </div>
-            <h3 className="text-lg font-medium text-gray-900 mb-2">
-              {projects.length === 0 ? 'No projects yet' : 'No projects found'}
-            </h3>
-            <p className="text-gray-600 mb-6">
-              {projects.length === 0
-                ? 'Get started by creating your first project'
-                : 'Try adjusting your search or filters'}
-            </p>
-            {projects.length === 0 && (
-              <button
-                onClick={() => navigate('/projects/new')}
-                className="btn btn-primary inline-flex items-center gap-2"
-              >
-                <Plus className="w-5 h-5" />
-                Create Your First Project
-              </button>
+            {projects.length === 0 ? (
+              <>
+                <div className="w-20 h-20 bg-gradient-to-br from-primary-100 to-primary-200 rounded-2xl flex items-center justify-center mx-auto mb-6">
+                  <ClipboardList className="w-10 h-10 text-primary-500" />
+                </div>
+                <h3 className="text-xl font-bold text-gray-900 mb-2">Welcome to Content Planner</h3>
+                <p className="text-gray-600 mb-6 max-w-md mx-auto">
+                  Create your first project to access the comprehensive 321-item content checklist
+                  and start tracking your optimization progress.
+                </p>
+                <button
+                  onClick={() => navigate('/planner/new')}
+                  className="btn btn-primary inline-flex items-center gap-2 mb-8"
+                >
+                  <Plus className="w-5 h-5" />
+                  Create Your First Project
+                </button>
+
+                {/* What you get section */}
+                <div className="bg-gray-50 rounded-xl p-6 max-w-2xl mx-auto text-left">
+                  <h4 className="text-sm font-semibold text-gray-700 mb-4 flex items-center gap-2">
+                    <Lightbulb className="w-4 h-4 text-amber-500" />
+                    What's included in each project:
+                  </h4>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    {[
+                      { icon: CheckCircle, text: '321-item SEO checklist', color: 'text-emerald-500' },
+                      { icon: ClipboardList, text: 'Organized by project phase', color: 'text-primary-500' },
+                      { icon: Users, text: 'Team task assignment', color: 'text-purple-500' },
+                      { icon: Calendar, text: 'Timeline & deadline tracking', color: 'text-cyan-500' }
+                    ].map((item, idx) => (
+                      <div key={idx} className="flex items-center gap-2 text-sm text-gray-600">
+                        <item.icon className={`w-4 h-4 ${item.color}`} />
+                        {item.text}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </>
+            ) : (
+              <>
+                <div className="w-16 h-16 bg-gradient-to-br from-gray-100 to-gray-200 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                  <Search className="w-8 h-8 text-gray-400" />
+                </div>
+                <h3 className="text-lg font-bold text-gray-900 mb-2">No projects found</h3>
+                <p className="text-gray-600 mb-6">
+                  No projects match your current search or filter criteria.
+                </p>
+                <button
+                  onClick={() => {
+                    setSearchQuery('');
+                    setFilterStatus('all');
+                    setFilterType('all');
+                  }}
+                  className="btn btn-secondary inline-flex items-center gap-2"
+                >
+                  <RefreshCw className="w-4 h-4" />
+                  Clear All Filters
+                </button>
+              </>
             )}
           </div>
         ) : (

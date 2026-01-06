@@ -1,0 +1,347 @@
+/**
+ * AI Accessibility Fix Suggestion Service
+ * Uses Claude API to generate remediation suggestions for accessibility violations
+ *
+ * SECURITY NOTE: In production, API calls should be proxied through a backend
+ * to avoid exposing the API key. Set VITE_AI_PROXY_URL to use a backend proxy.
+ */
+
+import { WCAG_CRITERIA } from '../../data/wcagCriteria';
+import { AXE_RULES } from '../../data/axeRules';
+
+const CLAUDE_API_URL = 'https://api.anthropic.com/v1/messages';
+
+/**
+ * Get API configuration
+ */
+function getApiConfig() {
+  const proxyUrl = import.meta.env.VITE_AI_PROXY_URL;
+  const apiKey = import.meta.env.VITE_CLAUDE_API_KEY;
+
+  if (proxyUrl) {
+    return { useProxy: true, proxyUrl };
+  }
+
+  if (apiKey) {
+    if (import.meta.env.PROD) {
+      console.warn('⚠️ Direct Claude API access in production is not recommended.');
+    }
+    return { useProxy: false, apiKey };
+  }
+
+  return null;
+}
+
+/**
+ * Call Claude API
+ */
+async function callClaude(prompt, maxTokens = 1024) {
+  const config = getApiConfig();
+
+  if (!config) {
+    throw new Error('AI not configured. Set VITE_AI_PROXY_URL or VITE_CLAUDE_API_KEY.');
+  }
+
+  if (config.useProxy) {
+    const response = await fetch(config.proxyUrl, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ prompt, maxTokens })
+    });
+
+    if (!response.ok) {
+      const error = await response.json().catch(() => ({}));
+      throw new Error(error.error?.message || `Proxy request failed: ${response.status}`);
+    }
+
+    const data = await response.json();
+    return data.content || data.text || data.response;
+  }
+
+  const response = await fetch(CLAUDE_API_URL, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'x-api-key': config.apiKey,
+      'anthropic-version': '2023-06-01',
+      'anthropic-dangerous-direct-browser-access': 'true'
+    },
+    body: JSON.stringify({
+      model: 'claude-sonnet-4-20250514',
+      max_tokens: maxTokens,
+      messages: [{ role: 'user', content: prompt }]
+    })
+  });
+
+  if (!response.ok) {
+    const error = await response.json().catch(() => ({}));
+    throw new Error(error.error?.message || `API request failed: ${response.status}`);
+  }
+
+  const data = await response.json();
+  return data.content[0].text;
+}
+
+/**
+ * Generate fix suggestion for a specific accessibility violation
+ * @param {Object} violation - The violation data
+ * @param {Object} options - Additional context
+ * @returns {Object} - Fix suggestions
+ */
+export async function suggestViolationFix(violation, options = {}) {
+  const { ruleId, name, impact, wcagCriteria, htmlElement, selector, help } = violation;
+  const { url, pageContext } = options;
+
+  // Get WCAG criteria details
+  const criteriaDetails = wcagCriteria?.map(id => {
+    const criterion = WCAG_CRITERIA[id];
+    return criterion ? `${id} - ${criterion.name} (Level ${criterion.level})` : id;
+  }).join(', ') || 'Best Practice';
+
+  const prompt = `You are a web accessibility expert specializing in WCAG 2.2 compliance.
+Provide a fix for this accessibility violation.
+
+Violation: ${name}
+Rule ID: ${ruleId}
+Impact: ${impact}
+WCAG Criteria: ${criteriaDetails}
+${help ? `Description: ${help}` : ''}
+${htmlElement ? `HTML Element: ${htmlElement}` : ''}
+${selector ? `CSS Selector: ${selector}` : ''}
+${url ? `Page URL: ${url}` : ''}
+
+Provide a practical, specific fix with code examples where applicable.
+
+Respond in JSON format only:
+{
+  "summary": "Brief one-line fix summary",
+  "explanation": "Detailed explanation of why this is an accessibility issue",
+  "fix": {
+    "steps": ["Step 1...", "Step 2..."],
+    "codeExample": {
+      "before": "problematic HTML/CSS/JS",
+      "after": "fixed HTML/CSS/JS"
+    }
+  },
+  "wcagReference": "Brief explanation of the WCAG requirement",
+  "additionalTips": ["tip 1", "tip 2"],
+  "testingSteps": ["How to verify the fix works"]
+}`;
+
+  try {
+    const response = await callClaude(prompt, 1500);
+    const jsonMatch = response.match(/\{[\s\S]*\}/);
+    if (jsonMatch) {
+      return JSON.parse(jsonMatch[0]);
+    }
+    throw new Error('Invalid response format');
+  } catch (error) {
+    console.error('Accessibility fix suggestion error:', error);
+    throw error;
+  }
+}
+
+/**
+ * Generate bulk fix suggestions for multiple violations
+ * @param {Array} violations - Array of violations
+ * @returns {Object} - Grouped fix suggestions
+ */
+export async function suggestBulkFixes(violations) {
+  const topViolations = violations
+    .filter(v => v.impact === 'critical' || v.impact === 'serious')
+    .slice(0, 5);
+
+  const violationSummary = topViolations.map(v =>
+    `- ${v.name} (${v.impact}, ${v.urlCount} URLs, WCAG: ${v.wcagCriteria?.join(', ') || 'Best Practice'})`
+  ).join('\n');
+
+  const prompt = `You are a web accessibility expert. Provide prioritized fix recommendations for these violations:
+
+${violationSummary}
+
+For each violation, provide a brief fix strategy.
+
+Respond in JSON format only:
+{
+  "priorityOrder": ["rule_id_1", "rule_id_2"],
+  "fixes": {
+    "rule_id": {
+      "priority": 1,
+      "quickFix": "One-line fix description",
+      "effort": "low|medium|high",
+      "impact": "How many users affected"
+    }
+  },
+  "generalRecommendations": ["recommendation 1", "recommendation 2"]
+}`;
+
+  try {
+    const response = await callClaude(prompt, 2000);
+    const jsonMatch = response.match(/\{[\s\S]*\}/);
+    if (jsonMatch) {
+      return JSON.parse(jsonMatch[0]);
+    }
+    throw new Error('Invalid response format');
+  } catch (error) {
+    console.error('Bulk fix suggestion error:', error);
+    throw error;
+  }
+}
+
+/**
+ * Generate a compliance improvement plan
+ * @param {Object} auditResults - Full audit results
+ * @returns {Object} - Improvement plan
+ */
+export async function generateCompliancePlan(auditResults) {
+  const { scores, summary, topIssues } = auditResults;
+
+  const issuesSummary = topIssues.slice(0, 10).map(i =>
+    `- ${i.name}: ${i.urlCount} URLs (${i.impact})`
+  ).join('\n');
+
+  const prompt = `You are a web accessibility consultant. Create a compliance improvement plan based on this audit:
+
+Current Scores:
+- Overall: ${scores.overall}%
+- Level A: ${scores.byLevel.A.score}%
+- Level AA: ${scores.byLevel.AA.score}%
+- Level AAA: ${scores.byLevel.AAA.score}%
+
+Summary:
+- Total URLs: ${summary.totalUrls}
+- URLs with violations: ${summary.urlsWithViolations}
+- Total violations: ${summary.totalViolations}
+
+Top Issues:
+${issuesSummary}
+
+Create a phased remediation plan.
+
+Respond in JSON format only:
+{
+  "executiveSummary": "Brief summary of accessibility state",
+  "targetScore": 95,
+  "phases": [
+    {
+      "name": "Phase 1: Critical Fixes",
+      "duration": "1-2 weeks",
+      "focus": ["issue type 1", "issue type 2"],
+      "expectedImprovement": "+15% compliance"
+    }
+  ],
+  "quickWins": ["Easy fix 1", "Easy fix 2"],
+  "resourcesNeeded": ["Resource 1", "Resource 2"],
+  "testingStrategy": "How to validate improvements"
+}`;
+
+  try {
+    const response = await callClaude(prompt, 2000);
+    const jsonMatch = response.match(/\{[\s\S]*\}/);
+    if (jsonMatch) {
+      return JSON.parse(jsonMatch[0]);
+    }
+    throw new Error('Invalid response format');
+  } catch (error) {
+    console.error('Compliance plan error:', error);
+    throw error;
+  }
+}
+
+/**
+ * Get static fix suggestion for a rule (no API call)
+ * Used when AI is not available or for quick suggestions
+ * @param {string} ruleId - The Axe rule ID
+ * @returns {Object} - Static fix suggestion
+ */
+export function getStaticFixSuggestion(ruleId) {
+  const rule = AXE_RULES[ruleId];
+
+  if (!rule) {
+    return {
+      summary: 'Review this accessibility issue and fix accordingly.',
+      steps: ['Identify the affected elements', 'Apply appropriate fixes', 'Test with assistive technologies']
+    };
+  }
+
+  return {
+    summary: rule.fixSuggestion || `Fix the ${rule.name} accessibility issue`,
+    wcagCriteria: rule.wcagCriteria,
+    wcagLevel: rule.wcagLevel,
+    impact: rule.impact,
+    steps: getFixStepsForRule(ruleId),
+    resources: [
+      rule.helpUrl,
+      ...rule.wcagCriteria?.map(c => `https://www.w3.org/WAI/WCAG22/Understanding/${c.replace('.', '-')}.html`) || []
+    ].filter(Boolean)
+  };
+}
+
+/**
+ * Get fix steps for common rule types
+ */
+function getFixStepsForRule(ruleId) {
+  const commonFixes = {
+    'images_require_alternate_text': [
+      'Add alt attribute to all <img> elements',
+      'For decorative images, use alt="" (empty alt)',
+      'For informative images, describe the content briefly',
+      'For functional images (buttons/links), describe the action'
+    ],
+    'links_must_have_discernible_text': [
+      'Add descriptive text content to links',
+      'If using icon-only links, add aria-label or visually hidden text',
+      'Avoid generic text like "click here" or "read more"',
+      'Ensure link purpose is clear from context'
+    ],
+    'buttons_must_have_discernible_text': [
+      'Add visible text or aria-label to buttons',
+      'Icon buttons need aria-label describing the action',
+      'Ensure button purpose is clear'
+    ],
+    'document_must_have_one_main_landmark': [
+      'Add <main> element to wrap primary content',
+      'Only one <main> element per page',
+      'Alternatively use role="main" on a container'
+    ],
+    'form_elements_must_have_labels': [
+      'Associate <label> with form input using for/id attributes',
+      'Or wrap input inside <label> element',
+      'Or use aria-label/aria-labelledby'
+    ],
+    'page_must_have_means_to_bypass_repeated_blocks': [
+      'Add skip navigation link at page start',
+      'Use proper landmark regions (header, nav, main, footer)',
+      'Implement heading hierarchy for navigation'
+    ],
+    'color_contrast_must_meet_minimum_ratio': [
+      'Increase contrast between text and background',
+      'Normal text: minimum 4.5:1 ratio',
+      'Large text (18pt+ or 14pt+ bold): minimum 3:1 ratio',
+      'Use a contrast checker tool to verify'
+    ]
+  };
+
+  return commonFixes[ruleId] || [
+    'Review the accessibility issue',
+    'Consult WCAG guidelines for specific requirements',
+    'Test fix with screen readers',
+    'Validate with accessibility testing tools'
+  ];
+}
+
+/**
+ * Check if AI features are available
+ */
+export function isAIAvailable() {
+  const config = getApiConfig();
+  return config !== null;
+}
+
+export default {
+  suggestViolationFix,
+  suggestBulkFixes,
+  generateCompliancePlan,
+  getStaticFixSuggestion,
+  isAIAvailable
+};

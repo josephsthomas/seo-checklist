@@ -3975,7 +3975,7 @@ export const helpContent = {
       "Bad: 'Click here for our services' → Good: 'View our SEO consulting services'",
       "Bad: 'Read more' → Good: 'Read the complete guide to technical SEO'",
       "Include keywords naturally: 'Learn about local SEO strategies for small businesses'",
-      "For downloads: 'Download the 2024 SEO Checklist (PDF, 2.5MB)'",
+      "For downloads: 'Download the 2024 Content Checklist (PDF, 2.5MB)'",
       "Avoid: 'Learn more', 'Click here', 'This page', 'Here', 'Link'",
       "Keep concise (3-8 words) while being descriptive"
     ],

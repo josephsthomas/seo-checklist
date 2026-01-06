@@ -1,9 +1,9 @@
 import React, { useState, useMemo } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { useMyTasks } from '../../hooks/useAssignments';
 import { useProjects } from '../../hooks/useProjects';
 import { checklistData } from '../../data/checklistData';
-import { Calendar, Clock, AlertCircle, CheckCircle, Filter } from 'lucide-react';
+import { Calendar, Clock, AlertCircle, CheckCircle, Filter, ClipboardList, ArrowRight, Inbox, Search, RefreshCw } from 'lucide-react';
 import { format, isAfter, isBefore, addDays, startOfDay } from 'date-fns';
 import { TASK_STATUS_LABELS } from '../../utils/roles';
 
@@ -242,16 +242,69 @@ export default function MyTasksPage() {
         {/* Tasks List */}
         {filteredTasks.length === 0 ? (
           <div className="bg-white rounded-lg shadow-md p-12 text-center">
-            <CheckCircle className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-            <h3 className="text-lg font-medium text-gray-900 mb-2">
-              {enrichedTasks.length === 0 ? 'No tasks assigned' : 'No tasks match your filters'}
-            </h3>
-            <p className="text-gray-600">
-              {enrichedTasks.length === 0
-                ? 'Tasks assigned to you will appear here'
-                : 'Try adjusting your filters'
-              }
-            </p>
+            {enrichedTasks.length === 0 ? (
+              <>
+                <div className="w-20 h-20 bg-gradient-to-br from-primary-100 to-primary-200 rounded-2xl flex items-center justify-center mx-auto mb-6">
+                  <Inbox className="w-10 h-10 text-primary-500" />
+                </div>
+                <h3 className="text-xl font-bold text-gray-900 mb-2">
+                  No tasks assigned yet
+                </h3>
+                <p className="text-gray-600 mb-6 max-w-md mx-auto">
+                  When team members assign tasks to you from content projects, they'll appear here.
+                  You can also assign tasks to yourself from any project checklist.
+                </p>
+                <div className="flex flex-col sm:flex-row gap-3 justify-center">
+                  <Link
+                    to="/planner"
+                    className="btn btn-primary inline-flex items-center gap-2"
+                  >
+                    <ClipboardList className="w-4 h-4" />
+                    View Projects
+                    <ArrowRight className="w-4 h-4" />
+                  </Link>
+                </div>
+                <div className="mt-8 p-4 bg-gray-50 rounded-lg text-left max-w-md mx-auto">
+                  <h4 className="text-sm font-semibold text-gray-700 mb-2">How to get tasks assigned:</h4>
+                  <ul className="text-sm text-gray-600 space-y-1">
+                    <li className="flex items-start gap-2">
+                      <span className="text-primary-500 mt-0.5">1.</span>
+                      Open a project from the Content Planner
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <span className="text-primary-500 mt-0.5">2.</span>
+                      Click on any checklist item to open details
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <span className="text-primary-500 mt-0.5">3.</span>
+                      Add your email in the "Assigned To" field
+                    </li>
+                  </ul>
+                </div>
+              </>
+            ) : (
+              <>
+                <div className="w-20 h-20 bg-gradient-to-br from-gray-100 to-gray-200 rounded-2xl flex items-center justify-center mx-auto mb-6">
+                  <Search className="w-10 h-10 text-gray-400" />
+                </div>
+                <h3 className="text-xl font-bold text-gray-900 mb-2">
+                  No tasks match your filters
+                </h3>
+                <p className="text-gray-600 mb-6">
+                  Try adjusting your filter criteria to see more tasks.
+                </p>
+                <button
+                  onClick={() => {
+                    setFilterStatus('all');
+                    setFilterDue('all');
+                  }}
+                  className="btn btn-secondary inline-flex items-center gap-2"
+                >
+                  <RefreshCw className="w-4 h-4" />
+                  Clear All Filters
+                </button>
+              </>
+            )}
           </div>
         ) : (
           <div className="space-y-3">
