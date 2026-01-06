@@ -29,6 +29,7 @@ const ResourceLibrary = lazy(() => import('./components/help/ResourceLibrary'));
 const GlossaryPage = lazy(() => import('./components/help/GlossaryPage'));
 import KeyboardShortcuts from './components/help/KeyboardShortcuts';
 import OnboardingWalkthrough from './components/help/OnboardingWalkthrough';
+import FeedbackWidget from './components/shared/FeedbackWidget';
 
 // Audit Components - lazy load (heaviest components with xlsx, jspdf)
 const AuditPage = lazy(() => import('./components/audit/AuditPage'));
@@ -355,6 +356,9 @@ function App() {
               },
             }}
           />
+
+          {/* Feedback Widget - Available on all pages */}
+          <FeedbackWidget />
         </div>
       </Router>
     </AuthProvider>
