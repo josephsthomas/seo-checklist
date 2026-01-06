@@ -1,75 +1,109 @@
 import React, { useState, useEffect } from 'react';
-import { X, ChevronLeft, ChevronRight, Check } from 'lucide-react';
+import {
+  X,
+  ChevronLeft,
+  ChevronRight,
+  Check,
+  Sparkles,
+  ClipboardList,
+  Search,
+  Accessibility,
+  Image,
+  Tags,
+  Code2,
+  Users,
+  Bell,
+  BookOpen,
+  Rocket
+} from 'lucide-react';
 
 const onboardingSteps = [
   {
     id: 1,
     title: "Welcome to Content Strategy Portal!",
-    description: "Let's take a quick tour of your content strategy portal. This will only take 2 minutes.",
-    image: "🎉",
+    description: "Your all-in-one hub for SEO content planning and technical optimization. Let's take a quick tour!",
+    icon: Sparkles,
+    color: 'from-primary-500 to-cyan-500',
     target: null
   },
   {
     id: 2,
-    title: "Projects Dashboard",
-    description: "Create and manage multiple content projects. Each project tracks 321 professional checklist items tailored to your project type.",
-    image: "📁",
+    title: "Content Planner",
+    description: "Create projects with our comprehensive 321-item SEO checklist. Track progress across Discovery, Design, Development, and Launch phases.",
+    icon: ClipboardList,
+    color: 'from-primary-500 to-primary-600',
     target: "#projects-page"
   },
   {
     id: 3,
-    title: "Create Your First Project",
-    description: "Click 'New Project' to get started. You'll enter project details, client info, timeline, and budget in a simple 4-step wizard.",
-    image: "➕",
-    target: "#new-project-button"
+    title: "Technical Audit",
+    description: "Upload Screaming Frog exports to run comprehensive technical SEO audits. Get AI-powered recommendations for fixing issues.",
+    icon: Search,
+    color: 'from-cyan-500 to-cyan-600',
+    target: "#audit-tool"
   },
   {
     id: 4,
-    title: "Content Checklist",
-    description: "Each project has a comprehensive 321-item checklist covering Discovery, Strategy, Build, Pre-Launch, Launch, and Post-Launch phases.",
-    image: "✅",
-    target: "#checklist-view"
+    title: "Accessibility Analyzer",
+    description: "Run WCAG 2.2 compliance audits on any URL. Identify violations and get AI-generated fix suggestions with code examples.",
+    icon: Accessibility,
+    color: 'from-purple-500 to-purple-600',
+    target: "#accessibility-tool"
   },
   {
     id: 5,
-    title: "Task Details & Collaboration",
-    description: "Click any checklist item to see detailed help, assign tasks to team members, add comments with @mentions, and track activity.",
-    image: "💬",
-    target: "#item-modal"
+    title: "Image Alt Generator",
+    description: "Use Claude Vision AI to generate descriptive, SEO-friendly alt text for your images. Batch process up to 100 images at once.",
+    icon: Image,
+    color: 'from-emerald-500 to-emerald-600',
+    target: "#image-alt-tool"
   },
   {
     id: 6,
-    title: "My Tasks",
-    description: "View all tasks assigned to you across all projects. Filter by status, due date, and priority to stay organized.",
-    image: "📋",
-    target: "#my-tasks-link"
+    title: "Meta Data Generator",
+    description: "Upload documents (DOCX, PDF, HTML) and let AI generate optimized titles, descriptions, and Open Graph tags.",
+    icon: Tags,
+    color: 'from-amber-500 to-amber-600',
+    target: "#meta-generator"
   },
   {
     id: 7,
-    title: "Team Management",
-    description: "Admins and Project Managers can manage team members, assign roles, and control permissions from the Team page.",
-    image: "👥",
-    target: "#team-link"
+    title: "Schema Generator",
+    description: "Generate JSON-LD structured data from your HTML content. Supports 50+ schema types for rich search results.",
+    icon: Code2,
+    color: 'from-rose-500 to-rose-600',
+    target: "#schema-generator"
   },
   {
     id: 8,
-    title: "Help & Resources",
-    description: "Access comprehensive guides, SEO glossary, and video tutorials anytime from the Help menu.",
-    image: "📚",
-    target: "#help-link"
+    title: "Team Collaboration",
+    description: "Assign tasks to team members, add comments with @mentions, and track activity across all your projects.",
+    icon: Users,
+    color: 'from-indigo-500 to-indigo-600',
+    target: "#team-link"
   },
   {
     id: 9,
-    title: "Notifications",
-    description: "Get real-time notifications when you're assigned tasks, mentioned in comments, or when important deadlines approach.",
-    image: "🔔",
+    title: "Stay Updated",
+    description: "Get real-time notifications for task assignments, comments, and deadlines. Customize your notification preferences anytime.",
+    icon: Bell,
+    color: 'from-orange-500 to-orange-600',
     target: "#notifications-bell"
   },
   {
     id: 10,
+    title: "Help & Resources",
+    description: "Access guides, tutorials, and an SEO glossary. Press Cmd+K to search across all tools and help content.",
+    icon: BookOpen,
+    color: 'from-teal-500 to-teal-600',
+    target: "#help-link"
+  },
+  {
+    id: 11,
     title: "You're All Set!",
-    description: "You're ready to start managing your content projects like a pro. Create your first project to begin!",
-    image: "🚀",
+    description: "You're ready to optimize your content like a pro. Start with a project or try any of our SEO tools!",
+    icon: Rocket,
+    color: 'from-primary-500 to-cyan-500',
     target: null
   }
 ];
@@ -128,17 +162,18 @@ export default function OnboardingWalkthrough({ onComplete }) {
 
   const step = onboardingSteps[currentStep];
   const progress = ((currentStep + 1) / onboardingSteps.length) * 100;
+  const StepIcon = step.icon;
 
   return (
     <>
       {/* Backdrop */}
-      <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
+      <div className="fixed inset-0 bg-charcoal-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
         {/* Modal */}
-        <div className="bg-white rounded-xl shadow-2xl max-w-2xl w-full relative">
+        <div className="bg-white rounded-2xl shadow-2xl max-w-2xl w-full relative overflow-hidden">
           {/* Progress Bar */}
-          <div className="h-2 bg-gray-200 rounded-t-xl overflow-hidden">
+          <div className="h-1.5 bg-charcoal-100">
             <div
-              className="h-full bg-primary-600 transition-all duration-300"
+              className="h-full bg-gradient-to-r from-primary-500 to-cyan-500 transition-all duration-500 ease-out"
               style={{ width: `${progress}%` }}
             />
           </div>
@@ -147,12 +182,12 @@ export default function OnboardingWalkthrough({ onComplete }) {
           <div className="p-8">
             {/* Step Indicator */}
             <div className="flex items-center justify-between mb-6">
-              <span className="text-sm text-gray-500">
+              <span className="text-sm font-medium text-charcoal-500">
                 Step {currentStep + 1} of {onboardingSteps.length}
               </span>
               <button
                 onClick={handleSkip}
-                className="text-sm text-gray-500 hover:text-gray-700"
+                className="text-sm text-charcoal-400 hover:text-charcoal-600 transition-colors"
               >
                 Skip tour
               </button>
@@ -160,27 +195,30 @@ export default function OnboardingWalkthrough({ onComplete }) {
 
             {/* Main Content */}
             <div className="text-center mb-8">
-              <div className="text-6xl mb-4">{step.image}</div>
-              <h2 className="text-2xl font-bold text-gray-900 mb-3">
+              <div className={`w-20 h-20 rounded-2xl bg-gradient-to-br ${step.color} flex items-center justify-center mx-auto mb-6 shadow-lg`}>
+                <StepIcon className="w-10 h-10 text-white" />
+              </div>
+              <h2 className="text-2xl font-bold text-charcoal-900 mb-3">
                 {step.title}
               </h2>
-              <p className="text-gray-600 text-lg">
+              <p className="text-charcoal-600 text-lg leading-relaxed max-w-md mx-auto">
                 {step.description}
               </p>
             </div>
 
             {/* Step Dots */}
-            <div className="flex items-center justify-center gap-2 mb-8">
+            <div className="flex items-center justify-center gap-1.5 mb-8">
               {onboardingSteps.map((_, index) => (
                 <button
                   key={index}
                   onClick={() => setCurrentStep(index)}
-                  className={`w-2 h-2 rounded-full transition-all ${
+                  aria-label={`Go to step ${index + 1}`}
+                  className={`h-2 rounded-full transition-all duration-300 ${
                     index === currentStep
-                      ? 'bg-primary-600 w-8'
+                      ? 'bg-gradient-to-r from-primary-500 to-cyan-500 w-8'
                       : index < currentStep
-                      ? 'bg-primary-400'
-                      : 'bg-gray-300'
+                      ? 'bg-primary-400 w-2'
+                      : 'bg-charcoal-200 w-2 hover:bg-charcoal-300'
                   }`}
                 />
               ))}
@@ -221,9 +259,10 @@ export default function OnboardingWalkthrough({ onComplete }) {
           {/* Close Button */}
           <button
             onClick={handleSkip}
-            className="absolute top-4 right-4 text-gray-400 hover:text-gray-600"
+            aria-label="Close walkthrough"
+            className="absolute top-4 right-4 p-1.5 rounded-lg text-charcoal-400 hover:text-charcoal-600 hover:bg-charcoal-100 transition-all"
           >
-            <X className="w-6 h-6" />
+            <X className="w-5 h-5" />
           </button>
         </div>
       </div>
