@@ -3,10 +3,12 @@ import { Link } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 import { useProjects } from '../../hooks/useProjects';
 import { useAudits } from '../../hooks/useAudits';
+import { useFavoritesAndRecents } from '../../hooks/useFavoritesAndRecents';
 import { getVisibleTools, TOOL_STATUS } from '../../config/tools';
 import ToolCard from './ToolCard';
 import { SkeletonStatCard, SkeletonToolCard, SkeletonProjectList } from '../shared/Skeleton';
 import FavoritesAndRecentsWidget from '../shared/FavoritesAndRecents';
+import { HomeRecommendations } from '../shared/ToolRecommendations';
 import {
   ClipboardList,
   Search,
@@ -31,6 +33,7 @@ export default function HomePage() {
   const { userProfile } = useAuth();
   const { projects, loading: projectsLoading } = useProjects();
   const { audits, loading: auditsLoading, stats: auditStats } = useAudits();
+  const { recents } = useFavoritesAndRecents();
 
   // Calculate Content Planner stats
   const activeProjects = projects.filter(p => p.status === 'Active').length;
@@ -428,6 +431,17 @@ export default function HomePage() {
             <h2 id="favorites-heading" className="text-lg font-bold text-charcoal-900">Quick Access</h2>
           </div>
           <FavoritesAndRecentsWidget />
+        </section>
+
+        {/* Personalized Recommendations */}
+        <section className="mb-12" aria-labelledby="recommendations-heading">
+          <HomeRecommendations
+            activity={{
+              recents,
+              projects,
+              audits
+            }}
+          />
         </section>
 
         {/* Quick Tips */}
