@@ -26,7 +26,9 @@ import {
   Link,
   Search,
   Filter,
-  BarChart3
+  BarChart3,
+  PauseCircle,
+  PlayCircle
 } from 'lucide-react';
 import { format, formatDistanceToNow, addDays, addWeeks, addMonths, subDays } from 'date-fns';
 import toast from 'react-hot-toast';
@@ -311,6 +313,19 @@ export default function ScheduledAuditsPanel() {
     ), { duration: 5000 });
   };
 
+  // Toggle all audits (maintenance mode)
+  const toggleAllAudits = (activate) => {
+    const activeCount = audits.filter(a => a.isActive).length;
+
+    if (activate) {
+      setAudits(prev => prev.map(a => ({ ...a, isActive: true })));
+      toast.success(`All ${audits.length} audit schedules activated`);
+    } else {
+      setAudits(prev => prev.map(a => ({ ...a, isActive: false })));
+      toast.success(`All ${activeCount} audit schedules paused (maintenance mode)`);
+    }
+  };
+
   // Run audit now
   const runNow = (id) => {
     const audit = audits.find(a => a.id === id);
@@ -375,13 +390,34 @@ export default function ScheduledAuditsPanel() {
             Configure recurring automated technical SEO audits
           </p>
         </div>
-        <button
-          onClick={() => setShowCreateModal(true)}
-          className="btn btn-primary flex items-center gap-2"
-        >
-          <Plus className="w-4 h-4" />
-          New Audit Schedule
-        </button>
+        <div className="flex items-center gap-2">
+          {audits.some(a => a.isActive) ? (
+            <button
+              onClick={() => toggleAllAudits(false)}
+              className="btn btn-secondary flex items-center gap-2"
+              title="Pause all audits for maintenance"
+            >
+              <PauseCircle className="w-4 h-4" />
+              Pause All
+            </button>
+          ) : (
+            <button
+              onClick={() => toggleAllAudits(true)}
+              className="btn btn-secondary flex items-center gap-2 text-emerald-600 dark:text-emerald-400"
+              title="Resume all audits"
+            >
+              <PlayCircle className="w-4 h-4" />
+              Resume All
+            </button>
+          )}
+          <button
+            onClick={() => setShowCreateModal(true)}
+            className="btn btn-primary flex items-center gap-2"
+          >
+            <Plus className="w-4 h-4" />
+            New Audit Schedule
+          </button>
+        </div>
       </div>
 
       {/* Stats */}

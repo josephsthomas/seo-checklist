@@ -26,7 +26,9 @@ import {
   Users,
   Download,
   Eye,
-  RefreshCw
+  RefreshCw,
+  PauseCircle,
+  PlayCircle
 } from 'lucide-react';
 import { format, formatDistanceToNow, addDays, addWeeks, addMonths } from 'date-fns';
 import toast from 'react-hot-toast';
@@ -268,6 +270,19 @@ export default function ScheduledReportsPanel() {
     ), { duration: 5000 });
   };
 
+  // Toggle all schedules (maintenance mode)
+  const toggleAllSchedules = (activate) => {
+    const activeCount = schedules.filter(s => s.isActive).length;
+
+    if (activate) {
+      setSchedules(prev => prev.map(s => ({ ...s, isActive: true })));
+      toast.success(`All ${schedules.length} schedules activated`);
+    } else {
+      setSchedules(prev => prev.map(s => ({ ...s, isActive: false })));
+      toast.success(`All ${activeCount} schedules paused (maintenance mode)`);
+    }
+  };
+
   // Run now
   const runNow = (id) => {
     const schedule = schedules.find(s => s.id === id);
@@ -311,13 +326,34 @@ export default function ScheduledReportsPanel() {
             Configure automated report generation and delivery
           </p>
         </div>
-        <button
-          onClick={() => setShowCreateModal(true)}
-          className="btn btn-primary flex items-center gap-2"
-        >
-          <Plus className="w-4 h-4" />
-          New Schedule
-        </button>
+        <div className="flex items-center gap-2">
+          {schedules.some(s => s.isActive) ? (
+            <button
+              onClick={() => toggleAllSchedules(false)}
+              className="btn btn-secondary flex items-center gap-2"
+              title="Pause all schedules for maintenance"
+            >
+              <PauseCircle className="w-4 h-4" />
+              Pause All
+            </button>
+          ) : (
+            <button
+              onClick={() => toggleAllSchedules(true)}
+              className="btn btn-secondary flex items-center gap-2 text-emerald-600 dark:text-emerald-400"
+              title="Resume all schedules"
+            >
+              <PlayCircle className="w-4 h-4" />
+              Resume All
+            </button>
+          )}
+          <button
+            onClick={() => setShowCreateModal(true)}
+            className="btn btn-primary flex items-center gap-2"
+          >
+            <Plus className="w-4 h-4" />
+            New Schedule
+          </button>
+        </div>
       </div>
 
       {/* Stats */}

@@ -181,24 +181,71 @@ export default function BatchAuditPanel({ onClose, onStartBatch }) {
     toast.success('Exported batch audit report as PDF');
   };
 
+  // Validate URL format with detailed checks
+  const validateUrl = (url) => {
+    const trimmedUrl = url.trim();
+    if (!trimmedUrl) return { valid: false, error: 'URL cannot be empty' };
+
+    // Check for common typos and issues
+    if (trimmedUrl.includes(' ')) {
+      return { valid: false, error: 'URL contains spaces - did you mean to remove them?' };
+    }
+
+    if (trimmedUrl.startsWith('htp://') || trimmedUrl.startsWith('htps://')) {
+      return { valid: false, error: 'Possible typo in protocol - check http:// or https://' };
+    }
+
+    // Add protocol if missing
+    const urlWithProtocol = trimmedUrl.startsWith('http') ? trimmedUrl : `https://${trimmedUrl}`;
+
+    try {
+      const parsed = new URL(urlWithProtocol);
+
+      // Check for valid hostname
+      if (!parsed.hostname || parsed.hostname.length < 3) {
+        return { valid: false, error: 'Invalid hostname' };
+      }
+
+      // Check for localhost/internal URLs (warning but allow)
+      if (parsed.hostname === 'localhost' || parsed.hostname.match(/^192\.168\.|^10\.|^172\.(1[6-9]|2[0-9]|3[0-1])\./)) {
+        return { valid: true, normalized: urlWithProtocol, warning: 'This appears to be a local/internal URL' };
+      }
+
+      // Check for valid TLD (basic check)
+      const hostParts = parsed.hostname.split('.');
+      if (hostParts.length < 2 || hostParts[hostParts.length - 1].length < 2) {
+        return { valid: false, error: 'Invalid domain - missing or invalid TLD (e.g., .com, .org)' };
+      }
+
+      // Check for common invalid characters in domain
+      if (parsed.hostname.match(/[<>'"\\]/)) {
+        return { valid: false, error: 'Domain contains invalid characters' };
+      }
+
+      return { valid: true, normalized: urlWithProtocol };
+    } catch {
+      return { valid: false, error: 'Invalid URL format - please check the URL structure' };
+    }
+  };
+
   // Add URL to list
   const addUrl = useCallback((url) => {
-    const trimmedUrl = url.trim();
-    if (!trimmedUrl) return;
+    const validation = validateUrl(url);
 
-    // Validate URL
-    try {
-      new URL(trimmedUrl.startsWith('http') ? trimmedUrl : `https://${trimmedUrl}`);
-    } catch {
-      toast.error('Invalid URL format');
+    if (!validation.valid) {
+      toast.error(validation.error);
       return;
     }
 
-    const normalizedUrl = trimmedUrl.startsWith('http') ? trimmedUrl : `https://${trimmedUrl}`;
+    const normalizedUrl = validation.normalized;
 
     if (urls.includes(normalizedUrl)) {
       toast.error('URL already added');
       return;
+    }
+
+    if (validation.warning) {
+      toast(validation.warning, { icon: '⚠️' });
     }
 
     setUrls(prev => [...prev, normalizedUrl]);
@@ -209,22 +256,45 @@ export default function BatchAuditPanel({ onClose, onStartBatch }) {
   const addMultipleUrls = useCallback((text) => {
     const urlLines = text.split(/[\n,]/).map(u => u.trim()).filter(Boolean);
     const newUrls = [];
+    let invalidCount = 0;
+    let duplicateCount = 0;
 
     urlLines.forEach(url => {
-      try {
-        const normalizedUrl = url.startsWith('http') ? url : `https://${url}`;
-        new URL(normalizedUrl);
-        if (!urls.includes(normalizedUrl) && !newUrls.includes(normalizedUrl)) {
-          newUrls.push(normalizedUrl);
-        }
-      } catch {
-        // Skip invalid URLs
+      const validation = validateUrl(url);
+
+      if (!validation.valid) {
+        invalidCount++;
+        return;
       }
+
+      const normalizedUrl = validation.normalized;
+      if (urls.includes(normalizedUrl) || newUrls.includes(normalizedUrl)) {
+        duplicateCount++;
+        return;
+      }
+
+      newUrls.push(normalizedUrl);
     });
 
     if (newUrls.length > 0) {
       setUrls(prev => [...prev, ...newUrls]);
-      toast.success(`Added ${newUrls.length} URLs`);
+
+      let message = `Added ${newUrls.length} URL${newUrls.length > 1 ? 's' : ''}`;
+      if (invalidCount > 0 || duplicateCount > 0) {
+        const skipped = [];
+        if (invalidCount > 0) skipped.push(`${invalidCount} invalid`);
+        if (duplicateCount > 0) skipped.push(`${duplicateCount} duplicate${duplicateCount > 1 ? 's' : ''}`);
+        message += ` (skipped ${skipped.join(', ')})`;
+      }
+      toast.success(message);
+    } else if (invalidCount > 0 || duplicateCount > 0) {
+      if (invalidCount > 0 && duplicateCount === 0) {
+        toast.error(`All ${invalidCount} URLs were invalid`);
+      } else if (duplicateCount > 0 && invalidCount === 0) {
+        toast.error(`All ${duplicateCount} URLs were duplicates`);
+      } else {
+        toast.error(`No valid URLs found (${invalidCount} invalid, ${duplicateCount} duplicates)`);
+      }
     }
   }, [urls]);
 
