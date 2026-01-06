@@ -35,6 +35,7 @@ const GlossaryPage = lazy(() => import('./components/help/GlossaryPage'));
 import KeyboardShortcuts from './components/help/KeyboardShortcuts';
 import OnboardingWalkthrough from './components/help/OnboardingWalkthrough';
 import FeedbackWidget from './components/shared/FeedbackWidget';
+import CommandPalette, { useCommandPalette } from './components/shared/CommandPalette';
 
 // Audit Components - lazy load (heaviest components with xlsx, jspdf)
 const AuditPage = lazy(() => import('./components/audit/AuditPage'));
@@ -107,17 +108,19 @@ function NotFoundPage() {
   );
 }
 
-function App() {
+// Wrapper component to use hooks inside Router
+function AppContent() {
+  const commandPalette = useCommandPalette();
+
   return (
-    <AuthProvider>
-      <Router>
-        <div className="min-h-screen bg-charcoal-50 flex flex-col">
-          <a href="#main-content" className="skip-link">
-            Skip to main content
-          </a>
-          <Navigation />
-          <OnboardingWalkthrough />
-          <KeyboardShortcuts />
+    <div className="min-h-screen bg-charcoal-50 dark:bg-charcoal-900 flex flex-col">
+      <a href="#main-content" className="skip-link">
+        Skip to main content
+      </a>
+      <Navigation />
+      <CommandPalette isOpen={commandPalette.isOpen} onClose={commandPalette.close} />
+      <OnboardingWalkthrough />
+      <KeyboardShortcuts />
           <main id="main-content" className="flex-1" role="main">
             <ErrorBoundary variant="page" message="Failed to load this page. This might be a temporary issue.">
               <Suspense fallback={<PageLoader />}>
@@ -438,6 +441,14 @@ function App() {
           {/* Feedback Widget - Available on all pages */}
           <FeedbackWidget />
         </div>
+  );
+}
+
+function App() {
+  return (
+    <AuthProvider>
+      <Router>
+        <AppContent />
       </Router>
     </AuthProvider>
   );
