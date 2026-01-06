@@ -290,18 +290,20 @@ export default function Navigation() {
 
             {/* User Menu */}
             <div className="flex items-center gap-3 pl-4 ml-2 border-l border-charcoal-200">
-              <div className="text-right">
-                <p className="text-sm font-medium text-charcoal-900">
-                  {userProfile?.name || currentUser.displayName || currentUser.email}
-                </p>
-                <p className="text-xs text-charcoal-500 capitalize">
-                  {userProfile?.role?.replace('_', ' ') || 'User'}
-                </p>
-              </div>
+              <Link to="/profile" className="flex items-center gap-3 hover:opacity-80 transition-opacity">
+                <div className="text-right">
+                  <p className="text-sm font-medium text-charcoal-900">
+                    {userProfile?.name || currentUser.displayName || currentUser.email}
+                  </p>
+                  <p className="text-xs text-charcoal-500 capitalize">
+                    {userProfile?.role?.replace('_', ' ') || 'User'}
+                  </p>
+                </div>
 
-              <div className="avatar">
-                <User className="w-4 h-4" />
-              </div>
+                <div className="avatar">
+                  <User className="w-4 h-4" />
+                </div>
+              </Link>
 
               <button
                 onClick={handleLogout}
@@ -395,7 +397,11 @@ export default function Navigation() {
               )}
 
               <div className="px-3 py-4 border-t border-charcoal-100 mt-3">
-                <div className="flex items-center gap-3 mb-4">
+                <Link
+                  to="/profile"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="flex items-center gap-3 mb-4 hover:opacity-80 transition-opacity"
+                >
                   <div className="avatar" aria-hidden="true">
                     <User className="w-4 h-4" />
                   </div>
@@ -407,7 +413,7 @@ export default function Navigation() {
                       {userProfile?.role?.replace('_', ' ') || 'User'}
                     </p>
                   </div>
-                </div>
+                </Link>
 
                 <button
                   onClick={handleLogout}

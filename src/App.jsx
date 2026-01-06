@@ -54,6 +54,9 @@ const SchemaGeneratorPage = lazy(() => import('./components/schema-generator/Sch
 // User Settings - lazy load
 const UserSettingsPage = lazy(() => import('./components/settings/UserSettingsPage'));
 
+// User Profile - lazy load
+const UserProfilePage = lazy(() => import('./components/profile/UserProfilePage'));
+
 /**
  * Enhanced Loading Fallback with Skeleton
  */
@@ -312,8 +315,24 @@ function App() {
                   />
 
                   {/* ============================================ */}
-                  {/* USER SETTINGS                               */}
+                  {/* USER PROFILE & SETTINGS                     */}
                   {/* ============================================ */}
+                  <Route
+                    path="/profile"
+                    element={
+                      <ProtectedRoute>
+                        <UserProfilePage />
+                      </ProtectedRoute>
+                    }
+                  />
+                  <Route
+                    path="/profile/:userId"
+                    element={
+                      <ProtectedRoute>
+                        <UserProfilePage />
+                      </ProtectedRoute>
+                    }
+                  />
                   <Route
                     path="/settings"
                     element={
