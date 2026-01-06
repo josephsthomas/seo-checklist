@@ -100,13 +100,13 @@ export default function KeyboardShortcuts() {
                 <Keyboard className="w-6 h-6 text-primary-600" />
               </div>
               <div>
-                <h2 className="text-2xl font-bold text-gray-900">Keyboard Shortcuts</h2>
-                <p className="text-sm text-gray-600">Work faster with keyboard commands</p>
+                <h2 className="text-2xl font-bold text-charcoal-900">Keyboard Shortcuts</h2>
+                <p className="text-sm text-charcoal-600">Work faster with keyboard commands</p>
               </div>
             </div>
             <button
               onClick={() => setIsOpen(false)}
-              className="text-gray-400 hover:text-gray-600"
+              className="text-charcoal-400 hover:text-charcoal-600"
             >
               <X className="w-6 h-6" />
             </button>
@@ -117,25 +117,25 @@ export default function KeyboardShortcuts() {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
               {shortcuts.map((category, idx) => (
                 <div key={idx}>
-                  <h3 className="text-lg font-semibold text-gray-900 mb-4">
+                  <h3 className="text-lg font-semibold text-charcoal-900 mb-4">
                     {category.category}
                   </h3>
                   <div className="space-y-3">
                     {category.items.map((shortcut, index) => (
                       <div
                         key={index}
-                        className="flex items-center justify-between p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors"
+                        className="flex items-center justify-between p-3 bg-charcoal-50 rounded-lg hover:bg-charcoal-100 transition-colors"
                       >
-                        <span className="text-sm text-gray-700">
+                        <span className="text-sm text-charcoal-700">
                           {shortcut.description}
                         </span>
                         <div className="flex items-center gap-1">
                           {shortcut.keys.map((key, keyIndex) => (
                             <React.Fragment key={keyIndex}>
                               {keyIndex > 0 && (
-                                <span className="text-gray-400 text-xs">+</span>
+                                <span className="text-charcoal-400 text-xs">+</span>
                               )}
-                              <kbd className="px-2 py-1 bg-white border border-gray-300 rounded text-xs font-mono text-gray-700 shadow-sm min-w-[32px] text-center">
+                              <kbd className="px-2 py-1 bg-white border border-charcoal-200 rounded text-xs font-mono text-charcoal-700 shadow-sm min-w-[32px] text-center">
                                 {key}
                               </kbd>
                             </React.Fragment>
@@ -164,7 +164,7 @@ export default function KeyboardShortcuts() {
           </div>
 
           {/* Footer */}
-          <div className="border-t px-6 py-4 bg-gray-50 flex justify-end">
+          <div className="border-t px-6 py-4 bg-charcoal-50 flex justify-end">
             <button
               onClick={() => setIsOpen(false)}
               className="btn btn-primary"

@@ -239,63 +239,68 @@ export default function UserSettingsPage() {
 
                     {/* Form Fields */}
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <div>
-                        <label className="block text-sm font-medium text-charcoal-700 mb-1">
+                      <div className="form-group">
+                        <label htmlFor="profile-name" className="block text-sm font-medium text-charcoal-700 mb-1">
                           Full Name
                         </label>
                         <div className="relative">
-                          <User className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-charcoal-400" />
+                          <User className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-charcoal-400" aria-hidden="true" />
                           <input
+                            id="profile-name"
                             type="text"
                             value={profileForm.name}
                             onChange={(e) => setProfileForm(prev => ({ ...prev, name: e.target.value }))}
-                            className="w-full pl-10 pr-4 py-2.5 border border-charcoal-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                            className="input pl-10"
                             placeholder="Your name"
                           />
                         </div>
                       </div>
 
-                      <div>
-                        <label className="block text-sm font-medium text-charcoal-700 mb-1">
+                      <div className="form-group">
+                        <label htmlFor="profile-email" className="block text-sm font-medium text-charcoal-700 mb-1">
                           Email
                         </label>
                         <div className="relative">
-                          <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-charcoal-400" />
+                          <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-charcoal-400" aria-hidden="true" />
                           <input
+                            id="profile-email"
                             type="email"
                             value={profileForm.email}
                             disabled
-                            className="w-full pl-10 pr-4 py-2.5 border border-charcoal-200 rounded-xl bg-charcoal-50 text-charcoal-500 cursor-not-allowed"
+                            aria-describedby="email-note"
+                            className="input pl-10 bg-charcoal-50 text-charcoal-500 cursor-not-allowed"
                           />
                         </div>
-                        <p className="text-xs text-charcoal-400 mt-1">Email cannot be changed</p>
+                        <p id="email-note" className="text-xs text-charcoal-400 mt-1">Email cannot be changed</p>
                       </div>
 
-                      <div>
-                        <label className="block text-sm font-medium text-charcoal-700 mb-1">
+                      <div className="form-group">
+                        <label htmlFor="profile-company" className="block text-sm font-medium text-charcoal-700 mb-1">
                           Company
                         </label>
                         <div className="relative">
-                          <Building className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-charcoal-400" />
+                          <Building className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-charcoal-400" aria-hidden="true" />
                           <input
+                            id="profile-company"
                             type="text"
                             value={profileForm.company}
                             onChange={(e) => setProfileForm(prev => ({ ...prev, company: e.target.value }))}
-                            className="w-full pl-10 pr-4 py-2.5 border border-charcoal-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                            className="input pl-10"
                             placeholder="Your company"
                           />
                         </div>
                       </div>
 
-                      <div>
-                        <label className="block text-sm font-medium text-charcoal-700 mb-1">
+                      <div className="form-group">
+                        <label htmlFor="profile-job-title" className="block text-sm font-medium text-charcoal-700 mb-1">
                           Job Title
                         </label>
                         <input
+                          id="profile-job-title"
                           type="text"
                           value={profileForm.jobTitle}
                           onChange={(e) => setProfileForm(prev => ({ ...prev, jobTitle: e.target.value }))}
-                          className="w-full px-4 py-2.5 border border-charcoal-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                          className="input"
                           placeholder="Your role"
                         />
                       </div>
@@ -383,36 +388,38 @@ export default function UserSettingsPage() {
 
                     {/* Compact Mode */}
                     <div className="flex items-center justify-between p-4 bg-charcoal-50 rounded-xl">
-                      <div>
+                      <div id="compact-mode-label">
                         <p className="font-medium text-charcoal-900">Compact Mode</p>
                         <p className="text-sm text-charcoal-500">Reduce spacing and padding</p>
                       </div>
-                      <label className="relative inline-flex items-center cursor-pointer">
-                        <input
-                          type="checkbox"
-                          checked={appearance.compactMode}
-                          onChange={(e) => setAppearance(prev => ({ ...prev, compactMode: e.target.checked }))}
-                          className="sr-only peer"
-                        />
-                        <div className="w-11 h-6 bg-charcoal-300 peer-focus:ring-2 peer-focus:ring-primary-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-charcoal-200 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary-500" />
-                      </label>
+                      <button
+                        type="button"
+                        role="switch"
+                        aria-checked={appearance.compactMode}
+                        aria-labelledby="compact-mode-label"
+                        onClick={() => setAppearance(prev => ({ ...prev, compactMode: !prev.compactMode }))}
+                        className={`toggle-switch ${appearance.compactMode ? 'bg-primary-500' : 'bg-charcoal-300'}`}
+                      >
+                        <span className={`toggle-switch-thumb ${appearance.compactMode ? 'translate-x-5' : 'translate-x-0.5'}`} />
+                      </button>
                     </div>
 
                     {/* Show Tips */}
                     <div className="flex items-center justify-between p-4 bg-charcoal-50 rounded-xl">
-                      <div>
+                      <div id="show-tips-label">
                         <p className="font-medium text-charcoal-900">Show Tips</p>
                         <p className="text-sm text-charcoal-500">Display helpful tips throughout the app</p>
                       </div>
-                      <label className="relative inline-flex items-center cursor-pointer">
-                        <input
-                          type="checkbox"
-                          checked={appearance.showTips}
-                          onChange={(e) => setAppearance(prev => ({ ...prev, showTips: e.target.checked }))}
-                          className="sr-only peer"
-                        />
-                        <div className="w-11 h-6 bg-charcoal-300 peer-focus:ring-2 peer-focus:ring-primary-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-charcoal-200 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary-500" />
-                      </label>
+                      <button
+                        type="button"
+                        role="switch"
+                        aria-checked={appearance.showTips}
+                        aria-labelledby="show-tips-label"
+                        onClick={() => setAppearance(prev => ({ ...prev, showTips: !prev.showTips }))}
+                        className={`toggle-switch ${appearance.showTips ? 'bg-primary-500' : 'bg-charcoal-300'}`}
+                      >
+                        <span className={`toggle-switch-thumb ${appearance.showTips ? 'translate-x-5' : 'translate-x-0.5'}`} />
+                      </button>
                     </div>
                   </div>
 
@@ -438,46 +445,53 @@ export default function UserSettingsPage() {
                     </p>
 
                     <div className="space-y-4 max-w-md">
-                      <div>
-                        <label className="block text-sm font-medium text-charcoal-700 mb-1">
+                      <div className="form-group">
+                        <label htmlFor="current-password" className="block text-sm font-medium text-charcoal-700 mb-1">
                           Current Password
                         </label>
                         <div className="relative">
-                          <Key className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-charcoal-400" />
+                          <Key className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-charcoal-400" aria-hidden="true" />
                           <input
+                            id="current-password"
                             type="password"
                             value={passwordForm.currentPassword}
                             onChange={(e) => setPasswordForm(prev => ({ ...prev, currentPassword: e.target.value }))}
-                            className="w-full pl-10 pr-4 py-2.5 border border-charcoal-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                            className="input pl-10"
                             placeholder="Enter current password"
+                            autoComplete="current-password"
                           />
                         </div>
                       </div>
 
-                      <div>
-                        <label className="block text-sm font-medium text-charcoal-700 mb-1">
+                      <div className="form-group">
+                        <label htmlFor="new-password" className="block text-sm font-medium text-charcoal-700 mb-1">
                           New Password
                         </label>
                         <input
+                          id="new-password"
                           type="password"
                           value={passwordForm.newPassword}
                           onChange={(e) => setPasswordForm(prev => ({ ...prev, newPassword: e.target.value }))}
-                          className="w-full px-4 py-2.5 border border-charcoal-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                          className="input"
                           placeholder="Enter new password"
+                          autoComplete="new-password"
+                          aria-describedby="new-password-hint"
                         />
-                        <p className="text-xs text-charcoal-400 mt-1">Minimum 8 characters</p>
+                        <p id="new-password-hint" className="text-xs text-charcoal-400 mt-1">Minimum 8 characters</p>
                       </div>
 
-                      <div>
-                        <label className="block text-sm font-medium text-charcoal-700 mb-1">
+                      <div className="form-group">
+                        <label htmlFor="confirm-password" className="block text-sm font-medium text-charcoal-700 mb-1">
                           Confirm New Password
                         </label>
                         <input
+                          id="confirm-password"
                           type="password"
                           value={passwordForm.confirmPassword}
                           onChange={(e) => setPasswordForm(prev => ({ ...prev, confirmPassword: e.target.value }))}
-                          className="w-full px-4 py-2.5 border border-charcoal-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                          className="input"
                           placeholder="Confirm new password"
+                          autoComplete="new-password"
                         />
                       </div>
                     </div>

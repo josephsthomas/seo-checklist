@@ -83,7 +83,7 @@ export default function PageAuditView({ url, urlData, issues, onBack }) {
     if (code >= 400) {
       return <span className="px-2 py-0.5 text-xs font-medium rounded bg-red-100 text-red-700">{code} Error</span>;
     }
-    return <span className="px-2 py-0.5 text-xs font-medium rounded bg-gray-100 text-gray-700">Unknown</span>;
+    return <span className="px-2 py-0.5 text-xs font-medium rounded bg-charcoal-100 text-charcoal-700">Unknown</span>;
   };
 
   const getIndexabilityBadge = (indexability) => {
@@ -94,13 +94,13 @@ export default function PageAuditView({ url, urlData, issues, onBack }) {
   };
 
   return (
-    <div className="h-full flex flex-col bg-gray-50">
+    <div className="h-full flex flex-col bg-charcoal-50">
       {/* Header */}
       <div className="bg-white border-b px-6 py-4">
         <div className="flex items-center gap-4 mb-4">
           <button
             onClick={onBack}
-            className="flex items-center gap-2 text-gray-600 hover:text-gray-900"
+            className="flex items-center gap-2 text-charcoal-600 hover:text-charcoal-900"
           >
             <ArrowLeft className="w-4 h-4" />
             Back
@@ -109,12 +109,12 @@ export default function PageAuditView({ url, urlData, issues, onBack }) {
 
         <div className="flex items-start justify-between gap-4">
           <div className="flex-1 min-w-0">
-            <h2 className="text-xl font-bold text-gray-900 truncate mb-2">{url}</h2>
+            <h2 className="text-xl font-bold text-charcoal-900 truncate mb-2">{url}</h2>
             <div className="flex items-center gap-2 flex-wrap">
               {urlData?.statusCode && getStatusBadge(urlData.statusCode)}
               {urlData?.indexability && getIndexabilityBadge(urlData.indexability)}
               {urlData?.contentType && (
-                <span className="px-2 py-0.5 text-xs font-medium rounded bg-gray-100 text-gray-700">
+                <span className="px-2 py-0.5 text-xs font-medium rounded bg-charcoal-100 text-charcoal-700">
                   {urlData.contentType}
                 </span>
               )}
@@ -147,92 +147,92 @@ export default function PageAuditView({ url, urlData, issues, onBack }) {
           {/* Page Metadata */}
           {urlData && (
             <div className="bg-white rounded-xl border p-6 mb-6">
-              <h3 className="text-lg font-semibold text-gray-900 mb-4">Page Details</h3>
+              <h3 className="text-lg font-semibold text-charcoal-900 mb-4">Page Details</h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {urlData.title1 && (
                   <div className="flex items-start gap-3">
-                    <FileText className="w-5 h-5 text-gray-400 mt-0.5" />
+                    <FileText className="w-5 h-5 text-charcoal-400 mt-0.5" />
                     <div>
-                      <p className="text-sm font-medium text-gray-700">Title</p>
-                      <p className="text-sm text-gray-600">{urlData.title1}</p>
+                      <p className="text-sm font-medium text-charcoal-700">Title</p>
+                      <p className="text-sm text-charcoal-600">{urlData.title1}</p>
                       {urlData.title1Length && (
-                        <p className="text-xs text-gray-400">{urlData.title1Length} characters</p>
+                        <p className="text-xs text-charcoal-400">{urlData.title1Length} characters</p>
                       )}
                     </div>
                   </div>
                 )}
                 {urlData.metaDescription1 && (
                   <div className="flex items-start gap-3">
-                    <FileText className="w-5 h-5 text-gray-400 mt-0.5" />
+                    <FileText className="w-5 h-5 text-charcoal-400 mt-0.5" />
                     <div>
-                      <p className="text-sm font-medium text-gray-700">Meta Description</p>
-                      <p className="text-sm text-gray-600 line-clamp-2">{urlData.metaDescription1}</p>
+                      <p className="text-sm font-medium text-charcoal-700">Meta Description</p>
+                      <p className="text-sm text-charcoal-600 line-clamp-2">{urlData.metaDescription1}</p>
                       {urlData.metaDescription1Length && (
-                        <p className="text-xs text-gray-400">{urlData.metaDescription1Length} characters</p>
+                        <p className="text-xs text-charcoal-400">{urlData.metaDescription1Length} characters</p>
                       )}
                     </div>
                   </div>
                 )}
                 {urlData.h1 && (
                   <div className="flex items-start gap-3">
-                    <FileText className="w-5 h-5 text-gray-400 mt-0.5" />
+                    <FileText className="w-5 h-5 text-charcoal-400 mt-0.5" />
                     <div>
-                      <p className="text-sm font-medium text-gray-700">H1</p>
-                      <p className="text-sm text-gray-600">{urlData.h1}</p>
+                      <p className="text-sm font-medium text-charcoal-700">H1</p>
+                      <p className="text-sm text-charcoal-600">{urlData.h1}</p>
                     </div>
                   </div>
                 )}
                 {urlData.wordCount && (
                   <div className="flex items-start gap-3">
-                    <FileText className="w-5 h-5 text-gray-400 mt-0.5" />
+                    <FileText className="w-5 h-5 text-charcoal-400 mt-0.5" />
                     <div>
-                      <p className="text-sm font-medium text-gray-700">Word Count</p>
-                      <p className="text-sm text-gray-600">{parseInt(urlData.wordCount, 10).toLocaleString()} words</p>
+                      <p className="text-sm font-medium text-charcoal-700">Word Count</p>
+                      <p className="text-sm text-charcoal-600">{parseInt(urlData.wordCount, 10).toLocaleString()} words</p>
                     </div>
                   </div>
                 )}
                 {urlData.uniqueInlinks && (
                   <div className="flex items-start gap-3">
-                    <Link2 className="w-5 h-5 text-gray-400 mt-0.5" />
+                    <Link2 className="w-5 h-5 text-charcoal-400 mt-0.5" />
                     <div>
-                      <p className="text-sm font-medium text-gray-700">Inlinks</p>
-                      <p className="text-sm text-gray-600">{urlData.uniqueInlinks} unique internal links</p>
+                      <p className="text-sm font-medium text-charcoal-700">Inlinks</p>
+                      <p className="text-sm text-charcoal-600">{urlData.uniqueInlinks} unique internal links</p>
                     </div>
                   </div>
                 )}
                 {urlData.uniqueOutlinks && (
                   <div className="flex items-start gap-3">
-                    <Link2 className="w-5 h-5 text-gray-400 mt-0.5" />
+                    <Link2 className="w-5 h-5 text-charcoal-400 mt-0.5" />
                     <div>
-                      <p className="text-sm font-medium text-gray-700">Outlinks</p>
-                      <p className="text-sm text-gray-600">{urlData.uniqueOutlinks} unique outbound links</p>
+                      <p className="text-sm font-medium text-charcoal-700">Outlinks</p>
+                      <p className="text-sm text-charcoal-600">{urlData.uniqueOutlinks} unique outbound links</p>
                     </div>
                   </div>
                 )}
                 {urlData.crawlDepth && (
                   <div className="flex items-start gap-3">
-                    <Globe className="w-5 h-5 text-gray-400 mt-0.5" />
+                    <Globe className="w-5 h-5 text-charcoal-400 mt-0.5" />
                     <div>
-                      <p className="text-sm font-medium text-gray-700">Crawl Depth</p>
-                      <p className="text-sm text-gray-600">{urlData.crawlDepth} clicks from homepage</p>
+                      <p className="text-sm font-medium text-charcoal-700">Crawl Depth</p>
+                      <p className="text-sm text-charcoal-600">{urlData.crawlDepth} clicks from homepage</p>
                     </div>
                   </div>
                 )}
                 {urlData.responseTime && (
                   <div className="flex items-start gap-3">
-                    <Clock className="w-5 h-5 text-gray-400 mt-0.5" />
+                    <Clock className="w-5 h-5 text-charcoal-400 mt-0.5" />
                     <div>
-                      <p className="text-sm font-medium text-gray-700">Response Time</p>
-                      <p className="text-sm text-gray-600">{urlData.responseTime}ms</p>
+                      <p className="text-sm font-medium text-charcoal-700">Response Time</p>
+                      <p className="text-sm text-charcoal-600">{urlData.responseTime}ms</p>
                     </div>
                   </div>
                 )}
                 {urlData.size && (
                   <div className="flex items-start gap-3">
-                    <Zap className="w-5 h-5 text-gray-400 mt-0.5" />
+                    <Zap className="w-5 h-5 text-charcoal-400 mt-0.5" />
                     <div>
-                      <p className="text-sm font-medium text-gray-700">Page Size</p>
-                      <p className="text-sm text-gray-600">{(parseInt(urlData.size, 10) / 1024).toFixed(1)} KB</p>
+                      <p className="text-sm font-medium text-charcoal-700">Page Size</p>
+                      <p className="text-sm text-charcoal-600">{(parseInt(urlData.size, 10) / 1024).toFixed(1)} KB</p>
                     </div>
                   </div>
                 )}
@@ -267,26 +267,26 @@ export default function PageAuditView({ url, urlData, issues, onBack }) {
           {pageIssues.length === 0 ? (
             <div className="bg-white rounded-xl border p-12 text-center">
               <Check className="w-12 h-12 text-green-500 mx-auto mb-4" />
-              <h3 className="text-lg font-medium text-gray-900 mb-2">No Issues Found</h3>
-              <p className="text-gray-600">This page passed all audit checks.</p>
+              <h3 className="text-lg font-medium text-charcoal-900 mb-2">No Issues Found</h3>
+              <p className="text-charcoal-600">This page passed all audit checks.</p>
             </div>
           ) : (
             <div className="space-y-4">
-              <h3 className="text-lg font-semibold text-gray-900">Issues ({pageIssues.length})</h3>
+              <h3 className="text-lg font-semibold text-charcoal-900">Issues ({pageIssues.length})</h3>
               {pageIssues.map(issue => (
                 <div key={issue.id} className="bg-white rounded-xl border overflow-hidden">
                   <div className="px-6 py-4 flex items-start gap-4">
                     {getSeverityIcon(issue.severity)}
                     <div className="flex-1">
                       <div className="flex items-center gap-2 mb-1">
-                        <h4 className="font-medium text-gray-900">{issue.title}</h4>
+                        <h4 className="font-medium text-charcoal-900">{issue.title}</h4>
                         {getPriorityBadge(issue.priority)}
                       </div>
-                      <p className="text-sm text-gray-500 mb-2">{issue.category}</p>
-                      <p className="text-sm text-gray-600 mb-3">{issue.description}</p>
-                      <div className="bg-gray-50 rounded-lg p-3">
-                        <p className="text-sm font-medium text-gray-700 mb-1">Recommendation</p>
-                        <p className="text-sm text-gray-600">{issue.recommendation}</p>
+                      <p className="text-sm text-charcoal-500 mb-2">{issue.category}</p>
+                      <p className="text-sm text-charcoal-600 mb-3">{issue.description}</p>
+                      <div className="bg-charcoal-50 rounded-lg p-3">
+                        <p className="text-sm font-medium text-charcoal-700 mb-1">Recommendation</p>
+                        <p className="text-sm text-charcoal-600">{issue.recommendation}</p>
                       </div>
                     </div>
                   </div>

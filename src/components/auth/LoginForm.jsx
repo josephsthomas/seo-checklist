@@ -40,21 +40,22 @@ export default function LoginForm() {
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-primary-50 to-primary-100 px-4">
       <div className="max-w-md w-full">
         <div className="text-center mb-8">
-          <h1 className="text-4xl font-bold text-primary mb-2">Content Strategy Portal</h1>
-          <p className="text-charcoal">All-in-one content and SEO suite for organic health & visibility</p>
+          <h1 className="text-4xl font-bold text-primary-600 mb-2">Content Strategy Portal</h1>
+          <p className="text-charcoal-600">All-in-one content and SEO suite for organic health & visibility</p>
         </div>
 
-        <div className="bg-white rounded-xl shadow-lg p-8">
-          <h2 className="text-2xl font-semibold text-gray-900 mb-6">Welcome back</h2>
+        <div className="card p-8">
+          <h2 className="text-2xl font-semibold text-charcoal-900 mb-6">Welcome back</h2>
 
           <form onSubmit={handleSubmit} className="space-y-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+            <div className="form-group">
+              <label htmlFor="email" className="block text-sm font-medium text-charcoal-700 mb-2">
                 Email Address
               </label>
               <div className="relative">
-                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5" />
+                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 text-charcoal-400 w-5 h-5" aria-hidden="true" />
                 <input
+                  id="email"
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
@@ -62,17 +63,19 @@ export default function LoginForm() {
                   placeholder="you@example.com"
                   autoComplete="email"
                   required
+                  aria-required="true"
                 />
               </div>
             </div>
 
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+            <div className="form-group">
+              <label htmlFor="password" className="block text-sm font-medium text-charcoal-700 mb-2">
                 Password
               </label>
               <div className="relative">
-                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5" />
+                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 text-charcoal-400 w-5 h-5" aria-hidden="true" />
                 <input
+                  id="password"
                   type="password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
@@ -80,6 +83,7 @@ export default function LoginForm() {
                   placeholder="••••••••"
                   autoComplete="current-password"
                   required
+                  aria-required="true"
                 />
               </div>
             </div>
@@ -88,8 +92,9 @@ export default function LoginForm() {
               type="submit"
               disabled={loading}
               className="btn btn-primary w-full flex items-center justify-center gap-2"
+              aria-busy={loading}
             >
-              <LogIn className="w-5 h-5" />
+              <LogIn className="w-5 h-5" aria-hidden="true" />
               {loading ? 'Signing in...' : 'Sign In'}
             </button>
           </form>
@@ -97,10 +102,10 @@ export default function LoginForm() {
           <div className="mt-6">
             <div className="relative">
               <div className="absolute inset-0 flex items-center">
-                <div className="w-full border-t border-gray-300" />
+                <div className="w-full border-t border-charcoal-200" />
               </div>
               <div className="relative flex justify-center text-sm">
-                <span className="px-2 bg-white text-gray-500">Or continue with</span>
+                <span className="px-2 bg-white text-charcoal-500">Or continue with</span>
               </div>
             </div>
 
@@ -109,13 +114,14 @@ export default function LoginForm() {
               onClick={handleGoogleLogin}
               disabled={loading}
               className="btn btn-secondary w-full mt-4 flex items-center justify-center gap-2"
+              aria-busy={loading}
             >
-              <Chrome className="w-5 h-5" />
+              <Chrome className="w-5 h-5" aria-hidden="true" />
               Sign in with Google
             </button>
           </div>
 
-          <p className="mt-6 text-center text-sm text-gray-600">
+          <p className="mt-6 text-center text-sm text-charcoal-600">
             Don't have an account?{' '}
             <Link to="/register" className="text-primary-600 hover:text-primary-700 font-medium">
               Sign up

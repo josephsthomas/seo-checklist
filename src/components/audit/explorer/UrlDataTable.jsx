@@ -153,7 +153,7 @@ export default function UrlDataTable({ urlData, onSelectUrl, isLoading = false }
     if (code >= 400) {
       return <span className="px-2 py-0.5 text-xs font-medium rounded bg-red-100 text-red-700">{code}</span>;
     }
-    return <span className="px-2 py-0.5 text-xs font-medium rounded bg-gray-100 text-gray-700">-</span>;
+    return <span className="px-2 py-0.5 text-xs font-medium rounded bg-charcoal-100 text-charcoal-700">-</span>;
   };
 
   const getIndexabilityBadge = (indexability) => {
@@ -203,13 +203,13 @@ export default function UrlDataTable({ urlData, onSelectUrl, isLoading = false }
   };
 
   return (
-    <div className="h-full flex flex-col bg-gray-50">
+    <div className="h-full flex flex-col bg-charcoal-50">
       {/* Header */}
       <div className="bg-white border-b px-6 py-4">
         <div className="flex items-center justify-between mb-4">
           <div>
-            <h2 className="text-xl font-bold text-gray-900">URL Data</h2>
-            <p className="text-sm text-gray-500">
+            <h2 className="text-xl font-bold text-charcoal-900">URL Data</h2>
+            <p className="text-sm text-charcoal-500">
               {filteredData.length.toLocaleString()} URLs {searchQuery || statusFilter !== 'all' ? '(filtered)' : ''}
             </p>
           </div>
@@ -218,7 +218,7 @@ export default function UrlDataTable({ urlData, onSelectUrl, isLoading = false }
         {/* Filters */}
         <div className="flex flex-wrap gap-3">
           <div className="flex-1 min-w-[200px] relative">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-4 h-4" />
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-charcoal-400 w-4 h-4" />
             <input
               type="text"
               placeholder="Search URLs..."
@@ -253,7 +253,7 @@ export default function UrlDataTable({ urlData, onSelectUrl, isLoading = false }
 
             {showColumnPicker && (
               <div className="absolute right-0 top-full mt-1 bg-white border rounded-lg shadow-lg p-3 z-20 w-56">
-                <p className="text-sm font-medium text-gray-700 mb-2">Show Columns</p>
+                <p className="text-sm font-medium text-charcoal-700 mb-2">Show Columns</p>
                 <div className="space-y-1 max-h-64 overflow-y-auto">
                   {COLUMNS.map(col => (
                     <label key={col.id} className="flex items-center gap-2 py-1 cursor-pointer">
@@ -261,9 +261,9 @@ export default function UrlDataTable({ urlData, onSelectUrl, isLoading = false }
                         type="checkbox"
                         checked={visibleColumns.includes(col.id)}
                         onChange={() => toggleColumn(col.id)}
-                        className="rounded border-gray-300"
+                        className="rounded border-charcoal-200"
                       />
-                      <span className="text-sm text-gray-600">{col.label}</span>
+                      <span className="text-sm text-charcoal-600">{col.label}</span>
                     </label>
                   ))}
                 </div>
@@ -276,17 +276,17 @@ export default function UrlDataTable({ urlData, onSelectUrl, isLoading = false }
       {/* Table */}
       <div className="flex-1 overflow-auto">
         <table className="w-full border-collapse">
-          <thead className="bg-gray-100 sticky top-0">
+          <thead className="bg-charcoal-100 sticky top-0">
             <tr>
               {COLUMNS.filter(col => visibleColumns.includes(col.id)).map(col => (
                 <th
                   key={col.id}
-                  className={`px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider border-b ${col.width}`}
+                  className={`px-4 py-3 text-left text-xs font-medium text-charcoal-500 uppercase tracking-wider border-b ${col.width}`}
                 >
                   {col.sortable ? (
                     <button
                       onClick={() => handleSort(col.id)}
-                      className="flex items-center gap-1 hover:text-gray-700"
+                      className="flex items-center gap-1 hover:text-charcoal-700"
                     >
                       {col.label}
                       {sortColumn === col.id ? (
@@ -306,12 +306,12 @@ export default function UrlDataTable({ urlData, onSelectUrl, isLoading = false }
               ))}
             </tr>
           </thead>
-          <tbody className="bg-white divide-y divide-gray-200">
+          <tbody className="bg-white divide-y divide-charcoal-200">
             {isLoading ? (
               <tr>
                 <td
                   colSpan={visibleColumns.length}
-                  className="px-4 py-12 text-center text-gray-500"
+                  className="px-4 py-12 text-center text-charcoal-500"
                 >
                   <div className="w-8 h-8 border-4 border-cyan-600 border-t-transparent rounded-full animate-spin mx-auto mb-2"></div>
                   Loading URL data...
@@ -321,17 +321,17 @@ export default function UrlDataTable({ urlData, onSelectUrl, isLoading = false }
               <tr>
                 <td
                   colSpan={visibleColumns.length}
-                  className="px-4 py-12 text-center text-gray-500"
+                  className="px-4 py-12 text-center text-charcoal-500"
                 >
-                  <Filter className="w-8 h-8 mx-auto mb-2 text-gray-300" />
+                  <Filter className="w-8 h-8 mx-auto mb-2 text-charcoal-300" />
                   No URLs match your filters
                 </td>
               </tr>
             ) : (
               paginatedData.map((row, idx) => (
-                <tr key={row.address || idx} className="hover:bg-gray-50">
+                <tr key={row.address || idx} className="hover:bg-charcoal-50">
                   {COLUMNS.filter(col => visibleColumns.includes(col.id)).map(col => (
-                    <td key={col.id} className="px-4 py-3 text-sm text-gray-600">
+                    <td key={col.id} className="px-4 py-3 text-sm text-charcoal-600">
                       {renderCellValue(row, col.id)}
                     </td>
                   ))}
@@ -345,7 +345,7 @@ export default function UrlDataTable({ urlData, onSelectUrl, isLoading = false }
       {/* Pagination */}
       <div className="bg-white border-t px-6 py-3 flex items-center justify-between">
         <div className="flex items-center gap-4">
-          <span className="text-sm text-gray-500">
+          <span className="text-sm text-charcoal-500">
             Showing {((currentPage - 1) * pageSize) + 1} - {Math.min(currentPage * pageSize, filteredData.length)} of {filteredData.length.toLocaleString()}
           </span>
           <select
@@ -357,27 +357,27 @@ export default function UrlDataTable({ urlData, onSelectUrl, isLoading = false }
               <option key={size} value={size}>{size}</option>
             ))}
           </select>
-          <span className="text-sm text-gray-500">per page</span>
+          <span className="text-sm text-charcoal-500">per page</span>
         </div>
 
         <div className="flex items-center gap-2">
           <button
             onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
             disabled={currentPage === 1}
-            className="p-2 rounded hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="p-2 rounded hover:bg-charcoal-100 disabled:opacity-50 disabled:cursor-not-allowed"
             aria-label="Previous page"
           >
             <ChevronLeft className="w-5 h-5" />
           </button>
 
-          <span className="text-sm text-gray-600">
+          <span className="text-sm text-charcoal-600">
             Page {currentPage} of {totalPages || 1}
           </span>
 
           <button
             onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
             disabled={currentPage >= totalPages}
-            className="p-2 rounded hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="p-2 rounded hover:bg-charcoal-100 disabled:opacity-50 disabled:cursor-not-allowed"
             aria-label="Next page"
           >
             <ChevronRight className="w-5 h-5" />

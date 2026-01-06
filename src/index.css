@@ -672,3 +672,91 @@ html {
 .dark ::selection {
   background: rgba(0, 102, 255, 0.3);
 }
+
+/* ===============================================
+   SECTION 508 ACCESSIBILITY ENHANCEMENTS
+   =============================================== */
+
+/* Reduced Motion - respects user preferences */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* Toggle Switch - Accessible Component */
+@layer components {
+  .toggle-switch {
+    @apply relative inline-flex h-6 w-11 items-center rounded-full
+           transition-colors duration-200 ease-in-out
+           focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2;
+  }
+
+  .toggle-switch[aria-checked="true"] {
+    @apply bg-primary-500;
+  }
+
+  .toggle-switch[aria-checked="false"] {
+    @apply bg-charcoal-300;
+  }
+
+  .toggle-switch-thumb {
+    @apply inline-block h-5 w-5 transform rounded-full bg-white shadow-md
+           transition-transform duration-200 ease-in-out;
+  }
+
+  .toggle-switch[aria-checked="true"] .toggle-switch-thumb {
+    @apply translate-x-5;
+  }
+
+  .toggle-switch[aria-checked="false"] .toggle-switch-thumb {
+    @apply translate-x-0.5;
+  }
+
+  /* Dark mode toggle */
+  .dark .toggle-switch[aria-checked="false"] {
+    @apply bg-charcoal-600;
+  }
+}
+
+/* High Contrast Mode Support */
+@media (forced-colors: active) {
+  .btn-primary,
+  .btn-danger,
+  .btn-success {
+    forced-color-adjust: none;
+    border: 2px solid currentColor;
+  }
+
+  .input,
+  .select {
+    border: 2px solid currentColor;
+  }
+
+  .badge {
+    border: 1px solid currentColor;
+  }
+}
+
+/* Focus Within for Form Groups */
+.form-group:focus-within label {
+  @apply text-primary-600;
+}
+
+/* Screen Reader Only - Enhanced */
+.sr-only-focusable:focus,
+.sr-only-focusable:active {
+  position: static;
+  width: auto;
+  height: auto;
+  padding: inherit;
+  margin: inherit;
+  overflow: visible;
+  clip: auto;
+  white-space: normal;
+}

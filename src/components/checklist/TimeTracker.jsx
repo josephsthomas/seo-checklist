@@ -79,17 +79,17 @@ export default function TimeTracker({ projectId, itemId, estimatedHours }) {
   const isOverBudget = variance && variance > 0;
 
   if (loading) {
-    return <div className="text-sm text-gray-500">Loading time tracking...</div>;
+    return <div className="text-sm text-charcoal-500">Loading time tracking...</div>;
   }
 
   return (
     <div className="space-y-4">
       {/* Timer Controls */}
-      <div className="p-4 bg-gray-50 rounded-lg">
+      <div className="p-4 bg-charcoal-50 rounded-lg">
         <div className="flex items-center justify-between mb-3">
           <div className="flex items-center gap-2">
-            <Clock className="w-5 h-5 text-gray-600" />
-            <span className="font-medium text-gray-900">Time Tracker</span>
+            <Clock className="w-5 h-5 text-charcoal-600" />
+            <span className="font-medium text-charcoal-900">Time Tracker</span>
           </div>
           {activeTimer && (
             <div className="text-2xl font-mono font-bold text-blue-600">
@@ -100,7 +100,7 @@ export default function TimeTracker({ projectId, itemId, estimatedHours }) {
 
         {activeTimer ? (
           <div className="space-y-3">
-            <div className="text-sm text-gray-600">
+            <div className="text-sm text-charcoal-600">
               Started: {format(activeTimer.startTime, 'h:mm a')}
             </div>
             <button
@@ -152,9 +152,9 @@ export default function TimeTracker({ projectId, itemId, estimatedHours }) {
       {/* Manual Entry */}
       <div>
         {showManualEntry ? (
-          <div className="p-4 border border-gray-300 rounded-lg space-y-3">
+          <div className="p-4 border border-charcoal-200 rounded-lg space-y-3">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label className="block text-sm font-medium text-charcoal-700 mb-1">
                 Minutes
               </label>
               <input
@@ -168,7 +168,7 @@ export default function TimeTracker({ projectId, itemId, estimatedHours }) {
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label className="block text-sm font-medium text-charcoal-700 mb-1">
                 Notes (optional)
               </label>
               <input
@@ -212,7 +212,7 @@ export default function TimeTracker({ projectId, itemId, estimatedHours }) {
       {/* Time Entries List */}
       {timeEntries.length > 0 && (
         <div>
-          <h5 className="text-sm font-medium text-gray-900 mb-2">Time Log</h5>
+          <h5 className="text-sm font-medium text-charcoal-900 mb-2">Time Log</h5>
           <div className="space-y-2 max-h-48 overflow-y-auto">
             {timeEntries
               .filter(e => !e.isActive)
@@ -220,12 +220,12 @@ export default function TimeTracker({ projectId, itemId, estimatedHours }) {
               .map(entry => (
                 <div
                   key={entry.id}
-                  className="p-3 bg-gray-50 rounded text-sm"
+                  className="p-3 bg-charcoal-50 rounded text-sm"
                 >
                   <div className="flex items-start justify-between">
                     <div className="flex-1">
                       <div className="flex items-center gap-2 mb-1">
-                        <span className="font-medium text-gray-900">
+                        <span className="font-medium text-charcoal-900">
                           {formatDuration(entry.minutes)}
                         </span>
                         {entry.isManual && (
@@ -234,14 +234,14 @@ export default function TimeTracker({ projectId, itemId, estimatedHours }) {
                           </span>
                         )}
                       </div>
-                      <div className="text-xs text-gray-600">
+                      <div className="text-xs text-charcoal-600">
                         {format(entry.startTime, 'MMM d, h:mm a')}
                         {entry.notes && ` - ${entry.notes}`}
                       </div>
                     </div>
                     <button
                       onClick={() => deleteEntry(entry.id)}
-                      className="p-1 text-gray-400 hover:text-red-600"
+                      className="p-1 text-charcoal-400 hover:text-red-600"
                       aria-label="Delete time entry"
                     >
                       <Trash2 className="w-4 h-4" aria-hidden="true" />

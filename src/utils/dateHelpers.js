@@ -124,7 +124,7 @@ export const isDueSoon = (date) => {
  * @returns {string} Tailwind color class
  */
 export const getDueDateColor = (date, completed = false) => {
-  if (!date) return 'text-gray-400';
+  if (!date) return 'text-charcoal-400';
   if (completed) return 'text-green-600';
 
   if (isOverdue(date, completed)) return 'text-red-600';
@@ -140,7 +140,7 @@ export const getDueDateColor = (date, completed = false) => {
  * @returns {string} Tailwind bg/text color classes
  */
 export const getDueDateBadgeColor = (date, completed = false) => {
-  if (!date) return 'bg-gray-100 text-gray-600';
+  if (!date) return 'bg-charcoal-100 text-charcoal-600';
   if (completed) return 'bg-green-100 text-green-800';
 
   if (isOverdue(date, completed)) return 'bg-red-100 text-red-800';

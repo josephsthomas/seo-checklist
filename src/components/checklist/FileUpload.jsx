@@ -54,7 +54,7 @@ export default function FileUpload({ projectId, itemId }) {
     if (fileType.includes('word')) return <FileText className="w-5 h-5 text-blue-700" />;
     if (fileType.includes('excel') || fileType.includes('spreadsheet'))
       return <Table className="w-5 h-5 text-green-600" />;
-    return <File className="w-5 h-5 text-gray-600" />;
+    return <File className="w-5 h-5 text-charcoal-600" />;
   };
 
   const handleDelete = async (attachmentId) => {
@@ -64,7 +64,7 @@ export default function FileUpload({ projectId, itemId }) {
   };
 
   if (loading) {
-    return <div className="text-sm text-gray-500">Loading attachments...</div>;
+    return <div className="text-sm text-charcoal-500">Loading attachments...</div>;
   }
 
   return (
@@ -76,19 +76,19 @@ export default function FileUpload({ projectId, itemId }) {
           className={`border-2 border-dashed rounded-lg p-8 text-center cursor-pointer transition-colors ${
             isDragActive
               ? 'border-blue-500 bg-blue-50'
-              : 'border-gray-300 hover:border-gray-400 bg-gray-50'
+              : 'border-charcoal-200 hover:border-charcoal-300 bg-charcoal-50'
           } ${uploading ? 'opacity-50 cursor-not-allowed' : ''}`}
         >
           <input {...getInputProps()} disabled={uploading} />
-          <Upload className="w-12 h-12 mx-auto mb-4 text-gray-400" />
+          <Upload className="w-12 h-12 mx-auto mb-4 text-charcoal-400" />
           {isDragActive ? (
             <p className="text-sm text-blue-600 font-medium">Drop file here...</p>
           ) : (
             <>
-              <p className="text-sm text-gray-600 mb-1">
+              <p className="text-sm text-charcoal-600 mb-1">
                 <span className="font-medium text-blue-600">Click to upload</span> or drag and drop
               </p>
-              <p className="text-xs text-gray-500">
+              <p className="text-xs text-charcoal-500">
                 Images, PDF, Word, Excel, Text (max {MAX_FILE_SIZE / 1024 / 1024}MB)
               </p>
             </>
@@ -110,14 +110,14 @@ export default function FileUpload({ projectId, itemId }) {
         {/* Upload Progress */}
         {uploading && (
           <div className="mt-3">
-            <div className="flex items-center justify-between text-sm text-gray-600 mb-2">
+            <div className="flex items-center justify-between text-sm text-charcoal-600 mb-2">
               <span className="flex items-center gap-2">
                 <Loader className="w-4 h-4 animate-spin" />
                 Uploading...
               </span>
               <span>{uploadProgress}%</span>
             </div>
-            <div className="w-full bg-gray-200 rounded-full h-2">
+            <div className="w-full bg-charcoal-200 rounded-full h-2">
               <div
                 className="bg-blue-600 h-2 rounded-full transition-all duration-300"
                 style={{ width: `${uploadProgress}%` }}
@@ -130,14 +130,14 @@ export default function FileUpload({ projectId, itemId }) {
       {/* Attachments List */}
       {attachments.length > 0 && (
         <div>
-          <h5 className="text-sm font-medium text-gray-900 mb-3">
+          <h5 className="text-sm font-medium text-charcoal-900 mb-3">
             Attachments ({attachments.length})
           </h5>
           <div className="space-y-2">
             {attachments.map(attachment => (
               <div
                 key={attachment.id}
-                className="flex items-start gap-3 p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors"
+                className="flex items-start gap-3 p-3 bg-charcoal-50 rounded-lg hover:bg-charcoal-100 transition-colors"
               >
                 {/* File Icon */}
                 <div className="flex-shrink-0 mt-1">
@@ -148,15 +148,15 @@ export default function FileUpload({ projectId, itemId }) {
                 <div className="flex-1 min-w-0">
                   <div className="flex items-start justify-between gap-2 mb-1">
                     <div className="flex-1 min-w-0">
-                      <p className="text-sm font-medium text-gray-900 truncate">
+                      <p className="text-sm font-medium text-charcoal-900 truncate">
                         {attachment.filename}
                       </p>
                       {attachment.description && (
-                        <p className="text-xs text-gray-600 mt-0.5">{attachment.description}</p>
+                        <p className="text-xs text-charcoal-600 mt-0.5">{attachment.description}</p>
                       )}
                     </div>
                   </div>
-                  <div className="flex items-center gap-3 text-xs text-gray-500">
+                  <div className="flex items-center gap-3 text-xs text-charcoal-500">
                     <span>{formatFileSize(attachment.fileSize)}</span>
                     <span>•</span>
                     <span>{format(attachment.uploadedAt, 'MMM d, yyyy h:mm a')}</span>
@@ -171,14 +171,14 @@ export default function FileUpload({ projectId, itemId }) {
                     href={attachment.downloadURL}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded"
+                    className="p-2 text-charcoal-400 hover:text-blue-600 hover:bg-blue-50 rounded"
                     aria-label={`Download ${attachment.filename}`}
                   >
                     <Download className="w-4 h-4" aria-hidden="true" />
                   </a>
                   <button
                     onClick={() => handleDelete(attachment.id)}
-                    className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded"
+                    className="p-2 text-charcoal-400 hover:text-red-600 hover:bg-red-50 rounded"
                     aria-label={`Delete ${attachment.filename}`}
                   >
                     <Trash2 className="w-4 h-4" aria-hidden="true" />
@@ -191,7 +191,7 @@ export default function FileUpload({ projectId, itemId }) {
       )}
 
       {attachments.length === 0 && (
-        <div className="text-center py-6 text-gray-500 text-sm">
+        <div className="text-center py-6 text-charcoal-500 text-sm">
           No attachments yet. Upload files to get started.
         </div>
       )}

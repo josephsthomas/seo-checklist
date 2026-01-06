@@ -66,20 +66,20 @@ export default function AISuggestions({ pageData }) {
 
   if (!aiAvailable) {
     return (
-      <div className="bg-gray-50 rounded-xl border p-6">
+      <div className="bg-charcoal-50 rounded-xl border p-6">
         <div className="flex items-center gap-3 mb-4">
-          <div className="w-10 h-10 bg-gray-200 rounded-lg flex items-center justify-center">
-            <Sparkles className="w-5 h-5 text-gray-400" />
+          <div className="w-10 h-10 bg-charcoal-200 rounded-lg flex items-center justify-center">
+            <Sparkles className="w-5 h-5 text-charcoal-400" />
           </div>
           <div>
-            <h3 className="text-lg font-semibold text-gray-900">AI Suggestions</h3>
-            <p className="text-sm text-gray-500">Not configured</p>
+            <h3 className="text-lg font-semibold text-charcoal-900">AI Suggestions</h3>
+            <p className="text-sm text-charcoal-500">Not configured</p>
           </div>
         </div>
-        <p className="text-sm text-gray-600">
+        <p className="text-sm text-charcoal-600">
           To enable AI-powered suggestions, add your Claude API key to your environment variables:
         </p>
-        <code className="block mt-2 p-3 bg-gray-100 rounded-lg text-sm font-mono text-gray-700">
+        <code className="block mt-2 p-3 bg-charcoal-100 rounded-lg text-sm font-mono text-charcoal-700">
           VITE_CLAUDE_API_KEY=your-api-key-here
         </code>
       </div>
@@ -96,8 +96,8 @@ export default function AISuggestions({ pageData }) {
               <Sparkles className="w-5 h-5 text-white" />
             </div>
             <div>
-              <h3 className="text-lg font-semibold text-gray-900">AI Suggestions</h3>
-              <p className="text-sm text-gray-500">Claude-powered optimization recommendations</p>
+              <h3 className="text-lg font-semibold text-charcoal-900">AI Suggestions</h3>
+              <p className="text-sm text-charcoal-500">Claude-powered optimization recommendations</p>
             </div>
           </div>
           <button
@@ -138,19 +138,19 @@ export default function AISuggestions({ pageData }) {
           <div>
             <button
               onClick={() => toggleSection('title')}
-              className="w-full px-6 py-4 flex items-center justify-between hover:bg-gray-50"
+              className="w-full px-6 py-4 flex items-center justify-between hover:bg-charcoal-50"
             >
               <div className="flex items-center gap-3">
                 <Type className="w-5 h-5 text-purple-500" />
-                <span className="font-medium text-gray-900">Title Suggestions</span>
-                <span className="text-sm text-gray-500">
+                <span className="font-medium text-charcoal-900">Title Suggestions</span>
+                <span className="text-sm text-charcoal-500">
                   ({suggestions.title?.suggestions?.length || 0} options)
                 </span>
               </div>
               {expandedSections.title ? (
-                <ChevronUp className="w-5 h-5 text-gray-400" />
+                <ChevronUp className="w-5 h-5 text-charcoal-400" />
               ) : (
-                <ChevronDown className="w-5 h-5 text-gray-400" />
+                <ChevronDown className="w-5 h-5 text-charcoal-400" />
               )}
             </button>
 
@@ -168,23 +168,23 @@ export default function AISuggestions({ pageData }) {
                 )}
 
                 {suggestions.title?.suggestions?.map((suggestion, idx) => (
-                  <div key={idx} className="bg-gray-50 rounded-lg p-4 group">
+                  <div key={idx} className="bg-charcoal-50 rounded-lg p-4 group">
                     <div className="flex items-start justify-between gap-3">
                       <div className="flex-1">
-                        <p className="font-medium text-gray-900">{suggestion.text}</p>
-                        <p className="text-xs text-gray-500 mt-1">
+                        <p className="font-medium text-charcoal-900">{suggestion.text}</p>
+                        <p className="text-xs text-charcoal-500 mt-1">
                           {suggestion.length} characters • {suggestion.reasoning}
                         </p>
                       </div>
                       <button
                         onClick={() => copyToClipboard(suggestion.text, `title-${idx}`)}
-                        className="p-2 hover:bg-gray-200 rounded-lg transition-colors"
+                        className="p-2 hover:bg-charcoal-200 rounded-lg transition-colors"
                         title="Copy to clipboard"
                       >
                         {copiedItem === `title-${idx}` ? (
                           <Check className="w-4 h-4 text-green-500" />
                         ) : (
-                          <Copy className="w-4 h-4 text-gray-400 group-hover:text-gray-600" />
+                          <Copy className="w-4 h-4 text-charcoal-400 group-hover:text-charcoal-600" />
                         )}
                       </button>
                     </div>
@@ -198,19 +198,19 @@ export default function AISuggestions({ pageData }) {
           <div>
             <button
               onClick={() => toggleSection('metaDescription')}
-              className="w-full px-6 py-4 flex items-center justify-between hover:bg-gray-50"
+              className="w-full px-6 py-4 flex items-center justify-between hover:bg-charcoal-50"
             >
               <div className="flex items-center gap-3">
                 <FileText className="w-5 h-5 text-cyan-500" />
-                <span className="font-medium text-gray-900">Meta Description Suggestions</span>
-                <span className="text-sm text-gray-500">
+                <span className="font-medium text-charcoal-900">Meta Description Suggestions</span>
+                <span className="text-sm text-charcoal-500">
                   ({suggestions.metaDescription?.suggestions?.length || 0} options)
                 </span>
               </div>
               {expandedSections.metaDescription ? (
-                <ChevronUp className="w-5 h-5 text-gray-400" />
+                <ChevronUp className="w-5 h-5 text-charcoal-400" />
               ) : (
-                <ChevronDown className="w-5 h-5 text-gray-400" />
+                <ChevronDown className="w-5 h-5 text-charcoal-400" />
               )}
             </button>
 
@@ -228,23 +228,23 @@ export default function AISuggestions({ pageData }) {
                 )}
 
                 {suggestions.metaDescription?.suggestions?.map((suggestion, idx) => (
-                  <div key={idx} className="bg-gray-50 rounded-lg p-4 group">
+                  <div key={idx} className="bg-charcoal-50 rounded-lg p-4 group">
                     <div className="flex items-start justify-between gap-3">
                       <div className="flex-1">
-                        <p className="font-medium text-gray-900">{suggestion.text}</p>
-                        <p className="text-xs text-gray-500 mt-1">
+                        <p className="font-medium text-charcoal-900">{suggestion.text}</p>
+                        <p className="text-xs text-charcoal-500 mt-1">
                           {suggestion.length} characters • {suggestion.reasoning}
                         </p>
                       </div>
                       <button
                         onClick={() => copyToClipboard(suggestion.text, `meta-${idx}`)}
-                        className="p-2 hover:bg-gray-200 rounded-lg transition-colors"
+                        className="p-2 hover:bg-charcoal-200 rounded-lg transition-colors"
                         title="Copy to clipboard"
                       >
                         {copiedItem === `meta-${idx}` ? (
                           <Check className="w-4 h-4 text-green-500" />
                         ) : (
-                          <Copy className="w-4 h-4 text-gray-400 group-hover:text-gray-600" />
+                          <Copy className="w-4 h-4 text-charcoal-400 group-hover:text-charcoal-600" />
                         )}
                       </button>
                     </div>
@@ -258,19 +258,19 @@ export default function AISuggestions({ pageData }) {
           <div>
             <button
               onClick={() => toggleSection('h1')}
-              className="w-full px-6 py-4 flex items-center justify-between hover:bg-gray-50"
+              className="w-full px-6 py-4 flex items-center justify-between hover:bg-charcoal-50"
             >
               <div className="flex items-center gap-3">
                 <Heading1 className="w-5 h-5 text-green-500" />
-                <span className="font-medium text-gray-900">H1 Suggestions</span>
-                <span className="text-sm text-gray-500">
+                <span className="font-medium text-charcoal-900">H1 Suggestions</span>
+                <span className="text-sm text-charcoal-500">
                   ({suggestions.h1?.suggestions?.length || 0} options)
                 </span>
               </div>
               {expandedSections.h1 ? (
-                <ChevronUp className="w-5 h-5 text-gray-400" />
+                <ChevronUp className="w-5 h-5 text-charcoal-400" />
               ) : (
-                <ChevronDown className="w-5 h-5 text-gray-400" />
+                <ChevronDown className="w-5 h-5 text-charcoal-400" />
               )}
             </button>
 
@@ -288,21 +288,21 @@ export default function AISuggestions({ pageData }) {
                 )}
 
                 {suggestions.h1?.suggestions?.map((suggestion, idx) => (
-                  <div key={idx} className="bg-gray-50 rounded-lg p-4 group">
+                  <div key={idx} className="bg-charcoal-50 rounded-lg p-4 group">
                     <div className="flex items-start justify-between gap-3">
                       <div className="flex-1">
-                        <p className="font-medium text-gray-900">{suggestion.text}</p>
-                        <p className="text-xs text-gray-500 mt-1">{suggestion.reasoning}</p>
+                        <p className="font-medium text-charcoal-900">{suggestion.text}</p>
+                        <p className="text-xs text-charcoal-500 mt-1">{suggestion.reasoning}</p>
                       </div>
                       <button
                         onClick={() => copyToClipboard(suggestion.text, `h1-${idx}`)}
-                        className="p-2 hover:bg-gray-200 rounded-lg transition-colors"
+                        className="p-2 hover:bg-charcoal-200 rounded-lg transition-colors"
                         title="Copy to clipboard"
                       >
                         {copiedItem === `h1-${idx}` ? (
                           <Check className="w-4 h-4 text-green-500" />
                         ) : (
-                          <Copy className="w-4 h-4 text-gray-400 group-hover:text-gray-600" />
+                          <Copy className="w-4 h-4 text-charcoal-400 group-hover:text-charcoal-600" />
                         )}
                       </button>
                     </div>
@@ -314,8 +314,8 @@ export default function AISuggestions({ pageData }) {
         </div>
       ) : !loading && (
         <div className="px-6 py-8 text-center">
-          <Sparkles className="w-12 h-12 text-gray-300 mx-auto mb-3" />
-          <p className="text-gray-500">Click "Generate Suggestions" to get AI-powered SEO recommendations</p>
+          <Sparkles className="w-12 h-12 text-charcoal-300 mx-auto mb-3" />
+          <p className="text-charcoal-500">Click "Generate Suggestions" to get AI-powered SEO recommendations</p>
         </div>
       )}
     </div>

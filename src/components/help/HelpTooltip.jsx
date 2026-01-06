@@ -12,7 +12,7 @@ export default function HelpTooltip({ itemId, itemTitle }) {
     <div className="relative inline-block">
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="p-1 text-gray-400 hover:text-primary-600 transition-colors"
+        className="p-1 text-charcoal-400 hover:text-primary-600 transition-colors"
         title="View help"
       >
         <HelpCircle className="w-4 h-4" />
@@ -27,15 +27,15 @@ export default function HelpTooltip({ itemId, itemTitle }) {
           />
 
           {/* Tooltip Panel */}
-          <div className="absolute left-0 top-full mt-2 w-96 bg-white rounded-lg shadow-xl border border-gray-300 z-50 max-h-[500px] overflow-y-auto">
+          <div className="absolute left-0 top-full mt-2 w-96 bg-white rounded-lg shadow-xl border border-charcoal-200 z-50 max-h-[500px] overflow-y-auto">
             <div className="p-4">
               {/* Header */}
               <div className="flex items-start justify-between mb-3">
                 <div className="flex-1">
-                  <h4 className="font-semibold text-gray-900 text-sm mb-1">
+                  <h4 className="font-semibold text-charcoal-900 text-sm mb-1">
                     Help: {itemTitle}
                   </h4>
-                  <div className="flex items-center gap-3 text-xs text-gray-500">
+                  <div className="flex items-center gap-3 text-xs text-charcoal-500">
                     {helpData.estimatedTime && (
                       <span className="flex items-center gap-1">
                         <Clock className="w-3 h-3" />
@@ -52,7 +52,7 @@ export default function HelpTooltip({ itemId, itemTitle }) {
                 </div>
                 <button
                   onClick={() => setIsOpen(false)}
-                  className="text-gray-400 hover:text-gray-600"
+                  className="text-charcoal-400 hover:text-charcoal-600"
                 >
                   <X className="w-4 h-4" />
                 </button>
@@ -60,18 +60,18 @@ export default function HelpTooltip({ itemId, itemTitle }) {
 
               {/* Description */}
               <div className="mb-4">
-                <p className="text-sm text-gray-700">{helpData.description}</p>
+                <p className="text-sm text-charcoal-700">{helpData.description}</p>
               </div>
 
               {/* Tips */}
               {helpData.tips && helpData.tips.length > 0 && (
                 <div className="mb-4">
-                  <h5 className="text-xs font-semibold text-gray-900 uppercase mb-2">
+                  <h5 className="text-xs font-semibold text-charcoal-900 uppercase mb-2">
                     Pro Tips
                   </h5>
                   <ul className="space-y-1.5">
                     {helpData.tips.map((tip, index) => (
-                      <li key={index} className="flex items-start gap-2 text-sm text-gray-600">
+                      <li key={index} className="flex items-start gap-2 text-sm text-charcoal-600">
                         <span className="text-primary-600 mt-1">•</span>
                         <span>{tip}</span>
                       </li>
@@ -83,7 +83,7 @@ export default function HelpTooltip({ itemId, itemTitle }) {
               {/* Resources */}
               {helpData.resources && helpData.resources.length > 0 && (
                 <div>
-                  <h5 className="text-xs font-semibold text-gray-900 uppercase mb-2">
+                  <h5 className="text-xs font-semibold text-charcoal-900 uppercase mb-2">
                     Learn More
                   </h5>
                   <div className="space-y-2">

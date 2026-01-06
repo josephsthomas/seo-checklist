@@ -145,7 +145,7 @@ export default function ItemDetailModal({ item, projectId, isOpen, onClose, onTo
       <div className="flex items-center justify-center min-h-screen px-4 pt-4 pb-20 text-center sm:block sm:p-0">
         {/* Background overlay */}
         <div
-          className="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity"
+          className="fixed inset-0 bg-charcoal-500 bg-opacity-75 transition-opacity"
           onClick={onClose}
           aria-hidden="true"
         />
@@ -157,7 +157,7 @@ export default function ItemDetailModal({ item, projectId, isOpen, onClose, onTo
             <div className="flex items-start justify-between">
               <div className="flex-1">
                 <div className="flex items-center gap-2 mb-2">
-                  <span className="text-sm text-gray-500">Item #{item.id}</span>
+                  <span className="text-sm text-charcoal-500">Item #{item.id}</span>
                   <span className={`px-2 py-0.5 rounded text-xs font-medium ${priorityColors[item.priority]}`}>
                     {item.priority}
                   </span>
@@ -167,13 +167,13 @@ export default function ItemDetailModal({ item, projectId, isOpen, onClose, onTo
                     </span>
                   )}
                 </div>
-                <h3 id="modal-title" className="text-lg font-semibold text-gray-900">
+                <h3 id="modal-title" className="text-lg font-semibold text-charcoal-900">
                   {item.item}
                 </h3>
               </div>
               <button
                 onClick={onClose}
-                className="ml-4 text-gray-400 hover:text-gray-500"
+                className="ml-4 text-charcoal-400 hover:text-charcoal-500"
                 aria-label="Close modal"
               >
                 <X className="w-6 h-6" aria-hidden="true" />
@@ -195,12 +195,12 @@ export default function ItemDetailModal({ item, projectId, isOpen, onClose, onTo
                   className={`px-4 py-3 text-sm font-medium border-b-2 transition-colors ${
                     activeTab === tab
                       ? 'border-primary-600 text-primary-600'
-                      : 'border-transparent text-gray-500 hover:text-gray-700'
+                      : 'border-transparent text-charcoal-500 hover:text-charcoal-700'
                   }`}
                 >
                   {tab.charAt(0).toUpperCase() + tab.slice(1)}
                   {tab === 'comments' && comments.length > 0 && (
-                    <span className="ml-2 px-2 py-0.5 rounded-full bg-gray-200 text-xs">
+                    <span className="ml-2 px-2 py-0.5 rounded-full bg-charcoal-200 text-xs">
                       {comments.length}
                     </span>
                   )}
@@ -215,26 +215,26 @@ export default function ItemDetailModal({ item, projectId, isOpen, onClose, onTo
               <div className="space-y-6">
                 {/* Item Details */}
                 <div>
-                  <h4 className="text-sm font-medium text-gray-900 mb-3">Item Information</h4>
+                  <h4 className="text-sm font-medium text-charcoal-900 mb-3">Item Information</h4>
                   <div className="grid grid-cols-2 gap-4 text-sm">
                     <div>
-                      <span className="text-gray-500">Phase:</span>
+                      <span className="text-charcoal-500">Phase:</span>
                       <span className="ml-2 font-medium">{item.phase}</span>
                     </div>
                     <div>
-                      <span className="text-gray-500">Owner:</span>
+                      <span className="text-charcoal-500">Owner:</span>
                       <span className="ml-2 font-medium">{item.owner}</span>
                     </div>
                     <div>
-                      <span className="text-gray-500">Category:</span>
+                      <span className="text-charcoal-500">Category:</span>
                       <span className="ml-2 font-medium">{item.category}</span>
                     </div>
                     <div>
-                      <span className="text-gray-500">Effort:</span>
+                      <span className="text-charcoal-500">Effort:</span>
                       <span className="ml-2 font-medium">{item.effortLevel}</span>
                     </div>
                     <div className="col-span-2">
-                      <span className="text-gray-500">Deliverable Type:</span>
+                      <span className="text-charcoal-500">Deliverable Type:</span>
                       <span className="ml-2 font-medium">{item.deliverableType}</span>
                     </div>
                   </div>
@@ -242,14 +242,14 @@ export default function ItemDetailModal({ item, projectId, isOpen, onClose, onTo
 
                 {/* Assignment Section */}
                 <div className="border-t pt-6">
-                  <h4 className="text-sm font-medium text-gray-900 mb-3">Assignment</h4>
+                  <h4 className="text-sm font-medium text-charcoal-900 mb-3">Assignment</h4>
 
                   <div className="space-y-4">
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2 flex items-center gap-2">
+                      <label className="block text-sm font-medium text-charcoal-700 mb-2 flex items-center gap-2">
                         Assigned To
                         <Tooltip text={FIELD_HELP.assignedTo}>
-                          <HelpCircle className="w-4 h-4 text-gray-400 hover:text-gray-600" />
+                          <HelpCircle className="w-4 h-4 text-charcoal-400 hover:text-charcoal-600" />
                         </Tooltip>
                       </label>
                       <input
@@ -262,7 +262,7 @@ export default function ItemDetailModal({ item, projectId, isOpen, onClose, onTo
                         }))}
                         className="input"
                       />
-                      <p className="mt-1 text-xs text-gray-500">
+                      <p className="mt-1 text-xs text-charcoal-500">
                         Team members responsible for completing this item
                       </p>
                     </div>
@@ -270,11 +270,11 @@ export default function ItemDetailModal({ item, projectId, isOpen, onClose, onTo
                     {/* Timeline Fields */}
                     <div className="grid grid-cols-2 gap-4">
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2 flex items-center gap-2">
+                        <label className="block text-sm font-medium text-charcoal-700 mb-2 flex items-center gap-2">
                           <Calendar className="inline w-4 h-4" />
                           Start Date
                           <Tooltip text={FIELD_HELP.startDate}>
-                            <HelpCircle className="w-3.5 h-3.5 text-gray-400 hover:text-gray-600" />
+                            <HelpCircle className="w-3.5 h-3.5 text-charcoal-400 hover:text-charcoal-600" />
                           </Tooltip>
                         </label>
                         <DatePicker
@@ -291,11 +291,11 @@ export default function ItemDetailModal({ item, projectId, isOpen, onClose, onTo
                       </div>
 
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2 flex items-center gap-2">
+                        <label className="block text-sm font-medium text-charcoal-700 mb-2 flex items-center gap-2">
                           <CalendarClock className="inline w-4 h-4" />
                           Due Date
                           <Tooltip text={FIELD_HELP.dueDate}>
-                            <HelpCircle className="w-3.5 h-3.5 text-gray-400 hover:text-gray-600" />
+                            <HelpCircle className="w-3.5 h-3.5 text-charcoal-400 hover:text-charcoal-600" />
                           </Tooltip>
                           {assignmentData.dueDate && isOverdue(assignmentData.dueDate, isCompleted) && (
                             <AlertCircle className="inline w-4 h-4 text-red-600" />
@@ -325,11 +325,11 @@ export default function ItemDetailModal({ item, projectId, isOpen, onClose, onTo
 
                     <div className="grid grid-cols-2 gap-4">
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2 flex items-center gap-2">
+                        <label className="block text-sm font-medium text-charcoal-700 mb-2 flex items-center gap-2">
                           <Clock className="inline w-4 h-4" />
                           Estimated Hours
                           <Tooltip text={FIELD_HELP.estimatedHours}>
-                            <HelpCircle className="w-3.5 h-3.5 text-gray-400 hover:text-gray-600" />
+                            <HelpCircle className="w-3.5 h-3.5 text-charcoal-400 hover:text-charcoal-600" />
                           </Tooltip>
                         </label>
                         <input
@@ -348,7 +348,7 @@ export default function ItemDetailModal({ item, projectId, isOpen, onClose, onTo
 
                       {assignmentData.completedDate && (
                         <div>
-                          <label className="block text-sm font-medium text-gray-700 mb-2 flex items-center gap-2">
+                          <label className="block text-sm font-medium text-charcoal-700 mb-2 flex items-center gap-2">
                             <Check className="inline w-4 h-4 text-green-600" />
                             Completed Date
                           </label>
@@ -361,10 +361,10 @@ export default function ItemDetailModal({ item, projectId, isOpen, onClose, onTo
 
                     {/* Notes Field */}
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2 flex items-center gap-2">
+                      <label className="block text-sm font-medium text-charcoal-700 mb-2 flex items-center gap-2">
                         Notes
                         <Tooltip text={FIELD_HELP.notes}>
-                          <HelpCircle className="w-3.5 h-3.5 text-gray-400 hover:text-gray-600" />
+                          <HelpCircle className="w-3.5 h-3.5 text-charcoal-400 hover:text-charcoal-600" />
                         </Tooltip>
                       </label>
                       <textarea
@@ -380,10 +380,10 @@ export default function ItemDetailModal({ item, projectId, isOpen, onClose, onTo
                     </div>
 
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2 flex items-center gap-2">
+                      <label className="block text-sm font-medium text-charcoal-700 mb-2 flex items-center gap-2">
                         Status
                         <Tooltip text={FIELD_HELP.status}>
-                          <HelpCircle className="w-3.5 h-3.5 text-gray-400 hover:text-gray-600" />
+                          <HelpCircle className="w-3.5 h-3.5 text-charcoal-400 hover:text-charcoal-600" />
                         </Tooltip>
                       </label>
                       <div className="flex flex-wrap gap-2">
@@ -394,14 +394,14 @@ export default function ItemDetailModal({ item, projectId, isOpen, onClose, onTo
                             className={`px-3 py-1.5 rounded text-sm font-medium transition-colors ${
                               assignmentData.status === value
                                 ? 'bg-primary-600 text-white'
-                                : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                                : 'bg-charcoal-100 text-charcoal-700 hover:bg-charcoal-200'
                             }`}
                           >
                             {label}
                           </button>
                         ))}
                       </div>
-                      <p className="mt-2 text-xs text-gray-500">
+                      <p className="mt-2 text-xs text-charcoal-500">
                         {assignmentData.status === 'not_started' && 'Task has not been worked on yet'}
                         {assignmentData.status === 'in_progress' && 'Work is actively being done on this task'}
                         {assignmentData.status === 'in_review' && 'Task is complete and awaiting review/approval'}
@@ -448,14 +448,14 @@ export default function ItemDetailModal({ item, projectId, isOpen, onClose, onTo
 
             {activeTab === 'activity' && (
               <div className="space-y-3">
-                <h4 className="text-sm font-medium text-gray-900 mb-3">Recent Activity</h4>
+                <h4 className="text-sm font-medium text-charcoal-900 mb-3">Recent Activity</h4>
                 {itemActivities.length === 0 ? (
                   <div className="text-center py-8">
-                    <div className="w-12 h-12 bg-gray-100 rounded-xl flex items-center justify-center mx-auto mb-3">
-                      <Activity className="w-6 h-6 text-gray-400" />
+                    <div className="w-12 h-12 bg-charcoal-100 rounded-xl flex items-center justify-center mx-auto mb-3">
+                      <Activity className="w-6 h-6 text-charcoal-400" />
                     </div>
-                    <p className="text-sm font-medium text-gray-700 mb-1">No activity recorded</p>
-                    <p className="text-xs text-gray-500 max-w-xs mx-auto">
+                    <p className="text-sm font-medium text-charcoal-700 mb-1">No activity recorded</p>
+                    <p className="text-xs text-charcoal-500 max-w-xs mx-auto">
                       Activity will appear here when team members make changes like updating status, leaving comments, or tracking time.
                     </p>
                   </div>
@@ -467,11 +467,11 @@ export default function ItemDetailModal({ item, projectId, isOpen, onClose, onTo
                           <Activity className="w-4 h-4 text-primary-600" />
                         </div>
                         <div className="flex-1">
-                          <p className="text-gray-900">
+                          <p className="text-charcoal-900">
                             <span className="font-medium">{activity.userName}</span>{' '}
                             {activity.action.replace('_', ' ')}
                           </p>
-                          <p className="text-gray-500 text-xs mt-0.5">
+                          <p className="text-charcoal-500 text-xs mt-0.5">
                             {activity.timestamp?.toDate ? format(activity.timestamp.toDate(), 'PPp') : 'Just now'}
                           </p>
                         </div>
@@ -484,7 +484,7 @@ export default function ItemDetailModal({ item, projectId, isOpen, onClose, onTo
           </div>
 
           {/* Footer */}
-          <div className="bg-gray-50 px-6 py-4 flex justify-between">
+          <div className="bg-charcoal-50 px-6 py-4 flex justify-between">
             <button
               onClick={() => onToggleComplete(item.id)}
               className={`btn ${isCompleted ? 'btn-secondary' : 'btn-primary'} flex items-center gap-2`}

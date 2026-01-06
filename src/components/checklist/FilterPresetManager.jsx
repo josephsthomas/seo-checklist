@@ -203,7 +203,7 @@ export default function FilterPresetManager({ currentFilters, onApplyPreset, onC
       <div className="flex items-center justify-center min-h-screen px-4 pt-4 pb-20 text-center sm:block sm:p-0">
         {/* Background overlay */}
         <div
-          className="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity"
+          className="fixed inset-0 bg-charcoal-500 bg-opacity-75 transition-opacity"
           onClick={onClose}
           aria-hidden="true"
         />
@@ -212,13 +212,13 @@ export default function FilterPresetManager({ currentFilters, onApplyPreset, onC
         <div className="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-3xl sm:w-full">
           {/* Header */}
           <div className="bg-white px-6 py-4 border-b flex items-center justify-between">
-            <h3 id="filter-presets-title" className="text-lg font-semibold text-gray-900">
+            <h3 id="filter-presets-title" className="text-lg font-semibold text-charcoal-900">
               <Star className="inline w-5 h-5 mr-2 text-yellow-500" aria-hidden="true" />
               Filter Presets
             </h3>
             <button
               onClick={onClose}
-              className="text-gray-400 hover:text-gray-500"
+              className="text-charcoal-400 hover:text-charcoal-500"
               aria-label="Close filter presets modal"
             >
               <X className="w-6 h-6" aria-hidden="true" />
@@ -248,7 +248,7 @@ export default function FilterPresetManager({ currentFilters, onApplyPreset, onC
               {showSaveDialog && (
                 <div className="mt-4 space-y-3 bg-white p-4 rounded border border-blue-300">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                    <label className="block text-sm font-medium text-charcoal-700 mb-1">
                       Preset Name *
                     </label>
                     <input
@@ -261,7 +261,7 @@ export default function FilterPresetManager({ currentFilters, onApplyPreset, onC
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                    <label className="block text-sm font-medium text-charcoal-700 mb-1">
                       Description (optional)
                     </label>
                     <input
@@ -287,7 +287,7 @@ export default function FilterPresetManager({ currentFilters, onApplyPreset, onC
                         setNewPresetName('');
                         setNewPresetDescription('');
                       }}
-                      className="px-4 py-2 bg-gray-200 text-gray-700 rounded hover:bg-gray-300 text-sm font-medium"
+                      className="px-4 py-2 bg-charcoal-200 text-charcoal-700 rounded hover:bg-charcoal-300 text-sm font-medium"
                     >
                       Cancel
                     </button>
@@ -298,7 +298,7 @@ export default function FilterPresetManager({ currentFilters, onApplyPreset, onC
 
             {/* Built-in Presets */}
             <div className="mb-6">
-              <h4 className="text-sm font-medium text-gray-900 mb-3">Built-in Presets</h4>
+              <h4 className="text-sm font-medium text-charcoal-900 mb-3">Built-in Presets</h4>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                 {PRESET_TEMPLATES.map(preset => {
                   const isActive = isPresetActive(preset);
@@ -309,13 +309,13 @@ export default function FilterPresetManager({ currentFilters, onApplyPreset, onC
                       className={`p-4 border rounded-lg hover:shadow-md transition-all text-left group ${
                         isActive
                           ? 'border-green-500 bg-green-50'
-                          : 'border-gray-300 hover:border-blue-500'
+                          : 'border-charcoal-200 hover:border-blue-500'
                       }`}
                     >
                       <div className="flex items-start justify-between mb-2">
                         <div className="flex items-center gap-2">
                           <h5 className={`text-sm font-medium ${
-                            isActive ? 'text-green-700' : 'text-gray-900 group-hover:text-blue-600'
+                            isActive ? 'text-green-700' : 'text-charcoal-900 group-hover:text-blue-600'
                           }`}>
                             {preset.name}
                           </h5>
@@ -325,7 +325,7 @@ export default function FilterPresetManager({ currentFilters, onApplyPreset, onC
                         </div>
                         <Star className="w-4 h-4 text-yellow-500" aria-hidden="true" />
                       </div>
-                      <p className="text-xs text-gray-600">{preset.description}</p>
+                      <p className="text-xs text-charcoal-600">{preset.description}</p>
                       {isActive && (
                         <span className="inline-block mt-2 px-2 py-0.5 text-xs font-medium text-green-700 bg-green-100 rounded">
                           Active
@@ -340,7 +340,7 @@ export default function FilterPresetManager({ currentFilters, onApplyPreset, onC
             {/* User Saved Presets */}
             {presets.length > 0 && (
               <div>
-                <h4 className="text-sm font-medium text-gray-900 mb-3">My Saved Presets</h4>
+                <h4 className="text-sm font-medium text-charcoal-900 mb-3">My Saved Presets</h4>
                 <div className="space-y-2">
                   {presets.map(preset => {
                     const isActive = isPresetActive(preset);
@@ -350,7 +350,7 @@ export default function FilterPresetManager({ currentFilters, onApplyPreset, onC
                         className={`p-4 border rounded-lg hover:shadow-md transition-all group ${
                           isActive
                             ? 'border-green-500 bg-green-50'
-                            : 'border-gray-300 hover:border-blue-500'
+                            : 'border-charcoal-200 hover:border-blue-500'
                         }`}
                       >
                         <div className="flex items-start justify-between">
@@ -360,7 +360,7 @@ export default function FilterPresetManager({ currentFilters, onApplyPreset, onC
                           >
                             <div className="flex items-center gap-2 mb-1">
                               <h5 className={`text-sm font-medium ${
-                                isActive ? 'text-green-700' : 'text-gray-900 group-hover:text-blue-600'
+                                isActive ? 'text-green-700' : 'text-charcoal-900 group-hover:text-blue-600'
                               }`}>
                                 {preset.name}
                               </h5>
@@ -369,28 +369,28 @@ export default function FilterPresetManager({ currentFilters, onApplyPreset, onC
                               )}
                             </div>
                             {preset.description && (
-                              <p className="text-xs text-gray-600">{preset.description}</p>
+                              <p className="text-xs text-charcoal-600">{preset.description}</p>
                             )}
                             {isActive && (
                               <span className="inline-block mt-2 px-2 py-0.5 text-xs font-medium text-green-700 bg-green-100 rounded">
                                 Active
                               </span>
                             )}
-                            <p className="text-xs text-gray-400 mt-2">
+                            <p className="text-xs text-charcoal-400 mt-2">
                               Created: {new Date(preset.createdAt).toLocaleDateString()}
                             </p>
                           </button>
                           <div className="flex gap-2 ml-4">
                             <button
                               onClick={() => handleEditPreset(preset)}
-                              className="p-1.5 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded"
+                              className="p-1.5 text-charcoal-400 hover:text-blue-600 hover:bg-blue-50 rounded"
                               aria-label={`Edit ${preset.name} preset`}
                             >
                               <Edit2 className="w-4 h-4" aria-hidden="true" />
                             </button>
                             <button
                               onClick={() => handleDeletePreset(preset.id)}
-                              className="p-1.5 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded"
+                              className="p-1.5 text-charcoal-400 hover:text-red-600 hover:bg-red-50 rounded"
                               aria-label={`Delete ${preset.name} preset`}
                             >
                               <Trash2 className="w-4 h-4" aria-hidden="true" />
@@ -405,8 +405,8 @@ export default function FilterPresetManager({ currentFilters, onApplyPreset, onC
             )}
 
             {presets.length === 0 && (
-              <div className="text-center py-8 text-gray-500">
-                <Star className="w-12 h-12 mx-auto mb-3 text-gray-300" />
+              <div className="text-center py-8 text-charcoal-500">
+                <Star className="w-12 h-12 mx-auto mb-3 text-charcoal-300" />
                 <p className="text-sm">No saved presets yet</p>
                 <p className="text-xs mt-1">Save your current filters to create your first preset</p>
               </div>
@@ -414,17 +414,17 @@ export default function FilterPresetManager({ currentFilters, onApplyPreset, onC
           </div>
 
           {/* Footer */}
-          <div className="bg-gray-50 px-6 py-4 border-t flex items-center justify-between">
+          <div className="bg-charcoal-50 px-6 py-4 border-t flex items-center justify-between">
             <div className="flex gap-2">
               <button
                 onClick={handleExportPresets}
                 disabled={presets.length === 0}
-                className="px-3 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+                className="px-3 py-2 text-sm font-medium text-charcoal-700 bg-white border border-charcoal-200 rounded hover:bg-charcoal-50 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
               >
                 <Download className="w-4 h-4" />
                 Export
               </button>
-              <label className="px-3 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded hover:bg-gray-50 cursor-pointer flex items-center gap-2">
+              <label className="px-3 py-2 text-sm font-medium text-charcoal-700 bg-white border border-charcoal-200 rounded hover:bg-charcoal-50 cursor-pointer flex items-center gap-2">
                 <Upload className="w-4 h-4" />
                 Import
                 <input
@@ -437,7 +437,7 @@ export default function FilterPresetManager({ currentFilters, onApplyPreset, onC
             </div>
             <button
               onClick={onClose}
-              className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded hover:bg-gray-50"
+              className="px-4 py-2 text-sm font-medium text-charcoal-700 bg-white border border-charcoal-200 rounded hover:bg-charcoal-50"
             >
               Close
             </button>

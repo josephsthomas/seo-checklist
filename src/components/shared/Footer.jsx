@@ -42,34 +42,38 @@ export default function Footer() {
             </p>
 
             {/* Social Links */}
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-3" role="list" aria-label="Social media links">
               <a
                 href="#"
                 className="w-9 h-9 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 hover:border-white/20 flex items-center justify-center text-charcoal-400 hover:text-white transition-all duration-200"
-                aria-label="Twitter"
+                aria-label="Follow us on Twitter"
+                role="listitem"
               >
-                <Twitter className="w-4 h-4" />
+                <Twitter className="w-4 h-4" aria-hidden="true" />
               </a>
               <a
                 href="#"
                 className="w-9 h-9 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 hover:border-white/20 flex items-center justify-center text-charcoal-400 hover:text-white transition-all duration-200"
-                aria-label="LinkedIn"
+                aria-label="Connect on LinkedIn"
+                role="listitem"
               >
-                <Linkedin className="w-4 h-4" />
+                <Linkedin className="w-4 h-4" aria-hidden="true" />
               </a>
               <a
                 href="#"
                 className="w-9 h-9 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 hover:border-white/20 flex items-center justify-center text-charcoal-400 hover:text-white transition-all duration-200"
-                aria-label="GitHub"
+                aria-label="View our GitHub"
+                role="listitem"
               >
-                <Github className="w-4 h-4" />
+                <Github className="w-4 h-4" aria-hidden="true" />
               </a>
               <a
                 href="mailto:support@flipside.com"
                 className="w-9 h-9 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 hover:border-white/20 flex items-center justify-center text-charcoal-400 hover:text-white transition-all duration-200"
-                aria-label="Email"
+                aria-label="Send us an email"
+                role="listitem"
               >
-                <Mail className="w-4 h-4" />
+                <Mail className="w-4 h-4" aria-hidden="true" />
               </a>
             </div>
           </div>

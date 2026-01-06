@@ -162,23 +162,23 @@ export default function SEOChecklist() {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
-          <h2 className="text-2xl font-bold text-gray-900">Project not found</h2>
-          <p className="text-gray-600 mt-2">The project you're looking for doesn't exist.</p>
+          <h2 className="text-2xl font-bold text-charcoal-900">Project not found</h2>
+          <p className="text-charcoal-600 mt-2">The project you're looking for doesn't exist.</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-charcoal-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Project Header */}
         <div className="bg-white rounded-lg shadow-md p-6 mb-6">
           <div className="flex justify-between items-start mb-4">
             <div>
-              <h1 className="text-2xl font-bold text-gray-900">{project.name}</h1>
-              <p className="text-gray-600">Client: {project.clientName}</p>
-              <p className="text-sm text-gray-500">Type: {project.projectType}</p>
+              <h1 className="text-2xl font-bold text-charcoal-900">{project.name}</h1>
+              <p className="text-charcoal-600">Client: {project.clientName}</p>
+              <p className="text-sm text-charcoal-500">Type: {project.projectType}</p>
             </div>
             <div className="flex gap-2">
               <button
@@ -200,18 +200,18 @@ export default function SEOChecklist() {
 
           {/* Progress Bar */}
           <div className="mt-4">
-            <div className="flex justify-between text-sm text-gray-600 mb-2">
+            <div className="flex justify-between text-sm text-charcoal-600 mb-2">
               <span>Overall Progress</span>
               <span className="font-semibold">{stats.percentage}% Complete</span>
             </div>
-            <div className="w-full bg-gray-200 rounded-full h-3">
+            <div className="w-full bg-charcoal-200 rounded-full h-3">
               <div
                 className="bg-primary-600 h-3 rounded-full transition-all duration-300"
                 style={{ width: `${stats.percentage}%` }}
               />
             </div>
             <div className="flex gap-4 mt-3 text-sm">
-              <span className="text-gray-600">
+              <span className="text-charcoal-600">
                 {stats.completed} of {stats.total} items complete
               </span>
               {stats.critical > 0 && (
@@ -237,7 +237,7 @@ export default function SEOChecklist() {
         <div className="bg-white rounded-lg shadow-md p-6 mb-6">
           <div className="flex flex-col md:flex-row gap-4 mb-4">
             <div className="flex-1 relative">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5" />
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-charcoal-400 w-5 h-5" />
               <input
                 type="text"
                 placeholder="Search checklist items..."
@@ -349,22 +349,22 @@ export default function SEOChecklist() {
               <div key={phase} className="bg-white rounded-lg shadow-md overflow-hidden">
                 <button
                   onClick={() => togglePhase(phase)}
-                  className="w-full p-4 flex items-center justify-between hover:bg-gray-50 transition-colors"
+                  className="w-full p-4 flex items-center justify-between hover:bg-charcoal-50 transition-colors"
                 >
                   <div className="flex items-center gap-4">
                     {isExpanded ? (
-                      <ChevronUp className="w-5 h-5 text-gray-600" />
+                      <ChevronUp className="w-5 h-5 text-charcoal-600" />
                     ) : (
-                      <ChevronDown className="w-5 h-5 text-gray-600" />
+                      <ChevronDown className="w-5 h-5 text-charcoal-600" />
                     )}
                     <div className="text-left">
-                      <h3 className="text-lg font-semibold text-gray-900">{phase}</h3>
-                      <p className="text-sm text-gray-600">
+                      <h3 className="text-lg font-semibold text-charcoal-900">{phase}</h3>
+                      <p className="text-sm text-charcoal-600">
                         {phaseCompleted} of {phaseTotal} completed ({phasePercentage}%)
                       </p>
                     </div>
                   </div>
-                  <div className="w-32 bg-gray-200 rounded-full h-2">
+                  <div className="w-32 bg-charcoal-200 rounded-full h-2">
                     <div
                       className="bg-primary-600 h-2 rounded-full transition-all duration-300"
                       style={{ width: `${phasePercentage}%` }}
@@ -377,7 +377,7 @@ export default function SEOChecklist() {
                     {phaseItems.map(item => (
                       <div
                         key={item.id}
-                        className={`p-4 border-b last:border-b-0 hover:bg-gray-50 transition-colors cursor-pointer
+                        className={`p-4 border-b last:border-b-0 hover:bg-charcoal-50 transition-colors cursor-pointer
                           ${completions[item.id] ? 'bg-green-50' : ''}`}
                         onClick={() => setSelectedItem(item)}
                       >
@@ -390,7 +390,7 @@ export default function SEOChecklist() {
                             className={`mt-1 w-5 h-5 rounded border-2 flex items-center justify-center flex-shrink-0
                               ${completions[item.id]
                                 ? 'bg-primary-600 border-primary-600'
-                                : 'border-gray-300 hover:border-primary-600'
+                                : 'border-charcoal-200 hover:border-primary-600'
                               }`}
                           >
                             {completions[item.id] && (
@@ -418,19 +418,19 @@ export default function SEOChecklist() {
                                   {item.riskLevel}
                                 </span>
                               )}
-                              <span className="px-2 py-0.5 rounded text-xs font-medium bg-gray-100 text-gray-800">
+                              <span className="px-2 py-0.5 rounded text-xs font-medium bg-charcoal-100 text-charcoal-800">
                                 {item.owner}
                               </span>
                             </div>
 
                             <div className="flex items-start gap-2">
-                              <p className={`flex-1 text-gray-900 ${completions[item.id] ? 'line-through text-gray-600' : ''}`}>
+                              <p className={`flex-1 text-charcoal-900 ${completions[item.id] ? 'line-through text-charcoal-600' : ''}`}>
                                 {item.item}
                               </p>
                               <HelpTooltip itemId={item.id} itemTitle={`#${item.id}`} />
                             </div>
 
-                            <div className="flex flex-wrap gap-4 mt-2 text-xs text-gray-500">
+                            <div className="flex flex-wrap gap-4 mt-2 text-xs text-charcoal-500">
                               <span>Category: {item.category}</span>
                               <span>Effort: {item.effortLevel}</span>
                               <span>Deliverable: {item.deliverableType}</span>
