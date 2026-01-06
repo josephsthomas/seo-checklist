@@ -21,6 +21,7 @@ import {
 import NotificationPanel from './NotificationPanel';
 import { hasPermission } from '../../utils/roles';
 import WhatsNew, { WhatsNewBadge } from '../help/WhatsNew';
+import HelpSearch from '../help/HelpSearch';
 import { getActiveTools, TOOL_COLORS } from '../../config/tools';
 
 export default function Navigation() {
@@ -31,6 +32,7 @@ export default function Navigation() {
   const [helpMenuOpen, setHelpMenuOpen] = useState(false);
   const [toolsMenuOpen, setToolsMenuOpen] = useState(false);
   const [whatsNewOpen, setWhatsNewOpen] = useState(false);
+  const [helpSearchOpen, setHelpSearchOpen] = useState(false);
   const toolsRef = useRef(null);
   const helpRef = useRef(null);
 
@@ -46,6 +48,18 @@ export default function Navigation() {
     }
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  // Global keyboard shortcut for help search (Cmd+K / Ctrl+K)
+  useEffect(() => {
+    function handleKeyDown(event) {
+      if ((event.metaKey || event.ctrlKey) && event.key === 'k') {
+        event.preventDefault();
+        setHelpSearchOpen(true);
+      }
+    }
+    document.addEventListener('keydown', handleKeyDown);
+    return () => document.removeEventListener('keydown', handleKeyDown);
   }, []);
 
   const handleLogout = async () => {
@@ -194,6 +208,23 @@ export default function Navigation() {
 
               {helpMenuOpen && (
                 <div className="dropdown-menu right-0 mt-2 w-56" role="menu" aria-label="Help">
+                  {/* Search Help */}
+                  <button
+                    onClick={() => {
+                      setHelpMenuOpen(false);
+                      setHelpSearchOpen(true);
+                    }}
+                    className="dropdown-item w-full"
+                    role="menuitem"
+                  >
+                    <Search className="w-4 h-4 text-primary-500" aria-hidden="true" />
+                    <div className="flex-1">
+                      <div className="font-medium text-charcoal-900">Search Help</div>
+                      <div className="text-xs text-charcoal-500">Tools, glossary & more</div>
+                    </div>
+                    <kbd className="text-xs font-mono px-1.5 py-0.5 bg-charcoal-100 rounded text-charcoal-500">⌘K</kbd>
+                  </button>
+                  <div className="h-px bg-charcoal-100 my-1" role="separator" />
                   <button
                     onClick={() => {
                       setHelpMenuOpen(false);
@@ -394,6 +425,9 @@ export default function Navigation() {
 
       {/* What's New Modal */}
       <WhatsNew isOpen={whatsNewOpen} onClose={() => setWhatsNewOpen(false)} />
+
+      {/* Help Search Modal */}
+      <HelpSearch isOpen={helpSearchOpen} onClose={() => setHelpSearchOpen(false)} />
     </nav>
   );
 }
