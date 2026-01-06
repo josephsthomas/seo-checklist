@@ -246,6 +246,395 @@ button:focus:not(:focus-visible) {
       'Use <caption> to describe the table\'s purpose',
       'For complex tables, use id and headers attributes'
     ]
+  },
+  'missing-video-captions': {
+    title: 'Video Missing Captions',
+    description: 'Videos with audio must have synchronized captions.',
+    wcag: 'WCAG 1.2.2',
+    level: 'A',
+    beforeCode: `<video src="presentation.mp4" controls></video>`,
+    afterCode: `<video src="presentation.mp4" controls>
+  <track kind="captions" src="captions.vtt" srclang="en" label="English" default>
+</video>`,
+    explanation: 'Captions make video content accessible to deaf and hard-of-hearing users, and also benefit users in noisy or quiet environments.',
+    tips: [
+      'Use WebVTT format for caption files',
+      'Include speaker identification for multiple speakers',
+      'Describe meaningful sound effects [door slams]',
+      'Ensure captions are synchronized with audio',
+      'Consider offering multiple language tracks'
+    ],
+    resources: [
+      { title: 'WebVTT Guide', url: 'https://developer.mozilla.org/en-US/docs/Web/API/WebVTT_API' }
+    ]
+  },
+  'missing-audio-transcript': {
+    title: 'Audio Missing Transcript',
+    description: 'Audio-only content requires a text transcript.',
+    wcag: 'WCAG 1.2.1',
+    level: 'A',
+    beforeCode: `<audio src="podcast.mp3" controls></audio>`,
+    afterCode: `<audio src="podcast.mp3" controls></audio>
+<details>
+  <summary>View Transcript</summary>
+  <div class="transcript">
+    <p><strong>Host:</strong> Welcome to our podcast...</p>
+  </div>
+</details>`,
+    explanation: 'Transcripts allow deaf users and those who prefer text to access audio content.',
+    tips: [
+      'Include all spoken content in the transcript',
+      'Identify different speakers',
+      'Describe relevant non-speech audio',
+      'Use semantic HTML for transcript structure',
+      'Consider providing downloadable transcript files'
+    ]
+  },
+  'keyboard-trap': {
+    title: 'Keyboard Trap Detected',
+    description: 'Users can enter but cannot exit an element using only the keyboard.',
+    wcag: 'WCAG 2.1.2',
+    level: 'A',
+    beforeCode: `// Modal that traps focus indefinitely
+const modal = document.querySelector('.modal');
+modal.addEventListener('keydown', (e) => {
+  e.preventDefault(); // Prevents all key navigation
+});`,
+    afterCode: `// Modal with proper focus management
+const modal = document.querySelector('.modal');
+const focusableElements = modal.querySelectorAll(
+  'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+);
+const firstElement = focusableElements[0];
+const lastElement = focusableElements[focusableElements.length - 1];
+
+modal.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape') closeModal();
+  if (e.key === 'Tab') {
+    if (e.shiftKey && document.activeElement === firstElement) {
+      lastElement.focus();
+      e.preventDefault();
+    } else if (!e.shiftKey && document.activeElement === lastElement) {
+      firstElement.focus();
+      e.preventDefault();
+    }
+  }
+});`,
+    explanation: 'Users must be able to navigate to and away from all interactive elements using only the keyboard.',
+    tips: [
+      'Always provide an Escape key to close modals/dialogs',
+      'Implement focus trapping that cycles through focusable elements',
+      'Return focus to the trigger element when closing',
+      'Test with keyboard-only navigation'
+    ]
+  },
+  'invalid-aria-attribute': {
+    title: 'Invalid ARIA Attribute Value',
+    description: 'ARIA attribute has an invalid or inappropriate value.',
+    wcag: 'WCAG 4.1.2',
+    level: 'A',
+    beforeCode: `<button aria-expanded="yes">Menu</button>
+<div aria-hidden="invisible">Content</div>`,
+    afterCode: `<button aria-expanded="true">Menu</button>
+<div aria-hidden="true">Content</div>`,
+    explanation: 'ARIA attributes must use valid values. Boolean attributes use "true" or "false", not "yes"/"no" or "visible"/"invisible".',
+    tips: [
+      'Use "true" or "false" for boolean ARIA attributes',
+      'Check MDN documentation for valid attribute values',
+      'Use automated tools to validate ARIA usage',
+      'Remember: No ARIA is better than bad ARIA'
+    ],
+    resources: [
+      { title: 'ARIA Attributes Reference', url: 'https://developer.mozilla.org/en-US/docs/Web/Accessibility/ARIA/Attributes' }
+    ]
+  },
+  'aria-role-mismatch': {
+    title: 'ARIA Role Conflicts with Native Element',
+    description: 'Element has an ARIA role that conflicts with its native semantics.',
+    wcag: 'WCAG 4.1.2',
+    level: 'A',
+    beforeCode: `<button role="link">Click me</button>
+<a role="button" href="/page">Go to page</a>`,
+    afterCode: `<button>Click me</button>
+<a href="/page">Go to page</a>
+<!-- Or if you need different behavior: -->
+<button onclick="navigate('/page')">Go to page</button>`,
+    explanation: 'Use native HTML elements for their intended purpose. Don\'t override native semantics with conflicting ARIA roles.',
+    tips: [
+      'Use the correct native element (button for actions, anchor for navigation)',
+      'Native HTML elements have built-in accessibility features',
+      'Only add ARIA roles when native elements cannot achieve the desired result',
+      'Test with screen readers to verify behavior'
+    ]
+  },
+  'color-only-information': {
+    title: 'Information Conveyed by Color Alone',
+    description: 'Color is the only means of conveying information.',
+    wcag: 'WCAG 1.4.1',
+    level: 'A',
+    beforeCode: `<style>
+  .error { color: red; }
+  .success { color: green; }
+</style>
+<p class="error">Email is invalid</p>`,
+    afterCode: `<style>
+  .error { color: red; }
+  .success { color: green; }
+</style>
+<p class="error">
+  <span aria-hidden="true">❌</span>
+  Email is invalid
+</p>
+<!-- Or with an icon -->
+<p class="error">
+  <svg aria-hidden="true">...</svg>
+  Email is invalid
+</p>`,
+    explanation: 'Color-blind users may not perceive color differences. Always supplement color with text, icons, or patterns.',
+    tips: [
+      'Add icons or symbols alongside color indicators',
+      'Use text labels in addition to color coding',
+      'Add patterns or textures to differentiate data in charts',
+      'Test with color blindness simulators'
+    ]
+  },
+  'auto-playing-media': {
+    title: 'Auto-playing Audio/Video',
+    description: 'Media plays automatically with audio, which can be disorienting.',
+    wcag: 'WCAG 1.4.2',
+    level: 'A',
+    beforeCode: `<video autoplay src="promo.mp4"></video>`,
+    afterCode: `<video src="promo.mp4" controls muted>
+  <button onclick="this.parentElement.play()">
+    Play video
+  </button>
+</video>`,
+    explanation: 'Auto-playing audio can interfere with screen readers and be startling. Always give users control over media playback.',
+    tips: [
+      'Never auto-play audio without user action',
+      'If video must auto-play, ensure it\'s muted by default',
+      'Provide clear controls to pause, stop, or adjust volume',
+      'If audio plays for more than 3 seconds, provide a way to pause or stop'
+    ]
+  },
+  'small-touch-target': {
+    title: 'Touch Target Too Small',
+    description: 'Interactive element is too small for easy touch activation.',
+    wcag: 'WCAG 2.5.8',
+    level: 'AA',
+    beforeCode: `.icon-button {
+  width: 20px;
+  height: 20px;
+  padding: 0;
+}`,
+    afterCode: `.icon-button {
+  width: 44px;
+  height: 44px;
+  min-width: 44px;
+  min-height: 44px;
+  padding: 10px;
+}
+/* The clickable area should be at least 24x24px (minimum)
+   or 44x44px (recommended) */`,
+    explanation: 'Small touch targets are difficult for users with motor impairments or those using touch devices. WCAG 2.5.8 requires minimum 24x24px targets.',
+    tips: [
+      'Minimum target size: 24x24 CSS pixels (WCAG 2.5.8)',
+      'Recommended target size: 44x44 CSS pixels',
+      'Add padding or increase element size',
+      'Ensure adequate spacing between targets',
+      'Test on actual touch devices'
+    ]
+  },
+  'time-limit-no-warning': {
+    title: 'Time Limit Without Warning',
+    description: 'Content has a time limit without user warning or controls.',
+    wcag: 'WCAG 2.2.1',
+    level: 'A',
+    beforeCode: `// Session expires silently after 5 minutes
+setTimeout(() => {
+  window.location = '/timeout';
+}, 300000);`,
+    afterCode: `// Warn user before timeout and allow extension
+let timeLeft = 300;
+const warningThreshold = 60; // 1 minute warning
+
+const timer = setInterval(() => {
+  timeLeft--;
+  if (timeLeft === warningThreshold) {
+    showWarningModal(\`Your session will expire in \${warningThreshold} seconds.
+      Would you like to extend it?\`);
+  }
+  if (timeLeft <= 0) {
+    clearInterval(timer);
+    handleTimeout();
+  }
+}, 1000);
+
+function extendSession() {
+  timeLeft = 300; // Reset timer
+  hideWarningModal();
+}`,
+    explanation: 'Users must be warned before time limits expire and given the option to extend or disable them, unless the limit is essential.',
+    tips: [
+      'Warn users at least 20 seconds before timeout',
+      'Allow users to extend the time limit',
+      'Provide option to disable time limits when possible',
+      'Save user progress before timeout occurs'
+    ]
+  },
+  'flashing-content': {
+    title: 'Flashing Content Detected',
+    description: 'Content flashes more than 3 times per second, which can trigger seizures.',
+    wcag: 'WCAG 2.3.1',
+    level: 'A',
+    beforeCode: `.flash {
+  animation: flash 0.2s infinite;
+}
+@keyframes flash {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
+}`,
+    afterCode: `.pulse {
+  animation: gentlePulse 2s ease-in-out infinite;
+}
+@keyframes gentlePulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.7; }
+}
+/* Respect user preferences */
+@media (prefers-reduced-motion: reduce) {
+  .pulse {
+    animation: none;
+  }
+}`,
+    explanation: 'Flashing content that exceeds 3 flashes per second can cause seizures in users with photosensitive epilepsy.',
+    tips: [
+      'Never flash content more than 3 times per second',
+      'Avoid red flashing (most likely to cause seizures)',
+      'Use prefers-reduced-motion media query',
+      'Provide warnings before showing video with flashing',
+      'Test with the Photosensitive Epilepsy Analysis Tool (PEAT)'
+    ]
+  },
+  'text-resize-breaks': {
+    title: 'Content Breaks When Text Resized',
+    description: 'Page content becomes unusable when text is resized to 200%.',
+    wcag: 'WCAG 1.4.4',
+    level: 'AA',
+    beforeCode: `.container {
+  width: 800px;
+  height: 400px;
+  overflow: hidden;
+}
+.text {
+  font-size: 14px;
+}`,
+    afterCode: `.container {
+  max-width: 800px;
+  min-height: 400px;
+  overflow: visible;
+}
+.text {
+  font-size: 0.875rem;
+  line-height: 1.5;
+}
+/* Use relative units and flexible containers */`,
+    explanation: 'Users must be able to resize text up to 200% without loss of content or functionality. Use relative units and flexible layouts.',
+    tips: [
+      'Use rem or em units for font sizes',
+      'Avoid fixed-height containers with overflow hidden',
+      'Test by zooming browser to 200%',
+      'Use media queries for responsive adjustments',
+      'Ensure text doesn\'t get cut off or overlap'
+    ]
+  },
+  'error-not-identified': {
+    title: 'Form Error Not Properly Identified',
+    description: 'Form errors are not clearly identified or described in text.',
+    wcag: 'WCAG 3.3.1',
+    level: 'A',
+    beforeCode: `<input type="email" class="error" value="invalid">
+<style>
+  .error { border-color: red; }
+</style>`,
+    afterCode: `<div>
+  <label for="email">Email Address</label>
+  <input
+    type="email"
+    id="email"
+    aria-invalid="true"
+    aria-describedby="email-error"
+    value="invalid"
+  >
+  <p id="email-error" class="error" role="alert">
+    Please enter a valid email address (e.g., name@example.com)
+  </p>
+</div>`,
+    explanation: 'When errors occur, users must be able to identify the error and understand how to fix it through text descriptions, not just visual cues.',
+    tips: [
+      'Use aria-invalid="true" on erroneous fields',
+      'Connect error messages with aria-describedby',
+      'Describe how to fix the error',
+      'Use role="alert" for important error messages',
+      'Summarize all errors at the top of the form'
+    ]
+  },
+  'duplicate-id': {
+    title: 'Duplicate Element IDs',
+    description: 'Multiple elements share the same ID, breaking accessibility associations.',
+    wcag: 'WCAG 4.1.1',
+    level: 'A',
+    beforeCode: `<label for="name">Name</label>
+<input id="name" type="text">
+<!-- Later in the page... -->
+<label for="name">Your Name</label>
+<input id="name" type="text">`,
+    afterCode: `<label for="billing-name">Name</label>
+<input id="billing-name" type="text">
+<!-- Later in the page... -->
+<label for="shipping-name">Your Name</label>
+<input id="shipping-name" type="text">`,
+    explanation: 'IDs must be unique within a page. Duplicate IDs break label associations and ARIA relationships.',
+    tips: [
+      'Use unique, descriptive IDs',
+      'Prefix IDs with section names (billing-, shipping-)',
+      'Use automated tools to detect duplicate IDs',
+      'IDs are case-sensitive in HTML5'
+    ]
+  },
+  'motion-not-reduceable': {
+    title: 'Motion Cannot Be Disabled',
+    description: 'Animated content has no option to reduce or disable motion.',
+    wcag: 'WCAG 2.3.3',
+    level: 'AAA',
+    beforeCode: `.animated {
+  animation: slide 1s infinite;
+}`,
+    afterCode: `.animated {
+  animation: slide 1s infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animated {
+    animation: none;
+    transition: none;
+  }
+}
+
+/* Or provide a toggle button */
+.reduced-motion .animated {
+  animation: none;
+}`,
+    explanation: 'Some users experience motion sickness or disorientation from animations. Provide ways to reduce or disable non-essential motion.',
+    tips: [
+      'Implement prefers-reduced-motion media query',
+      'Provide a visible toggle for users to disable animations',
+      'Only animate what\'s necessary for understanding content',
+      'Avoid parallax scrolling or make it optional'
+    ],
+    resources: [
+      { title: 'prefers-reduced-motion Guide', url: 'https://developer.mozilla.org/en-US/docs/Web/CSS/@media/prefers-reduced-motion' }
+    ]
   }
 };
 
@@ -282,7 +671,7 @@ export default function FixSuggestionsPanel({ issue, onClose }) {
     if (issueMessage.includes('lang')) {
       return FIX_SUGGESTIONS['missing-lang'];
     }
-    if (issueMessage.includes('focus')) {
+    if (issueMessage.includes('focus') && !issueMessage.includes('trap')) {
       return FIX_SUGGESTIONS['missing-focus-indicator'];
     }
     if (issueMessage.includes('link') && issueMessage.includes('text')) {
@@ -290,6 +679,55 @@ export default function FixSuggestionsPanel({ issue, onClose }) {
     }
     if (issueMessage.includes('button') && (issueMessage.includes('text') || issueMessage.includes('name'))) {
       return FIX_SUGGESTIONS['missing-button-text'];
+    }
+    // New fuzzy matches
+    if (issueMessage.includes('caption') || (issueMessage.includes('video') && issueMessage.includes('text'))) {
+      return FIX_SUGGESTIONS['missing-video-captions'];
+    }
+    if (issueMessage.includes('transcript') || (issueMessage.includes('audio') && issueMessage.includes('text'))) {
+      return FIX_SUGGESTIONS['missing-audio-transcript'];
+    }
+    if (issueMessage.includes('keyboard') && issueMessage.includes('trap')) {
+      return FIX_SUGGESTIONS['keyboard-trap'];
+    }
+    if (issueMessage.includes('aria') && (issueMessage.includes('invalid') || issueMessage.includes('value'))) {
+      return FIX_SUGGESTIONS['invalid-aria-attribute'];
+    }
+    if (issueMessage.includes('role') && (issueMessage.includes('conflict') || issueMessage.includes('mismatch'))) {
+      return FIX_SUGGESTIONS['aria-role-mismatch'];
+    }
+    if (issueMessage.includes('color') && issueMessage.includes('only')) {
+      return FIX_SUGGESTIONS['color-only-information'];
+    }
+    if (issueMessage.includes('autoplay') || issueMessage.includes('auto-play')) {
+      return FIX_SUGGESTIONS['auto-playing-media'];
+    }
+    if (issueMessage.includes('touch') || issueMessage.includes('target size') || issueMessage.includes('tap target')) {
+      return FIX_SUGGESTIONS['small-touch-target'];
+    }
+    if (issueMessage.includes('time') && (issueMessage.includes('limit') || issueMessage.includes('timeout'))) {
+      return FIX_SUGGESTIONS['time-limit-no-warning'];
+    }
+    if (issueMessage.includes('flash') || issueMessage.includes('blink')) {
+      return FIX_SUGGESTIONS['flashing-content'];
+    }
+    if (issueMessage.includes('resize') || issueMessage.includes('zoom')) {
+      return FIX_SUGGESTIONS['text-resize-breaks'];
+    }
+    if (issueMessage.includes('error') && (issueMessage.includes('identif') || issueMessage.includes('descri'))) {
+      return FIX_SUGGESTIONS['error-not-identified'];
+    }
+    if (issueMessage.includes('duplicate') && issueMessage.includes('id')) {
+      return FIX_SUGGESTIONS['duplicate-id'];
+    }
+    if (issueMessage.includes('motion') || issueMessage.includes('animation')) {
+      return FIX_SUGGESTIONS['motion-not-reduceable'];
+    }
+    if (issueMessage.includes('table') && issueMessage.includes('header')) {
+      return FIX_SUGGESTIONS['no-table-headers'];
+    }
+    if (issueMessage.includes('landmark')) {
+      return FIX_SUGGESTIONS['missing-aria-landmarks'];
     }
 
     return null;

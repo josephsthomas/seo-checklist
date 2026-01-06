@@ -78,6 +78,26 @@ const DAYS_OF_WEEK = [
   { id: 6, label: 'Sat', full: 'Saturday' }
 ];
 
+// Common timezones
+const TIMEZONES = [
+  { id: 'UTC', label: 'UTC (Coordinated Universal Time)', offset: 0 },
+  { id: 'America/New_York', label: 'Eastern Time (ET)', offset: -5 },
+  { id: 'America/Chicago', label: 'Central Time (CT)', offset: -6 },
+  { id: 'America/Denver', label: 'Mountain Time (MT)', offset: -7 },
+  { id: 'America/Los_Angeles', label: 'Pacific Time (PT)', offset: -8 },
+  { id: 'America/Anchorage', label: 'Alaska Time (AKT)', offset: -9 },
+  { id: 'Pacific/Honolulu', label: 'Hawaii Time (HT)', offset: -10 },
+  { id: 'Europe/London', label: 'London (GMT/BST)', offset: 0 },
+  { id: 'Europe/Paris', label: 'Central European (CET)', offset: 1 },
+  { id: 'Europe/Berlin', label: 'Berlin (CET)', offset: 1 },
+  { id: 'Asia/Tokyo', label: 'Japan (JST)', offset: 9 },
+  { id: 'Asia/Shanghai', label: 'China (CST)', offset: 8 },
+  { id: 'Asia/Singapore', label: 'Singapore (SGT)', offset: 8 },
+  { id: 'Asia/Dubai', label: 'Dubai (GST)', offset: 4 },
+  { id: 'Australia/Sydney', label: 'Sydney (AEST)', offset: 10 },
+  { id: 'Australia/Perth', label: 'Perth (AWST)', offset: 8 }
+];
+
 // Generate mock scheduled audits
 function generateMockAudits() {
   return [
@@ -88,6 +108,7 @@ function generateMockAudits() {
       frequency: 'weekly',
       dayOfWeek: 1,
       time: '03:00',
+      timezone: 'America/New_York',
       depth: 3,
       categories: ['meta', 'headings', 'images', 'links', 'performance'],
       isActive: true,
@@ -121,6 +142,7 @@ function generateMockAudits() {
       url: 'https://example.com/blog',
       frequency: 'daily',
       time: '06:00',
+      timezone: 'America/Chicago',
       depth: 2,
       categories: ['meta', 'headings', 'images'],
       isActive: true,
@@ -155,6 +177,7 @@ function generateMockAudits() {
       frequency: 'monthly',
       dayOfMonth: 1,
       time: '02:00',
+      timezone: 'America/Los_Angeles',
       depth: 5,
       categories: ['meta', 'headings', 'images', 'links', 'performance', 'security', 'mobile'],
       isActive: false,
@@ -251,10 +274,41 @@ export default function ScheduledAuditsPanel() {
     return next;
   };
 
-  // Delete audit
+  // State for delete confirmation
+  const [deleteConfirm, setDeleteConfirm] = useState(null);
+
+  // Delete audit with confirmation and undo
   const deleteAudit = (id) => {
-    setAudits(prev => prev.filter(a => a.id !== id));
-    toast.success('Scheduled audit deleted');
+    const audit = audits.find(a => a.id === id);
+    setDeleteConfirm({
+      id,
+      name: audit?.name || 'this audit schedule'
+    });
+  };
+
+  const confirmDelete = () => {
+    if (!deleteConfirm) return;
+
+    const deletedAudit = audits.find(a => a.id === deleteConfirm.id);
+    setAudits(prev => prev.filter(a => a.id !== deleteConfirm.id));
+    setDeleteConfirm(null);
+
+    // Show toast with undo option
+    toast((t) => (
+      <div className="flex items-center gap-3">
+        <span>Audit schedule deleted</span>
+        <button
+          onClick={() => {
+            setAudits(prev => [...prev, deletedAudit]);
+            toast.dismiss(t.id);
+            toast.success('Audit schedule restored');
+          }}
+          className="px-2 py-1 bg-cyan-500 text-white rounded text-sm font-medium hover:bg-cyan-600"
+        >
+          Undo
+        </button>
+      </div>
+    ), { duration: 5000 });
   };
 
   // Run audit now
@@ -466,7 +520,7 @@ export default function ScheduledAuditsPanel() {
                     <div className="flex items-center gap-4 mt-1 text-xs text-charcoal-400 dark:text-charcoal-500">
                       <span className="flex items-center gap-1">
                         <Clock className="w-3 h-3" />
-                        {AUDIT_CONFIGS.frequency.find(f => f.id === audit.frequency)?.label} at {audit.time}
+                        {AUDIT_CONFIGS.frequency.find(f => f.id === audit.frequency)?.label} at {audit.time} {audit.timezone && `(${TIMEZONES.find(tz => tz.id === audit.timezone)?.label.split('(')[1]?.replace(')', '') || audit.timezone})`}
                       </span>
                       {audit.lastRun && (
                         <span>Last: {formatDistanceToNow(audit.lastRun.date, { addSuffix: true })}</span>
@@ -602,6 +656,10 @@ export default function ScheduledAuditsPanel() {
                             </div>
                           )}
                           <div className="flex items-center gap-2">
+                            <Globe className="w-3 h-3" />
+                            {TIMEZONES.find(tz => tz.id === audit.timezone)?.label || audit.timezone || 'UTC'}
+                          </div>
+                          <div className="flex items-center gap-2">
                             <BarChart3 className="w-3 h-3" />
                             {audit.runCount} audits completed
                           </div>
@@ -712,6 +770,45 @@ export default function ScheduledAuditsPanel() {
           onClose={() => setViewingHistory(null)}
         />
       )}
+
+      {/* Delete Confirmation Modal */}
+      {deleteConfirm && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white dark:bg-charcoal-800 rounded-2xl shadow-xl w-full max-w-md p-6">
+            <div className="flex items-center gap-3 mb-4">
+              <div className="p-3 bg-red-100 dark:bg-red-900/30 rounded-xl">
+                <Trash2 className="w-6 h-6 text-red-600 dark:text-red-400" />
+              </div>
+              <div>
+                <h3 className="text-lg font-semibold text-charcoal-900 dark:text-white">
+                  Delete Audit Schedule
+                </h3>
+                <p className="text-sm text-charcoal-500 dark:text-charcoal-400">
+                  This action can be undone
+                </p>
+              </div>
+            </div>
+            <p className="text-charcoal-600 dark:text-charcoal-300 mb-6">
+              Are you sure you want to delete "<strong>{deleteConfirm.name}</strong>"?
+              You'll have 5 seconds to undo this action.
+            </p>
+            <div className="flex gap-3">
+              <button
+                onClick={() => setDeleteConfirm(null)}
+                className="btn btn-secondary flex-1"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={confirmDelete}
+                className="btn bg-red-500 hover:bg-red-600 text-white flex-1"
+              >
+                Delete
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
@@ -727,6 +824,7 @@ function AuditScheduleFormModal({ audit, onSave, onClose }) {
     dayOfWeek: audit?.dayOfWeek ?? 1,
     dayOfMonth: audit?.dayOfMonth ?? 1,
     time: audit?.time || '09:00',
+    timezone: audit?.timezone || 'America/New_York',
     depth: audit?.depth || 2,
     categories: audit?.categories || ['meta', 'headings', 'images', 'links'],
     isActive: audit?.isActive ?? true,
@@ -741,6 +839,33 @@ function AuditScheduleFormModal({ audit, onSave, onClose }) {
 
   const [step, setStep] = useState(1);
 
+  // Check for schedule conflicts
+  const checkConflicts = () => {
+    const conflicts = [];
+
+    // This would normally check against existing audits passed via props
+    // For demo purposes, we check for common conflict patterns
+
+    // Check if the time is during peak hours
+    const [hours] = formData.time.split(':').map(Number);
+    if (hours >= 9 && hours <= 17) {
+      conflicts.push({
+        type: 'warning',
+        message: 'Scheduling during business hours (9 AM - 5 PM) may impact site performance for users'
+      });
+    }
+
+    return conflicts;
+  };
+
+  const [conflicts, setConflicts] = useState([]);
+
+  // Check conflicts when schedule details change
+  useEffect(() => {
+    const newConflicts = checkConflicts();
+    setConflicts(newConflicts);
+  }, [formData.time, formData.frequency, formData.url]);
+
   const handleSubmit = (e) => {
     e.preventDefault();
 
@@ -754,6 +879,13 @@ function AuditScheduleFormModal({ audit, onSave, onClose }) {
     }
     if (formData.categories.length === 0) {
       toast.error('Please select at least one category');
+      return;
+    }
+
+    // Warn about conflicts but allow proceeding
+    const criticalConflicts = conflicts.filter(c => c.type === 'error');
+    if (criticalConflicts.length > 0) {
+      toast.error('Please resolve schedule conflicts before saving');
       return;
     }
 
@@ -960,20 +1092,74 @@ function AuditScheduleFormModal({ audit, onSave, onClose }) {
                 </div>
               )}
 
-              <div>
-                <label className="block text-sm font-medium text-charcoal-700 dark:text-charcoal-300 mb-2">
-                  Time (UTC)
-                </label>
-                <input
-                  type="time"
-                  value={formData.time}
-                  onChange={(e) => setFormData(prev => ({ ...prev, time: e.target.value }))}
-                  className="input"
-                />
-                <p className="text-xs text-charcoal-400 mt-1">
-                  Recommended: Off-peak hours (2:00-6:00 AM) for minimal impact on site performance
-                </p>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-charcoal-700 dark:text-charcoal-300 mb-2">
+                    Time
+                  </label>
+                  <input
+                    type="time"
+                    value={formData.time}
+                    onChange={(e) => setFormData(prev => ({ ...prev, time: e.target.value }))}
+                    className="input"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-charcoal-700 dark:text-charcoal-300 mb-2">
+                    Timezone
+                  </label>
+                  <select
+                    value={formData.timezone}
+                    onChange={(e) => setFormData(prev => ({ ...prev, timezone: e.target.value }))}
+                    className="input"
+                  >
+                    {TIMEZONES.map(tz => (
+                      <option key={tz.id} value={tz.id}>{tz.label}</option>
+                    ))}
+                  </select>
+                </div>
               </div>
+              <p className="text-xs text-charcoal-400">
+                Recommended: Off-peak hours (2:00-6:00 AM) for minimal impact on site performance
+              </p>
+
+              {/* Schedule Conflicts Warning */}
+              {conflicts.length > 0 && (
+                <div className="space-y-2">
+                  {conflicts.map((conflict, idx) => (
+                    <div
+                      key={idx}
+                      className={`p-3 rounded-lg flex items-start gap-3 ${
+                        conflict.type === 'error'
+                          ? 'bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800'
+                          : 'bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800'
+                      }`}
+                    >
+                      <AlertTriangle className={`w-5 h-5 flex-shrink-0 ${
+                        conflict.type === 'error'
+                          ? 'text-red-500'
+                          : 'text-amber-500'
+                      }`} />
+                      <div>
+                        <p className={`text-sm font-medium ${
+                          conflict.type === 'error'
+                            ? 'text-red-700 dark:text-red-300'
+                            : 'text-amber-700 dark:text-amber-300'
+                        }`}>
+                          {conflict.type === 'error' ? 'Schedule Conflict' : 'Schedule Advisory'}
+                        </p>
+                        <p className={`text-sm ${
+                          conflict.type === 'error'
+                            ? 'text-red-600 dark:text-red-400'
+                            : 'text-amber-600 dark:text-amber-400'
+                        }`}>
+                          {conflict.message}
+                        </p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
 
               <div className="flex items-center gap-3 p-4 bg-charcoal-50 dark:bg-charcoal-700/50 rounded-lg">
                 <input
@@ -1105,7 +1291,7 @@ function AuditScheduleFormModal({ audit, onSave, onClose }) {
                   <div className="flex items-center gap-2">
                     <Clock className="w-4 h-4" />
                     <span>
-                      {AUDIT_CONFIGS.frequency.find(f => f.id === formData.frequency)?.label} at {formData.time}
+                      {AUDIT_CONFIGS.frequency.find(f => f.id === formData.frequency)?.label} at {formData.time} ({TIMEZONES.find(tz => tz.id === formData.timezone)?.label.split('(')[1]?.replace(')', '') || formData.timezone})
                     </span>
                   </div>
                   <div className="flex items-center gap-2">

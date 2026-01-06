@@ -124,6 +124,26 @@ const EXPORT_FORMATS = [
   { id: 'html', label: 'HTML', icon: Code }
 ];
 
+// Common timezones
+const TIMEZONES = [
+  { id: 'UTC', label: 'UTC (Coordinated Universal Time)', offset: 0 },
+  { id: 'America/New_York', label: 'Eastern Time (ET)', offset: -5 },
+  { id: 'America/Chicago', label: 'Central Time (CT)', offset: -6 },
+  { id: 'America/Denver', label: 'Mountain Time (MT)', offset: -7 },
+  { id: 'America/Los_Angeles', label: 'Pacific Time (PT)', offset: -8 },
+  { id: 'America/Anchorage', label: 'Alaska Time (AKT)', offset: -9 },
+  { id: 'Pacific/Honolulu', label: 'Hawaii Time (HT)', offset: -10 },
+  { id: 'Europe/London', label: 'London (GMT/BST)', offset: 0 },
+  { id: 'Europe/Paris', label: 'Central European (CET)', offset: 1 },
+  { id: 'Europe/Berlin', label: 'Berlin (CET)', offset: 1 },
+  { id: 'Asia/Tokyo', label: 'Japan (JST)', offset: 9 },
+  { id: 'Asia/Shanghai', label: 'China (CST)', offset: 8 },
+  { id: 'Asia/Singapore', label: 'Singapore (SGT)', offset: 8 },
+  { id: 'Asia/Dubai', label: 'Dubai (GST)', offset: 4 },
+  { id: 'Australia/Sydney', label: 'Sydney (AEST)', offset: 10 },
+  { id: 'Australia/Perth', label: 'Perth (AWST)', offset: 8 }
+];
+
 // Generate mock scheduled reports
 function generateMockSchedules() {
   return [
@@ -134,6 +154,7 @@ function generateMockSchedules() {
       frequency: 'weekly',
       dayOfWeek: 1,
       time: '09:00',
+      timezone: 'America/New_York',
       recipients: ['team@example.com', 'manager@example.com'],
       format: 'pdf',
       isActive: true,
@@ -151,6 +172,7 @@ function generateMockSchedules() {
       frequency: 'monthly',
       dayOfMonth: 1,
       time: '08:00',
+      timezone: 'America/Chicago',
       recipients: ['accessibility@example.com'],
       format: 'pdf',
       isActive: true,
@@ -167,6 +189,7 @@ function generateMockSchedules() {
       reportType: 'content-progress',
       frequency: 'daily',
       time: '18:00',
+      timezone: 'America/Los_Angeles',
       recipients: ['project-lead@example.com'],
       format: 'xlsx',
       isActive: false,
@@ -208,10 +231,41 @@ export default function ScheduledReportsPanel() {
     toast.success(schedule?.isActive ? 'Schedule paused' : 'Schedule activated');
   };
 
-  // Delete schedule
+  // State for delete confirmation
+  const [deleteConfirm, setDeleteConfirm] = useState(null);
+
+  // Delete schedule with confirmation and undo
   const deleteSchedule = (id) => {
-    setSchedules(prev => prev.filter(s => s.id !== id));
-    toast.success('Schedule deleted');
+    const schedule = schedules.find(s => s.id === id);
+    setDeleteConfirm({
+      id,
+      name: schedule?.name || 'this schedule'
+    });
+  };
+
+  const confirmDelete = () => {
+    if (!deleteConfirm) return;
+
+    const deletedSchedule = schedules.find(s => s.id === deleteConfirm.id);
+    setSchedules(prev => prev.filter(s => s.id !== deleteConfirm.id));
+    setDeleteConfirm(null);
+
+    // Show toast with undo option
+    toast((t) => (
+      <div className="flex items-center gap-3">
+        <span>Schedule deleted</span>
+        <button
+          onClick={() => {
+            setSchedules(prev => [...prev, deletedSchedule]);
+            toast.dismiss(t.id);
+            toast.success('Schedule restored');
+          }}
+          className="px-2 py-1 bg-primary-500 text-white rounded text-sm font-medium hover:bg-primary-600"
+        >
+          Undo
+        </button>
+      </div>
+    ), { duration: 5000 });
   };
 
   // Run now
@@ -385,7 +439,7 @@ export default function ScheduledReportsPanel() {
                       {getStatusBadge(schedule)}
                     </div>
                     <p className="text-sm text-charcoal-500 dark:text-charcoal-400">
-                      {reportType?.name} • {FREQUENCY_OPTIONS.find(f => f.id === schedule.frequency)?.label} at {schedule.time}
+                      {reportType?.name} • {FREQUENCY_OPTIONS.find(f => f.id === schedule.frequency)?.label} at {schedule.time} {schedule.timezone && `(${TIMEZONES.find(tz => tz.id === schedule.timezone)?.label.split('(')[1]?.replace(')', '') || schedule.timezone})`}
                     </p>
                     <div className="flex items-center gap-4 mt-1 text-xs text-charcoal-400 dark:text-charcoal-500">
                       {schedule.lastRun && (
@@ -485,6 +539,10 @@ export default function ScheduledReportsPanel() {
                             <Bell className="w-3 h-3" />
                             {schedule.time}
                           </div>
+                          <div className="flex items-center gap-2">
+                            <Globe className="w-3 h-3" />
+                            {TIMEZONES.find(tz => tz.id === schedule.timezone)?.label || schedule.timezone || 'UTC'}
+                          </div>
                         </div>
                       </div>
 
@@ -548,6 +606,45 @@ export default function ScheduledReportsPanel() {
           }}
         />
       )}
+
+      {/* Delete Confirmation Modal */}
+      {deleteConfirm && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white dark:bg-charcoal-800 rounded-2xl shadow-xl w-full max-w-md p-6">
+            <div className="flex items-center gap-3 mb-4">
+              <div className="p-3 bg-red-100 dark:bg-red-900/30 rounded-xl">
+                <Trash2 className="w-6 h-6 text-red-600 dark:text-red-400" />
+              </div>
+              <div>
+                <h3 className="text-lg font-semibold text-charcoal-900 dark:text-white">
+                  Delete Schedule
+                </h3>
+                <p className="text-sm text-charcoal-500 dark:text-charcoal-400">
+                  This action can be undone
+                </p>
+              </div>
+            </div>
+            <p className="text-charcoal-600 dark:text-charcoal-300 mb-6">
+              Are you sure you want to delete "<strong>{deleteConfirm.name}</strong>"?
+              You'll have 5 seconds to undo this action.
+            </p>
+            <div className="flex gap-3">
+              <button
+                onClick={() => setDeleteConfirm(null)}
+                className="btn btn-secondary flex-1"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={confirmDelete}
+                className="btn bg-red-500 hover:bg-red-600 text-white flex-1"
+              >
+                Delete
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
@@ -563,6 +660,7 @@ function ScheduleFormModal({ schedule, onSave, onClose }) {
     dayOfWeek: schedule?.dayOfWeek ?? 1,
     dayOfMonth: schedule?.dayOfMonth ?? 1,
     time: schedule?.time || '09:00',
+    timezone: schedule?.timezone || 'America/New_York',
     recipients: schedule?.recipients?.join(', ') || '',
     format: schedule?.format || 'pdf',
     isActive: schedule?.isActive ?? true,
@@ -799,16 +897,32 @@ function ScheduleFormModal({ schedule, onSave, onClose }) {
                 </div>
               )}
 
-              <div>
-                <label className="block text-sm font-medium text-charcoal-700 dark:text-charcoal-300 mb-2">
-                  Time (UTC)
-                </label>
-                <input
-                  type="time"
-                  value={formData.time}
-                  onChange={(e) => setFormData(prev => ({ ...prev, time: e.target.value }))}
-                  className="input"
-                />
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-charcoal-700 dark:text-charcoal-300 mb-2">
+                    Time
+                  </label>
+                  <input
+                    type="time"
+                    value={formData.time}
+                    onChange={(e) => setFormData(prev => ({ ...prev, time: e.target.value }))}
+                    className="input"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-charcoal-700 dark:text-charcoal-300 mb-2">
+                    Timezone
+                  </label>
+                  <select
+                    value={formData.timezone}
+                    onChange={(e) => setFormData(prev => ({ ...prev, timezone: e.target.value }))}
+                    className="input"
+                  >
+                    {TIMEZONES.map(tz => (
+                      <option key={tz.id} value={tz.id}>{tz.label}</option>
+                    ))}
+                  </select>
+                </div>
               </div>
 
               <div className="flex items-center gap-3 p-4 bg-charcoal-50 dark:bg-charcoal-700/50 rounded-lg">
@@ -881,6 +995,7 @@ function ScheduleFormModal({ schedule, onSave, onClose }) {
                         ` on ${DAYS_OF_WEEK.find(d => d.id === formData.dayOfWeek)?.full}`}
                       {(formData.frequency === 'monthly' || formData.frequency === 'quarterly') &&
                         ` on day ${formData.dayOfMonth}`}
+                      {` (${TIMEZONES.find(tz => tz.id === formData.timezone)?.label.split('(')[1]?.replace(')', '') || formData.timezone})`}
                     </span>
                   </div>
                   <div className="flex items-center gap-2">
