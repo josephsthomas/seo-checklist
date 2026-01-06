@@ -25,6 +25,9 @@ const TeamManagementPage = lazy(() => import('./components/projects/TeamManageme
 const SEOChecklist = lazy(() => import('./components/checklist/SEOChecklist'));
 const ProgressDashboard = lazy(() => import('./components/projects/ProgressDashboard'));
 
+// Activity Components - lazy load
+const ActivityPage = lazy(() => import('./components/activity/ActivityPage'));
+
 // Help Components - lazy load
 const ResourceLibrary = lazy(() => import('./components/help/ResourceLibrary'));
 const GlossaryPage = lazy(() => import('./components/help/GlossaryPage'));
@@ -296,6 +299,14 @@ function App() {
                     element={
                       <ProtectedRoute>
                         <GlossaryPage />
+                      </ProtectedRoute>
+                    }
+                  />
+                  <Route
+                    path="/activity"
+                    element={
+                      <ProtectedRoute>
+                        <ActivityPage />
                       </ProtectedRoute>
                     }
                   />

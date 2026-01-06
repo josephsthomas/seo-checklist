@@ -9,6 +9,7 @@ import ToolCard from './ToolCard';
 import { SkeletonStatCard, SkeletonToolCard, SkeletonProjectList } from '../shared/Skeleton';
 import FavoritesAndRecentsWidget from '../shared/FavoritesAndRecents';
 import { HomeRecommendations } from '../shared/ToolRecommendations';
+import { ActivityWidget } from '../activity/ActivityTimeline';
 import {
   ClipboardList,
   Search,
@@ -424,13 +425,16 @@ export default function HomePage() {
           </div>
         </section>
 
-        {/* Favorites & Recent Items */}
-        <section className="mb-12" aria-labelledby="favorites-heading">
-          <div className="flex items-center gap-2 mb-4">
-            <Star className="w-5 h-5 text-amber-500" />
-            <h2 id="favorites-heading" className="text-lg font-bold text-charcoal-900">Quick Access</h2>
+        {/* Favorites & Recent Items + Activity Widget */}
+        <section className="mb-12 grid grid-cols-1 lg:grid-cols-2 gap-6" aria-labelledby="favorites-heading">
+          <div>
+            <div className="flex items-center gap-2 mb-4">
+              <Star className="w-5 h-5 text-amber-500" />
+              <h2 id="favorites-heading" className="text-lg font-bold text-charcoal-900">Quick Access</h2>
+            </div>
+            <FavoritesAndRecentsWidget />
           </div>
-          <FavoritesAndRecentsWidget />
+          <ActivityWidget limit={5} />
         </section>
 
         {/* Personalized Recommendations */}
