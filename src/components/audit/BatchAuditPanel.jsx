@@ -20,6 +20,7 @@ import {
 } from 'lucide-react';
 import { format } from 'date-fns';
 import toast from 'react-hot-toast';
+import InfoTooltip from '../common/InfoTooltip';
 import jsPDF from 'jspdf';
 import 'jspdf-autotable';
 
@@ -432,7 +433,10 @@ export default function BatchAuditPanel({ onClose, onStartBatch }) {
             <Globe className="w-5 h-5 text-white" />
           </div>
           <div>
-            <h2 className="text-lg font-bold text-charcoal-900 dark:text-white">Multi-URL Batch Audit</h2>
+            <h2 className="text-lg font-bold text-charcoal-900 dark:text-white flex items-center gap-1">
+              Multi-URL Batch Audit
+              <InfoTooltip tipKey="batch.urls" />
+            </h2>
             <p className="text-sm text-charcoal-500 dark:text-charcoal-400">
               Audit multiple URLs at once
             </p>
@@ -473,6 +477,7 @@ export default function BatchAuditPanel({ onClose, onStartBatch }) {
             <label className="flex items-center gap-2 px-4 py-2 bg-charcoal-100 dark:bg-charcoal-700 text-charcoal-700 dark:text-charcoal-300 rounded-lg cursor-pointer hover:bg-charcoal-200 dark:hover:bg-charcoal-600 transition-colors">
               <Upload className="w-4 h-4" />
               <span className="text-sm font-medium">Upload CSV/TXT</span>
+              <InfoTooltip tipKey="batch.upload" />
               <input
                 type="file"
                 accept=".csv,.txt"

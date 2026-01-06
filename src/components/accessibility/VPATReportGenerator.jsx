@@ -20,6 +20,7 @@ import {
 } from 'lucide-react';
 import { format } from 'date-fns';
 import toast from 'react-hot-toast';
+import InfoTooltip from '../common/InfoTooltip';
 import jsPDF from 'jspdf';
 import 'jspdf-autotable';
 
@@ -284,7 +285,10 @@ export default function VPATReportGenerator({ auditResults, productInfo, onClose
             <FileText className="w-5 h-5 text-white" />
           </div>
           <div>
-            <h2 className="text-lg font-bold text-charcoal-900 dark:text-white">VPAT Report Generator</h2>
+            <h2 className="text-lg font-bold text-charcoal-900 dark:text-white flex items-center gap-1">
+              VPAT Report Generator
+              <InfoTooltip tipKey="vpat.version" />
+            </h2>
             <p className="text-sm text-charcoal-500 dark:text-charcoal-400">
               Voluntary Product Accessibility Template (WCAG 2.1)
             </p>
@@ -294,6 +298,7 @@ export default function VPATReportGenerator({ auditResults, productInfo, onClose
           <button
             onClick={handleExport}
             className="btn btn-primary flex items-center gap-2"
+            title="Generate a PDF VPAT report suitable for procurement documentation"
           >
             <Download className="w-4 h-4" />
             Export VPAT

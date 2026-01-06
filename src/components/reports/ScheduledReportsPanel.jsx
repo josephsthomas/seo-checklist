@@ -32,6 +32,7 @@ import {
 } from 'lucide-react';
 import { format, formatDistanceToNow, addDays, addWeeks, addMonths } from 'date-fns';
 import toast from 'react-hot-toast';
+import InfoTooltip from '../common/InfoTooltip';
 
 /**
  * Scheduled Reports Panel
@@ -829,8 +830,9 @@ function ScheduleFormModal({ schedule, onSave, onClose }) {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-charcoal-700 dark:text-charcoal-300 mb-2">
+                <label className="block text-sm font-medium text-charcoal-700 dark:text-charcoal-300 mb-2 flex items-center gap-1">
                   Report Type
+                  <InfoTooltip tipKey="schedule.reportType" />
                 </label>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   {REPORT_TYPES.map(type => {
@@ -870,8 +872,9 @@ function ScheduleFormModal({ schedule, onSave, onClose }) {
           {step === 2 && (
             <div className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-charcoal-700 dark:text-charcoal-300 mb-2">
+                <label className="block text-sm font-medium text-charcoal-700 dark:text-charcoal-300 mb-2 flex items-center gap-1">
                   Frequency
+                  <InfoTooltip tipKey="schedule.frequency" />
                 </label>
                 <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
                   {FREQUENCY_OPTIONS.map(option => (
@@ -946,8 +949,9 @@ function ScheduleFormModal({ schedule, onSave, onClose }) {
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-charcoal-700 dark:text-charcoal-300 mb-2">
+                  <label className="block text-sm font-medium text-charcoal-700 dark:text-charcoal-300 mb-2 flex items-center gap-1">
                     Timezone
+                    <InfoTooltip tipKey="schedule.timezone" />
                   </label>
                   <select
                     value={formData.timezone}
@@ -969,8 +973,9 @@ function ScheduleFormModal({ schedule, onSave, onClose }) {
                   onChange={(e) => setFormData(prev => ({ ...prev, isActive: e.target.checked }))}
                   className="w-4 h-4 text-primary-600 rounded"
                 />
-                <label htmlFor="isActive" className="text-sm text-charcoal-700 dark:text-charcoal-300">
+                <label htmlFor="isActive" className="text-sm text-charcoal-700 dark:text-charcoal-300 flex items-center gap-1">
                   Activate schedule immediately after saving
+                  <InfoTooltip tipKey="schedule.active" />
                 </label>
               </div>
             </div>
@@ -980,8 +985,9 @@ function ScheduleFormModal({ schedule, onSave, onClose }) {
           {step === 3 && (
             <div className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-charcoal-700 dark:text-charcoal-300 mb-2">
+                <label className="block text-sm font-medium text-charcoal-700 dark:text-charcoal-300 mb-2 flex items-center gap-1">
                   Recipients (comma-separated emails)
+                  <InfoTooltip tipKey="schedule.recipients" />
                 </label>
                 <textarea
                   value={formData.recipients}

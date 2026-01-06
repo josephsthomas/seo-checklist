@@ -32,6 +32,7 @@ import {
 } from 'lucide-react';
 import { format, formatDistanceToNow, addDays, addWeeks, addMonths, subDays } from 'date-fns';
 import toast from 'react-hot-toast';
+import InfoTooltip from '../common/InfoTooltip';
 
 /**
  * Scheduled Audits Panel
@@ -996,8 +997,9 @@ function AuditScheduleFormModal({ audit, onSave, onClose }) {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-charcoal-700 dark:text-charcoal-300 mb-2">
+                <label className="block text-sm font-medium text-charcoal-700 dark:text-charcoal-300 mb-2 flex items-center gap-1">
                   Target URL
+                  <InfoTooltip tipKey="audit.url" />
                 </label>
                 <div className="relative">
                   <Globe className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-charcoal-400" />
@@ -1012,8 +1014,9 @@ function AuditScheduleFormModal({ audit, onSave, onClose }) {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-charcoal-700 dark:text-charcoal-300 mb-2">
+                <label className="block text-sm font-medium text-charcoal-700 dark:text-charcoal-300 mb-2 flex items-center gap-1">
                   Crawl Depth
+                  <InfoTooltip tipKey="audit.depth" />
                 </label>
                 <div className="grid grid-cols-2 gap-2">
                   {AUDIT_CONFIGS.depth.map(option => (
@@ -1037,8 +1040,9 @@ function AuditScheduleFormModal({ audit, onSave, onClose }) {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-charcoal-700 dark:text-charcoal-300 mb-2">
+                <label className="block text-sm font-medium text-charcoal-700 dark:text-charcoal-300 mb-2 flex items-center gap-1">
                   Audit Categories
+                  <InfoTooltip tipKey="audit.categories" />
                 </label>
                 <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
                   {AUDIT_CONFIGS.categories.map(cat => (
@@ -1065,8 +1069,9 @@ function AuditScheduleFormModal({ audit, onSave, onClose }) {
           {step === 2 && (
             <div className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-charcoal-700 dark:text-charcoal-300 mb-2">
+                <label className="block text-sm font-medium text-charcoal-700 dark:text-charcoal-300 mb-2 flex items-center gap-1">
                   Frequency
+                  <InfoTooltip tipKey="audit.frequency" />
                 </label>
                 <div className="grid grid-cols-2 gap-2">
                   {AUDIT_CONFIGS.frequency.map(option => (
@@ -1250,8 +1255,9 @@ function AuditScheduleFormModal({ audit, onSave, onClose }) {
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-charcoal-700 dark:text-charcoal-300 mb-2">
+                    <label className="block text-sm font-medium text-charcoal-700 dark:text-charcoal-300 mb-2 flex items-center gap-1">
                       Score Threshold
+                      <InfoTooltip tipKey="audit.alerts.threshold" />
                     </label>
                     <div className="flex items-center gap-4">
                       <input

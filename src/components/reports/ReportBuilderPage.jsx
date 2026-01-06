@@ -39,6 +39,7 @@ import {
 } from 'lucide-react';
 import { format } from 'date-fns';
 import toast from 'react-hot-toast';
+import InfoTooltip from '../common/InfoTooltip';
 import jsPDF from 'jspdf';
 import html2canvas from 'html2canvas';
 import useReportBuilder, {
@@ -462,8 +463,9 @@ export default function ReportBuilderPage() {
             {/* Templates View */}
             {showTemplates && (
               <div className="p-4 space-y-3">
-                <h3 className="text-xs font-semibold text-charcoal-500 dark:text-charcoal-400 uppercase tracking-wide">
+                <h3 className="text-xs font-semibold text-charcoal-500 dark:text-charcoal-400 uppercase tracking-wide flex items-center gap-1">
                   Start with a Template
+                  <InfoTooltip tipKey="report.template" />
                 </h3>
                 {REPORT_TEMPLATES.map(template => {
                   const Icon = ICONS[template.icon] || FileText;
@@ -549,8 +551,9 @@ export default function ReportBuilderPage() {
             {!showTemplates && !showSavedReports && (
               <>
                 <div className="p-4 border-b border-charcoal-200 dark:border-charcoal-700">
-                  <h3 className="text-xs font-semibold text-charcoal-500 dark:text-charcoal-400 uppercase tracking-wide mb-3">
+                  <h3 className="text-xs font-semibold text-charcoal-500 dark:text-charcoal-400 uppercase tracking-wide mb-3 flex items-center gap-1">
                     Add Widgets
+                    <InfoTooltip tipKey="report.widget.add" />
                   </h3>
                   <div className="grid grid-cols-2 gap-2">
                     {Object.entries(WIDGET_TYPES).map(([type, config]) => {
@@ -573,8 +576,9 @@ export default function ReportBuilderPage() {
 
                 {/* Data Sources */}
                 <div className="p-4">
-                  <h3 className="text-xs font-semibold text-charcoal-500 dark:text-charcoal-400 uppercase tracking-wide mb-3">
+                  <h3 className="text-xs font-semibold text-charcoal-500 dark:text-charcoal-400 uppercase tracking-wide mb-3 flex items-center gap-1">
                     Data Sources
+                    <InfoTooltip tipKey="report.dataSource" />
                   </h3>
                   <div className="space-y-4">
                     {Object.entries(groupedDataSources).map(([category, sources]) => (
@@ -658,6 +662,7 @@ export default function ReportBuilderPage() {
                     ? 'bg-primary-100 text-primary-700 dark:bg-primary-900/30 dark:text-primary-300'
                     : 'text-charcoal-600 dark:text-charcoal-400 hover:bg-charcoal-100 dark:hover:bg-charcoal-700'
                 }`}
+                title="Preview shows exactly how the report will appear when exported or shared"
               >
                 {isPreviewMode ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                 {isPreviewMode ? 'Edit' : 'Preview'}
@@ -669,6 +674,7 @@ export default function ReportBuilderPage() {
                 onClick={saveReport}
                 disabled={!hasUnsavedChanges && currentReport}
                 className="px-3 py-2 text-sm bg-primary-500 text-white rounded-lg hover:bg-primary-600 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+                title="Save your report layout to reuse and schedule for automatic delivery"
               >
                 <Save className="w-4 h-4" />
                 Save
