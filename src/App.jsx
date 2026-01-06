@@ -23,6 +23,7 @@ const ProjectCreationWizard = lazy(() => import('./components/projects/ProjectCr
 const MyTasksPage = lazy(() => import('./components/projects/MyTasksPage'));
 const TeamManagementPage = lazy(() => import('./components/projects/TeamManagementPage'));
 const SEOChecklist = lazy(() => import('./components/checklist/SEOChecklist'));
+const ProgressDashboard = lazy(() => import('./components/projects/ProgressDashboard'));
 
 // Help Components - lazy load
 const ResourceLibrary = lazy(() => import('./components/help/ResourceLibrary'));
@@ -154,6 +155,16 @@ function App() {
                       <ProtectedRoute>
                         <ToolErrorBoundary toolName="Content Checklist" toolColor="primary">
                           <SEOChecklist />
+                        </ToolErrorBoundary>
+                      </ProtectedRoute>
+                    }
+                  />
+                  <Route
+                    path="/planner/progress"
+                    element={
+                      <ProtectedRoute>
+                        <ToolErrorBoundary toolName="Progress Dashboard" toolColor="primary">
+                          <ProgressDashboard />
                         </ToolErrorBoundary>
                       </ProtectedRoute>
                     }
