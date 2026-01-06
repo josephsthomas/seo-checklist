@@ -47,6 +47,9 @@ const MetaGeneratorPage = lazy(() => import('./components/meta-generator/MetaGen
 // Structured Data Generator - lazy load
 const SchemaGeneratorPage = lazy(() => import('./components/schema-generator/SchemaGeneratorPage'));
 
+// User Settings - lazy load
+const UserSettingsPage = lazy(() => import('./components/settings/UserSettingsPage'));
+
 /**
  * Enhanced Loading Fallback with Skeleton
  */
@@ -282,6 +285,18 @@ function App() {
                     element={
                       <ProtectedRoute>
                         <GlossaryPage />
+                      </ProtectedRoute>
+                    }
+                  />
+
+                  {/* ============================================ */}
+                  {/* USER SETTINGS                               */}
+                  {/* ============================================ */}
+                  <Route
+                    path="/settings"
+                    element={
+                      <ProtectedRoute>
+                        <UserSettingsPage />
                       </ProtectedRoute>
                     }
                   />
