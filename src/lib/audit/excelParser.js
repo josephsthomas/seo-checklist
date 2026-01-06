@@ -6,6 +6,7 @@ import * as XLSX from 'xlsx';
  */
 
 // Column mappings for internal_all.xlsx (141 columns in SF 17+)
+// Updated to match actual Screaming Frog export column names
 const INTERNAL_ALL_COLUMNS = {
   // Core URL data
   address: 'Address',
@@ -36,10 +37,12 @@ const INTERNAL_ALL_COLUMNS = {
   // Headings
   h1: 'H1-1',
   h1Length: 'H1-1 Length',
-  h1Count: 'H1-2',
+  h1Second: 'H1-2',
+  h1SecondLength: 'H1-2 Length',
   h2: 'H2-1',
   h2Length: 'H2-1 Length',
-  h2Count: 'H2-2',
+  h2Second: 'H2-2',
+  h2SecondLength: 'H2-2 Length',
 
   // Directives
   metaRobots1: 'Meta Robots 1',
@@ -48,11 +51,14 @@ const INTERNAL_ALL_COLUMNS = {
   canonicalLinkElement1: 'Canonical Link Element 1',
   relNext1: 'rel="next" 1',
   relPrev1: 'rel="prev" 1',
-  httpCanonical: 'HTTP Canonical',
+  httpRelNext1: 'HTTP rel="next" 1',
+  httpRelPrev1: 'HTTP rel="prev" 1',
+  amphtmlLinkElement: 'amphtml Link Element',
 
   // Size & Performance
   size: 'Size (bytes)',
   transferred: 'Transferred (bytes)',
+  totalTransferred: 'Total Transferred (bytes)',
   responseTime: 'Response Time',
 
   // Content
@@ -73,13 +79,15 @@ const INTERNAL_ALL_COLUMNS = {
   percentOfTotal: '% of Total',
   outlinks: 'Outlinks',
   uniqueOutlinks: 'Unique Outlinks',
+  uniqueJsOutlinks: 'Unique JS Outlinks',
   externalOutlinks: 'External Outlinks',
+  uniqueExternalOutlinks: 'Unique External Outlinks',
+  uniqueExternalJsOutlinks: 'Unique External JS Outlinks',
 
   // Duplication
   hashValue: 'Hash',
   nearDuplicateMatch: 'Closest Near Duplicate Match',
   nearDuplicateCount: 'No. Near Duplicates',
-  nearDuplicateSimilarity: 'Near Duplicate Similarity',
 
   // Spelling/Grammar
   spellingErrors: 'Spelling Errors',
@@ -87,6 +95,7 @@ const INTERNAL_ALL_COLUMNS = {
 
   // Dates
   lastModified: 'Last Modified',
+  crawlTimestamp: 'Crawl Timestamp',
 
   // Redirects
   redirectUrl: 'Redirect URL',
@@ -95,47 +104,104 @@ const INTERNAL_ALL_COLUMNS = {
   // Cookies
   cookies: 'Cookies',
 
-  // Language
+  // Language & HTTP
   language: 'Language',
+  httpVersion: 'HTTP Version',
 
-  // Core Web Vitals
+  // Core Web Vitals (Lab Data)
   performanceScore: 'Performance Score',
   fcp: 'First Contentful Paint Time (ms)',
+  speedIndex: 'Speed Index Time (ms)',
   lcp: 'Largest Contentful Paint Time (ms)',
   tti: 'Time to Interactive (ms)',
   tbt: 'Total Blocking Time (ms)',
   cls: 'Cumulative Layout Shift',
-  speedIndex: 'Speed Index (ms)',
 
-  // CrUX Data
-  cruxLcp: 'CrUX LCP',
-  cruxFid: 'CrUX FID',
-  cruxInp: 'CrUX INP',
-  cruxCls: 'CrUX CLS',
-  cruxFcp: 'CrUX FCP',
+  // PageSpeed Savings
+  totalSizeSavings: 'Total Size Savings (Bytes)',
+  totalTimeSavings: 'Total Time Savings (ms)',
+
+  // Page Size Breakdown
+  totalRequests: 'Total Requests',
+  totalPageSize: 'Total Page Size (Bytes)',
+  htmlSize: 'HTML Size (Bytes)',
+  htmlCount: 'HTML Count',
+  imageSize: 'Image Size (Bytes)',
+  imageCount: 'Image Count',
+  cssSize: 'CSS Size (Bytes)',
+  cssCount: 'CSS Count',
+  jsSize: 'JavaScript Size (Bytes)',
+  jsCount: 'JavaScript Count',
+  fontSize: 'Font Size (Bytes)',
+  fontCount: 'Font Count',
+  mediaSize: 'Media Size (Bytes)',
+  mediaCount: 'Media Count',
+  otherSize: 'Other Size (Bytes)',
+  otherCount: 'Other Count',
+
+  // CrUX Data (Field Data)
   cwvAssessment: 'Core Web Vitals Assessment',
+  cruxLcp: 'CrUX Largest Contentful Paint Time (ms)',
+  cruxInp: 'CrUX Interaction to Next Paint (ms)',
+  cruxCls: 'CrUX Cumulative Layout Shift',
+  cruxFcp: 'CrUX First Contentful Paint Time (ms)',
+
+  // PageSpeed Optimization Opportunities
+  minifyCssSavingsMs: 'Minify CSS Savings (ms)',
+  minifyCssSavingsBytes: 'Minify CSS Savings (Bytes)',
+  minifyJsSavingsMs: 'Minify JavaScript Savings (ms)',
+  minifyJsSavingsBytes: 'Minify JavaScript Savings (Bytes)',
+  unusedCssSavingsMs: 'Reduce Unused CSS Savings (ms)',
+  unusedCssSavingsBytes: 'Reduce Unused CSS Savings (Bytes)',
+  unusedJsSavingsMs: 'Reduce Unused JavaScript Savings (ms)',
+  unusedJsSavingsBytes: 'Reduce Unused JavaScript Savings (Bytes)',
+  jsExecutionTime: 'JavaScript Execution Time (ms)',
+  jsExecutionCategory: 'JavaScript Execution Time Category',
+  mainThreadWork: 'Minimize Main-Thread Work (ms)',
+  mainThreadCategory: 'Minimize Main-Thread Work Category',
+  networkPayloadSize: 'Network Payload Size (Bytes)',
+  userTimingMarks: 'User Timing Marks and Measures',
+  numberOfRedirects: 'Number of Redirects',
+  serverRespondsQuickly: 'Server Responds Quickly',
+  appliesTextCompression: 'Applies Text Compression',
+  lcpRequestDiscovery: 'LCP Request Discovery',
+  lcpBreakdown: 'LCP Breakdown',
+  renderBlockingSavings: 'Render Blocking Requests Savings (ms)',
+  preconnectSavings: 'Preconnect Candidates Savings (ms)',
+  maxCriticalPathLatency: 'Maximum Critical Path Latency (ms)',
+  cacheLifetimeSavings: 'Use Efficient Cache Lifetimes Savings (Bytes)',
+  layoutShiftCulprits: 'Layout Shift Culprits',
+  domSize: 'DOM Size',
+  imageDeliverySavings: 'Improve Image Delivery Savings (Bytes)',
+  forcedReflowSavings: 'Forced Reflow Savings (ms)',
+  legacyJsSavings: 'Legacy JavaScript Savings (Bytes)',
+  duplicatedJsBytes: 'Duplicated JavaScript (Bytes)',
+  fontDisplaySavings: 'Font Display Savings (ms)',
+
+  // Third Party
+  thirdPartySize: 'Third Party Size (Bytes)',
+  thirdPartyCount: 'Third Party Count',
+  thirdParties: '3rd Parties',
+
+  // Mobile
+  targetSize: 'Target Size',
+  contentWidth: 'Content Width',
+  fontDisplaySize: 'Font Display Size',
+  viewport: 'Viewport',
+  mobileAlternateLink: 'Mobile Alternate Link',
+
+  // Semantic/AI Content Analysis
+  closestSemanticMatch: 'Closest Semantically Similar Address',
+  semanticSimilarityScore: 'Semantic Similarity Score',
+  semanticSimilarCount: 'No. Semantically Similar',
+  semanticRelevanceScore: 'Semantic Relevance Score',
 
   // Carbon/Sustainability
   co2: 'CO2 (mg)',
   carbonRating: 'Carbon Rating',
 
-  // DOM
-  domSize: 'DOM Size',
-
-  // Mobile
-  viewport: 'Viewport',
-  targetSize: 'Target Size',
-  contentWidth: 'Content Width',
-
-  // Semantic
-  semanticSimilarityScore: 'Semantic Similarity Score',
-  semanticSimilarCount: 'No. Semantically Similar',
-  semanticRelevanceScore: 'Semantic Relevance Score',
-
-  // Third Party
-  thirdPartySize: 'Third Party Size',
-  thirdPartyCount: 'Third Party Count',
-  thirdParties: '3rd Parties'
+  // URL
+  urlEncodedAddress: 'URL Encoded Address'
 };
 
 /**
@@ -363,6 +429,40 @@ export function groupByStatusCode(rows) {
 }
 
 /**
+ * Detect what audit types are available in the exported files
+ * @param {Object} extractedFiles - Files extracted from ZIP
+ * @returns {Object} - Available audit types
+ */
+export function detectAvailableAudits(extractedFiles) {
+  const fileNames = Object.keys(extractedFiles);
+
+  return {
+    // SEO Technical Audit requires internal_all.xlsx
+    seoAudit: fileNames.includes('internal_all.xlsx'),
+
+    // Accessibility Audit requires accessibility_all.xlsx
+    accessibilityAudit: fileNames.includes('accessibility_all.xlsx'),
+
+    // Count accessibility violation files
+    accessibilityFiles: fileNames.filter(f => f.startsWith('accessibility_')).length,
+
+    // Count total files
+    totalFiles: fileNames.length,
+
+    // List key files found
+    keyFilesFound: {
+      internal: fileNames.includes('internal_all.xlsx'),
+      accessibilityAll: fileNames.includes('accessibility_all.xlsx'),
+      accessibilitySummary: fileNames.includes('accessibility_violations_summary.xlsx'),
+      pagespeed: fileNames.includes('pagespeed_all.xlsx'),
+      structuredData: fileNames.includes('structured_data_all.xlsx'),
+      hreflang: fileNames.includes('hreflang_all.xlsx'),
+      javascript: fileNames.includes('javascript_all.xlsx')
+    }
+  };
+}
+
+/**
  * Parse all available Excel files from extracted ZIP
  * @param {Object} extractedFiles - Files extracted from ZIP
  * @param {Function} onProgress - Progress callback
@@ -379,6 +479,7 @@ export async function parseAllFiles(extractedFiles, onProgress = () => {}) {
     images: null,
     structuredData: null,
     security: null,
+    accessibility: null,  // Added for accessibility data
     other: {}
   };
 
@@ -396,6 +497,10 @@ export async function parseAllFiles(extractedFiles, onProgress = () => {}) {
     // Parse based on file name
     if (fileName === 'internal_all.xlsx') {
       parsedData.internal = parseInternalAll(file.data);
+    } else if (fileName.startsWith('accessibility_')) {
+      // Group all accessibility files together
+      parsedData.accessibility = parsedData.accessibility || {};
+      parsedData.accessibility[fileName] = parseExcelFile(file.data, file.name);
     } else if (fileName.includes('pagespeed') || fileName.includes('core_web_vitals')) {
       parsedData.pageSpeed = parsedData.pageSpeed || {};
       parsedData.pageSpeed[fileName] = parseExcelFile(file.data, file.name);
@@ -438,5 +543,6 @@ export default {
   extractDomainInfo,
   getSummaryStats,
   groupByStatusCode,
+  detectAvailableAudits,
   INTERNAL_ALL_COLUMNS
 };
