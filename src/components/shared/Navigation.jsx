@@ -21,6 +21,7 @@ import {
 import NotificationPanel from './NotificationPanel';
 import { hasPermission } from '../../utils/roles';
 import WhatsNew, { WhatsNewBadge } from '../help/WhatsNew';
+import { getActiveTools, TOOL_COLORS } from '../../config/tools';
 
 export default function Navigation() {
   const { currentUser, userProfile, logout } = useAuth();
@@ -103,7 +104,7 @@ export default function Navigation() {
             <div className="relative" ref={toolsRef}>
               <button
                 onClick={() => setToolsMenuOpen(!toolsMenuOpen)}
-                className={`nav-link ${isToolActive('/planner') || isToolActive('/audit') ? 'nav-link-active' : ''}`}
+                className={`nav-link ${getActiveTools().some(t => isToolActive(t.path)) ? 'nav-link-active' : ''}`}
                 aria-expanded={toolsMenuOpen}
                 aria-haspopup="menu"
                 aria-label="Tools menu"
@@ -114,38 +115,42 @@ export default function Navigation() {
               </button>
 
               {toolsMenuOpen && (
-                <div className="dropdown-menu left-0 mt-2 w-72 p-2" role="menu" aria-label="Tools">
-                  <Link
-                    to="/planner"
-                    onClick={() => setToolsMenuOpen(false)}
-                    className={`dropdown-item group ${isToolActive('/planner') ? 'dropdown-item-active' : ''}`}
-                    role="menuitem"
-                  >
-                    <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary-100 to-primary-50 flex items-center justify-center group-hover:from-primary-200 group-hover:to-primary-100 transition-colors" aria-hidden="true">
-                      <ClipboardList className="w-5 h-5 text-primary-600" />
-                    </div>
-                    <div className="flex-1">
-                      <div className="font-medium text-charcoal-900">Content Planner</div>
-                      <div className="text-xs text-charcoal-500">321-item comprehensive checklist</div>
-                    </div>
-                  </Link>
-                  <Link
-                    to="/audit"
-                    onClick={() => setToolsMenuOpen(false)}
-                    className={`dropdown-item group mt-1 ${isToolActive('/audit') ? 'dropdown-item-active' : ''}`}
-                    role="menuitem"
-                  >
-                    <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-cyan-100 to-cyan-50 flex items-center justify-center group-hover:from-cyan-200 group-hover:to-cyan-100 transition-colors" aria-hidden="true">
-                      <Search className="w-5 h-5 text-cyan-600" />
-                    </div>
-                    <div className="flex-1">
-                      <div className="font-medium text-charcoal-900 flex items-center gap-2">
-                        Technical Audit
-                        <span className="badge badge-info text-2xs">New</span>
-                      </div>
-                      <div className="text-xs text-charcoal-500">Screaming Frog analyzer</div>
-                    </div>
-                  </Link>
+                <div className="dropdown-menu left-0 mt-2 w-80 p-2 max-h-[70vh] overflow-y-auto" role="menu" aria-label="Tools">
+                  {getActiveTools().map((tool, index) => {
+                    const ToolIcon = tool.icon;
+                    const colorClasses = {
+                      [TOOL_COLORS.PRIMARY]: { bg: 'from-primary-100 to-primary-50', bgHover: 'group-hover:from-primary-200 group-hover:to-primary-100', icon: 'text-primary-600' },
+                      [TOOL_COLORS.CYAN]: { bg: 'from-cyan-100 to-cyan-50', bgHover: 'group-hover:from-cyan-200 group-hover:to-cyan-100', icon: 'text-cyan-600' },
+                      [TOOL_COLORS.PURPLE]: { bg: 'from-purple-100 to-purple-50', bgHover: 'group-hover:from-purple-200 group-hover:to-purple-100', icon: 'text-purple-600' },
+                      [TOOL_COLORS.EMERALD]: { bg: 'from-emerald-100 to-emerald-50', bgHover: 'group-hover:from-emerald-200 group-hover:to-emerald-100', icon: 'text-emerald-600' },
+                      [TOOL_COLORS.AMBER]: { bg: 'from-amber-100 to-amber-50', bgHover: 'group-hover:from-amber-200 group-hover:to-amber-100', icon: 'text-amber-600' },
+                      [TOOL_COLORS.ROSE]: { bg: 'from-rose-100 to-rose-50', bgHover: 'group-hover:from-rose-200 group-hover:to-rose-100', icon: 'text-rose-600' }
+                    };
+                    const colors = colorClasses[tool.color] || colorClasses[TOOL_COLORS.PRIMARY];
+
+                    return (
+                      <Link
+                        key={tool.id}
+                        to={tool.path}
+                        onClick={() => setToolsMenuOpen(false)}
+                        className={`dropdown-item group ${index > 0 ? 'mt-1' : ''} ${isToolActive(tool.path) ? 'dropdown-item-active' : ''}`}
+                        role="menuitem"
+                      >
+                        <div className={`w-10 h-10 rounded-xl bg-gradient-to-br ${colors.bg} flex items-center justify-center ${colors.bgHover} transition-colors`} aria-hidden="true">
+                          <ToolIcon className={`w-5 h-5 ${colors.icon}`} />
+                        </div>
+                        <div className="flex-1">
+                          <div className="font-medium text-charcoal-900 flex items-center gap-2">
+                            {tool.name}
+                            {tool.badge && (
+                              <span className="badge badge-info text-2xs">{tool.badge}</span>
+                            )}
+                          </div>
+                          <div className="text-xs text-charcoal-500">{tool.features[0]}</div>
+                        </div>
+                      </Link>
+                    );
+                  })}
                 </div>
               )}
             </div>
@@ -312,25 +317,25 @@ export default function Navigation() {
               {/* Mobile Tools Section */}
               <div className="px-3 py-2 mt-3">
                 <p className="text-xs font-semibold text-charcoal-400 uppercase tracking-wider mb-2" id="mobile-tools-label">Tools</p>
-                <div role="group" aria-labelledby="mobile-tools-label">
-                  <Link
-                    to="/planner"
-                    onClick={() => setMobileMenuOpen(false)}
-                    className={`nav-link mb-1 ${isToolActive('/planner') ? 'nav-link-active' : ''}`}
-                    role="menuitem"
-                  >
-                    <ClipboardList className="w-5 h-5" aria-hidden="true" />
-                    <span>Content Planner</span>
-                  </Link>
-                  <Link
-                    to="/audit"
-                    onClick={() => setMobileMenuOpen(false)}
-                    className={`nav-link ${isToolActive('/audit') ? 'nav-link-active' : ''}`}
-                    role="menuitem"
-                  >
-                    <Search className="w-5 h-5" aria-hidden="true" />
-                    <span>Technical Audit</span>
-                  </Link>
+                <div role="group" aria-labelledby="mobile-tools-label" className="space-y-1">
+                  {getActiveTools().map((tool) => {
+                    const ToolIcon = tool.icon;
+                    return (
+                      <Link
+                        key={tool.id}
+                        to={tool.path}
+                        onClick={() => setMobileMenuOpen(false)}
+                        className={`nav-link ${isToolActive(tool.path) ? 'nav-link-active' : ''}`}
+                        role="menuitem"
+                      >
+                        <ToolIcon className="w-5 h-5" aria-hidden="true" />
+                        <span>{tool.shortName || tool.name}</span>
+                        {tool.badge && (
+                          <span className="badge badge-info text-2xs ml-auto">{tool.badge}</span>
+                        )}
+                      </Link>
+                    );
+                  })}
                 </div>
               </div>
 
