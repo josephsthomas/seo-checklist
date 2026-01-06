@@ -18,6 +18,7 @@ import ItemDetailModal from './ItemDetailModal';
 import FilterPresetManager from './FilterPresetManager';
 import PdfExportModal from './PdfExportModal';
 import HelpTooltip from '../help/HelpTooltip';
+import ProjectLinkedItems from '../projects/ProjectLinkedItems';
 
 const PRIORITIES = ['CRITICAL', 'HIGH', 'MEDIUM', 'LOW'];
 const PHASES = ['Discovery', 'Strategy', 'Build', 'Pre-Launch', 'Launch', 'Post-Launch'];
@@ -225,6 +226,11 @@ export default function SEOChecklist() {
               )}
             </div>
           </div>
+        </div>
+
+        {/* Linked Items from Other Tools */}
+        <div className="mb-6">
+          <ProjectLinkedItems projectId={projectId} collapsible={true} />
         </div>
 
         {/* Search and Filters */}

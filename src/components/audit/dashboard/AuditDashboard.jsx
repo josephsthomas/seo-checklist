@@ -26,7 +26,8 @@ import {
   X,
   Loader2,
   Globe,
-  Clock
+  Clock,
+  Link2
 } from 'lucide-react';
 import { SEVERITY, PRIORITY } from '../../../lib/audit/auditEngine';
 import { exportToPDF, exportToExcel } from '../../../lib/audit/exportService';
@@ -34,6 +35,8 @@ import { saveAudit, createShareLink } from '../../../lib/audit/auditStorageServi
 import IssueExplorer from '../explorer/IssueExplorer';
 import PageAuditView from '../explorer/PageAuditView';
 import UrlDataTable from '../explorer/UrlDataTable';
+import { LinkToProjectButton } from '../../shared/LinkToProjectModal';
+import { LINKED_ITEM_TYPES } from '../../../hooks/useProjectLinkedItems';
 
 // View tabs
 const TABS = {
@@ -370,6 +373,19 @@ export default function AuditDashboard({ auditResults, domainInfo, urlData = [],
                 <Share2 className="w-4 h-4" />
                 <span className="hidden sm:inline">Share</span>
               </button>
+              {savedAuditId && (
+                <LinkToProjectButton
+                  item={{
+                    id: savedAuditId,
+                    type: LINKED_ITEM_TYPES.AUDIT,
+                    name: `Audit: ${domainInfo?.domain || 'Unknown'}`,
+                    url: domainInfo?.domain,
+                    data: { healthScore, urlCount, issueCount: stats.total }
+                  }}
+                  size="md"
+                  className="hidden sm:flex"
+                />
+              )}
               <button
                 onClick={handleSaveAudit}
                 disabled={saving || savedAuditId}
