@@ -24,6 +24,7 @@ const MyTasksPage = lazy(() => import('./components/projects/MyTasksPage'));
 const TeamManagementPage = lazy(() => import('./components/projects/TeamManagementPage'));
 const SEOChecklist = lazy(() => import('./components/checklist/SEOChecklist'));
 const ProgressDashboard = lazy(() => import('./components/projects/ProgressDashboard'));
+const ProjectHealthReport = lazy(() => import('./components/projects/ProjectHealthReport'));
 
 // Activity Components - lazy load
 const ActivityPage = lazy(() => import('./components/activity/ActivityPage'));
@@ -174,6 +175,16 @@ function App() {
                       <ProtectedRoute>
                         <ToolErrorBoundary toolName="Progress Dashboard" toolColor="primary">
                           <ProgressDashboard />
+                        </ToolErrorBoundary>
+                      </ProtectedRoute>
+                    }
+                  />
+                  <Route
+                    path="/planner/projects/:projectId/health"
+                    element={
+                      <ProtectedRoute>
+                        <ToolErrorBoundary toolName="Project Health Report" toolColor="primary">
+                          <ProjectHealthReport />
                         </ToolErrorBoundary>
                       </ProtectedRoute>
                     }
