@@ -34,6 +34,9 @@ import OnboardingWalkthrough from './components/help/OnboardingWalkthrough';
 const AuditPage = lazy(() => import('./components/audit/AuditPage'));
 const SharedAuditView = lazy(() => import('./components/audit/shared/SharedAuditView'));
 
+// Accessibility Components - lazy load
+const AccessibilityAuditPage = lazy(() => import('./components/accessibility/AccessibilityAuditPage'));
+
 /**
  * Enhanced Loading Fallback with Skeleton
  */
@@ -178,6 +181,20 @@ function App() {
                       <ToolErrorBoundary toolName="Shared Audit" toolColor="cyan">
                         <SharedAuditView />
                       </ToolErrorBoundary>
+                    }
+                  />
+
+                  {/* ============================================ */}
+                  {/* ACCESSIBILITY ANALYZER ROUTES               */}
+                  {/* ============================================ */}
+                  <Route
+                    path="/accessibility"
+                    element={
+                      <ProtectedRoute>
+                        <ToolErrorBoundary toolName="Accessibility Analyzer" toolColor="purple">
+                          <AccessibilityAuditPage />
+                        </ToolErrorBoundary>
+                      </ProtectedRoute>
                     }
                   />
 

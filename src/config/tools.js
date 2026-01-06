@@ -13,7 +13,8 @@ import {
   LineChart,
   Target,
   Globe,
-  Zap
+  Zap,
+  Accessibility
 } from 'lucide-react';
 
 /**
@@ -74,7 +75,7 @@ export const tools = [
     path: '/audit',
     color: TOOL_COLORS.CYAN,
     status: TOOL_STATUS.ACTIVE,
-    badge: 'New',
+    badge: null,
     features: [
       '31 audit categories',
       'AI recommendations',
@@ -89,13 +90,36 @@ export const tools = [
     order: 2
   },
   {
+    id: 'accessibility',
+    name: 'Accessibility Analyzer',
+    shortName: 'A11y',
+    description: 'WCAG 2.2 compliance auditing with 93 Axe-core rules. Analyze violations, get AI fix suggestions, and generate compliance reports.',
+    icon: Accessibility,
+    path: '/accessibility',
+    color: TOOL_COLORS.PURPLE,
+    status: TOOL_STATUS.ACTIVE,
+    badge: 'New',
+    features: [
+      'WCAG 2.2 compliance',
+      '93 Axe-core rules',
+      'AI fix suggestions',
+      'VPAT export'
+    ],
+    statsConfig: [
+      { key: 'accessibilityAudits', label: 'Audits' },
+      { key: 'criteria', label: 'WCAG Criteria', static: '87' }
+    ],
+    permissions: ['canRunAccessibilityAudits'],
+    order: 3
+  },
+  {
     id: 'analytics',
     name: 'Analytics Dashboard',
     shortName: 'Analytics',
     description: 'Unified analytics view combining data from Google Analytics, Search Console, and other sources.',
     icon: BarChart3,
     path: '/analytics',
-    color: TOOL_COLORS.PURPLE,
+    color: TOOL_COLORS.AMBER,
     status: TOOL_STATUS.COMING_SOON,
     badge: null,
     features: [
@@ -106,7 +130,7 @@ export const tools = [
     ],
     statsConfig: [],
     permissions: ['canViewAnalytics'],
-    order: 3
+    order: 4
   },
   {
     id: 'content',
@@ -126,7 +150,7 @@ export const tools = [
     ],
     statsConfig: [],
     permissions: ['canOptimizeContent'],
-    order: 4
+    order: 5
   }
 ];
 
