@@ -15,10 +15,12 @@ import {
   ClipboardList,
   Search,
   Wrench,
-  Sparkles
+  Sparkles,
+  Gift
 } from 'lucide-react';
 import NotificationPanel from './NotificationPanel';
 import { hasPermission } from '../../utils/roles';
+import WhatsNew, { WhatsNewBadge } from '../help/WhatsNew';
 
 export default function Navigation() {
   const { currentUser, userProfile, logout } = useAuth();
@@ -27,6 +29,7 @@ export default function Navigation() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [helpMenuOpen, setHelpMenuOpen] = useState(false);
   const [toolsMenuOpen, setToolsMenuOpen] = useState(false);
+  const [whatsNewOpen, setWhatsNewOpen] = useState(false);
   const toolsRef = useRef(null);
   const helpRef = useRef(null);
 
@@ -186,6 +189,24 @@ export default function Navigation() {
 
               {helpMenuOpen && (
                 <div className="dropdown-menu right-0 mt-2 w-56" role="menu" aria-label="Help">
+                  <button
+                    onClick={() => {
+                      setHelpMenuOpen(false);
+                      setWhatsNewOpen(true);
+                    }}
+                    className="dropdown-item w-full"
+                    role="menuitem"
+                  >
+                    <div className="relative">
+                      <Gift className="w-4 h-4 text-emerald-500" aria-hidden="true" />
+                      <WhatsNewBadge />
+                    </div>
+                    <div>
+                      <div className="font-medium text-charcoal-900">What's New</div>
+                      <div className="text-xs text-charcoal-500">Latest updates & features</div>
+                    </div>
+                  </button>
+                  <div className="h-px bg-charcoal-100 my-1" role="separator" />
                   <Link
                     to="/help/resources"
                     onClick={() => setHelpMenuOpen(false)}
@@ -365,6 +386,9 @@ export default function Navigation() {
           </div>
         )}
       </div>
+
+      {/* What's New Modal */}
+      <WhatsNew isOpen={whatsNewOpen} onClose={() => setWhatsNewOpen(false)} />
     </nav>
   );
 }
