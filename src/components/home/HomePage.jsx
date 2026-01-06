@@ -13,7 +13,14 @@ import {
   CheckCircle2,
   Lightbulb,
   ArrowRight,
-  Sparkles
+  Sparkles,
+  Play,
+  Image,
+  Tags,
+  Code2,
+  Accessibility,
+  Plus,
+  Zap
 } from 'lucide-react';
 import { format } from 'date-fns';
 
@@ -155,6 +162,75 @@ export default function HomePage() {
               </div>
             </div>
           )}
+
+          {/* Quick Actions */}
+          <section className="mb-8" aria-labelledby="quick-actions-heading">
+            <div className="flex items-center gap-2 mb-4">
+              <Zap className="w-5 h-5 text-amber-500" />
+              <h2 id="quick-actions-heading" className="text-lg font-bold text-charcoal-900">Quick Actions</h2>
+            </div>
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
+              <Link
+                to="/planner/new"
+                className="group flex flex-col items-center p-4 rounded-xl bg-white/80 backdrop-blur border border-charcoal-100 hover:border-primary-300 hover:bg-primary-50/50 transition-all duration-200 hover:shadow-lg hover:shadow-primary-500/10"
+              >
+                <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-primary-500 to-primary-600 flex items-center justify-center mb-2 group-hover:scale-110 transition-transform shadow-md" aria-hidden="true">
+                  <Plus className="w-5 h-5 text-white" />
+                </div>
+                <span className="text-sm font-medium text-charcoal-700 group-hover:text-primary-700 text-center">New Project</span>
+              </Link>
+
+              <Link
+                to="/audit"
+                className="group flex flex-col items-center p-4 rounded-xl bg-white/80 backdrop-blur border border-charcoal-100 hover:border-cyan-300 hover:bg-cyan-50/50 transition-all duration-200 hover:shadow-lg hover:shadow-cyan-500/10"
+              >
+                <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-cyan-500 to-cyan-600 flex items-center justify-center mb-2 group-hover:scale-110 transition-transform shadow-md" aria-hidden="true">
+                  <Search className="w-5 h-5 text-white" />
+                </div>
+                <span className="text-sm font-medium text-charcoal-700 group-hover:text-cyan-700 text-center">Run Audit</span>
+              </Link>
+
+              <Link
+                to="/accessibility"
+                className="group flex flex-col items-center p-4 rounded-xl bg-white/80 backdrop-blur border border-charcoal-100 hover:border-purple-300 hover:bg-purple-50/50 transition-all duration-200 hover:shadow-lg hover:shadow-purple-500/10"
+              >
+                <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-purple-500 to-purple-600 flex items-center justify-center mb-2 group-hover:scale-110 transition-transform shadow-md" aria-hidden="true">
+                  <Accessibility className="w-5 h-5 text-white" />
+                </div>
+                <span className="text-sm font-medium text-charcoal-700 group-hover:text-purple-700 text-center">A11y Check</span>
+              </Link>
+
+              <Link
+                to="/image-alt"
+                className="group flex flex-col items-center p-4 rounded-xl bg-white/80 backdrop-blur border border-charcoal-100 hover:border-emerald-300 hover:bg-emerald-50/50 transition-all duration-200 hover:shadow-lg hover:shadow-emerald-500/10"
+              >
+                <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-emerald-500 to-emerald-600 flex items-center justify-center mb-2 group-hover:scale-110 transition-transform shadow-md" aria-hidden="true">
+                  <Image className="w-5 h-5 text-white" />
+                </div>
+                <span className="text-sm font-medium text-charcoal-700 group-hover:text-emerald-700 text-center">Alt Text</span>
+              </Link>
+
+              <Link
+                to="/meta-generator"
+                className="group flex flex-col items-center p-4 rounded-xl bg-white/80 backdrop-blur border border-charcoal-100 hover:border-amber-300 hover:bg-amber-50/50 transition-all duration-200 hover:shadow-lg hover:shadow-amber-500/10"
+              >
+                <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-amber-500 to-amber-600 flex items-center justify-center mb-2 group-hover:scale-110 transition-transform shadow-md" aria-hidden="true">
+                  <Tags className="w-5 h-5 text-white" />
+                </div>
+                <span className="text-sm font-medium text-charcoal-700 group-hover:text-amber-700 text-center">Meta Tags</span>
+              </Link>
+
+              <Link
+                to="/schema-generator"
+                className="group flex flex-col items-center p-4 rounded-xl bg-white/80 backdrop-blur border border-charcoal-100 hover:border-rose-300 hover:bg-rose-50/50 transition-all duration-200 hover:shadow-lg hover:shadow-rose-500/10"
+              >
+                <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-rose-500 to-rose-600 flex items-center justify-center mb-2 group-hover:scale-110 transition-transform shadow-md" aria-hidden="true">
+                  <Code2 className="w-5 h-5 text-white" />
+                </div>
+                <span className="text-sm font-medium text-charcoal-700 group-hover:text-rose-700 text-center">Schema</span>
+              </Link>
+            </div>
+          </section>
         </div>
       </div>
 
