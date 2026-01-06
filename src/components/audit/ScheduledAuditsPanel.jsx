@@ -1,0 +1,1237 @@
+import React, { useState, useEffect } from 'react';
+import {
+  Clock,
+  Globe,
+  Plus,
+  Edit2,
+  Trash2,
+  Play,
+  Pause,
+  CheckCircle,
+  AlertCircle,
+  XCircle,
+  Calendar,
+  ChevronDown,
+  ChevronUp,
+  X,
+  Save,
+  Settings,
+  History,
+  Eye,
+  RefreshCw,
+  AlertTriangle,
+  TrendingUp,
+  TrendingDown,
+  Minus,
+  Link,
+  Search,
+  Filter,
+  BarChart3
+} from 'lucide-react';
+import { format, formatDistanceToNow, addDays, addWeeks, addMonths, subDays } from 'date-fns';
+import toast from 'react-hot-toast';
+
+/**
+ * Scheduled Audits Panel
+ * Configure recurring automated technical SEO audits
+ */
+
+// Audit configurations
+const AUDIT_CONFIGS = {
+  depth: [
+    { value: 1, label: 'Shallow (1 level)', description: 'Homepage only' },
+    { value: 2, label: 'Standard (2 levels)', description: 'Homepage + linked pages' },
+    { value: 3, label: 'Deep (3 levels)', description: 'Full site crawl' },
+    { value: 5, label: 'Complete (5 levels)', description: 'Exhaustive crawl' }
+  ],
+  categories: [
+    { id: 'meta', label: 'Meta Tags', icon: '🏷️' },
+    { id: 'headings', label: 'Headings', icon: '📑' },
+    { id: 'images', label: 'Images', icon: '🖼️' },
+    { id: 'links', label: 'Links', icon: '🔗' },
+    { id: 'performance', label: 'Performance', icon: '⚡' },
+    { id: 'security', label: 'Security', icon: '🔒' },
+    { id: 'mobile', label: 'Mobile', icon: '📱' },
+    { id: 'accessibility', label: 'Accessibility', icon: '♿' }
+  ],
+  frequency: [
+    { id: 'daily', label: 'Daily', description: 'Every day' },
+    { id: 'weekly', label: 'Weekly', description: 'Once a week' },
+    { id: 'biweekly', label: 'Bi-weekly', description: 'Every two weeks' },
+    { id: 'monthly', label: 'Monthly', description: 'Once a month' }
+  ],
+  alertThresholds: [
+    { id: 'score_drop', label: 'Score drops below', type: 'number', defaultValue: 70 },
+    { id: 'critical_issues', label: 'Critical issues exceed', type: 'number', defaultValue: 5 },
+    { id: 'new_issues', label: 'New issues found', type: 'boolean', defaultValue: true }
+  ]
+};
+
+// Days of week
+const DAYS_OF_WEEK = [
+  { id: 0, label: 'Sun', full: 'Sunday' },
+  { id: 1, label: 'Mon', full: 'Monday' },
+  { id: 2, label: 'Tue', full: 'Tuesday' },
+  { id: 3, label: 'Wed', full: 'Wednesday' },
+  { id: 4, label: 'Thu', full: 'Thursday' },
+  { id: 5, label: 'Fri', full: 'Friday' },
+  { id: 6, label: 'Sat', full: 'Saturday' }
+];
+
+// Generate mock scheduled audits
+function generateMockAudits() {
+  return [
+    {
+      id: '1',
+      name: 'Main Site Weekly Audit',
+      url: 'https://example.com',
+      frequency: 'weekly',
+      dayOfWeek: 1,
+      time: '03:00',
+      depth: 3,
+      categories: ['meta', 'headings', 'images', 'links', 'performance'],
+      isActive: true,
+      alerts: {
+        enabled: true,
+        email: 'alerts@example.com',
+        scoreThreshold: 70,
+        criticalThreshold: 5,
+        notifyOnNewIssues: true
+      },
+      lastRun: {
+        date: subDays(new Date(), 2),
+        score: 78,
+        issues: { critical: 3, warnings: 12, info: 8 },
+        duration: 45,
+        pagesScanned: 156
+      },
+      history: [
+        { date: subDays(new Date(), 2), score: 78, issues: 23 },
+        { date: subDays(new Date(), 9), score: 75, issues: 28 },
+        { date: subDays(new Date(), 16), score: 72, issues: 32 },
+        { date: subDays(new Date(), 23), score: 74, issues: 29 }
+      ],
+      nextRun: addDays(new Date(), 5),
+      createdAt: subDays(new Date(), 30),
+      runCount: 4
+    },
+    {
+      id: '2',
+      name: 'Blog Section Daily Check',
+      url: 'https://example.com/blog',
+      frequency: 'daily',
+      time: '06:00',
+      depth: 2,
+      categories: ['meta', 'headings', 'images'],
+      isActive: true,
+      alerts: {
+        enabled: true,
+        email: 'content@example.com',
+        scoreThreshold: 80,
+        criticalThreshold: 3,
+        notifyOnNewIssues: true
+      },
+      lastRun: {
+        date: subDays(new Date(), 1),
+        score: 85,
+        issues: { critical: 1, warnings: 5, info: 3 },
+        duration: 12,
+        pagesScanned: 45
+      },
+      history: [
+        { date: subDays(new Date(), 1), score: 85, issues: 9 },
+        { date: subDays(new Date(), 2), score: 84, issues: 10 },
+        { date: subDays(new Date(), 3), score: 86, issues: 8 },
+        { date: subDays(new Date(), 4), score: 83, issues: 11 }
+      ],
+      nextRun: addDays(new Date(), 1),
+      createdAt: subDays(new Date(), 14),
+      runCount: 14
+    },
+    {
+      id: '3',
+      name: 'E-commerce Monthly Deep Scan',
+      url: 'https://shop.example.com',
+      frequency: 'monthly',
+      dayOfMonth: 1,
+      time: '02:00',
+      depth: 5,
+      categories: ['meta', 'headings', 'images', 'links', 'performance', 'security', 'mobile'],
+      isActive: false,
+      alerts: {
+        enabled: false,
+        email: '',
+        scoreThreshold: 60,
+        criticalThreshold: 10,
+        notifyOnNewIssues: false
+      },
+      lastRun: {
+        date: subDays(new Date(), 35),
+        score: 68,
+        issues: { critical: 8, warnings: 24, info: 15 },
+        duration: 180,
+        pagesScanned: 523
+      },
+      history: [
+        { date: subDays(new Date(), 35), score: 68, issues: 47 }
+      ],
+      nextRun: null,
+      createdAt: subDays(new Date(), 60),
+      runCount: 1
+    }
+  ];
+}
+
+export default function ScheduledAuditsPanel() {
+  const [audits, setAudits] = useState([]);
+  const [showCreateModal, setShowCreateModal] = useState(false);
+  const [editingAudit, setEditingAudit] = useState(null);
+  const [expandedId, setExpandedId] = useState(null);
+  const [viewingHistory, setViewingHistory] = useState(null);
+  const [filter, setFilter] = useState('all');
+
+  // Load mock data
+  useEffect(() => {
+    setAudits(generateMockAudits());
+  }, []);
+
+  // Filter audits
+  const filteredAudits = audits.filter(audit => {
+    if (filter === 'active') return audit.isActive;
+    if (filter === 'paused') return !audit.isActive;
+    return true;
+  });
+
+  // Toggle audit active status
+  const toggleAudit = (id) => {
+    setAudits(prev => prev.map(a =>
+      a.id === id ? {
+        ...a,
+        isActive: !a.isActive,
+        nextRun: !a.isActive ? calculateNextRun(a) : null
+      } : a
+    ));
+    const audit = audits.find(a => a.id === id);
+    toast.success(audit?.isActive ? 'Audit schedule paused' : 'Audit schedule activated');
+  };
+
+  // Calculate next run time
+  const calculateNextRun = (audit) => {
+    const now = new Date();
+    const [hours, minutes] = audit.time.split(':').map(Number);
+    let next = new Date(now);
+    next.setHours(hours, minutes, 0, 0);
+
+    if (next <= now) {
+      next = addDays(next, 1);
+    }
+
+    switch (audit.frequency) {
+      case 'weekly':
+        while (next.getDay() !== audit.dayOfWeek) {
+          next = addDays(next, 1);
+        }
+        break;
+      case 'biweekly':
+        while (next.getDay() !== audit.dayOfWeek) {
+          next = addDays(next, 1);
+        }
+        next = addWeeks(next, 1);
+        break;
+      case 'monthly':
+        next.setDate(audit.dayOfMonth || 1);
+        if (next <= now) {
+          next = addMonths(next, 1);
+        }
+        break;
+      default:
+        break;
+    }
+
+    return next;
+  };
+
+  // Delete audit
+  const deleteAudit = (id) => {
+    setAudits(prev => prev.filter(a => a.id !== id));
+    toast.success('Scheduled audit deleted');
+  };
+
+  // Run audit now
+  const runNow = (id) => {
+    const audit = audits.find(a => a.id === id);
+    toast.success(`Starting audit for ${audit?.url}...`);
+
+    // Simulate running
+    setTimeout(() => {
+      const newScore = Math.floor(Math.random() * 20) + 70;
+      const newIssues = {
+        critical: Math.floor(Math.random() * 5),
+        warnings: Math.floor(Math.random() * 15) + 5,
+        info: Math.floor(Math.random() * 10) + 3
+      };
+
+      setAudits(prev => prev.map(a =>
+        a.id === id ? {
+          ...a,
+          lastRun: {
+            date: new Date(),
+            score: newScore,
+            issues: newIssues,
+            duration: Math.floor(Math.random() * 60) + 20,
+            pagesScanned: audit.lastRun?.pagesScanned || 100
+          },
+          history: [
+            { date: new Date(), score: newScore, issues: Object.values(newIssues).reduce((a, b) => a + b, 0) },
+            ...a.history.slice(0, 9)
+          ],
+          runCount: a.runCount + 1
+        } : a
+      ));
+      toast.success('Audit completed!');
+    }, 3000);
+  };
+
+  // Get score color
+  const getScoreColor = (score) => {
+    if (score >= 80) return 'emerald';
+    if (score >= 60) return 'amber';
+    return 'red';
+  };
+
+  // Get trend indicator
+  const getTrend = (history) => {
+    if (history.length < 2) return null;
+    const diff = history[0].score - history[1].score;
+    if (diff > 0) return { direction: 'up', value: diff, color: 'emerald' };
+    if (diff < 0) return { direction: 'down', value: Math.abs(diff), color: 'red' };
+    return { direction: 'same', value: 0, color: 'charcoal' };
+  };
+
+  return (
+    <div className="space-y-6">
+      {/* Header */}
+      <div className="flex items-center justify-between">
+        <div>
+          <h2 className="text-xl font-semibold text-charcoal-900 dark:text-white flex items-center gap-2">
+            <Clock className="w-5 h-5 text-cyan-500" />
+            Scheduled Audits
+          </h2>
+          <p className="text-sm text-charcoal-500 dark:text-charcoal-400 mt-1">
+            Configure recurring automated technical SEO audits
+          </p>
+        </div>
+        <button
+          onClick={() => setShowCreateModal(true)}
+          className="btn btn-primary flex items-center gap-2"
+        >
+          <Plus className="w-4 h-4" />
+          New Audit Schedule
+        </button>
+      </div>
+
+      {/* Stats */}
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <div className="card p-4">
+          <div className="flex items-center gap-3">
+            <div className="p-2 bg-cyan-100 dark:bg-cyan-900/30 rounded-lg">
+              <Clock className="w-5 h-5 text-cyan-600 dark:text-cyan-400" />
+            </div>
+            <div>
+              <p className="text-2xl font-bold text-charcoal-900 dark:text-white">
+                {audits.length}
+              </p>
+              <p className="text-sm text-charcoal-500 dark:text-charcoal-400">Scheduled</p>
+            </div>
+          </div>
+        </div>
+        <div className="card p-4">
+          <div className="flex items-center gap-3">
+            <div className="p-2 bg-emerald-100 dark:bg-emerald-900/30 rounded-lg">
+              <Play className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
+            </div>
+            <div>
+              <p className="text-2xl font-bold text-charcoal-900 dark:text-white">
+                {audits.filter(a => a.isActive).length}
+              </p>
+              <p className="text-sm text-charcoal-500 dark:text-charcoal-400">Active</p>
+            </div>
+          </div>
+        </div>
+        <div className="card p-4">
+          <div className="flex items-center gap-3">
+            <div className="p-2 bg-primary-100 dark:bg-primary-900/30 rounded-lg">
+              <BarChart3 className="w-5 h-5 text-primary-600 dark:text-primary-400" />
+            </div>
+            <div>
+              <p className="text-2xl font-bold text-charcoal-900 dark:text-white">
+                {audits.reduce((sum, a) => sum + a.runCount, 0)}
+              </p>
+              <p className="text-sm text-charcoal-500 dark:text-charcoal-400">Total Runs</p>
+            </div>
+          </div>
+        </div>
+        <div className="card p-4">
+          <div className="flex items-center gap-3">
+            <div className="p-2 bg-amber-100 dark:bg-amber-900/30 rounded-lg">
+              <Globe className="w-5 h-5 text-amber-600 dark:text-amber-400" />
+            </div>
+            <div>
+              <p className="text-2xl font-bold text-charcoal-900 dark:text-white">
+                {audits.reduce((sum, a) => sum + (a.lastRun?.pagesScanned || 0), 0)}
+              </p>
+              <p className="text-sm text-charcoal-500 dark:text-charcoal-400">Pages Scanned</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Filter tabs */}
+      <div className="flex items-center gap-2">
+        {[
+          { id: 'all', label: 'All Schedules' },
+          { id: 'active', label: 'Active' },
+          { id: 'paused', label: 'Paused' }
+        ].map(tab => (
+          <button
+            key={tab.id}
+            onClick={() => setFilter(tab.id)}
+            className={`px-4 py-2 text-sm font-medium rounded-lg transition-colors ${
+              filter === tab.id
+                ? 'bg-cyan-100 text-cyan-700 dark:bg-cyan-900/30 dark:text-cyan-300'
+                : 'text-charcoal-600 hover:bg-charcoal-100 dark:text-charcoal-400 dark:hover:bg-charcoal-700'
+            }`}
+          >
+            {tab.label}
+          </button>
+        ))}
+      </div>
+
+      {/* Audits list */}
+      <div className="space-y-3">
+        {filteredAudits.length === 0 ? (
+          <div className="card p-8 text-center">
+            <Clock className="w-12 h-12 text-charcoal-300 dark:text-charcoal-600 mx-auto mb-4" />
+            <h3 className="text-lg font-medium text-charcoal-900 dark:text-white mb-2">
+              No scheduled audits
+            </h3>
+            <p className="text-charcoal-500 dark:text-charcoal-400 mb-4">
+              Set up automated audits to continuously monitor your site's SEO health
+            </p>
+            <button
+              onClick={() => setShowCreateModal(true)}
+              className="btn btn-primary"
+            >
+              Create Audit Schedule
+            </button>
+          </div>
+        ) : (
+          filteredAudits.map(audit => {
+            const isExpanded = expandedId === audit.id;
+            const trend = getTrend(audit.history);
+            const scoreColor = getScoreColor(audit.lastRun?.score || 0);
+
+            return (
+              <div key={audit.id} className="card overflow-hidden">
+                {/* Main row */}
+                <div className="p-4 flex items-center gap-4">
+                  {/* Score badge */}
+                  <div className={`relative w-16 h-16 rounded-xl bg-${scoreColor}-100 dark:bg-${scoreColor}-900/30 flex items-center justify-center`}>
+                    <span className={`text-2xl font-bold text-${scoreColor}-600 dark:text-${scoreColor}-400`}>
+                      {audit.lastRun?.score || '–'}
+                    </span>
+                    {trend && (
+                      <div className={`absolute -top-1 -right-1 p-1 rounded-full bg-${trend.color}-100 dark:bg-${trend.color}-900/50`}>
+                        {trend.direction === 'up' && <TrendingUp className={`w-3 h-3 text-${trend.color}-600`} />}
+                        {trend.direction === 'down' && <TrendingDown className={`w-3 h-3 text-${trend.color}-600`} />}
+                        {trend.direction === 'same' && <Minus className={`w-3 h-3 text-${trend.color}-600`} />}
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Info */}
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2">
+                      <h3 className="font-semibold text-charcoal-900 dark:text-white truncate">
+                        {audit.name}
+                      </h3>
+                      <span className={`badge ${audit.isActive ? 'badge-emerald' : 'badge-charcoal'}`}>
+                        {audit.isActive ? 'Active' : 'Paused'}
+                      </span>
+                    </div>
+                    <div className="flex items-center gap-2 mt-1 text-sm text-charcoal-500 dark:text-charcoal-400">
+                      <Globe className="w-4 h-4" />
+                      <span className="truncate">{audit.url}</span>
+                    </div>
+                    <div className="flex items-center gap-4 mt-1 text-xs text-charcoal-400 dark:text-charcoal-500">
+                      <span className="flex items-center gap-1">
+                        <Clock className="w-3 h-3" />
+                        {AUDIT_CONFIGS.frequency.find(f => f.id === audit.frequency)?.label} at {audit.time}
+                      </span>
+                      {audit.lastRun && (
+                        <span>Last: {formatDistanceToNow(audit.lastRun.date, { addSuffix: true })}</span>
+                      )}
+                      {audit.nextRun && audit.isActive && (
+                        <span>Next: {format(audit.nextRun, 'MMM d, h:mm a')}</span>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Issues summary */}
+                  {audit.lastRun?.issues && (
+                    <div className="hidden lg:flex items-center gap-3">
+                      <div className="text-center">
+                        <div className="flex items-center gap-1 text-red-500">
+                          <XCircle className="w-4 h-4" />
+                          <span className="font-semibold">{audit.lastRun.issues.critical}</span>
+                        </div>
+                        <span className="text-xs text-charcoal-400">Critical</span>
+                      </div>
+                      <div className="text-center">
+                        <div className="flex items-center gap-1 text-amber-500">
+                          <AlertTriangle className="w-4 h-4" />
+                          <span className="font-semibold">{audit.lastRun.issues.warnings}</span>
+                        </div>
+                        <span className="text-xs text-charcoal-400">Warnings</span>
+                      </div>
+                      <div className="text-center">
+                        <div className="flex items-center gap-1 text-primary-500">
+                          <AlertCircle className="w-4 h-4" />
+                          <span className="font-semibold">{audit.lastRun.issues.info}</span>
+                        </div>
+                        <span className="text-xs text-charcoal-400">Info</span>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Actions */}
+                  <div className="flex items-center gap-2">
+                    <button
+                      onClick={() => runNow(audit.id)}
+                      className="p-2 text-charcoal-400 hover:text-cyan-600 hover:bg-cyan-50 dark:hover:bg-cyan-900/20 rounded-lg transition-colors"
+                      title="Run now"
+                    >
+                      <RefreshCw className="w-4 h-4" />
+                    </button>
+                    <button
+                      onClick={() => setViewingHistory(audit)}
+                      className="p-2 text-charcoal-400 hover:text-primary-600 hover:bg-primary-50 dark:hover:bg-primary-900/20 rounded-lg transition-colors"
+                      title="View history"
+                    >
+                      <History className="w-4 h-4" />
+                    </button>
+                    <button
+                      onClick={() => toggleAudit(audit.id)}
+                      className={`p-2 rounded-lg transition-colors ${
+                        audit.isActive
+                          ? 'text-amber-500 hover:bg-amber-50 dark:hover:bg-amber-900/20'
+                          : 'text-emerald-500 hover:bg-emerald-50 dark:hover:bg-emerald-900/20'
+                      }`}
+                      title={audit.isActive ? 'Pause' : 'Resume'}
+                    >
+                      {audit.isActive ? <Pause className="w-4 h-4" /> : <Play className="w-4 h-4" />}
+                    </button>
+                    <button
+                      onClick={() => setEditingAudit(audit)}
+                      className="p-2 text-charcoal-400 hover:text-charcoal-600 hover:bg-charcoal-100 dark:hover:bg-charcoal-700 rounded-lg transition-colors"
+                      title="Edit"
+                    >
+                      <Edit2 className="w-4 h-4" />
+                    </button>
+                    <button
+                      onClick={() => deleteAudit(audit.id)}
+                      className="p-2 text-charcoal-400 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors"
+                      title="Delete"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </button>
+                    <button
+                      onClick={() => setExpandedId(isExpanded ? null : audit.id)}
+                      className="p-2 text-charcoal-400 hover:text-charcoal-600 hover:bg-charcoal-100 dark:hover:bg-charcoal-700 rounded-lg transition-colors"
+                    >
+                      {isExpanded ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+                    </button>
+                  </div>
+                </div>
+
+                {/* Expanded details */}
+                {isExpanded && (
+                  <div className="px-4 pb-4 pt-0 border-t border-charcoal-100 dark:border-charcoal-700">
+                    <div className="mt-4 grid grid-cols-1 md:grid-cols-3 gap-4">
+                      {/* Configuration */}
+                      <div>
+                        <h4 className="text-sm font-medium text-charcoal-700 dark:text-charcoal-300 mb-2">
+                          Configuration
+                        </h4>
+                        <div className="space-y-2 text-sm text-charcoal-600 dark:text-charcoal-400">
+                          <div className="flex items-center gap-2">
+                            <Search className="w-3 h-3" />
+                            Depth: {AUDIT_CONFIGS.depth.find(d => d.value === audit.depth)?.label}
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <Filter className="w-3 h-3" />
+                            {audit.categories.length} categories
+                          </div>
+                          <div className="flex flex-wrap gap-1 mt-1">
+                            {audit.categories.map(cat => {
+                              const category = AUDIT_CONFIGS.categories.find(c => c.id === cat);
+                              return (
+                                <span key={cat} className="px-2 py-0.5 bg-charcoal-100 dark:bg-charcoal-700 rounded text-xs">
+                                  {category?.icon} {category?.label}
+                                </span>
+                              );
+                            })}
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Schedule */}
+                      <div>
+                        <h4 className="text-sm font-medium text-charcoal-700 dark:text-charcoal-300 mb-2">
+                          Schedule Details
+                        </h4>
+                        <div className="space-y-2 text-sm text-charcoal-600 dark:text-charcoal-400">
+                          <div className="flex items-center gap-2">
+                            <Calendar className="w-3 h-3" />
+                            {AUDIT_CONFIGS.frequency.find(f => f.id === audit.frequency)?.label}
+                          </div>
+                          {audit.dayOfWeek !== undefined && (
+                            <div className="flex items-center gap-2">
+                              <Clock className="w-3 h-3" />
+                              {DAYS_OF_WEEK.find(d => d.id === audit.dayOfWeek)?.full} at {audit.time}
+                            </div>
+                          )}
+                          <div className="flex items-center gap-2">
+                            <BarChart3 className="w-3 h-3" />
+                            {audit.runCount} audits completed
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Alerts */}
+                      <div>
+                        <h4 className="text-sm font-medium text-charcoal-700 dark:text-charcoal-300 mb-2">
+                          Alert Settings
+                        </h4>
+                        <div className="space-y-2 text-sm text-charcoal-600 dark:text-charcoal-400">
+                          <div className="flex items-center gap-2">
+                            {audit.alerts.enabled ? (
+                              <CheckCircle className="w-3 h-3 text-emerald-500" />
+                            ) : (
+                              <XCircle className="w-3 h-3 text-charcoal-400" />
+                            )}
+                            Alerts {audit.alerts.enabled ? 'enabled' : 'disabled'}
+                          </div>
+                          {audit.alerts.enabled && (
+                            <>
+                              <div className="flex items-center gap-2">
+                                <AlertTriangle className="w-3 h-3" />
+                                Score threshold: {audit.alerts.scoreThreshold}
+                              </div>
+                              <div className="flex items-center gap-2">
+                                <XCircle className="w-3 h-3" />
+                                Critical threshold: {audit.alerts.criticalThreshold}
+                              </div>
+                            </>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Mini history chart */}
+                    {audit.history.length > 1 && (
+                      <div className="mt-4 p-3 bg-charcoal-50 dark:bg-charcoal-800 rounded-lg">
+                        <h4 className="text-sm font-medium text-charcoal-700 dark:text-charcoal-300 mb-3">
+                          Score Trend
+                        </h4>
+                        <div className="flex items-end gap-2 h-16">
+                          {audit.history.slice(0, 8).reverse().map((entry, idx) => {
+                            const height = (entry.score / 100) * 100;
+                            const color = getScoreColor(entry.score);
+                            return (
+                              <div
+                                key={idx}
+                                className="flex-1 flex flex-col items-center gap-1"
+                              >
+                                <div
+                                  className={`w-full bg-${color}-500 rounded-t`}
+                                  style={{ height: `${height}%` }}
+                                  title={`${format(entry.date, 'MMM d')}: ${entry.score}`}
+                                />
+                                <span className="text-[10px] text-charcoal-400">
+                                  {format(entry.date, 'M/d')}
+                                </span>
+                              </div>
+                            );
+                          })}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                )}
+              </div>
+            );
+          })
+        )}
+      </div>
+
+      {/* Create/Edit Modal */}
+      {(showCreateModal || editingAudit) && (
+        <AuditScheduleFormModal
+          audit={editingAudit}
+          onSave={(newAudit) => {
+            if (editingAudit) {
+              setAudits(prev => prev.map(a => a.id === editingAudit.id ? { ...a, ...newAudit } : a));
+              toast.success('Audit schedule updated');
+            } else {
+              const nextRun = calculateNextRun({ ...newAudit, time: newAudit.time || '09:00' });
+              setAudits(prev => [...prev, {
+                ...newAudit,
+                id: Date.now().toString(),
+                createdAt: new Date(),
+                runCount: 0,
+                history: [],
+                nextRun
+              }]);
+              toast.success('Audit schedule created');
+            }
+            setShowCreateModal(false);
+            setEditingAudit(null);
+          }}
+          onClose={() => {
+            setShowCreateModal(false);
+            setEditingAudit(null);
+          }}
+        />
+      )}
+
+      {/* History Modal */}
+      {viewingHistory && (
+        <AuditHistoryModal
+          audit={viewingHistory}
+          onClose={() => setViewingHistory(null)}
+        />
+      )}
+    </div>
+  );
+}
+
+/**
+ * Audit Schedule Form Modal
+ */
+function AuditScheduleFormModal({ audit, onSave, onClose }) {
+  const [formData, setFormData] = useState({
+    name: audit?.name || '',
+    url: audit?.url || '',
+    frequency: audit?.frequency || 'weekly',
+    dayOfWeek: audit?.dayOfWeek ?? 1,
+    dayOfMonth: audit?.dayOfMonth ?? 1,
+    time: audit?.time || '09:00',
+    depth: audit?.depth || 2,
+    categories: audit?.categories || ['meta', 'headings', 'images', 'links'],
+    isActive: audit?.isActive ?? true,
+    alerts: audit?.alerts || {
+      enabled: true,
+      email: '',
+      scoreThreshold: 70,
+      criticalThreshold: 5,
+      notifyOnNewIssues: true
+    }
+  });
+
+  const [step, setStep] = useState(1);
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+
+    if (!formData.name.trim()) {
+      toast.error('Please enter an audit name');
+      return;
+    }
+    if (!formData.url.trim()) {
+      toast.error('Please enter a URL');
+      return;
+    }
+    if (formData.categories.length === 0) {
+      toast.error('Please select at least one category');
+      return;
+    }
+
+    onSave(formData);
+  };
+
+  const toggleCategory = (catId) => {
+    setFormData(prev => ({
+      ...prev,
+      categories: prev.categories.includes(catId)
+        ? prev.categories.filter(c => c !== catId)
+        : [...prev.categories, catId]
+    }));
+  };
+
+  return (
+    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+      <div className="bg-white dark:bg-charcoal-800 rounded-2xl shadow-xl w-full max-w-2xl max-h-[90vh] overflow-hidden flex flex-col">
+        {/* Header */}
+        <div className="p-6 border-b border-charcoal-100 dark:border-charcoal-700">
+          <div className="flex items-center justify-between">
+            <h2 className="text-xl font-semibold text-charcoal-900 dark:text-white">
+              {audit ? 'Edit Audit Schedule' : 'Create New Audit Schedule'}
+            </h2>
+            <button
+              onClick={onClose}
+              className="p-2 text-charcoal-400 hover:text-charcoal-600 hover:bg-charcoal-100 dark:hover:bg-charcoal-700 rounded-lg"
+            >
+              <X className="w-5 h-5" />
+            </button>
+          </div>
+
+          {/* Step indicators */}
+          <div className="flex items-center gap-2 mt-4">
+            {[1, 2, 3].map(s => (
+              <button
+                key={s}
+                onClick={() => setStep(s)}
+                className={`flex-1 h-2 rounded-full transition-colors ${
+                  s === step
+                    ? 'bg-cyan-500'
+                    : s < step
+                    ? 'bg-emerald-500'
+                    : 'bg-charcoal-200 dark:bg-charcoal-600'
+                }`}
+              />
+            ))}
+          </div>
+          <div className="flex justify-between mt-2 text-xs text-charcoal-500 dark:text-charcoal-400">
+            <span>Target</span>
+            <span>Schedule</span>
+            <span>Alerts</span>
+          </div>
+        </div>
+
+        {/* Form content */}
+        <form onSubmit={handleSubmit} className="flex-1 overflow-y-auto p-6">
+          {/* Step 1: Target */}
+          {step === 1 && (
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-charcoal-700 dark:text-charcoal-300 mb-2">
+                  Audit Name
+                </label>
+                <input
+                  type="text"
+                  value={formData.name}
+                  onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
+                  placeholder="e.g., Main Site Weekly Audit"
+                  className="input"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-charcoal-700 dark:text-charcoal-300 mb-2">
+                  Target URL
+                </label>
+                <div className="relative">
+                  <Globe className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-charcoal-400" />
+                  <input
+                    type="url"
+                    value={formData.url}
+                    onChange={(e) => setFormData(prev => ({ ...prev, url: e.target.value }))}
+                    placeholder="https://example.com"
+                    className="input pl-10"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-charcoal-700 dark:text-charcoal-300 mb-2">
+                  Crawl Depth
+                </label>
+                <div className="grid grid-cols-2 gap-2">
+                  {AUDIT_CONFIGS.depth.map(option => (
+                    <button
+                      key={option.value}
+                      type="button"
+                      onClick={() => setFormData(prev => ({ ...prev, depth: option.value }))}
+                      className={`p-3 rounded-lg border text-left transition-all ${
+                        formData.depth === option.value
+                          ? 'border-cyan-500 bg-cyan-50 dark:bg-cyan-900/20'
+                          : 'border-charcoal-200 dark:border-charcoal-600 hover:border-charcoal-300'
+                      }`}
+                    >
+                      <p className={`font-medium ${formData.depth === option.value ? 'text-cyan-700 dark:text-cyan-300' : 'text-charcoal-900 dark:text-white'}`}>
+                        {option.label}
+                      </p>
+                      <p className="text-xs text-charcoal-500">{option.description}</p>
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-charcoal-700 dark:text-charcoal-300 mb-2">
+                  Audit Categories
+                </label>
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                  {AUDIT_CONFIGS.categories.map(cat => (
+                    <button
+                      key={cat.id}
+                      type="button"
+                      onClick={() => toggleCategory(cat.id)}
+                      className={`p-3 rounded-lg border text-center transition-all ${
+                        formData.categories.includes(cat.id)
+                          ? 'border-cyan-500 bg-cyan-50 dark:bg-cyan-900/20'
+                          : 'border-charcoal-200 dark:border-charcoal-600 hover:border-charcoal-300'
+                      }`}
+                    >
+                      <span className="text-xl">{cat.icon}</span>
+                      <p className="text-xs mt-1 text-charcoal-700 dark:text-charcoal-300">{cat.label}</p>
+                    </button>
+                  ))}
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Step 2: Schedule */}
+          {step === 2 && (
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-charcoal-700 dark:text-charcoal-300 mb-2">
+                  Frequency
+                </label>
+                <div className="grid grid-cols-2 gap-2">
+                  {AUDIT_CONFIGS.frequency.map(option => (
+                    <button
+                      key={option.id}
+                      type="button"
+                      onClick={() => setFormData(prev => ({ ...prev, frequency: option.id }))}
+                      className={`p-3 rounded-lg border text-center transition-all ${
+                        formData.frequency === option.id
+                          ? 'border-cyan-500 bg-cyan-50 dark:bg-cyan-900/20 text-cyan-700 dark:text-cyan-300'
+                          : 'border-charcoal-200 dark:border-charcoal-600 text-charcoal-700 dark:text-charcoal-300 hover:border-charcoal-300'
+                      }`}
+                    >
+                      <p className="font-medium">{option.label}</p>
+                      <p className="text-xs opacity-75">{option.description}</p>
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {(formData.frequency === 'weekly' || formData.frequency === 'biweekly') && (
+                <div>
+                  <label className="block text-sm font-medium text-charcoal-700 dark:text-charcoal-300 mb-2">
+                    Day of Week
+                  </label>
+                  <div className="flex gap-2">
+                    {DAYS_OF_WEEK.map(day => (
+                      <button
+                        key={day.id}
+                        type="button"
+                        onClick={() => setFormData(prev => ({ ...prev, dayOfWeek: day.id }))}
+                        className={`flex-1 p-2 rounded-lg border text-center transition-all ${
+                          formData.dayOfWeek === day.id
+                            ? 'border-cyan-500 bg-cyan-50 dark:bg-cyan-900/20 text-cyan-700 dark:text-cyan-300'
+                            : 'border-charcoal-200 dark:border-charcoal-600 text-charcoal-700 dark:text-charcoal-300 hover:border-charcoal-300'
+                        }`}
+                      >
+                        {day.label}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {formData.frequency === 'monthly' && (
+                <div>
+                  <label className="block text-sm font-medium text-charcoal-700 dark:text-charcoal-300 mb-2">
+                    Day of Month
+                  </label>
+                  <select
+                    value={formData.dayOfMonth}
+                    onChange={(e) => setFormData(prev => ({ ...prev, dayOfMonth: parseInt(e.target.value) }))}
+                    className="input"
+                  >
+                    {Array.from({ length: 28 }, (_, i) => i + 1).map(day => (
+                      <option key={day} value={day}>{day}</option>
+                    ))}
+                  </select>
+                </div>
+              )}
+
+              <div>
+                <label className="block text-sm font-medium text-charcoal-700 dark:text-charcoal-300 mb-2">
+                  Time (UTC)
+                </label>
+                <input
+                  type="time"
+                  value={formData.time}
+                  onChange={(e) => setFormData(prev => ({ ...prev, time: e.target.value }))}
+                  className="input"
+                />
+                <p className="text-xs text-charcoal-400 mt-1">
+                  Recommended: Off-peak hours (2:00-6:00 AM) for minimal impact on site performance
+                </p>
+              </div>
+
+              <div className="flex items-center gap-3 p-4 bg-charcoal-50 dark:bg-charcoal-700/50 rounded-lg">
+                <input
+                  type="checkbox"
+                  id="isActive"
+                  checked={formData.isActive}
+                  onChange={(e) => setFormData(prev => ({ ...prev, isActive: e.target.checked }))}
+                  className="w-4 h-4 text-cyan-600 rounded"
+                />
+                <label htmlFor="isActive" className="text-sm text-charcoal-700 dark:text-charcoal-300">
+                  Activate schedule immediately after saving
+                </label>
+              </div>
+            </div>
+          )}
+
+          {/* Step 3: Alerts */}
+          {step === 3 && (
+            <div className="space-y-4">
+              <div className="flex items-center gap-3 p-4 bg-charcoal-50 dark:bg-charcoal-700/50 rounded-lg">
+                <input
+                  type="checkbox"
+                  id="alertsEnabled"
+                  checked={formData.alerts.enabled}
+                  onChange={(e) => setFormData(prev => ({
+                    ...prev,
+                    alerts: { ...prev.alerts, enabled: e.target.checked }
+                  }))}
+                  className="w-4 h-4 text-cyan-600 rounded"
+                />
+                <label htmlFor="alertsEnabled" className="text-sm text-charcoal-700 dark:text-charcoal-300">
+                  Enable alert notifications
+                </label>
+              </div>
+
+              {formData.alerts.enabled && (
+                <>
+                  <div>
+                    <label className="block text-sm font-medium text-charcoal-700 dark:text-charcoal-300 mb-2">
+                      Alert Email
+                    </label>
+                    <input
+                      type="email"
+                      value={formData.alerts.email}
+                      onChange={(e) => setFormData(prev => ({
+                        ...prev,
+                        alerts: { ...prev.alerts, email: e.target.value }
+                      }))}
+                      placeholder="alerts@example.com"
+                      className="input"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-charcoal-700 dark:text-charcoal-300 mb-2">
+                      Score Threshold
+                    </label>
+                    <div className="flex items-center gap-4">
+                      <input
+                        type="range"
+                        min="0"
+                        max="100"
+                        value={formData.alerts.scoreThreshold}
+                        onChange={(e) => setFormData(prev => ({
+                          ...prev,
+                          alerts: { ...prev.alerts, scoreThreshold: parseInt(e.target.value) }
+                        }))}
+                        className="flex-1"
+                      />
+                      <span className="w-12 text-center font-medium text-charcoal-900 dark:text-white">
+                        {formData.alerts.scoreThreshold}
+                      </span>
+                    </div>
+                    <p className="text-xs text-charcoal-400 mt-1">
+                      Alert when score drops below this value
+                    </p>
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-charcoal-700 dark:text-charcoal-300 mb-2">
+                      Critical Issues Threshold
+                    </label>
+                    <input
+                      type="number"
+                      min="1"
+                      max="100"
+                      value={formData.alerts.criticalThreshold}
+                      onChange={(e) => setFormData(prev => ({
+                        ...prev,
+                        alerts: { ...prev.alerts, criticalThreshold: parseInt(e.target.value) }
+                      }))}
+                      className="input w-24"
+                    />
+                    <p className="text-xs text-charcoal-400 mt-1">
+                      Alert when critical issues exceed this count
+                    </p>
+                  </div>
+
+                  <div className="flex items-center gap-3">
+                    <input
+                      type="checkbox"
+                      id="notifyOnNew"
+                      checked={formData.alerts.notifyOnNewIssues}
+                      onChange={(e) => setFormData(prev => ({
+                        ...prev,
+                        alerts: { ...prev.alerts, notifyOnNewIssues: e.target.checked }
+                      }))}
+                      className="w-4 h-4 text-cyan-600 rounded"
+                    />
+                    <label htmlFor="notifyOnNew" className="text-sm text-charcoal-700 dark:text-charcoal-300">
+                      Notify when new issues are detected
+                    </label>
+                  </div>
+                </>
+              )}
+
+              {/* Summary */}
+              <div className="p-4 bg-gradient-to-br from-cyan-50 to-primary-50 dark:from-cyan-900/20 dark:to-primary-900/20 rounded-xl mt-6">
+                <h4 className="font-medium text-charcoal-900 dark:text-white mb-3">Schedule Summary</h4>
+                <div className="space-y-2 text-sm text-charcoal-600 dark:text-charcoal-400">
+                  <div className="flex items-center gap-2">
+                    <Globe className="w-4 h-4" />
+                    <span className="truncate">{formData.url || 'No URL specified'}</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Search className="w-4 h-4" />
+                    <span>Depth: {AUDIT_CONFIGS.depth.find(d => d.value === formData.depth)?.label}</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Clock className="w-4 h-4" />
+                    <span>
+                      {AUDIT_CONFIGS.frequency.find(f => f.id === formData.frequency)?.label} at {formData.time}
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Filter className="w-4 h-4" />
+                    <span>{formData.categories.length} categories selected</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+        </form>
+
+        {/* Footer */}
+        <div className="p-6 border-t border-charcoal-100 dark:border-charcoal-700 flex justify-between">
+          <button
+            type="button"
+            onClick={() => step > 1 ? setStep(step - 1) : onClose()}
+            className="btn btn-secondary"
+          >
+            {step > 1 ? 'Back' : 'Cancel'}
+          </button>
+          {step < 3 ? (
+            <button
+              type="button"
+              onClick={() => setStep(step + 1)}
+              className="btn btn-primary"
+            >
+              Continue
+            </button>
+          ) : (
+            <button
+              onClick={handleSubmit}
+              className="btn btn-primary flex items-center gap-2"
+            >
+              <Save className="w-4 h-4" />
+              {audit ? 'Save Changes' : 'Create Schedule'}
+            </button>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/**
+ * Audit History Modal
+ */
+function AuditHistoryModal({ audit, onClose }) {
+  return (
+    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+      <div className="bg-white dark:bg-charcoal-800 rounded-2xl shadow-xl w-full max-w-2xl max-h-[90vh] overflow-hidden flex flex-col">
+        {/* Header */}
+        <div className="p-6 border-b border-charcoal-100 dark:border-charcoal-700">
+          <div className="flex items-center justify-between">
+            <div>
+              <h2 className="text-xl font-semibold text-charcoal-900 dark:text-white">
+                Audit History
+              </h2>
+              <p className="text-sm text-charcoal-500 dark:text-charcoal-400 mt-1">
+                {audit.name}
+              </p>
+            </div>
+            <button
+              onClick={onClose}
+              className="p-2 text-charcoal-400 hover:text-charcoal-600 hover:bg-charcoal-100 dark:hover:bg-charcoal-700 rounded-lg"
+            >
+              <X className="w-5 h-5" />
+            </button>
+          </div>
+        </div>
+
+        {/* History list */}
+        <div className="flex-1 overflow-y-auto p-6">
+          {audit.history.length === 0 ? (
+            <div className="text-center py-8">
+              <History className="w-12 h-12 text-charcoal-300 dark:text-charcoal-600 mx-auto mb-4" />
+              <p className="text-charcoal-500 dark:text-charcoal-400">No audit history yet</p>
+            </div>
+          ) : (
+            <div className="space-y-3">
+              {audit.history.map((entry, idx) => {
+                const scoreColor = entry.score >= 80 ? 'emerald' : entry.score >= 60 ? 'amber' : 'red';
+                const prevEntry = audit.history[idx + 1];
+                const scoreDiff = prevEntry ? entry.score - prevEntry.score : 0;
+
+                return (
+                  <div key={idx} className="flex items-center gap-4 p-4 bg-charcoal-50 dark:bg-charcoal-700/50 rounded-xl">
+                    <div className={`w-14 h-14 rounded-xl bg-${scoreColor}-100 dark:bg-${scoreColor}-900/30 flex items-center justify-center`}>
+                      <span className={`text-xl font-bold text-${scoreColor}-600 dark:text-${scoreColor}-400`}>
+                        {entry.score}
+                      </span>
+                    </div>
+                    <div className="flex-1">
+                      <div className="flex items-center gap-2">
+                        <span className="font-medium text-charcoal-900 dark:text-white">
+                          {format(entry.date, 'MMMM d, yyyy')}
+                        </span>
+                        {scoreDiff !== 0 && (
+                          <span className={`flex items-center gap-1 text-sm ${scoreDiff > 0 ? 'text-emerald-600' : 'text-red-600'}`}>
+                            {scoreDiff > 0 ? <TrendingUp className="w-3 h-3" /> : <TrendingDown className="w-3 h-3" />}
+                            {scoreDiff > 0 ? '+' : ''}{scoreDiff}
+                          </span>
+                        )}
+                      </div>
+                      <p className="text-sm text-charcoal-500 dark:text-charcoal-400">
+                        {format(entry.date, 'h:mm a')} • {entry.issues} issues found
+                      </p>
+                    </div>
+                    <button className="btn btn-secondary text-sm">
+                      <Eye className="w-4 h-4 mr-2" />
+                      View
+                    </button>
+                  </div>
+                );
+              })}
+            </div>
+          )}
+        </div>
+
+        {/* Footer */}
+        <div className="p-6 border-t border-charcoal-100 dark:border-charcoal-700">
+          <button onClick={onClose} className="btn btn-secondary w-full">
+            Close
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
