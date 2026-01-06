@@ -19,6 +19,7 @@ import {
   Gift
 } from 'lucide-react';
 import NotificationPanel from './NotificationPanel';
+import { ThemeToggle } from './ThemeSwitcher';
 import { hasPermission } from '../../utils/roles';
 import WhatsNew, { WhatsNewBadge } from '../help/WhatsNew';
 import HelpSearch from '../help/HelpSearch';
@@ -78,7 +79,7 @@ export default function Navigation() {
 
   return (
     <nav
-      className="sticky top-0 z-50 bg-white/80 backdrop-blur-xl border-b border-charcoal-100/50 shadow-sm"
+      className="sticky top-0 z-50 bg-white/80 dark:bg-charcoal-900/80 backdrop-blur-xl border-b border-charcoal-100/50 dark:border-charcoal-800/50 shadow-sm"
       role="navigation"
       aria-label="Main navigation"
     >
@@ -93,10 +94,10 @@ export default function Navigation() {
               <div className="absolute -top-1 -right-1 w-3 h-3 bg-gradient-to-br from-cyan-400 to-cyan-500 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
             </div>
             <div className="hidden sm:block">
-              <span className="text-lg font-semibold text-charcoal-900 tracking-tight">
+              <span className="text-lg font-semibold text-charcoal-900 dark:text-white tracking-tight">
                 Content Strategy
               </span>
-              <span className="text-lg font-semibold text-primary-500 tracking-tight ml-1">
+              <span className="text-lg font-semibold text-primary-500 dark:text-primary-400 tracking-tight ml-1">
                 Portal
               </span>
             </div>
@@ -191,6 +192,9 @@ export default function Navigation() {
 
             {/* Notifications */}
             <NotificationPanel />
+
+            {/* Theme Toggle */}
+            <ThemeToggle />
 
             {/* Help Menu */}
             <div className="relative" ref={helpRef}>
@@ -289,13 +293,13 @@ export default function Navigation() {
             </div>
 
             {/* User Menu */}
-            <div className="flex items-center gap-3 pl-4 ml-2 border-l border-charcoal-200">
+            <div className="flex items-center gap-3 pl-4 ml-2 border-l border-charcoal-200 dark:border-charcoal-700">
               <Link to="/profile" className="flex items-center gap-3 hover:opacity-80 transition-opacity">
                 <div className="text-right">
-                  <p className="text-sm font-medium text-charcoal-900">
+                  <p className="text-sm font-medium text-charcoal-900 dark:text-charcoal-100">
                     {userProfile?.name || currentUser.displayName || currentUser.email}
                   </p>
-                  <p className="text-xs text-charcoal-500 capitalize">
+                  <p className="text-xs text-charcoal-500 dark:text-charcoal-400 capitalize">
                     {userProfile?.role?.replace('_', ' ') || 'User'}
                   </p>
                 </div>
@@ -307,7 +311,7 @@ export default function Navigation() {
 
               <button
                 onClick={handleLogout}
-                className="p-2 rounded-xl text-charcoal-500 hover:text-red-600 hover:bg-red-50 transition-all duration-200"
+                className="p-2 rounded-xl text-charcoal-500 dark:text-charcoal-400 hover:text-red-600 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 transition-all duration-200"
                 title="Logout"
                 aria-label="Logout"
               >
