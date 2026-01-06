@@ -39,6 +39,12 @@ import {
 import { WCAG_PRINCIPLES, WCAG_CRITERIA, getCriteriaByLevel } from '../../../data/wcagCriteria';
 import { IMPACT_LEVELS } from '../../../data/axeRules';
 import { COMPLIANCE_STATUS } from '../../../lib/accessibility/accessibilityEngine';
+import {
+  exportAccessibilityPDF,
+  exportAccessibilityExcel,
+  exportVPAT
+} from '../../../lib/accessibility/accessibilityExportService';
+import { getStaticFixSuggestion, isAIAvailable } from '../../../lib/accessibility/aiSuggestionService';
 
 // View tabs
 const TABS = {
@@ -159,19 +165,53 @@ export default function AccessibilityDashboard({ auditResults, domainInfo, onNew
   const handleExportPDF = () => {
     setExporting(true);
     setShowExportMenu(false);
-    setTimeout(() => {
-      toast.success('PDF export coming soon!');
+    try {
+      exportAccessibilityPDF(auditResults, {
+        filename: `accessibility-report-${domainInfo?.domain || 'audit'}-${new Date().toISOString().split('T')[0]}.pdf`,
+        domainInfo
+      });
+      toast.success('PDF compliance report downloaded!');
+    } catch (error) {
+      console.error('PDF export error:', error);
+      toast.error('Failed to generate PDF report');
+    } finally {
       setExporting(false);
-    }, 500);
+    }
   };
 
   const handleExportExcel = () => {
     setExporting(true);
     setShowExportMenu(false);
-    setTimeout(() => {
-      toast.success('Excel export coming soon!');
+    try {
+      exportAccessibilityExcel(auditResults, {
+        filename: `accessibility-audit-${domainInfo?.domain || 'audit'}-${new Date().toISOString().split('T')[0]}.xlsx`,
+        domainInfo
+      });
+      toast.success('Excel export downloaded!');
+    } catch (error) {
+      console.error('Excel export error:', error);
+      toast.error('Failed to generate Excel export');
+    } finally {
       setExporting(false);
-    }, 500);
+    }
+  };
+
+  const handleExportVPAT = () => {
+    setExporting(true);
+    setShowExportMenu(false);
+    try {
+      exportVPAT(auditResults, {
+        filename: `vpat-${domainInfo?.domain || 'audit'}-${new Date().toISOString().split('T')[0]}.xlsx`,
+        productName: domainInfo?.domain || 'Website',
+        domainInfo
+      });
+      toast.success('VPAT report downloaded!');
+    } catch (error) {
+      console.error('VPAT export error:', error);
+      toast.error('Failed to generate VPAT report');
+    } finally {
+      setExporting(false);
+    }
   };
 
   return (
@@ -226,6 +266,10 @@ export default function AccessibilityDashboard({ auditResults, domainInfo, onNew
                     <button onClick={handleExportExcel} className="dropdown-item w-full">
                       <FileSpreadsheet className="w-4 h-4 text-emerald-500" />
                       <span>Detailed Export (Excel)</span>
+                    </button>
+                    <button onClick={handleExportVPAT} className="dropdown-item w-full">
+                      <Shield className="w-4 h-4 text-purple-500" />
+                      <span>VPAT Report (Excel)</span>
                     </button>
                   </div>
                 )}
