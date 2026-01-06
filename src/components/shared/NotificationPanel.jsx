@@ -1,11 +1,13 @@
 import React, { useState } from 'react';
-import { Bell, Check, CheckCheck, Trash2, X } from 'lucide-react';
+import { Bell, Check, CheckCheck, Trash2, X, Settings } from 'lucide-react';
 import { useNotifications } from '../../hooks/useNotifications';
 import { useNavigate } from 'react-router-dom';
 import { format } from 'date-fns';
+import NotificationPreferences from './NotificationPreferences';
 
 export default function NotificationPanel() {
   const [isOpen, setIsOpen] = useState(false);
+  const [prefsOpen, setPrefsOpen] = useState(false);
   const { notifications, unreadCount, markAsRead, markAllAsRead } = useNotifications();
   const navigate = useNavigate();
 
@@ -95,6 +97,17 @@ export default function NotificationPanel() {
                   </button>
                 )}
                 <button
+                  onClick={() => {
+                    setIsOpen(false);
+                    setPrefsOpen(true);
+                  }}
+                  className="p-1.5 hover:bg-gray-100 rounded-lg transition-colors"
+                  title="Notification settings"
+                  aria-label="Open notification settings"
+                >
+                  <Settings className="w-4 h-4 text-gray-500" />
+                </button>
+                <button
                   onClick={() => setIsOpen(false)}
                   className="text-gray-400 hover:text-gray-600"
                 >
@@ -166,6 +179,12 @@ export default function NotificationPanel() {
           </div>
         </>
       )}
+
+      {/* Notification Preferences Modal */}
+      <NotificationPreferences
+        isOpen={prefsOpen}
+        onClose={() => setPrefsOpen(false)}
+      />
     </div>
   );
 }
