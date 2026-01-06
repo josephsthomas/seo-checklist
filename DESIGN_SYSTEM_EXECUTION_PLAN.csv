@@ -1,0 +1,54 @@
+ID,Category,Component,File Path,Issue Type,Issue Description,Priority,Status,Section 508 Impact,Fix Required
+1,Authentication,LoginForm,src/components/auth/LoginForm.jsx,Color Inconsistency,Uses legacy gray-* colors instead of charcoal-*,High,Completed,No,Replaced text-gray-900 with text-charcoal-900
+2,Authentication,LoginForm,src/components/auth/LoginForm.jsx,Color Inconsistency,Uses text-gray-700 instead of text-charcoal-700,High,Completed,No,Replaced text-gray-700 with text-charcoal-700
+3,Authentication,LoginForm,src/components/auth/LoginForm.jsx,Color Inconsistency,Uses text-gray-600 instead of text-charcoal-600,High,Completed,No,Replaced text-gray-600 with text-charcoal-600
+4,Authentication,LoginForm,src/components/auth/LoginForm.jsx,Color Inconsistency,Uses text-gray-500 instead of text-charcoal-500,High,Completed,No,Replaced text-gray-500 with text-charcoal-500
+5,Authentication,LoginForm,src/components/auth/LoginForm.jsx,Color Inconsistency,Uses text-gray-400 instead of text-charcoal-400,High,Completed,No,Replaced text-gray-400 with text-charcoal-400
+6,Authentication,LoginForm,src/components/auth/LoginForm.jsx,Color Inconsistency,Uses border-gray-300 instead of border-charcoal-200,High,Completed,No,Replaced border-gray-300 with border-charcoal-200
+7,Authentication,LoginForm,src/components/auth/LoginForm.jsx,Accessibility,Missing aria-hidden on decorative Mail icon,Medium,Completed,Yes,Added aria-hidden=true to Mail icon
+8,Authentication,LoginForm,src/components/auth/LoginForm.jsx,Accessibility,Missing aria-hidden on decorative Lock icon,Medium,Completed,Yes,Added aria-hidden=true to Lock icon
+9,Authentication,LoginForm,src/components/auth/LoginForm.jsx,Accessibility,Missing aria-hidden on decorative LogIn icon,Medium,Completed,Yes,Added aria-hidden=true to LogIn icon
+10,Authentication,LoginForm,src/components/auth/LoginForm.jsx,Accessibility,Missing aria-hidden on decorative Chrome icon,Medium,Completed,Yes,Added aria-hidden=true to Chrome icon
+11,Authentication,LoginForm,src/components/auth/LoginForm.jsx,Color Token,Uses text-primary instead of text-primary-500,Medium,Completed,No,Updated color token to explicit shade
+12,Authentication,RegisterForm,src/components/auth/RegisterForm.jsx,Color Inconsistency,Uses legacy gray-* colors,High,Completed,No,Replaced gray-* with charcoal-*
+13,Authentication,RegisterForm,src/components/auth/RegisterForm.jsx,Accessibility,Missing aria-hidden on icons,Medium,Completed,Yes,Added aria-hidden=true to decorative icons
+14,Settings,UserSettingsPage,src/components/settings/UserSettingsPage.jsx,Styling Inconsistency,Inline input styles instead of .input class,Medium,Completed,No,Replaced inline styles with .input class
+15,Settings,UserSettingsPage,src/components/settings/UserSettingsPage.jsx,Accessibility,Toggle switches missing aria-label,High,Completed,Yes,Added aria-labelledby to toggle switches
+16,Settings,UserSettingsPage,src/components/settings/UserSettingsPage.jsx,Accessibility,Toggle switches missing role=switch,High,Completed,Yes,Added role=switch to toggle buttons
+17,Settings,UserSettingsPage,src/components/settings/UserSettingsPage.jsx,Accessibility,Toggle switches missing aria-checked,High,Completed,Yes,Added aria-checked state to toggles
+18,Settings,UserSettingsPage,src/components/settings/UserSettingsPage.jsx,Accessibility,Section icons missing aria-hidden,Medium,Completed,Yes,Added aria-hidden=true to section icons
+19,Shared,Navigation,src/components/shared/Navigation.jsx,Verified,Proper ARIA implementation,N/A,Verified,Yes,No changes needed
+20,Shared,Footer,src/components/shared/Footer.jsx,Accessibility,Missing aria-hidden on social icons,Medium,Completed,Yes,Added aria-hidden=true to social icons
+21,Shared,InfoTooltip,src/components/common/InfoTooltip.jsx,Verified,Proper ARIA and accessibility,N/A,Verified,Yes,No changes needed
+22,Shared,Skeleton,src/components/shared/Skeleton.jsx,Accessibility,Verify aria-busy on loading states,Low,Deferred,Yes,Recommendation for future
+23,Home,HomePage,src/components/home/HomePage.jsx,Verified,Uses design system consistently,N/A,Verified,Yes,No changes needed
+24,Home,ToolCard,src/components/home/ToolCard.jsx,Verified,Uses design system consistently,N/A,Verified,Yes,No changes needed
+25,Audit,AuditPage,src/components/audit/AuditPage.jsx,Verified,Uses design system consistently,N/A,Verified,Yes,No changes needed
+26,Audit,AuditUploadScreen,src/components/audit/upload/AuditUploadScreen.jsx,Verified,Uses design system,N/A,Verified,No,No changes needed
+27,Audit,AuditDashboard,src/components/audit/dashboard/AuditDashboard.jsx,Verified,Uses design system,N/A,Verified,No,No changes needed
+28,Accessibility,AccessibilityAuditPage,src/components/accessibility/AccessibilityAuditPage.jsx,Verified,Uses design system,N/A,Verified,No,No changes needed
+29,Accessibility,VPATReportGenerator,src/components/accessibility/VPATReportGenerator.jsx,Verified,Uses proper ARIA,N/A,Verified,Yes,No changes needed
+30,ImageAlt,ImageAltGeneratorPage,src/components/image-alt-generator/ImageAltGeneratorPage.jsx,Verified,Uses design system,N/A,Verified,No,No changes needed
+31,ImageAlt,ImageAltUploadScreen,src/components/image-alt-generator/upload/ImageAltUploadScreen.jsx,Verified,File input accessible,N/A,Verified,Yes,No changes needed
+32,Meta,MetaGeneratorPage,src/components/meta-generator/MetaGeneratorPage.jsx,Verified,Uses design system,N/A,Verified,No,No changes needed
+33,Meta,MetaUploadScreen,src/components/meta-generator/upload/MetaUploadScreen.jsx,Verified,File input accessible,N/A,Verified,Yes,No changes needed
+34,Schema,SchemaGeneratorPage,src/components/schema-generator/SchemaGeneratorPage.jsx,Verified,Uses design system,N/A,Verified,No,No changes needed
+35,Projects,ProjectDashboard,src/components/projects/ProjectDashboard.jsx,Verified,Uses design system,N/A,Verified,No,No changes needed
+36,Projects,ProjectCard,src/components/projects/ProjectCard.jsx,Color/Accessibility,Uses gray-* colors and missing ARIA,High,Completed,Yes,Updated colors and added ARIA attributes
+37,Projects,ProjectCreationWizard,src/components/projects/ProjectCreationWizard.jsx,Verified,Form steps accessible,N/A,Verified,Yes,No changes needed
+38,Checklist,SEOChecklist,src/components/checklist/SEOChecklist.jsx,Verified,Checkbox interactions accessible,N/A,Verified,Yes,No changes needed
+39,Checklist,ItemDetailModal,src/components/checklist/ItemDetailModal.jsx,Verified,Modal has proper ARIA,N/A,Verified,Yes,No changes needed
+40,Checklist,FilterPresetManager,src/components/checklist/FilterPresetManager.jsx,Verified,Filters accessible,N/A,Verified,Yes,No changes needed
+41,Help,HelpSearch,src/components/help/HelpSearch.jsx,Verified,Search modal accessible,N/A,Verified,Yes,No changes needed
+42,Help,KeyboardShortcuts,src/components/help/KeyboardShortcuts.jsx,Verified,Keyboard-focused component,N/A,Verified,Yes,No changes needed
+43,Help,GlossaryPage,src/components/help/GlossaryPage.jsx,Verified,Uses design system,N/A,Verified,No,No changes needed
+44,Profile,UserProfilePage,src/components/profile/UserProfilePage.jsx,Verified,Uses design system,N/A,Verified,Yes,No changes needed
+45,Export,ExportHubPage,src/components/export/ExportHubPage.jsx,Verified,Uses design system,N/A,Verified,No,No changes needed
+46,Activity,ActivityPage,src/components/activity/ActivityPage.jsx,Verified,Uses design system,N/A,Verified,No,No changes needed
+47,Global,App.jsx,src/App.jsx,Verified,Skip link and ARIA landmarks present,N/A,Verified,Yes,No changes needed
+48,Global,index.css,src/index.css,Enhancement,Add reduced motion media query,Low,Completed,Yes,Added @media (prefers-reduced-motion)
+49,Global,index.css,src/index.css,Enhancement,Add toggle switch component,Medium,Completed,Yes,Added accessible .toggle-switch class
+50,Global,index.css,src/index.css,Enhancement,Add high contrast mode support,Medium,Completed,Yes,Added @media (forced-colors: active)
+51,Global,tailwind.config.js,tailwind.config.js,Verified,Design tokens properly defined,N/A,Verified,No,No changes needed
+52,Admin,UsageAnalyticsDashboard,src/components/admin/UsageAnalyticsDashboard.jsx,Deferred,Chart accessibility,High,Deferred,Yes,Recommendation for future
+53,Admin,AuditLogViewer,src/components/admin/AuditLogViewer.jsx,Deferred,Table accessibility,Medium,Deferred,Yes,Recommendation for future
