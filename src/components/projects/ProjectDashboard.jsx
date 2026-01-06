@@ -64,14 +64,14 @@ export default function ProjectDashboard() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-charcoal-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Header */}
         <div className="mb-8">
           <div className="flex justify-between items-center mb-6">
             <div>
-              <h1 className="text-3xl font-bold text-gray-900">Content Planner</h1>
-              <p className="text-gray-600 mt-1">Manage your content projects and checklists</p>
+              <h1 className="text-3xl font-bold text-charcoal-900">Content Planner</h1>
+              <p className="text-charcoal-600 mt-1">Manage your content projects and checklists</p>
             </div>
             <div className="flex items-center gap-3">
               <Link
@@ -96,7 +96,7 @@ export default function ProjectDashboard() {
             <div className="card">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-gray-600">Active Projects</p>
+                  <p className="text-sm text-charcoal-600">Active Projects</p>
                   <p className="text-3xl font-bold text-primary-600">{stats.totalActive}</p>
                 </div>
                 <div className="p-3 bg-primary-100 rounded-full">
@@ -108,7 +108,7 @@ export default function ProjectDashboard() {
             <div className="card">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-gray-600">Completed This Month</p>
+                  <p className="text-sm text-charcoal-600">Completed This Month</p>
                   <p className="text-3xl font-bold text-green-600">{stats.completedThisMonth}</p>
                 </div>
                 <div className="p-3 bg-green-100 rounded-full">
@@ -120,11 +120,11 @@ export default function ProjectDashboard() {
             <div className="card">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-gray-600">Total Projects</p>
-                  <p className="text-3xl font-bold text-gray-900">{stats.totalProjects}</p>
+                  <p className="text-sm text-charcoal-600">Total Projects</p>
+                  <p className="text-3xl font-bold text-charcoal-900">{stats.totalProjects}</p>
                 </div>
-                <div className="p-3 bg-gray-100 rounded-full">
-                  <Calendar className="w-6 h-6 text-gray-600" />
+                <div className="p-3 bg-charcoal-100 rounded-full">
+                  <Calendar className="w-6 h-6 text-charcoal-600" />
                 </div>
               </div>
             </div>
@@ -133,7 +133,7 @@ export default function ProjectDashboard() {
           {/* Search and Filters */}
           <div className="flex flex-col md:flex-row gap-4">
             <div className="flex-1 relative">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5" />
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-charcoal-400 w-5 h-5" />
               <input
                 type="text"
                 placeholder="Search projects, clients, descriptions..."
@@ -178,8 +178,8 @@ export default function ProjectDashboard() {
                 <div className="w-20 h-20 bg-gradient-to-br from-primary-100 to-primary-200 rounded-2xl flex items-center justify-center mx-auto mb-6">
                   <ClipboardList className="w-10 h-10 text-primary-500" />
                 </div>
-                <h3 className="text-xl font-bold text-gray-900 mb-2">Welcome to Content Planner</h3>
-                <p className="text-gray-600 mb-6 max-w-md mx-auto">
+                <h3 className="text-xl font-bold text-charcoal-900 mb-2">Welcome to Content Planner</h3>
+                <p className="text-charcoal-600 mb-6 max-w-md mx-auto">
                   Create your first project to access the comprehensive 321-item content checklist
                   and start tracking your optimization progress.
                 </p>
@@ -192,8 +192,8 @@ export default function ProjectDashboard() {
                 </button>
 
                 {/* What you get section */}
-                <div className="bg-gray-50 rounded-xl p-6 max-w-2xl mx-auto text-left">
-                  <h4 className="text-sm font-semibold text-gray-700 mb-4 flex items-center gap-2">
+                <div className="bg-charcoal-50 rounded-xl p-6 max-w-2xl mx-auto text-left">
+                  <h4 className="text-sm font-semibold text-charcoal-700 mb-4 flex items-center gap-2">
                     <Lightbulb className="w-4 h-4 text-amber-500" />
                     What's included in each project:
                   </h4>
@@ -204,7 +204,7 @@ export default function ProjectDashboard() {
                       { icon: Users, text: 'Team task assignment', color: 'text-purple-500' },
                       { icon: Calendar, text: 'Timeline & deadline tracking', color: 'text-cyan-500' }
                     ].map((item, idx) => (
-                      <div key={idx} className="flex items-center gap-2 text-sm text-gray-600">
+                      <div key={idx} className="flex items-center gap-2 text-sm text-charcoal-600">
                         <item.icon className={`w-4 h-4 ${item.color}`} />
                         {item.text}
                       </div>
@@ -215,10 +215,10 @@ export default function ProjectDashboard() {
             ) : (
               <>
                 <div className="w-16 h-16 bg-gradient-to-br from-gray-100 to-gray-200 rounded-2xl flex items-center justify-center mx-auto mb-4">
-                  <Search className="w-8 h-8 text-gray-400" />
+                  <Search className="w-8 h-8 text-charcoal-400" />
                 </div>
-                <h3 className="text-lg font-bold text-gray-900 mb-2">No projects found</h3>
-                <p className="text-gray-600 mb-6">
+                <h3 className="text-lg font-bold text-charcoal-900 mb-2">No projects found</h3>
+                <p className="text-charcoal-600 mb-6">
                   No projects match your current search or filter criteria.
                 </p>
                 <button

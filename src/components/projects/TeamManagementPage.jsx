@@ -68,17 +68,17 @@ export default function TeamManagementPage() {
           <div className="w-20 h-20 bg-gradient-to-br from-purple-100 to-purple-200 rounded-2xl flex items-center justify-center mx-auto mb-6">
             <Shield className="w-10 h-10 text-purple-500" />
           </div>
-          <h2 className="text-2xl font-bold text-gray-900 mb-3">Access Restricted</h2>
-          <p className="text-gray-600 mb-6">
+          <h2 className="text-2xl font-bold text-charcoal-900 mb-3">Access Restricted</h2>
+          <p className="text-charcoal-600 mb-6">
             Team management is available to Administrators and Project Managers.
             Contact your team admin if you need access.
           </p>
-          <div className="p-4 bg-gray-50 rounded-lg text-left">
-            <h4 className="text-sm font-semibold text-gray-700 mb-2 flex items-center gap-2">
+          <div className="p-4 bg-charcoal-50 rounded-lg text-left">
+            <h4 className="text-sm font-semibold text-charcoal-700 mb-2 flex items-center gap-2">
               <Info className="w-4 h-4" />
               Your current role: {ROLE_LABELS[userProfile?.role] || 'Unknown'}
             </h4>
-            <p className="text-sm text-gray-500">
+            <p className="text-sm text-charcoal-500">
               With this role, you can view and complete assigned tasks. To manage team members,
               ask an admin to update your role to Project Manager or Administrator.
             </p>
@@ -89,12 +89,12 @@ export default function TeamManagementPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-charcoal-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Header */}
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">Team Management</h1>
-          <p className="text-gray-600">Manage team members and their roles</p>
+          <h1 className="text-3xl font-bold text-charcoal-900 mb-2">Team Management</h1>
+          <p className="text-charcoal-600">Manage team members and their roles</p>
         </div>
 
         {/* Stats */}
@@ -102,8 +102,8 @@ export default function TeamManagementPage() {
           <div className="card">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-gray-600">Total Members</p>
-                <p className="text-3xl font-bold text-gray-900">{users.length}</p>
+                <p className="text-sm text-charcoal-600">Total Members</p>
+                <p className="text-3xl font-bold text-charcoal-900">{users.length}</p>
               </div>
               <div className="p-3 bg-blue-100 rounded-full">
                 <User className="w-6 h-6 text-blue-600" />
@@ -114,7 +114,7 @@ export default function TeamManagementPage() {
           <div className="card">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-gray-600">Admins</p>
+                <p className="text-sm text-charcoal-600">Admins</p>
                 <p className="text-3xl font-bold text-purple-600">
                   {users.filter(u => u.role === USER_ROLES.ADMIN).length}
                 </p>
@@ -128,7 +128,7 @@ export default function TeamManagementPage() {
           <div className="card">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-gray-600">Project Managers</p>
+                <p className="text-sm text-charcoal-600">Project Managers</p>
                 <p className="text-3xl font-bold text-green-600">
                   {users.filter(u => u.role === USER_ROLES.PROJECT_MANAGER).length}
                 </p>
@@ -142,7 +142,7 @@ export default function TeamManagementPage() {
           <div className="card">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-gray-600">Team Members</p>
+                <p className="text-sm text-charcoal-600">Team Members</p>
                 <p className="text-3xl font-bold text-orange-600">
                   {users.filter(u =>
                     u.role !== USER_ROLES.ADMIN &&
@@ -163,18 +163,18 @@ export default function TeamManagementPage() {
           {users.length === 0 ? (
             <div className="p-12 text-center">
               <div className="w-16 h-16 bg-gradient-to-br from-gray-100 to-gray-200 rounded-2xl flex items-center justify-center mx-auto mb-4">
-                <Users className="w-8 h-8 text-gray-400" />
+                <Users className="w-8 h-8 text-charcoal-400" />
               </div>
-              <h3 className="text-lg font-semibold text-gray-900 mb-2">No team members yet</h3>
-              <p className="text-gray-600 mb-6 max-w-md mx-auto">
+              <h3 className="text-lg font-semibold text-charcoal-900 mb-2">No team members yet</h3>
+              <p className="text-charcoal-600 mb-6 max-w-md mx-auto">
                 Team members will appear here when they create an account and join your organization.
               </p>
-              <div className="p-4 bg-gray-50 rounded-lg text-left max-w-md mx-auto">
-                <h4 className="text-sm font-semibold text-gray-700 mb-2 flex items-center gap-2">
+              <div className="p-4 bg-charcoal-50 rounded-lg text-left max-w-md mx-auto">
+                <h4 className="text-sm font-semibold text-charcoal-700 mb-2 flex items-center gap-2">
                   <UserPlus className="w-4 h-4" />
                   How to add team members:
                 </h4>
-                <ul className="text-sm text-gray-600 space-y-1">
+                <ul className="text-sm text-charcoal-600 space-y-1">
                   <li>1. Share the registration link with your team</li>
                   <li>2. They create an account using their work email</li>
                   <li>3. Update their role from this page once they join</li>
@@ -184,25 +184,25 @@ export default function TeamManagementPage() {
           ) : (
           <div className="overflow-x-auto">
             <table className="min-w-full divide-y divide-gray-200">
-              <thead className="bg-gray-50">
+              <thead className="bg-charcoal-50">
                 <tr>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-6 py-3 text-left text-xs font-medium text-charcoal-500 uppercase tracking-wider">
                     Member
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-6 py-3 text-left text-xs font-medium text-charcoal-500 uppercase tracking-wider">
                     Role
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-6 py-3 text-left text-xs font-medium text-charcoal-500 uppercase tracking-wider">
                     Joined
                   </th>
-                  <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-6 py-3 text-right text-xs font-medium text-charcoal-500 uppercase tracking-wider">
                     Actions
                   </th>
                 </tr>
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">
                 {users.map((user) => (
-                  <tr key={user.id} className="hover:bg-gray-50">
+                  <tr key={user.id} className="hover:bg-charcoal-50">
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="flex items-center">
                         <div className="w-10 h-10 bg-primary-100 rounded-full flex items-center justify-center flex-shrink-0">
@@ -217,13 +217,13 @@ export default function TeamManagementPage() {
                           )}
                         </div>
                         <div className="ml-4">
-                          <div className="text-sm font-medium text-gray-900">
+                          <div className="text-sm font-medium text-charcoal-900">
                             {user.name}
                             {user.id === currentUser.uid && (
-                              <span className="ml-2 text-xs text-gray-500">(You)</span>
+                              <span className="ml-2 text-xs text-charcoal-500">(You)</span>
                             )}
                           </div>
-                          <div className="text-sm text-gray-500 flex items-center gap-1">
+                          <div className="text-sm text-charcoal-500 flex items-center gap-1">
                             <Mail className="w-3 h-3" />
                             {user.email}
                           </div>
@@ -251,14 +251,14 @@ export default function TeamManagementPage() {
                             : user.role === USER_ROLES.PROJECT_MANAGER
                             ? 'bg-green-100 text-green-800'
                             : user.role === USER_ROLES.CLIENT
-                            ? 'bg-gray-100 text-gray-800'
+                            ? 'bg-charcoal-100 text-charcoal-800'
                             : 'bg-blue-100 text-blue-800'
                         }`}>
                           {ROLE_LABELS[user.role] || user.role}
                         </span>
                       )}
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-charcoal-500">
                       <div className="flex items-center gap-1">
                         <Calendar className="w-3 h-3" />
                         {user.createdAt?.toDate

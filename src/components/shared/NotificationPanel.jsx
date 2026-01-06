@@ -60,7 +60,7 @@ export default function NotificationPanel() {
       {/* Bell Icon Button */}
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="relative p-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-colors"
+        className="relative p-2 text-charcoal-600 hover:text-charcoal-900 hover:bg-charcoal-100 rounded-lg transition-colors"
       >
         <Bell className="w-5 h-5" />
         {unreadCount > 0 && (
@@ -80,10 +80,10 @@ export default function NotificationPanel() {
           />
 
           {/* Panel */}
-          <div className="absolute right-0 mt-2 w-96 bg-white rounded-lg shadow-xl border border-gray-300 z-50 max-h-[600px] flex flex-col">
+          <div className="absolute right-0 mt-2 w-96 bg-white rounded-lg shadow-xl border border-charcoal-200 z-50 max-h-[600px] flex flex-col">
             {/* Header */}
             <div className="p-4 border-b flex items-center justify-between">
-              <h3 className="text-lg font-semibold text-gray-900">
+              <h3 className="text-lg font-semibold text-charcoal-900">
                 Notifications
               </h3>
               <div className="flex items-center gap-2">
@@ -101,15 +101,15 @@ export default function NotificationPanel() {
                     setIsOpen(false);
                     setPrefsOpen(true);
                   }}
-                  className="p-1.5 hover:bg-gray-100 rounded-lg transition-colors"
+                  className="p-1.5 hover:bg-charcoal-100 rounded-lg transition-colors"
                   title="Notification settings"
                   aria-label="Open notification settings"
                 >
-                  <Settings className="w-4 h-4 text-gray-500" />
+                  <Settings className="w-4 h-4 text-charcoal-500" />
                 </button>
                 <button
                   onClick={() => setIsOpen(false)}
-                  className="text-gray-400 hover:text-gray-600"
+                  className="text-charcoal-400 hover:text-charcoal-600"
                 >
                   <X className="w-5 h-5" />
                 </button>
@@ -120,8 +120,8 @@ export default function NotificationPanel() {
             <div className="flex-1 overflow-y-auto">
               {notifications.length === 0 ? (
                 <div className="p-8 text-center">
-                  <Bell className="w-12 h-12 text-gray-300 mx-auto mb-3" />
-                  <p className="text-gray-500">No notifications yet</p>
+                  <Bell className="w-12 h-12 text-charcoal-300 mx-auto mb-3" />
+                  <p className="text-charcoal-500">No notifications yet</p>
                 </div>
               ) : (
                 <div className="divide-y">
@@ -129,7 +129,7 @@ export default function NotificationPanel() {
                     <button
                       key={notification.id}
                       onClick={() => handleNotificationClick(notification)}
-                      className={`w-full text-left p-4 hover:bg-gray-50 transition-colors ${
+                      className={`w-full text-left p-4 hover:bg-charcoal-50 transition-colors ${
                         !notification.read ? 'bg-primary-50' : ''
                       }`}
                     >
@@ -140,7 +140,7 @@ export default function NotificationPanel() {
                         <div className="flex-1 min-w-0">
                           <div className="flex items-start justify-between">
                             <p className={`text-sm ${
-                              !notification.read ? 'font-semibold text-gray-900' : 'font-medium text-gray-700'
+                              !notification.read ? 'font-semibold text-charcoal-900' : 'font-medium text-charcoal-700'
                             }`}>
                               {notification.title}
                             </p>
@@ -148,10 +148,10 @@ export default function NotificationPanel() {
                               <div className="w-2 h-2 bg-primary-600 rounded-full flex-shrink-0 ml-2 mt-1" />
                             )}
                           </div>
-                          <p className="text-sm text-gray-600 mt-0.5 line-clamp-2">
+                          <p className="text-sm text-charcoal-600 mt-0.5 line-clamp-2">
                             {notification.message}
                           </p>
-                          <p className="text-xs text-gray-400 mt-1">
+                          <p className="text-xs text-charcoal-400 mt-1">
                             {formatTimestamp(notification.createdAt)}
                           </p>
                         </div>
@@ -164,7 +164,7 @@ export default function NotificationPanel() {
 
             {/* Footer */}
             {notifications.length > 0 && (
-              <div className="p-3 border-t bg-gray-50 text-center">
+              <div className="p-3 border-t bg-charcoal-50 text-center">
                 <button
                   onClick={() => {
                     navigate('/notifications');

@@ -97,13 +97,13 @@ export default function MyTasksPage() {
   };
 
   const getDueDateColor = (dueDate) => {
-    if (!dueDate) return 'text-gray-500';
+    if (!dueDate) return 'text-charcoal-500';
     const date = dueDate.toDate();
     const today = startOfDay(new Date());
 
     if (isBefore(date, today)) return 'text-red-600 font-semibold';
     if (isBefore(date, addDays(today, 3))) return 'text-orange-600 font-medium';
-    return 'text-gray-700';
+    return 'text-charcoal-700';
   };
 
   const priorityColors = {
@@ -114,7 +114,7 @@ export default function MyTasksPage() {
   };
 
   const statusColors = {
-    'not_started': 'bg-gray-100 text-gray-800',
+    'not_started': 'bg-charcoal-100 text-charcoal-800',
     'in_progress': 'bg-blue-100 text-blue-800',
     'in_review': 'bg-purple-100 text-purple-800',
     'completed': 'bg-green-100 text-green-800'
@@ -129,12 +129,12 @@ export default function MyTasksPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-charcoal-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Header */}
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">My Tasks</h1>
-          <p className="text-gray-600">Tasks assigned to you across all projects</p>
+          <h1 className="text-3xl font-bold text-charcoal-900 mb-2">My Tasks</h1>
+          <p className="text-charcoal-600">Tasks assigned to you across all projects</p>
         </div>
 
         {/* Stats Cards */}
@@ -142,8 +142,8 @@ export default function MyTasksPage() {
           <div className="card">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-gray-600">Total Tasks</p>
-                <p className="text-3xl font-bold text-gray-900">{stats.total}</p>
+                <p className="text-sm text-charcoal-600">Total Tasks</p>
+                <p className="text-3xl font-bold text-charcoal-900">{stats.total}</p>
               </div>
               <div className="p-3 bg-blue-100 rounded-full">
                 <CheckCircle className="w-6 h-6 text-blue-600" />
@@ -154,7 +154,7 @@ export default function MyTasksPage() {
           <div className="card">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-gray-600">Due Today</p>
+                <p className="text-sm text-charcoal-600">Due Today</p>
                 <p className="text-3xl font-bold text-orange-600">{stats.dueToday}</p>
               </div>
               <div className="p-3 bg-orange-100 rounded-full">
@@ -166,7 +166,7 @@ export default function MyTasksPage() {
           <div className="card">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-gray-600">Overdue</p>
+                <p className="text-sm text-charcoal-600">Overdue</p>
                 <p className="text-3xl font-bold text-red-600">{stats.overdue}</p>
               </div>
               <div className="p-3 bg-red-100 rounded-full">
@@ -178,7 +178,7 @@ export default function MyTasksPage() {
           <div className="card">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-gray-600">Completed This Week</p>
+                <p className="text-sm text-charcoal-600">Completed This Week</p>
                 <p className="text-3xl font-bold text-green-600">{stats.completedThisWeek}</p>
               </div>
               <div className="p-3 bg-green-100 rounded-full">
@@ -192,7 +192,7 @@ export default function MyTasksPage() {
         <div className="bg-white rounded-lg shadow-md p-6 mb-6">
           <div className="flex flex-col md:flex-row gap-4">
             <div className="flex-1">
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium text-charcoal-700 mb-2">
                 Status
               </label>
               <select
@@ -208,7 +208,7 @@ export default function MyTasksPage() {
             </div>
 
             <div className="flex-1">
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium text-charcoal-700 mb-2">
                 Due Date
               </label>
               <select
@@ -223,7 +223,7 @@ export default function MyTasksPage() {
             </div>
 
             <div className="flex-1">
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium text-charcoal-700 mb-2">
                 Sort By
               </label>
               <select
@@ -247,10 +247,10 @@ export default function MyTasksPage() {
                 <div className="w-20 h-20 bg-gradient-to-br from-primary-100 to-primary-200 rounded-2xl flex items-center justify-center mx-auto mb-6">
                   <Inbox className="w-10 h-10 text-primary-500" />
                 </div>
-                <h3 className="text-xl font-bold text-gray-900 mb-2">
+                <h3 className="text-xl font-bold text-charcoal-900 mb-2">
                   No tasks assigned yet
                 </h3>
-                <p className="text-gray-600 mb-6 max-w-md mx-auto">
+                <p className="text-charcoal-600 mb-6 max-w-md mx-auto">
                   When team members assign tasks to you from content projects, they'll appear here.
                   You can also assign tasks to yourself from any project checklist.
                 </p>
@@ -264,9 +264,9 @@ export default function MyTasksPage() {
                     <ArrowRight className="w-4 h-4" />
                   </Link>
                 </div>
-                <div className="mt-8 p-4 bg-gray-50 rounded-lg text-left max-w-md mx-auto">
-                  <h4 className="text-sm font-semibold text-gray-700 mb-2">How to get tasks assigned:</h4>
-                  <ul className="text-sm text-gray-600 space-y-1">
+                <div className="mt-8 p-4 bg-charcoal-50 rounded-lg text-left max-w-md mx-auto">
+                  <h4 className="text-sm font-semibold text-charcoal-700 mb-2">How to get tasks assigned:</h4>
+                  <ul className="text-sm text-charcoal-600 space-y-1">
                     <li className="flex items-start gap-2">
                       <span className="text-primary-500 mt-0.5">1.</span>
                       Open a project from the Content Planner
@@ -285,12 +285,12 @@ export default function MyTasksPage() {
             ) : (
               <>
                 <div className="w-20 h-20 bg-gradient-to-br from-gray-100 to-gray-200 rounded-2xl flex items-center justify-center mx-auto mb-6">
-                  <Search className="w-10 h-10 text-gray-400" />
+                  <Search className="w-10 h-10 text-charcoal-400" />
                 </div>
-                <h3 className="text-xl font-bold text-gray-900 mb-2">
+                <h3 className="text-xl font-bold text-charcoal-900 mb-2">
                   No tasks match your filters
                 </h3>
-                <p className="text-gray-600 mb-6">
+                <p className="text-charcoal-600 mb-6">
                   Try adjusting your filter criteria to see more tasks.
                 </p>
                 <button
@@ -312,7 +312,7 @@ export default function MyTasksPage() {
               <div
                 key={index}
                 onClick={() => handleTaskClick(task)}
-                className="bg-white rounded-lg shadow-sm border border-gray-300 p-4 hover:shadow-md hover:border-primary-300 transition-all cursor-pointer"
+                className="bg-white rounded-lg shadow-sm border border-charcoal-200 p-4 hover:shadow-md hover:border-primary-300 transition-all cursor-pointer"
               >
                 <div className="flex items-start gap-4">
                   <div className="flex-1">
@@ -323,17 +323,17 @@ export default function MyTasksPage() {
                       <span className={`px-2 py-0.5 rounded text-xs font-medium ${statusColors[task.status]}`}>
                         {TASK_STATUS_LABELS[task.status]}
                       </span>
-                      <span className="text-xs text-gray-500">#{task.item.id}</span>
+                      <span className="text-xs text-charcoal-500">#{task.item.id}</span>
                     </div>
 
-                    <h3 className="text-gray-900 font-medium mb-1 line-clamp-2">
+                    <h3 className="text-charcoal-900 font-medium mb-1 line-clamp-2">
                       {task.item.item}
                     </h3>
 
-                    <div className="flex flex-wrap items-center gap-4 text-sm text-gray-600">
+                    <div className="flex flex-wrap items-center gap-4 text-sm text-charcoal-600">
                       <span className="flex items-center gap-1">
                         <span className="font-medium">{task.project.name}</span>
-                        <span className="text-gray-400">•</span>
+                        <span className="text-charcoal-400">•</span>
                         <span>{task.item.phase}</span>
                       </span>
 

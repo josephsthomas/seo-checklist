@@ -74,7 +74,7 @@ export default function CommentThread({ comments, loading, onAddComment, project
             className="input min-h-[100px]"
             rows={3}
           />
-          <p className="text-xs text-gray-500 mt-1">
+          <p className="text-xs text-charcoal-500 mt-1">
             Tip: Use @username to mention team members
           </p>
         </div>
@@ -85,9 +85,9 @@ export default function CommentThread({ comments, loading, onAddComment, project
               type="checkbox"
               checked={isInternal}
               onChange={(e) => setIsInternal(e.target.checked)}
-              className="rounded border-gray-300 text-primary-600 focus:ring-primary-500"
+              className="rounded border-charcoal-200 text-primary-600 focus:ring-primary-500"
             />
-            <span className="text-gray-700">Internal note (hidden from clients)</span>
+            <span className="text-charcoal-700">Internal note (hidden from clients)</span>
           </label>
 
           <button
@@ -104,7 +104,7 @@ export default function CommentThread({ comments, loading, onAddComment, project
       {/* Comments List */}
       <div className="space-y-4 pt-4 border-t">
         {comments.length === 0 ? (
-          <p className="text-center text-gray-500 py-8">
+          <p className="text-center text-charcoal-500 py-8">
             No comments yet. Be the first to comment!
           </p>
         ) : (
@@ -123,11 +123,11 @@ export default function CommentThread({ comments, loading, onAddComment, project
               </div>
 
               <div className="flex-1">
-                <div className="bg-gray-50 rounded-lg p-3">
+                <div className="bg-charcoal-50 rounded-lg p-3">
                   <div className="flex items-start justify-between mb-2">
                     <div>
-                      <span className="font-medium text-gray-900">{comment.userName}</span>
-                      <span className="text-gray-500 text-xs ml-2">
+                      <span className="font-medium text-charcoal-900">{comment.userName}</span>
+                      <span className="text-charcoal-500 text-xs ml-2">
                         {formatTimestamp(comment.createdAt)}
                       </span>
                       {comment.isInternal && (
@@ -139,13 +139,13 @@ export default function CommentThread({ comments, loading, onAddComment, project
                     {comment.userId === currentUser?.uid && (
                       <div className="flex gap-1">
                         <button
-                          className="p-1 text-gray-400 hover:text-gray-600"
+                          className="p-1 text-charcoal-400 hover:text-charcoal-600"
                           title="Edit"
                         >
                           <Edit2 className="w-4 h-4" />
                         </button>
                         <button
-                          className="p-1 text-gray-400 hover:text-red-600"
+                          className="p-1 text-charcoal-400 hover:text-red-600"
                           title="Delete"
                         >
                           <Trash2 className="w-4 h-4" />
@@ -154,12 +154,12 @@ export default function CommentThread({ comments, loading, onAddComment, project
                     )}
                   </div>
 
-                  <p className="text-gray-700 text-sm whitespace-pre-wrap">
+                  <p className="text-charcoal-700 text-sm whitespace-pre-wrap">
                     {highlightMentions(comment.text)}
                   </p>
 
                   {comment.updatedAt && (
-                    <p className="text-xs text-gray-400 mt-2">
+                    <p className="text-xs text-charcoal-400 mt-2">
                       (edited)
                     </p>
                   )}
