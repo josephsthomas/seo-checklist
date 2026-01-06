@@ -57,6 +57,9 @@ const UserSettingsPage = lazy(() => import('./components/settings/UserSettingsPa
 // User Profile - lazy load
 const UserProfilePage = lazy(() => import('./components/profile/UserProfilePage'));
 
+// Export Hub - lazy load
+const ExportHubPage = lazy(() => import('./components/export/ExportHubPage'));
+
 /**
  * Enhanced Loading Fallback with Skeleton
  */
@@ -310,6 +313,14 @@ function App() {
                     element={
                       <ProtectedRoute>
                         <ActivityPage />
+                      </ProtectedRoute>
+                    }
+                  />
+                  <Route
+                    path="/export"
+                    element={
+                      <ProtectedRoute>
+                        <ExportHubPage />
                       </ProtectedRoute>
                     }
                   />
