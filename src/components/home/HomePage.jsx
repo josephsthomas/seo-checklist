@@ -6,6 +6,7 @@ import { useAudits } from '../../hooks/useAudits';
 import { getVisibleTools, TOOL_STATUS } from '../../config/tools';
 import ToolCard from './ToolCard';
 import { SkeletonStatCard, SkeletonToolCard, SkeletonProjectList } from '../shared/Skeleton';
+import FavoritesAndRecentsWidget from '../shared/FavoritesAndRecents';
 import {
   ClipboardList,
   Search,
@@ -20,7 +21,9 @@ import {
   Code2,
   Accessibility,
   Plus,
-  Zap
+  Zap,
+  Settings,
+  Star
 } from 'lucide-react';
 import { format } from 'date-fns';
 
@@ -88,10 +91,19 @@ export default function HomePage() {
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
           {/* Welcome Header */}
           <div className="mb-10">
-            <div className="flex items-center gap-2 text-sm text-charcoal-500 mb-2">
-              <time dateTime={new Date().toISOString()}>
-                {format(new Date(), 'EEEE, MMMM d, yyyy')}
-              </time>
+            <div className="flex items-center justify-between mb-2">
+              <div className="flex items-center gap-2 text-sm text-charcoal-500">
+                <time dateTime={new Date().toISOString()}>
+                  {format(new Date(), 'EEEE, MMMM d, yyyy')}
+                </time>
+              </div>
+              <Link
+                to="/settings"
+                className="flex items-center gap-2 px-3 py-1.5 text-sm text-charcoal-600 hover:text-charcoal-800 hover:bg-white/50 rounded-lg transition-colors"
+              >
+                <Settings className="w-4 h-4" />
+                <span className="hidden sm:inline">Settings</span>
+              </Link>
             </div>
             <h1 className="text-4xl sm:text-5xl font-bold text-charcoal-900 mb-3">
               {getGreeting()},{' '}
@@ -407,6 +419,15 @@ export default function HomePage() {
               </div>
             )}
           </div>
+        </section>
+
+        {/* Favorites & Recent Items */}
+        <section className="mb-12" aria-labelledby="favorites-heading">
+          <div className="flex items-center gap-2 mb-4">
+            <Star className="w-5 h-5 text-amber-500" />
+            <h2 id="favorites-heading" className="text-lg font-bold text-charcoal-900">Quick Access</h2>
+          </div>
+          <FavoritesAndRecentsWidget />
         </section>
 
         {/* Quick Tips */}
