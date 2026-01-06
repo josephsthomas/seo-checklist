@@ -19,7 +19,8 @@ import {
   ChevronRight,
   Clock,
   AlertCircle,
-  RefreshCcw
+  RefreshCcw,
+  X
 } from 'lucide-react';
 import { format, subDays, startOfDay, endOfDay } from 'date-fns';
 import { collection, query, where, orderBy, limit, getDocs, startAfter, Timestamp } from 'firebase/firestore';
@@ -177,8 +178,73 @@ export default function AuditLogViewer() {
     setCurrentPage(1);
   }, [filteredLogs.length]);
 
-  const handleExport = () => {
-    toast.success('Audit log export coming soon!');
+  const handleExport = (exportFormat = 'csv') => {
+    if (filteredLogs.length === 0) {
+      toast.error('No logs to export');
+      return;
+    }
+
+    try {
+      if (exportFormat === 'csv') {
+        // Generate CSV
+        const headers = ['Timestamp', 'User', 'Email', 'Action', 'Resource', 'Resource Name', 'IP Address', 'Status', 'Error Message'];
+        const rows = filteredLogs.map(log => [
+          format(log.timestamp, 'yyyy-MM-dd HH:mm:ss'),
+          log.userName,
+          log.userEmail,
+          ACTION_TYPES[log.action]?.label || log.action,
+          log.resource,
+          log.resourceName,
+          log.ipAddress,
+          log.success ? 'Success' : 'Failed',
+          log.errorMessage || ''
+        ]);
+
+        const csvContent = [headers, ...rows]
+          .map(row => row.map(cell => `"${String(cell).replace(/"/g, '""')}"`).join(','))
+          .join('\n');
+
+        const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+        const link = document.createElement('a');
+        link.href = URL.createObjectURL(blob);
+        link.download = `audit_log_${format(new Date(), 'yyyy-MM-dd')}.csv`;
+        link.click();
+        URL.revokeObjectURL(link.href);
+        toast.success(`Exported ${filteredLogs.length} audit log entries to CSV`);
+      } else if (exportFormat === 'json') {
+        // Generate JSON
+        const jsonData = filteredLogs.map(log => ({
+          timestamp: format(log.timestamp, 'yyyy-MM-dd HH:mm:ss'),
+          user: {
+            id: log.userId,
+            name: log.userName,
+            email: log.userEmail
+          },
+          action: ACTION_TYPES[log.action]?.label || log.action,
+          resource: {
+            type: log.resource,
+            id: log.resourceId,
+            name: log.resourceName
+          },
+          ipAddress: log.ipAddress,
+          userAgent: log.userAgent,
+          success: log.success,
+          errorMessage: log.errorMessage,
+          details: log.details
+        }));
+
+        const blob = new Blob([JSON.stringify(jsonData, null, 2)], { type: 'application/json' });
+        const link = document.createElement('a');
+        link.href = URL.createObjectURL(blob);
+        link.download = `audit_log_${format(new Date(), 'yyyy-MM-dd')}.json`;
+        link.click();
+        URL.revokeObjectURL(link.href);
+        toast.success(`Exported ${filteredLogs.length} audit log entries to JSON`);
+      }
+    } catch (err) {
+      console.error('Export error:', err);
+      toast.error('Failed to export audit logs');
+    }
   };
 
   const getActionConfig = (action) => {
@@ -210,13 +276,27 @@ export default function AuditLogViewer() {
               <RefreshCcw className="w-4 h-4" />
               Refresh
             </button>
-            <button
-              onClick={handleExport}
-              className="btn btn-primary flex items-center gap-2"
-            >
-              <Download className="w-4 h-4" />
-              Export Logs
-            </button>
+            <div className="relative group">
+              <button className="btn btn-primary flex items-center gap-2">
+                <Download className="w-4 h-4" />
+                Export Logs
+                <ChevronDown className="w-4 h-4" />
+              </button>
+              <div className="absolute right-0 top-full mt-1 w-40 bg-white dark:bg-charcoal-800 border border-charcoal-200 dark:border-charcoal-700 rounded-lg shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-10">
+                <button
+                  onClick={() => handleExport('csv')}
+                  className="w-full px-4 py-2 text-sm text-left text-charcoal-700 dark:text-charcoal-300 hover:bg-charcoal-100 dark:hover:bg-charcoal-700 rounded-t-lg"
+                >
+                  Export as CSV
+                </button>
+                <button
+                  onClick={() => handleExport('json')}
+                  className="w-full px-4 py-2 text-sm text-left text-charcoal-700 dark:text-charcoal-300 hover:bg-charcoal-100 dark:hover:bg-charcoal-700 rounded-b-lg"
+                >
+                  Export as JSON
+                </button>
+              </div>
+            </div>
           </div>
         </div>
 

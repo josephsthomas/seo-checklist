@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import {
   Globe,
   Upload,
@@ -15,9 +15,16 @@ import {
   BarChart2,
   ChevronDown,
   ChevronRight,
-  Loader2
+  Loader2,
+  Save
 } from 'lucide-react';
+import { format } from 'date-fns';
 import toast from 'react-hot-toast';
+import jsPDF from 'jspdf';
+import 'jspdf-autotable';
+
+// Local storage key for persisting batch audit results
+const STORAGE_KEY = 'batchAuditResults';
 
 export default function BatchAuditPanel({ onClose, onStartBatch }) {
   const [urls, setUrls] = useState([]);
@@ -26,6 +33,153 @@ export default function BatchAuditPanel({ onClose, onStartBatch }) {
   const [results, setResults] = useState([]);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [showResults, setShowResults] = useState(false);
+  const [savedBatches, setSavedBatches] = useState([]);
+
+  // Load saved batch results from localStorage
+  useEffect(() => {
+    try {
+      const saved = localStorage.getItem(STORAGE_KEY);
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        setSavedBatches(parsed);
+      }
+    } catch (err) {
+      console.error('Error loading saved batches:', err);
+    }
+  }, []);
+
+  // Save results to localStorage when batch completes
+  const saveCurrentBatch = useCallback(() => {
+    if (results.length === 0) return;
+
+    const batchData = {
+      id: Date.now().toString(),
+      completedAt: new Date().toISOString(),
+      urls,
+      results,
+      summary: {
+        totalUrls: urls.length,
+        avgScore: Math.round(results.reduce((acc, r) => acc + r.healthScore, 0) / results.length),
+        totalIssues: results.reduce((acc, r) => acc + r.issueCount, 0)
+      }
+    };
+
+    try {
+      const updatedBatches = [batchData, ...savedBatches].slice(0, 10); // Keep last 10
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(updatedBatches));
+      setSavedBatches(updatedBatches);
+      toast.success('Batch results saved');
+    } catch (err) {
+      console.error('Error saving batch:', err);
+    }
+  }, [results, urls, savedBatches]);
+
+  // Export results as CSV
+  const exportAsCSV = () => {
+    if (results.length === 0) {
+      toast.error('No results to export');
+      return;
+    }
+
+    const headers = ['URL', 'Health Score', 'Issues', 'Meta Tags', 'Images', 'Links', 'Performance', 'Timestamp'];
+    const rows = results.map(r => [
+      r.url,
+      r.healthScore,
+      r.issueCount,
+      r.categories['Meta Tags'],
+      r.categories['Images'],
+      r.categories['Links'],
+      r.categories['Performance'],
+      format(r.timestamp, 'yyyy-MM-dd HH:mm:ss')
+    ]);
+
+    const csvContent = [headers, ...rows]
+      .map(row => row.map(cell => `"${String(cell).replace(/"/g, '""')}"`).join(','))
+      .join('\n');
+
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    link.download = `batch_audit_${format(new Date(), 'yyyy-MM-dd_HHmm')}.csv`;
+    link.click();
+    URL.revokeObjectURL(link.href);
+    toast.success(`Exported ${results.length} results to CSV`);
+  };
+
+  // Export results as PDF
+  const exportAsPDF = () => {
+    if (results.length === 0) {
+      toast.error('No results to export');
+      return;
+    }
+
+    const doc = new jsPDF();
+    const pageWidth = doc.internal.pageSize.getWidth();
+
+    // Title
+    doc.setFontSize(20);
+    doc.setTextColor(31, 41, 55);
+    doc.text('Batch SEO Audit Report', pageWidth / 2, 20, { align: 'center' });
+
+    // Subtitle
+    doc.setFontSize(11);
+    doc.setTextColor(107, 114, 128);
+    doc.text(`Generated: ${format(new Date(), 'MMMM d, yyyy h:mm a')}`, pageWidth / 2, 28, { align: 'center' });
+
+    // Summary
+    const avgScore = Math.round(results.reduce((acc, r) => acc + r.healthScore, 0) / results.length);
+    const totalIssues = results.reduce((acc, r) => acc + r.issueCount, 0);
+
+    doc.setFontSize(12);
+    doc.setTextColor(31, 41, 55);
+    doc.text('Summary', 20, 45);
+
+    doc.setFontSize(10);
+    doc.setTextColor(107, 114, 128);
+    doc.text(`URLs Audited: ${results.length}`, 20, 55);
+    doc.text(`Average Health Score: ${avgScore}%`, 20, 62);
+    doc.text(`Total Issues Found: ${totalIssues}`, 20, 69);
+
+    // Results table
+    const tableData = results.map(r => [
+      r.url.length > 40 ? r.url.substring(0, 40) + '...' : r.url,
+      `${r.healthScore}%`,
+      r.issueCount,
+      `${r.categories['Meta Tags']}%`,
+      `${r.categories['Images']}%`,
+      `${r.categories['Links']}%`,
+      `${r.categories['Performance']}%`
+    ]);
+
+    doc.autoTable({
+      startY: 80,
+      head: [['URL', 'Score', 'Issues', 'Meta', 'Images', 'Links', 'Perf']],
+      body: tableData,
+      headStyles: {
+        fillColor: [14, 165, 233],
+        textColor: 255,
+        fontSize: 9
+      },
+      bodyStyles: {
+        fontSize: 8
+      },
+      columnStyles: {
+        0: { cellWidth: 60 },
+        1: { cellWidth: 18, halign: 'center' },
+        2: { cellWidth: 18, halign: 'center' },
+        3: { cellWidth: 18, halign: 'center' },
+        4: { cellWidth: 18, halign: 'center' },
+        5: { cellWidth: 18, halign: 'center' },
+        6: { cellWidth: 18, halign: 'center' }
+      },
+      alternateRowStyles: {
+        fillColor: [248, 250, 252]
+      }
+    });
+
+    doc.save(`batch_audit_${format(new Date(), 'yyyy-MM-dd_HHmm')}.pdf`);
+    toast.success('Exported batch audit report as PDF');
+  };
 
   // Add URL to list
   const addUrl = useCallback((url) => {
@@ -143,6 +297,41 @@ export default function BatchAuditPanel({ onClose, onStartBatch }) {
 
     setIsRunning(false);
     toast.success('Batch audit complete!');
+
+    // Auto-save results
+    const batchData = {
+      id: Date.now().toString(),
+      completedAt: new Date().toISOString(),
+      urls,
+      results: [...results, {
+        url: urls[urls.length - 1],
+        status: 'completed',
+        healthScore: Math.floor(60 + Math.random() * 40),
+        issueCount: Math.floor(Math.random() * 30) + 5,
+        timestamp: new Date(),
+        categories: {
+          'Meta Tags': Math.floor(70 + Math.random() * 30),
+          'Images': Math.floor(60 + Math.random() * 40),
+          'Links': Math.floor(75 + Math.random() * 25),
+          'Performance': Math.floor(50 + Math.random() * 50),
+        }
+      }],
+      summary: {
+        totalUrls: urls.length,
+        avgScore: Math.round(results.reduce((acc, r) => acc + r.healthScore, 0) / results.length) || 0,
+        totalIssues: results.reduce((acc, r) => acc + r.issueCount, 0)
+      }
+    };
+
+    try {
+      const saved = localStorage.getItem(STORAGE_KEY);
+      const existingBatches = saved ? JSON.parse(saved) : [];
+      const updatedBatches = [batchData, ...existingBatches].slice(0, 10);
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(updatedBatches));
+      setSavedBatches(updatedBatches);
+    } catch (err) {
+      console.error('Error auto-saving batch:', err);
+    }
 
     // Callback with results
     if (onStartBatch) {
@@ -435,13 +624,29 @@ export default function BatchAuditPanel({ onClose, onStartBatch }) {
                   Resume
                 </button>
               ) : (
-                <button
-                  className="btn btn-primary flex items-center gap-2"
-                  onClick={() => toast.success('Export coming soon!')}
-                >
-                  <Download className="w-4 h-4" />
-                  Export Results
-                </button>
+                <div className="relative group">
+                  <button className="btn btn-primary flex items-center gap-2">
+                    <Download className="w-4 h-4" />
+                    Export Results
+                    <ChevronDown className="w-4 h-4" />
+                  </button>
+                  <div className="absolute right-0 bottom-full mb-1 w-44 bg-white dark:bg-charcoal-800 border border-charcoal-200 dark:border-charcoal-700 rounded-lg shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-10">
+                    <button
+                      onClick={exportAsPDF}
+                      className="w-full px-4 py-2 text-sm text-left text-charcoal-700 dark:text-charcoal-300 hover:bg-charcoal-100 dark:hover:bg-charcoal-700 rounded-t-lg flex items-center gap-2"
+                    >
+                      <FileText className="w-4 h-4" />
+                      Export as PDF
+                    </button>
+                    <button
+                      onClick={exportAsCSV}
+                      className="w-full px-4 py-2 text-sm text-left text-charcoal-700 dark:text-charcoal-300 hover:bg-charcoal-100 dark:hover:bg-charcoal-700 rounded-b-lg flex items-center gap-2"
+                    >
+                      <BarChart2 className="w-4 h-4" />
+                      Export as CSV
+                    </button>
+                  </div>
+                </div>
               )}
             </div>
           </>
