@@ -17,7 +17,7 @@ import {
  * Renders different widget types with mock/real data
  */
 
-export default function ReportWidgetRenderer({ widget, isPreview, data }) {
+export default function ReportWidgetRenderer({ widget, data }) {
   const { type, config } = widget;
 
   switch (type) {
@@ -226,7 +226,7 @@ function renderArrayChart(data, chartType) {
  * Render chart from object data
  */
 function renderObjectChart(data, chartType) {
-  const entries = Object.entries(data).filter(([k, v]) => typeof v === 'number');
+  const entries = Object.entries(data).filter(([, v]) => typeof v === 'number');
   const total = entries.reduce((sum, [, v]) => sum + v, 0);
 
   const colors = ['bg-red-500', 'bg-amber-500', 'bg-primary-500', 'bg-emerald-500', 'bg-purple-500'];
@@ -449,7 +449,7 @@ function DividerWidget({ config }) {
 /**
  * Summary Widget - Executive summary
  */
-function SummaryWidget({ config, data }) {
+function SummaryWidget({ config }) {
   return (
     <div className="h-full p-4 bg-gradient-to-br from-primary-50 to-cyan-50 dark:from-primary-900/20 dark:to-cyan-900/20">
       <h4 className="text-lg font-semibold text-charcoal-900 dark:text-white mb-3 flex items-center gap-2">

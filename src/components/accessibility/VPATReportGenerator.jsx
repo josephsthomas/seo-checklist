@@ -95,8 +95,9 @@ const WCAG_CRITERIA = [
   { id: '3.3.9', title: 'Accessible Authentication (Enhanced)', level: 'AAA', principle: 'Understandable', version: '2.2' },
 ];
 
-export default function VPATReportGenerator({ auditResults, productInfo, onClose }) {
-  const [showPreview, setShowPreview] = useState(true);
+export default function VPATReportGenerator({ productInfo, onClose }) {
+  // eslint-disable-next-line no-unused-vars
+  const [_showPreview, _setShowPreview] = useState(true);
   const [expandedPrinciples, setExpandedPrinciples] = useState(['Perceivable', 'Operable', 'Understandable', 'Robust']);
   const [evaluationData, setEvaluationData] = useState(() => {
     // Map audit results to VPAT criteria
@@ -203,7 +204,7 @@ export default function VPATReportGenerator({ auditResults, productInfo, onClose
     const principles = ['Perceivable', 'Operable', 'Understandable', 'Robust'];
     let yPosition = 20;
 
-    principles.forEach((principle, pIndex) => {
+    principles.forEach((principle) => {
       const criteriaForPrinciple = WCAG_CRITERIA.filter(c => c.principle === principle);
 
       if (yPosition > 250) {
@@ -248,7 +249,7 @@ export default function VPATReportGenerator({ auditResults, productInfo, onClose
           4: { cellWidth: 'auto' }
         },
         margin: { left: 20, right: 20 },
-        didDrawPage: (data) => {
+        didDrawPage: () => {
           // Footer
           doc.setFontSize(8);
           doc.setTextColor(156, 163, 175);

@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import { useState, useMemo } from 'react';
 import {
   Tags,
   Search,
@@ -14,7 +14,6 @@ import {
   Eye,
   AlertCircle,
   CheckCircle,
-  ExternalLink,
   Twitter,
   Facebook
 } from 'lucide-react';
@@ -37,7 +36,7 @@ export default function MetaDashboard({ results, onNewProcess, onUpdateMetadata 
   const [editValue, setEditValue] = useState('');
   const [copiedField, setCopiedField] = useState(null);
 
-  const { metadata, extractedContent, context, fileName } = results;
+  const { metadata, context, fileName } = results;
 
   // Generate HTML code
   const htmlCode = useMemo(() => {

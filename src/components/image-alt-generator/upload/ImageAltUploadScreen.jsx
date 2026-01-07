@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react';
+import { useState, useCallback } from 'react';
 import { useDropzone } from 'react-dropzone';
 import {
   Upload,
@@ -11,7 +11,6 @@ import {
   FileImage,
   Download,
   CheckCircle,
-  Info,
   X
 } from 'lucide-react';
 
@@ -21,7 +20,8 @@ const TONE_OPTIONS = ['Professional', 'Casual', 'Technical', 'Creative'];
 export default function ImageAltUploadScreen({ onFileSelect }) {
   const [files, setFiles] = useState([]);
   const [showContext, setShowContext] = useState(false);
-  const [showConfig, setShowConfig] = useState(false);
+  // eslint-disable-next-line no-unused-vars
+  const [_showConfig, _setShowConfig] = useState(false);
   const [context, setContext] = useState({
     brandName: '',
     industry: '',

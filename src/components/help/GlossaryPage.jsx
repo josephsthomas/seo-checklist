@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import { useState, useMemo } from 'react';
 import { Search, BookOpen, Tag, Link as LinkIcon } from 'lucide-react';
 import { glossaryTerms, glossaryCategories } from '../../data/glossary';
 

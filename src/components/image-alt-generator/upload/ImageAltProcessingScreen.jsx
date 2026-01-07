@@ -1,4 +1,3 @@
-import React from 'react';
 import { Image, Loader2, Sparkles } from 'lucide-react';
 
 export default function ImageAltProcessingScreen({ progress, stage, fileCount }) {

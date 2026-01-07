@@ -49,6 +49,7 @@ export default function SEOChecklist() {
   const [expandedPhases, setExpandedPhases] = useState(PHASES);
 
   // Debounced search handler
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   const debouncedSetSearch = useCallback(
     debounce((value) => setDebouncedSearchQuery(value), 300),
     []
@@ -62,6 +63,7 @@ export default function SEOChecklist() {
   }, [debouncedSetSearch]);
 
   // Debounced save to Firebase
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   const debouncedSaveUIState = useCallback(
     debounce((newFilters, newExpandedPhases) => {
       if (projectId) {

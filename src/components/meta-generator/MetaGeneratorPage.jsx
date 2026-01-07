@@ -18,7 +18,7 @@ export default function MetaGeneratorPage() {
   const [progress, setProgress] = useState(0);
   const [stage, setStage] = useState('');
   const [results, setResults] = useState(null);
-  const [context, setContext] = useState({});
+  const [, setContext] = useState({});
   const [error, setError] = useState(null);
   const [fileName, setFileName] = useState('');
 

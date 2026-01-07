@@ -17,7 +17,6 @@ import {
   Lightbulb,
   ArrowRight,
   Sparkles,
-  Play,
   Image,
   Tags,
   Code2,

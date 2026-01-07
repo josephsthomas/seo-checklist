@@ -1,4 +1,3 @@
-import React from 'react';
 
 /**
  * PageLayout - Consistent page structure with optional hero section

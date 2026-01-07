@@ -920,6 +920,7 @@ export default function FixSuggestionsPanel({ issue, onClose }) {
 }
 
 // Get all available fix suggestions
+// eslint-disable-next-line react-refresh/only-export-components
 export function getFixSuggestions() {
   return Object.entries(FIX_SUGGESTIONS).map(([id, suggestion]) => ({
     id,
@@ -928,6 +929,7 @@ export function getFixSuggestions() {
 }
 
 // Check if a fix suggestion exists for an issue type
+// eslint-disable-next-line react-refresh/only-export-components
 export function hasFixSuggestion(issueType) {
   return !!FIX_SUGGESTIONS[issueType];
 }

@@ -6,7 +6,7 @@
 import jsPDF from 'jspdf';
 import 'jspdf-autotable';
 import * as XLSX from 'xlsx';
-import { WCAG_CRITERIA, WCAG_PRINCIPLES, getCriteriaByLevel } from '../../data/wcagCriteria';
+import { getCriteriaByLevel, WCAG_PRINCIPLES } from '../../data/wcagCriteria';
 import { COMPLIANCE_STATUS } from './accessibilityEngine';
 
 /**
@@ -21,7 +21,7 @@ export function exportAccessibilityPDF(auditResults, options = {}) {
     domainInfo = {}
   } = options;
 
-  const { scores, summary, violationsByRule, topIssues, criteriaStatus, timestamp } = auditResults;
+  const { scores, summary, topIssues, criteriaStatus, timestamp } = auditResults;
   const doc = new jsPDF();
   let yPos = 20;
 
@@ -67,7 +67,7 @@ export function exportAccessibilityPDF(auditResults, options = {}) {
     { name: 'Level AAA', score: scores.byLevel.AAA.score, color: [139, 92, 246] }
   ];
 
-  levels.forEach((level, idx) => {
+  levels.forEach((level) => {
     doc.setTextColor(55, 65, 81);
     doc.text(`${level.name}:`, 60, yPos);
     doc.setTextColor(...level.color);
@@ -305,7 +305,7 @@ export function exportAccessibilityExcel(auditResults, options = {}) {
     domainInfo = {}
   } = options;
 
-  const { scores, summary, violationsByRule, topIssues, worstPages, criteriaStatus, timestamp } = auditResults;
+  const { scores, summary, worstPages, criteriaStatus, timestamp, violationsByRule } = auditResults;
   const wb = XLSX.utils.book_new();
 
   // ===== SUMMARY SHEET =====

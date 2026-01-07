@@ -12,7 +12,6 @@ import {
   Users,
   HelpCircle,
   ChevronDown,
-  ClipboardList,
   Search,
   Wrench,
   Sparkles,

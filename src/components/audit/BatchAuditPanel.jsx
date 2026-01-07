@@ -31,7 +31,7 @@ export default function BatchAuditPanel({ onClose, onStartBatch }) {
   const [results, setResults] = useState([]);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [showResults, setShowResults] = useState(false);
-  const [savedBatches, setSavedBatches] = useState([]);
+  const [, setSavedBatches] = useState([]);
 
   // Load saved batch results from localStorage
   useEffect(() => {

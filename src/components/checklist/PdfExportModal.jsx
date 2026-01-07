@@ -4,7 +4,7 @@
  * Phase 9 - Batch 4
  */
 
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { X, FileText, Download, Eye, Loader } from 'lucide-react';
 import { generateChecklistPDF, downloadPDF, previewPDF } from '../../lib/pdfGenerator';
 import toast from 'react-hot-toast';

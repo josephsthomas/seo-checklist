@@ -7,14 +7,13 @@ import {
   Copy,
   Trash2,
   X,
-  ChevronDown,
   Filter,
   RefreshCcw,
   Check,
   AlertCircle
 } from 'lucide-react';
 import { useAltTextHistory } from '../../hooks/useAltTextHistory';
-import { format, formatDistanceToNow } from 'date-fns';
+import { formatDistanceToNow } from 'date-fns';
 import toast from 'react-hot-toast';
 
 export default function AltTextHistoryPanel({ onApply, onClose }) {

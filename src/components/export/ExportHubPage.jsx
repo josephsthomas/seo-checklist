@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import { useState, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import {
   Download,
@@ -13,11 +13,8 @@ import {
   Code2,
   ClipboardList,
   ArrowLeft,
-  CheckCircle2,
   Clock,
   Trash2,
-  Filter,
-  Calendar,
   ChevronDown,
   Loader2,
   FolderOpen
@@ -25,7 +22,7 @@ import {
 import { useExportHistory, EXPORT_TYPES } from '../../hooks/useExportHistory';
 import { useProjects } from '../../hooks/useProjects';
 import { exportChecklistProgress } from '../../lib/unifiedExportService';
-import { format, formatDistanceToNow } from 'date-fns';
+import { formatDistanceToNow } from 'date-fns';
 import toast from 'react-hot-toast';
 
 // Icon mapping

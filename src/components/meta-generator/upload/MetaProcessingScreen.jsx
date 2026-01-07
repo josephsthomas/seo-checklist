@@ -1,4 +1,3 @@
-import React from 'react';
 import { Tags, Loader2, Sparkles } from 'lucide-react';
 
 export default function MetaProcessingScreen({ progress, stage, fileName }) {

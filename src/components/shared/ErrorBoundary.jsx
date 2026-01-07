@@ -19,7 +19,6 @@ class ErrorBoundary extends React.Component {
     this.setState({ errorInfo });
     // Log error to console only in development
     if (import.meta.env.DEV) {
-      // eslint-disable-next-line no-console
       console.error('ErrorBoundary caught an error:', error, errorInfo);
     }
   }

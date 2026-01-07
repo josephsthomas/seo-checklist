@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { HelpCircle, X, ExternalLink, Clock, Award } from 'lucide-react';
 import { getHelpContent } from '../../data/helpContent';
 

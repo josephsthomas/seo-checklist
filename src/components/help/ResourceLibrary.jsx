@@ -1,5 +1,5 @@
-import React, { useState, useMemo } from 'react';
-import { Search, Book, Video, FileText, Filter, ExternalLink } from 'lucide-react';
+import { useState, useMemo } from 'react';
+import { Search, Book, Video, FileText } from 'lucide-react';
 import { resources, resourceCategories, resourceTypes, difficultyLevels } from '../../data/resources';
 import ReactMarkdown from 'react-markdown';
 

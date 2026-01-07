@@ -169,6 +169,7 @@ export default function BulkActionsBar({
 /**
  * Hook for managing bulk selection state
  */
+// eslint-disable-next-line react-refresh/only-export-components
 export function useBulkSelection(items = []) {
   const [selected, setSelected] = useState(new Set());
 
@@ -265,6 +266,7 @@ export function SelectAllCheckbox({ checked, indeterminate, onChange, className 
 /**
  * Predefined action creators for common bulk operations
  */
+// eslint-disable-next-line react-refresh/only-export-components
 export const createBulkActions = {
   complete: (onComplete) => ({
     id: 'complete',

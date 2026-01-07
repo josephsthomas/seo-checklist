@@ -2,14 +2,11 @@ import { useState } from 'react';
 import {
   Search,
   Globe,
-  ArrowRight,
   AlertCircle,
   Check,
   X,
-  Eye,
   Copy,
   BarChart2,
-  FileText,
   Loader2,
   ExternalLink,
   Lightbulb,
@@ -23,7 +20,7 @@ import toast from 'react-hot-toast';
 import jsPDF from 'jspdf';
 import 'jspdf-autotable';
 
-export default function CompetitorAnalysisPanel({ currentMeta, onClose, onApplyInsight }) {
+export default function CompetitorAnalysisPanel({ currentMeta, onClose }) {
   const [competitorUrl, setCompetitorUrl] = useState('');
   const [loading, setLoading] = useState(false);
   const [competitorMeta, setCompetitorMeta] = useState(null);

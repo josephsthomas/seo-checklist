@@ -3,7 +3,7 @@ import { Send, Trash2, Edit2, User } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 import { format } from 'date-fns';
 
-export default function CommentThread({ comments, loading, onAddComment, projectId, itemId }) {
+export default function CommentThread({ comments, loading, onAddComment }) {
   const [newComment, setNewComment] = useState('');
   const [isInternal, setIsInternal] = useState(false);
   const [submitting, setSubmitting] = useState(false);
