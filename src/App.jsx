@@ -8,7 +8,9 @@ import { lazyWithRetry } from './utils/lazyWithRetry';
 // Auth Components (keep eager - needed for initial auth)
 import LoginForm from './components/auth/LoginForm';
 import RegisterForm from './components/auth/RegisterForm';
+import ForgotPassword from './components/auth/ForgotPassword';
 import ProtectedRoute from './components/auth/ProtectedRoute';
+import EmailVerificationBanner from './components/auth/EmailVerificationBanner';
 
 // Layout Components (keep eager - always needed)
 import Navigation from './components/shared/Navigation';
@@ -126,6 +128,7 @@ function AppContent() {
         Skip to main content
       </a>
       <Navigation />
+      <EmailVerificationBanner />
       <CommandPalette isOpen={commandPalette.isOpen} onClose={commandPalette.close} />
       <OnboardingWalkthrough />
       <KeyboardShortcuts />
@@ -136,6 +139,7 @@ function AppContent() {
                   {/* Public Routes */}
                   <Route path="/login" element={<LoginForm />} />
                   <Route path="/register" element={<RegisterForm />} />
+                  <Route path="/forgot-password" element={<ForgotPassword />} />
 
                   {/* Legal Pages - Public */}
                   <Route path="/terms" element={<TermsOfService />} />
