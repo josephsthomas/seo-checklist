@@ -109,6 +109,13 @@ export default function AIDisclaimer({
                 <li>Generated suggestions should be treated as starting points, not final content</li>
               </ul>
             </div>
+            <div className="bg-red-50 border border-red-200 rounded-lg p-3 text-sm">
+              <p className="text-red-700 font-medium">Not Professional Advice</p>
+              <p className="text-red-600 text-xs mt-1">
+                This tool provides suggestions only and does not constitute professional SEO, legal,
+                accessibility, or compliance advice. Consult qualified professionals for specific requirements.
+              </p>
+            </div>
             <div className="flex items-center gap-4 pt-2">
               <Link
                 to="/ai-policy"

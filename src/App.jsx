@@ -36,6 +36,7 @@ const GlossaryPage = lazyWithRetry(() => import('./components/help/GlossaryPage'
 import KeyboardShortcuts from './components/help/KeyboardShortcuts';
 import OnboardingWalkthrough from './components/help/OnboardingWalkthrough';
 import FeedbackWidget from './components/shared/FeedbackWidget';
+import CookieConsent from './components/shared/CookieConsent';
 import CommandPalette, { useCommandPalette } from './components/shared/CommandPalette';
 
 // Audit Components - lazy load (heaviest components with exceljs, jspdf)
@@ -67,6 +68,7 @@ const ExportHubPage = lazyWithRetry(() => import('./components/export/ExportHubP
 const TermsOfService = lazyWithRetry(() => import('./components/legal/TermsOfService'), 'TermsOfService');
 const PrivacyPolicy = lazyWithRetry(() => import('./components/legal/PrivacyPolicy'), 'PrivacyPolicy');
 const AIPolicy = lazyWithRetry(() => import('./components/legal/AIPolicy'), 'AIPolicy');
+const AccessibilityStatement = lazyWithRetry(() => import('./components/legal/AccessibilityStatement'), 'AccessibilityStatement');
 
 /**
  * Enhanced Loading Fallback with Skeleton
@@ -139,6 +141,7 @@ function AppContent() {
                   <Route path="/terms" element={<TermsOfService />} />
                   <Route path="/privacy" element={<PrivacyPolicy />} />
                   <Route path="/ai-policy" element={<AIPolicy />} />
+                  <Route path="/accessibility" element={<AccessibilityStatement />} />
 
                   {/* Home - Portal Dashboard */}
                   <Route
@@ -469,6 +472,9 @@ function AppContent() {
 
           {/* Feedback Widget - Available on all pages */}
           <FeedbackWidget />
+
+          {/* Cookie Consent Banner - GDPR/CCPA Compliance */}
+          <CookieConsent />
         </div>
   );
 }

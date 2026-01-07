@@ -136,7 +136,7 @@ export default function Footer() {
         </div>
 
         {/* Legal Links Section */}
-        <div className="pb-8 border-b border-white/10">
+        <div className="py-6 border-b border-white/10">
           <div className="flex flex-wrap items-center justify-center gap-x-8 gap-y-2">
             <Link to="/terms" className="text-charcoal-400 hover:text-white text-sm transition-colors duration-200">
               Terms of Service
@@ -146,6 +146,9 @@ export default function Footer() {
             </Link>
             <Link to="/ai-policy" className="text-charcoal-400 hover:text-white text-sm transition-colors duration-200">
               AI Usage Policy
+            </Link>
+            <Link to="/accessibility" className="text-charcoal-400 hover:text-white text-sm transition-colors duration-200">
+              Accessibility
             </Link>
           </div>
         </div>

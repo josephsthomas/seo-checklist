@@ -58,6 +58,32 @@ export default function TermsOfService() {
             </div>
           </section>
 
+          {/* Eligibility & Age Requirements */}
+          <section className="card p-8 mb-6">
+            <h2 className="text-xl font-semibold text-charcoal-900 mb-4">Eligibility & Age Requirements</h2>
+            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-4">
+              <p className="text-blue-800 text-sm font-medium">Age Requirement:</p>
+              <p className="text-blue-700 text-sm mt-1">
+                You must be at least <strong>18 years of age</strong> to use this Service. If you are between 13 and 17 years
+                of age, you may only use this Service with the consent and supervision of a parent or legal guardian who agrees
+                to be bound by these Terms.
+              </p>
+            </div>
+            <p className="text-charcoal-600 mb-4">
+              By using the Service, you represent and warrant that:
+            </p>
+            <ul className="list-disc list-inside text-charcoal-600 space-y-2">
+              <li>You are at least 18 years old, or if you are between 13-17, you have parental/guardian consent</li>
+              <li>You have the legal capacity to enter into a binding agreement</li>
+              <li>You are not barred from using the Service under applicable law</li>
+              <li>If using the Service on behalf of an organization, you have authority to bind that organization</li>
+            </ul>
+            <p className="text-charcoal-600 mt-4">
+              We do not knowingly collect information from children under 13. If you believe a child under 13 has provided
+              us with personal information, please contact us immediately.
+            </p>
+          </section>
+
           {/* Intellectual Property */}
           <section className="card p-8 mb-6">
             <h2 className="text-xl font-semibold text-charcoal-900 mb-4 flex items-center gap-2">
@@ -115,6 +141,34 @@ export default function TermsOfService() {
             </ul>
             <p className="text-charcoal-600 font-medium">
               We strongly recommend having qualified professionals review all AI-generated content before publication or implementation.
+            </p>
+          </section>
+
+          {/* Not Professional Advice */}
+          <section className="card p-8 mb-6 bg-amber-50 border-amber-200">
+            <h2 className="text-xl font-semibold text-charcoal-900 mb-4">Not Professional Advice</h2>
+            <div className="bg-white border border-amber-300 rounded-lg p-4 mb-4">
+              <p className="text-charcoal-700 text-sm font-medium mb-2">Important Disclaimer:</p>
+              <p className="text-charcoal-600 text-sm">
+                The Content Strategy Portal and all content generated through it (including SEO recommendations,
+                accessibility suggestions, metadata, alt text, and structured data) are provided for <strong>informational
+                and educational purposes only</strong>.
+              </p>
+            </div>
+            <p className="text-charcoal-600 mb-4">
+              <strong>This Service does not constitute and should not be relied upon as:</strong>
+            </p>
+            <ul className="list-disc list-inside text-charcoal-600 space-y-2 mb-4">
+              <li>Professional SEO consulting or marketing advice</li>
+              <li>Legal advice or compliance guidance (including ADA, WCAG, GDPR, or other regulations)</li>
+              <li>Professional accessibility consulting or WCAG certification</li>
+              <li>Web development or technical consulting services</li>
+              <li>Guarantee of search engine rankings or performance</li>
+            </ul>
+            <p className="text-charcoal-600">
+              For specific legal, compliance, accessibility, or professional SEO requirements, you should consult
+              with qualified professionals in those respective fields. We disclaim any liability arising from
+              reliance on this Service as a substitute for professional advice.
             </p>
           </section>
 
