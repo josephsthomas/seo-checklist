@@ -108,6 +108,12 @@ service cloud.firestore {
     match /teams/{teamId}/members/{memberId} {
       allow read, write: if request.auth != null;
     }
+
+    // Feedback submissions - authenticated users can create
+    match /feedback/{feedbackId} {
+      allow create: if request.auth != null;
+      // Note: Reading/managing feedback requires admin access via Firebase Console or Cloud Functions
+    }
   }
 }
 ```
@@ -140,6 +146,12 @@ service firebase.storage {
     match /shared/{allPaths=**} {
       allow read: if true;
       allow write: if request.auth != null;
+    }
+
+    // Feedback screenshots - authenticated users can upload
+    match /feedback-screenshots/{fileName} {
+      allow write: if request.auth != null;
+      // Read access limited to admins via Firebase Console
     }
   }
 }
