@@ -181,6 +181,22 @@ export default function AccessibilityUploadScreen({ onFileSelect }) {
               </div>
             </div>
           )}
+
+          {/* Info messages (estimated time, tips) */}
+          {validationResult?.info?.length > 0 && (
+            <div className="mt-4 card p-4 bg-blue-50 border-blue-200">
+              <div className="flex items-start gap-3">
+                <div className="w-8 h-8 rounded-lg bg-blue-100 flex items-center justify-center flex-shrink-0">
+                  <Info className="w-4 h-4 text-blue-600" />
+                </div>
+                <div>
+                  {validationResult.info.map((infoMsg, idx) => (
+                    <p key={idx} className="text-sm text-blue-700">{infoMsg}</p>
+                  ))}
+                </div>
+              </div>
+            </div>
+          )}
         </div>
       </div>
 

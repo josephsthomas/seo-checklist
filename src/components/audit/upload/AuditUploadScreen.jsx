@@ -137,7 +137,7 @@ export default function AuditUploadScreen({ onFileSelect }) {
                     Drag and drop your ZIP file, or click to browse
                   </p>
                   <p className="text-sm text-charcoal-400">
-                    Supports ZIP files up to 500MB from Screaming Frog Multi Export (Excel format)
+                    Supports ZIP files up to 5GB from Screaming Frog Multi Export (Excel format)
                   </p>
                 </>
               )}
@@ -178,6 +178,22 @@ export default function AuditUploadScreen({ onFileSelect }) {
                 <div>
                   {validationResult.warnings.map((warning, idx) => (
                     <p key={idx} className="text-sm text-amber-700">{warning}</p>
+                  ))}
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Info messages (estimated time, tips) */}
+          {validationResult?.info?.length > 0 && (
+            <div className="mt-4 card p-4 bg-blue-50 border-blue-200">
+              <div className="flex items-start gap-3">
+                <div className="w-8 h-8 rounded-lg bg-blue-100 flex items-center justify-center flex-shrink-0">
+                  <Info className="w-4 h-4 text-blue-600" />
+                </div>
+                <div>
+                  {validationResult.info.map((infoMsg, idx) => (
+                    <p key={idx} className="text-sm text-blue-700">{infoMsg}</p>
                   ))}
                 </div>
               </div>
@@ -319,7 +335,7 @@ export default function AuditUploadScreen({ onFileSelect }) {
                   </li>
                   <li className="flex items-start gap-2">
                     <span className="w-1.5 h-1.5 rounded-full bg-charcoal-400 mt-2 flex-shrink-0" />
-                    <span>Multi Export ZIP file in Excel format (up to 500MB)</span>
+                    <span>Multi Export ZIP file in Excel format (up to 5GB)</span>
                   </li>
                 </ul>
               </div>
