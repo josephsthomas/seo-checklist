@@ -101,7 +101,7 @@ export default function HomePage() {
                 </time>
               </div>
               <Link
-                to="/settings"
+                to="/app/settings"
                 className="flex items-center gap-2 px-3 py-1.5 text-sm text-charcoal-600 hover:text-charcoal-800 hover:bg-white/50 rounded-lg transition-colors"
               >
                 <Settings className="w-4 h-4" />
@@ -186,7 +186,7 @@ export default function HomePage() {
             </div>
             <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
               <Link
-                to="/planner/new"
+                to="/app/planner/new"
                 className="group flex flex-col items-center p-4 rounded-xl bg-white/80 backdrop-blur border border-charcoal-100 hover:border-primary-300 hover:bg-primary-50/50 transition-all duration-200 hover:shadow-lg hover:shadow-primary-500/10"
               >
                 <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-primary-500 to-primary-600 flex items-center justify-center mb-2 group-hover:scale-110 transition-transform shadow-md" aria-hidden="true">
@@ -196,7 +196,7 @@ export default function HomePage() {
               </Link>
 
               <Link
-                to="/audit"
+                to="/app/audit"
                 className="group flex flex-col items-center p-4 rounded-xl bg-white/80 backdrop-blur border border-charcoal-100 hover:border-cyan-300 hover:bg-cyan-50/50 transition-all duration-200 hover:shadow-lg hover:shadow-cyan-500/10"
               >
                 <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-cyan-500 to-cyan-600 flex items-center justify-center mb-2 group-hover:scale-110 transition-transform shadow-md" aria-hidden="true">
@@ -206,7 +206,7 @@ export default function HomePage() {
               </Link>
 
               <Link
-                to="/accessibility"
+                to="/app/accessibility"
                 className="group flex flex-col items-center p-4 rounded-xl bg-white/80 backdrop-blur border border-charcoal-100 hover:border-purple-300 hover:bg-purple-50/50 transition-all duration-200 hover:shadow-lg hover:shadow-purple-500/10"
               >
                 <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-purple-500 to-purple-600 flex items-center justify-center mb-2 group-hover:scale-110 transition-transform shadow-md" aria-hidden="true">
@@ -216,7 +216,7 @@ export default function HomePage() {
               </Link>
 
               <Link
-                to="/image-alt"
+                to="/app/image-alt"
                 className="group flex flex-col items-center p-4 rounded-xl bg-white/80 backdrop-blur border border-charcoal-100 hover:border-emerald-300 hover:bg-emerald-50/50 transition-all duration-200 hover:shadow-lg hover:shadow-emerald-500/10"
               >
                 <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-emerald-500 to-emerald-600 flex items-center justify-center mb-2 group-hover:scale-110 transition-transform shadow-md" aria-hidden="true">
@@ -226,7 +226,7 @@ export default function HomePage() {
               </Link>
 
               <Link
-                to="/meta-generator"
+                to="/app/meta-generator"
                 className="group flex flex-col items-center p-4 rounded-xl bg-white/80 backdrop-blur border border-charcoal-100 hover:border-amber-300 hover:bg-amber-50/50 transition-all duration-200 hover:shadow-lg hover:shadow-amber-500/10"
               >
                 <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-amber-500 to-amber-600 flex items-center justify-center mb-2 group-hover:scale-110 transition-transform shadow-md" aria-hidden="true">
@@ -236,7 +236,7 @@ export default function HomePage() {
               </Link>
 
               <Link
-                to="/schema-generator"
+                to="/app/schema-generator"
                 className="group flex flex-col items-center p-4 rounded-xl bg-white/80 backdrop-blur border border-charcoal-100 hover:border-rose-300 hover:bg-rose-50/50 transition-all duration-200 hover:shadow-lg hover:shadow-rose-500/10"
               >
                 <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-rose-500 to-rose-600 flex items-center justify-center mb-2 group-hover:scale-110 transition-transform shadow-md" aria-hidden="true">
@@ -246,7 +246,7 @@ export default function HomePage() {
               </Link>
 
               <Link
-                to="/export"
+                to="/app/export"
                 className="group flex flex-col items-center p-4 rounded-xl bg-white/80 backdrop-blur border border-charcoal-100 hover:border-indigo-300 hover:bg-indigo-50/50 transition-all duration-200 hover:shadow-lg hover:shadow-indigo-500/10"
               >
                 <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-indigo-500 to-indigo-600 flex items-center justify-center mb-2 group-hover:scale-110 transition-transform shadow-md" aria-hidden="true">
@@ -304,7 +304,7 @@ export default function HomePage() {
             <div className="flex items-center justify-between mb-5">
               <h3 className="text-lg font-bold text-charcoal-900">Recent Projects</h3>
               <Link
-                to="/planner"
+                to="/app/planner"
                 className="text-sm text-primary-600 hover:text-primary-700 font-medium flex items-center gap-1 group"
               >
                 View all
@@ -319,7 +319,7 @@ export default function HomePage() {
                 {recentProjects.map((project) => (
                   <li key={project.id}>
                     <Link
-                      to={`/planner/projects/${project.id}`}
+                      to={`/app/planner/projects/${project.id}`}
                       className="flex items-center gap-4 p-4 rounded-xl hover:bg-charcoal-50 transition-colors group"
                     >
                       <span
@@ -357,7 +357,7 @@ export default function HomePage() {
                 <p className="text-charcoal-600 font-medium mb-1">No projects yet</p>
                 <p className="text-sm text-charcoal-500 mb-4">Create your first project to get started</p>
                 <Link
-                  to="/planner/new"
+                  to="/app/planner/new"
                   className="btn btn-primary inline-flex"
                 >
                   Create Project
@@ -371,7 +371,7 @@ export default function HomePage() {
             <div className="flex items-center justify-between mb-5">
               <h3 className="text-lg font-bold text-charcoal-900">Recent Audits</h3>
               <Link
-                to="/audit"
+                to="/app/audit"
                 className="text-sm text-cyan-600 hover:text-cyan-700 font-medium flex items-center gap-1 group"
               >
                 View all
@@ -386,7 +386,7 @@ export default function HomePage() {
                 {recentAudits.map((audit) => (
                   <li key={audit.id}>
                     <Link
-                      to={`/audit/${audit.id}`}
+                      to={`/app/audit/${audit.id}`}
                       className="flex items-center gap-4 p-4 rounded-xl hover:bg-charcoal-50 transition-colors group"
                     >
                       <span
@@ -424,7 +424,7 @@ export default function HomePage() {
                 <p className="text-charcoal-600 font-medium mb-1">No audits yet</p>
                 <p className="text-sm text-charcoal-500 mb-4">Run your first technical SEO audit</p>
                 <Link
-                  to="/audit"
+                  to="/app/audit"
                   className="btn bg-gradient-to-r from-cyan-500 to-cyan-600 hover:from-cyan-600 hover:to-cyan-700 text-white inline-flex"
                 >
                   Start Audit
