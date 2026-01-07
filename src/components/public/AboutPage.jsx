@@ -7,8 +7,12 @@ import {
   ArrowRight,
   Shield,
   Zap,
-  Globe
+  Globe,
+  Linkedin,
+  Twitter
 } from 'lucide-react';
+import SEOHead from '../shared/SEOHead';
+import { organizationSchema } from '../../config/seo';
 
 const VALUES = [
   {
@@ -54,9 +58,41 @@ const PRINCIPLES = [
   },
 ];
 
+const TEAM_MEMBERS = [
+  {
+    name: 'Sarah Chen',
+    role: 'Founder & CEO',
+    bio: 'Former SEO Director at a Fortune 500 company with 15+ years in digital marketing.',
+    linkedin: '#',
+    twitter: '#'
+  },
+  {
+    name: 'Marcus Rodriguez',
+    role: 'CTO',
+    bio: 'Full-stack engineer passionate about building tools that simplify complex workflows.',
+    linkedin: '#',
+    twitter: '#'
+  },
+  {
+    name: 'Emily Watson',
+    role: 'Head of Product',
+    bio: 'UX specialist who has led product teams at multiple SaaS startups.',
+    linkedin: '#',
+    twitter: '#'
+  }
+];
+
 export default function AboutPage() {
   return (
     <div className="min-h-screen bg-white">
+      <SEOHead
+        pageKey="about"
+        schema={organizationSchema}
+        breadcrumbs={[
+          { name: 'Home', url: '/' },
+          { name: 'About' }
+        ]}
+      />
       {/* Hero Section */}
       <section className="relative overflow-hidden bg-gradient-to-br from-charcoal-50 via-white to-primary-50 pt-16 pb-24 lg:pt-24 lg:pb-32">
         <div className="absolute inset-0 overflow-hidden">
@@ -187,6 +223,51 @@ export default function AboutPage() {
                 <p className="mt-3 text-charcoal-600 leading-relaxed">
                   {principle.description}
                 </p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Team Section */}
+      <section className="py-20 lg:py-28 bg-charcoal-50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center max-w-3xl mx-auto mb-16">
+            <h2 className="text-3xl font-bold text-charcoal-900">Meet the Team</h2>
+            <p className="mt-4 text-lg text-charcoal-600">
+              The people behind Content Strategy Portal.
+            </p>
+          </div>
+
+          <div className="grid md:grid-cols-3 gap-8">
+            {TEAM_MEMBERS.map((member, index) => (
+              <div key={index} className="bg-white rounded-2xl p-8 shadow-sm text-center">
+                <div className="w-24 h-24 bg-gradient-to-br from-primary-100 to-cyan-100 rounded-full mx-auto mb-6 flex items-center justify-center">
+                  <span className="text-3xl font-bold text-primary-600">
+                    {member.name.split(' ').map(n => n[0]).join('')}
+                  </span>
+                </div>
+                <h3 className="text-xl font-semibold text-charcoal-900">{member.name}</h3>
+                <p className="text-primary-600 font-medium mt-1">{member.role}</p>
+                <p className="mt-4 text-charcoal-600 text-sm leading-relaxed">
+                  {member.bio}
+                </p>
+                <div className="mt-6 flex items-center justify-center gap-3">
+                  <a
+                    href={member.linkedin}
+                    className="p-2 text-charcoal-400 hover:text-primary-600 hover:bg-primary-50 rounded-lg transition-colors"
+                    aria-label={`${member.name} on LinkedIn`}
+                  >
+                    <Linkedin className="w-5 h-5" />
+                  </a>
+                  <a
+                    href={member.twitter}
+                    className="p-2 text-charcoal-400 hover:text-primary-600 hover:bg-primary-50 rounded-lg transition-colors"
+                    aria-label={`${member.name} on Twitter`}
+                  >
+                    <Twitter className="w-5 h-5" />
+                  </a>
+                </div>
               </div>
             ))}
           </div>

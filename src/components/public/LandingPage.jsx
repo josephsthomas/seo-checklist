@@ -15,6 +15,8 @@ import {
   Clock,
   Award
 } from 'lucide-react';
+import SEOHead from '../shared/SEOHead';
+import { organizationSchema, generateBreadcrumbSchema } from '../../config/seo';
 
 const FEATURES = [
   {
@@ -76,8 +78,28 @@ const STATS = [
 ];
 
 export default function LandingPage() {
+  // Schema for homepage
+  const homeSchema = {
+    '@context': 'https://schema.org',
+    '@type': 'WebSite',
+    name: 'Content Strategy Portal',
+    url: 'https://contentstrategyportal.com',
+    description: 'AI-powered SEO management platform for agencies and enterprise teams.',
+    potentialAction: {
+      '@type': 'SearchAction',
+      target: 'https://contentstrategyportal.com/search?q={search_term_string}',
+      'query-input': 'required name=search_term_string'
+    }
+  };
+
   return (
     <div className="min-h-screen">
+      <SEOHead
+        pageKey="home"
+        schema={[homeSchema, organizationSchema]}
+        breadcrumbs={[{ name: 'Home' }]}
+      />
+
       {/* Hero Section */}
       <section className="relative overflow-hidden bg-gradient-to-br from-charcoal-50 via-white to-primary-50 pt-16 pb-24 lg:pt-24 lg:pb-32">
         {/* Background decoration */}
@@ -89,21 +111,21 @@ export default function LandingPage() {
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center max-w-4xl mx-auto">
             <div className="inline-flex items-center gap-2 px-4 py-2 bg-primary-50 border border-primary-200 rounded-full text-primary-700 text-sm font-medium mb-8">
-              <Zap className="w-4 h-4" />
-              AI-Powered SEO & Content Platform
+              <Zap className="w-4 h-4" aria-hidden="true" />
+              Built for SEO Agencies & In-House Teams
             </div>
 
             <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-charcoal-900 tracking-tight leading-tight">
-              Your Complete{' '}
+              SEO Project Management{' '}
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary-500 to-primary-700">
-                Content Strategy
-              </span>{' '}
-              Command Center
+                That Actually Works
+              </span>
             </h1>
 
             <p className="mt-6 text-xl text-charcoal-600 max-w-2xl mx-auto leading-relaxed">
-              Manage SEO projects, run technical audits, ensure accessibility compliance,
-              and optimize content at scale. Everything agencies and enterprise teams need in one platform.
+              Run technical audits in 5 minutes. Track 321 SEO checklist items per project.
+              Ensure WCAG 2.2 accessibility. Generate AI-optimized meta data.
+              <span className="block mt-2 font-medium text-charcoal-700">One platform for agencies managing 10+ client sites.</span>
             </p>
 
             <div className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-4">
@@ -111,26 +133,30 @@ export default function LandingPage() {
                 to="/register"
                 className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-8 py-4 bg-gradient-to-r from-primary-500 to-primary-600 hover:from-primary-600 hover:to-primary-700 text-white font-semibold rounded-xl shadow-lg shadow-primary-500/25 hover:shadow-primary-500/40 transition-all duration-200"
               >
-                Get Started Free
-                <ArrowRight className="w-5 h-5" />
+                Start Your Free Project
+                <ArrowRight className="w-5 h-5" aria-hidden="true" />
               </Link>
               <Link
                 to="/features"
                 className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-8 py-4 bg-white hover:bg-charcoal-50 text-charcoal-700 font-semibold rounded-xl border border-charcoal-200 transition-colors"
               >
-                Explore Features
+                Explore All 6 Tools
               </Link>
             </div>
 
             {/* Trust indicators */}
-            <div className="mt-12 flex items-center justify-center gap-8 text-sm text-charcoal-500">
+            <div className="mt-12 flex flex-col sm:flex-row items-center justify-center gap-4 sm:gap-8 text-sm text-charcoal-500">
               <div className="flex items-center gap-2">
-                <CheckCircle2 className="w-5 h-5 text-emerald-500" />
+                <CheckCircle2 className="w-5 h-5 text-emerald-500" aria-hidden="true" />
                 No credit card required
               </div>
               <div className="flex items-center gap-2">
-                <CheckCircle2 className="w-5 h-5 text-emerald-500" />
-                Free tier available
+                <CheckCircle2 className="w-5 h-5 text-emerald-500" aria-hidden="true" />
+                Unlimited projects on free tier
+              </div>
+              <div className="flex items-center gap-2">
+                <CheckCircle2 className="w-5 h-5 text-emerald-500" aria-hidden="true" />
+                Setup in under 2 minutes
               </div>
             </div>
           </div>

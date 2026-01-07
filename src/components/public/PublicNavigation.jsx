@@ -67,18 +67,18 @@ export default function PublicNavigation() {
       <nav className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
-          <Link to="/" className="flex items-center gap-3 group">
+          <Link to="/" className="flex items-center gap-2 sm:gap-3 group">
             <div className="relative">
-              <div className="w-10 h-10 bg-gradient-to-br from-primary-500 to-primary-600 rounded-xl flex items-center justify-center shadow-lg shadow-primary-500/20 group-hover:shadow-primary-500/40 transition-shadow duration-300">
-                <span className="text-white font-bold text-sm">CS</span>
+              <div className="w-9 h-9 sm:w-10 sm:h-10 bg-gradient-to-br from-primary-500 to-primary-600 rounded-xl flex items-center justify-center shadow-lg shadow-primary-500/20 group-hover:shadow-primary-500/40 transition-shadow duration-300">
+                <span className="text-white font-bold text-xs sm:text-sm">CS</span>
               </div>
               <div className="absolute -top-1 -right-1 w-3 h-3 bg-gradient-to-br from-cyan-400 to-cyan-500 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
             </div>
-            <div className="hidden sm:block">
-              <span className="text-lg font-semibold text-charcoal-900 tracking-tight">
+            <div>
+              <span className="text-base sm:text-lg font-semibold text-charcoal-900 tracking-tight">
                 Content Strategy
               </span>
-              <span className="text-lg font-semibold text-primary-600 tracking-tight ml-1">
+              <span className="text-base sm:text-lg font-semibold text-primary-600 tracking-tight ml-1">
                 Portal
               </span>
             </div>
@@ -104,6 +104,9 @@ export default function PublicNavigation() {
                   setFeaturesOpen(!featuresOpen);
                   setHelpOpen(false);
                 }}
+                aria-expanded={featuresOpen}
+                aria-haspopup="true"
+                aria-label="Features menu"
                 className={`flex items-center gap-1 px-4 py-2 text-sm font-medium rounded-lg transition-colors ${
                   isActive('/features')
                     ? 'text-primary-600 bg-primary-50'
@@ -111,11 +114,16 @@ export default function PublicNavigation() {
                 }`}
               >
                 Features
-                <ChevronDown className={`w-4 h-4 transition-transform ${featuresOpen ? 'rotate-180' : ''}`} />
+                <ChevronDown className={`w-4 h-4 transition-transform ${featuresOpen ? 'rotate-180' : ''}`} aria-hidden="true" />
               </button>
 
               {featuresOpen && (
-                <div className="absolute top-full left-0 mt-2 w-80 bg-white rounded-2xl shadow-xl border border-charcoal-100 p-2 animate-in fade-in slide-in-from-top-2 duration-200">
+                <div
+                  className="absolute top-full left-0 mt-2 w-80 bg-white rounded-2xl shadow-xl border border-charcoal-100 p-2 animate-in fade-in slide-in-from-top-2 duration-200"
+                  role="menu"
+                  aria-orientation="vertical"
+                  aria-labelledby="features-menu"
+                >
                   <Link
                     to="/features"
                     className="block px-4 py-3 rounded-xl hover:bg-charcoal-50 transition-colors border-b border-charcoal-100 mb-2"
@@ -149,6 +157,9 @@ export default function PublicNavigation() {
                   setHelpOpen(!helpOpen);
                   setFeaturesOpen(false);
                 }}
+                aria-expanded={helpOpen}
+                aria-haspopup="true"
+                aria-label="Help menu"
                 className={`flex items-center gap-1 px-4 py-2 text-sm font-medium rounded-lg transition-colors ${
                   isActive('/help')
                     ? 'text-primary-600 bg-primary-50'
@@ -156,11 +167,16 @@ export default function PublicNavigation() {
                 }`}
               >
                 Help
-                <ChevronDown className={`w-4 h-4 transition-transform ${helpOpen ? 'rotate-180' : ''}`} />
+                <ChevronDown className={`w-4 h-4 transition-transform ${helpOpen ? 'rotate-180' : ''}`} aria-hidden="true" />
               </button>
 
               {helpOpen && (
-                <div className="absolute top-full left-0 mt-2 w-72 bg-white rounded-2xl shadow-xl border border-charcoal-100 p-2 animate-in fade-in slide-in-from-top-2 duration-200">
+                <div
+                  className="absolute top-full left-0 mt-2 w-72 bg-white rounded-2xl shadow-xl border border-charcoal-100 p-2 animate-in fade-in slide-in-from-top-2 duration-200"
+                  role="menu"
+                  aria-orientation="vertical"
+                  aria-labelledby="help-menu"
+                >
                   {HELP_LINKS.map((link) => (
                     <Link
                       key={link.href}
@@ -235,10 +251,12 @@ export default function PublicNavigation() {
               <div>
                 <button
                   onClick={() => setFeaturesOpen(!featuresOpen)}
+                  aria-expanded={featuresOpen}
+                  aria-label="Toggle features menu"
                   className="w-full flex items-center justify-between px-4 py-3 rounded-xl font-medium text-charcoal-700 hover:bg-charcoal-50"
                 >
                   Features
-                  <ChevronDown className={`w-5 h-5 transition-transform ${featuresOpen ? 'rotate-180' : ''}`} />
+                  <ChevronDown className={`w-5 h-5 transition-transform ${featuresOpen ? 'rotate-180' : ''}`} aria-hidden="true" />
                 </button>
                 {featuresOpen && (
                   <div className="pl-4 space-y-1 mt-1">
@@ -262,10 +280,12 @@ export default function PublicNavigation() {
               <div>
                 <button
                   onClick={() => setHelpOpen(!helpOpen)}
+                  aria-expanded={helpOpen}
+                  aria-label="Toggle help menu"
                   className="w-full flex items-center justify-between px-4 py-3 rounded-xl font-medium text-charcoal-700 hover:bg-charcoal-50"
                 >
                   Help
-                  <ChevronDown className={`w-5 h-5 transition-transform ${helpOpen ? 'rotate-180' : ''}`} />
+                  <ChevronDown className={`w-5 h-5 transition-transform ${helpOpen ? 'rotate-180' : ''}`} aria-hidden="true" />
                 </button>
                 {helpOpen && (
                   <div className="pl-4 space-y-1 mt-1">

@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import {
   Sparkles,
@@ -9,9 +10,11 @@ import {
   BarChart3,
   Users,
   Download,
-  Play,
-  ChevronRight
+  ChevronRight,
+  Circle
 } from 'lucide-react';
+import SEOHead from '../shared/SEOHead';
+import { howToSchema } from '../../config/seo';
 
 const STEPS = [
   {
@@ -107,9 +110,65 @@ const QUICK_TIPS = [
   }
 ];
 
+function ProgressIndicator({ steps, currentStep, onStepClick }) {
+  return (
+    <div className="hidden lg:block fixed right-8 top-1/2 -translate-y-1/2 z-40">
+      <div className="bg-white/90 backdrop-blur-sm rounded-2xl shadow-lg border border-charcoal-100 p-4">
+        <div className="space-y-3">
+          {steps.map((step, index) => (
+            <button
+              key={step.number}
+              onClick={() => onStepClick(index)}
+              className={`flex items-center gap-3 w-full text-left transition-colors rounded-lg px-3 py-2 ${
+                currentStep === index
+                  ? 'bg-primary-50 text-primary-600'
+                  : 'text-charcoal-500 hover:text-charcoal-700 hover:bg-charcoal-50'
+              }`}
+              aria-label={`Go to step ${index + 1}: ${step.title}`}
+            >
+              {currentStep > index ? (
+                <CheckCircle2 className="w-5 h-5 text-emerald-500 flex-shrink-0" />
+              ) : currentStep === index ? (
+                <Circle className="w-5 h-5 text-primary-500 fill-primary-500 flex-shrink-0" />
+              ) : (
+                <Circle className="w-5 h-5 flex-shrink-0" />
+              )}
+              <span className="text-sm font-medium whitespace-nowrap">{step.title}</span>
+            </button>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export default function GettingStartedPage() {
+  const [currentStep, setCurrentStep] = useState(0);
+
+  const scrollToStep = (index) => {
+    setCurrentStep(index);
+    const element = document.getElementById(`step-${index}`);
+    if (element) {
+      element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+  };
+
   return (
     <div className="min-h-screen bg-white">
+      <SEOHead
+        pageKey="gettingStarted"
+        schema={howToSchema}
+        breadcrumbs={[
+          { name: 'Home', url: '/' },
+          { name: 'Help Center', url: '/help' },
+          { name: 'Getting Started' }
+        ]}
+      />
+      <ProgressIndicator
+        steps={STEPS}
+        currentStep={currentStep}
+        onStepClick={scrollToStep}
+      />
       {/* Hero Section */}
       <section className="relative overflow-hidden bg-gradient-to-br from-charcoal-50 via-white to-primary-50 pt-16 pb-24 lg:pt-24 lg:pb-32">
         <div className="absolute inset-0 overflow-hidden">
@@ -155,7 +214,8 @@ export default function GettingStartedPage() {
             {STEPS.map((step, index) => (
               <div
                 key={step.number}
-                className={`grid lg:grid-cols-2 gap-12 items-center ${
+                id={`step-${index}`}
+                className={`grid lg:grid-cols-2 gap-12 items-center scroll-mt-24 ${
                   index % 2 === 1 ? 'lg:grid-flow-dense' : ''
                 }`}
               >
@@ -230,56 +290,6 @@ export default function GettingStartedPage() {
                 <p className="mt-2 text-sm text-charcoal-600">{tip.description}</p>
               </div>
             ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Video Section */}
-      <section className="py-20 lg:py-28">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid lg:grid-cols-2 gap-12 items-center">
-            <div>
-              <h2 className="text-3xl font-bold text-charcoal-900">
-                Watch the Quick Start Video
-              </h2>
-              <p className="mt-4 text-lg text-charcoal-600">
-                See Content Strategy Portal in action with our 5-minute walkthrough video.
-                Learn how to set up your first project and run your first audit.
-              </p>
-              <ul className="mt-6 space-y-3">
-                <li className="flex items-center gap-3 text-charcoal-700">
-                  <CheckCircle2 className="w-5 h-5 text-emerald-500" />
-                  Dashboard overview
-                </li>
-                <li className="flex items-center gap-3 text-charcoal-700">
-                  <CheckCircle2 className="w-5 h-5 text-emerald-500" />
-                  Creating your first project
-                </li>
-                <li className="flex items-center gap-3 text-charcoal-700">
-                  <CheckCircle2 className="w-5 h-5 text-emerald-500" />
-                  Running a technical audit
-                </li>
-                <li className="flex items-center gap-3 text-charcoal-700">
-                  <CheckCircle2 className="w-5 h-5 text-emerald-500" />
-                  Using AI features
-                </li>
-              </ul>
-              <Link
-                to="/help/resources"
-                className="mt-8 inline-flex items-center gap-2 text-primary-600 font-medium hover:text-primary-700"
-              >
-                View all tutorials
-                <ArrowRight className="w-4 h-4" />
-              </Link>
-            </div>
-            <div className="bg-charcoal-900 rounded-3xl aspect-video flex items-center justify-center">
-              <div className="text-center">
-                <div className="w-20 h-20 bg-primary-500 rounded-full flex items-center justify-center mx-auto cursor-pointer hover:bg-primary-600 transition-colors">
-                  <Play className="w-8 h-8 text-white ml-1" />
-                </div>
-                <p className="mt-4 text-charcoal-400">Quick Start Video</p>
-              </div>
-            </div>
           </div>
         </div>
       </section>

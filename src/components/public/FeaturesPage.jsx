@@ -10,6 +10,8 @@ import {
   CheckCircle2,
   Zap
 } from 'lucide-react';
+import SEOHead from '../shared/SEOHead';
+import { softwareSchemas } from '../../config/seo';
 
 const FEATURES = [
   {
@@ -143,6 +145,14 @@ const getColorClasses = (color) => {
 export default function FeaturesPage() {
   return (
     <div className="min-h-screen bg-white">
+      <SEOHead
+        pageKey="features"
+        schema={Object.values(softwareSchemas)}
+        breadcrumbs={[
+          { name: 'Home', url: '/' },
+          { name: 'Features' }
+        ]}
+      />
       {/* Hero Section */}
       <section className="relative overflow-hidden bg-gradient-to-br from-charcoal-50 via-white to-primary-50 pt-16 pb-24 lg:pt-24 lg:pb-32">
         <div className="absolute inset-0 overflow-hidden">

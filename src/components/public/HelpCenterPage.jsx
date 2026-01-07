@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom';
+import { useState } from 'react';
 import {
   Sparkles,
   BookOpen,
@@ -12,8 +13,12 @@ import {
   HelpCircle,
   MessageSquare,
   Video,
-  Zap
+  Zap,
+  ChevronDown,
+  ChevronUp
 } from 'lucide-react';
+import SEOHead from '../shared/SEOHead';
+import { generateFAQSchema } from '../../config/seo';
 
 const HELP_SECTIONS = [
   {
@@ -132,9 +137,60 @@ const getColorClasses = (color) => {
   return colors[color] || colors.primary;
 };
 
+function FAQAccordion() {
+  const [openIndex, setOpenIndex] = useState(null);
+
+  const toggleItem = (index) => {
+    setOpenIndex(openIndex === index ? null : index);
+  };
+
+  return (
+    <div className="space-y-3">
+      {FAQ_ITEMS.map((item, index) => (
+        <div
+          key={index}
+          className="bg-charcoal-50 rounded-2xl overflow-hidden transition-all duration-200"
+        >
+          <button
+            onClick={() => toggleItem(index)}
+            className="w-full flex items-center justify-between p-6 text-left hover:bg-charcoal-100 transition-colors"
+            aria-expanded={openIndex === index}
+            aria-controls={`faq-answer-${index}`}
+          >
+            <h3 className="font-semibold text-charcoal-900 pr-4">{item.question}</h3>
+            {openIndex === index ? (
+              <ChevronUp className="w-5 h-5 text-charcoal-500 flex-shrink-0" />
+            ) : (
+              <ChevronDown className="w-5 h-5 text-charcoal-500 flex-shrink-0" />
+            )}
+          </button>
+          <div
+            id={`faq-answer-${index}`}
+            className={`overflow-hidden transition-all duration-200 ${
+              openIndex === index ? 'max-h-96' : 'max-h-0'
+            }`}
+          >
+            <p className="px-6 pb-6 text-charcoal-600">{item.answer}</p>
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
 export default function HelpCenterPage() {
+  const faqSchema = generateFAQSchema(FAQ_ITEMS);
+
   return (
     <div className="min-h-screen bg-white">
+      <SEOHead
+        pageKey="help"
+        schema={faqSchema}
+        breadcrumbs={[
+          { name: 'Home', url: '/' },
+          { name: 'Help Center' }
+        ]}
+      />
       {/* Hero Section */}
       <section className="relative overflow-hidden bg-gradient-to-br from-charcoal-50 via-white to-emerald-50 pt-16 pb-24 lg:pt-24 lg:pb-32">
         <div className="absolute inset-0 overflow-hidden">
@@ -238,14 +294,7 @@ export default function HelpCenterPage() {
           </div>
 
           <div className="max-w-3xl mx-auto">
-            <div className="space-y-4">
-              {FAQ_ITEMS.map((item, index) => (
-                <div key={index} className="bg-charcoal-50 rounded-2xl p-6">
-                  <h3 className="font-semibold text-charcoal-900">{item.question}</h3>
-                  <p className="mt-2 text-charcoal-600">{item.answer}</p>
-                </div>
-              ))}
-            </div>
+            <FAQAccordion />
           </div>
         </div>
       </section>

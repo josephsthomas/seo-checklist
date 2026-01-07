@@ -21,6 +21,8 @@ import {
   Download,
   Settings
 } from 'lucide-react';
+import SEOHead from '../shared/SEOHead';
+import { softwareSchemas } from '../../config/seo';
 
 const FEATURE_DATA = {
   planner: {
@@ -385,6 +387,16 @@ const getColorClasses = (color) => {
   return colors[color] || colors.primary;
 };
 
+// Map feature slugs to schema keys
+const SCHEMA_KEY_MAP = {
+  'planner': 'contentPlanner',
+  'audit': 'technicalAudit',
+  'accessibility': 'accessibilityAnalyzer',
+  'meta-generator': 'metaGenerator',
+  'schema-generator': 'schemaGenerator',
+  'image-alt': 'imageAltGenerator'
+};
+
 export default function FeatureDetailPage() {
   const { featureSlug } = useParams();
   const feature = FEATURE_DATA[featureSlug];
@@ -395,9 +407,22 @@ export default function FeatureDetailPage() {
 
   const colors = getColorClasses(feature.color);
   const Icon = feature.icon;
+  const schemaKey = SCHEMA_KEY_MAP[featureSlug];
+  const featureSchema = schemaKey ? softwareSchemas[schemaKey] : null;
 
   return (
     <div className="min-h-screen bg-white">
+      <SEOHead
+        title={`${feature.name} - ${feature.tagline} | Content Strategy Portal`}
+        description={feature.description}
+        canonical={`/features/${featureSlug}`}
+        schema={featureSchema}
+        breadcrumbs={[
+          { name: 'Home', url: '/' },
+          { name: 'Features', url: '/features' },
+          { name: feature.name }
+        ]}
+      />
       {/* Hero Section */}
       <section className={`relative overflow-hidden bg-gradient-to-br ${colors.gradient} pt-16 pb-24 lg:pt-24 lg:pb-32`}>
         <div className="absolute inset-0 overflow-hidden">
