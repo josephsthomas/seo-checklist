@@ -58,7 +58,6 @@ export function useProjects() {
       toast.success('Project created successfully!');
       return docRef.id;
     } catch (error) {
-      console.error('Error creating project:', error);
       toast.error('Failed to create project');
       throw error;
     }
@@ -73,7 +72,6 @@ export function useProjects() {
       });
       toast.success('Project updated successfully!');
     } catch (error) {
-      console.error('Error updating project:', error);
       toast.error('Failed to update project');
       throw error;
     }
@@ -84,7 +82,6 @@ export function useProjects() {
       await deleteDoc(doc(db, 'projects', projectId));
       toast.success('Project deleted successfully!');
     } catch (error) {
-      console.error('Error deleting project:', error);
       toast.error('Failed to delete project');
       throw error;
     }
@@ -99,7 +96,6 @@ export function useProjects() {
       }
       return null;
     } catch (error) {
-      console.error('Error getting project:', error);
       throw error;
     }
   };

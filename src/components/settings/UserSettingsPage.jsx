@@ -72,8 +72,8 @@ export default function UserSettingsPage() {
       if (savedAppearance) {
         setAppearance(JSON.parse(savedAppearance));
       }
-    } catch (error) {
-      console.error('Error loading appearance settings:', error);
+    } catch {
+      // Silently fail - use default appearance settings
     }
   }, [userProfile, currentUser]);
 
@@ -99,8 +99,7 @@ export default function UserSettingsPage() {
       }, { merge: true });
 
       toast.success('Profile updated successfully');
-    } catch (error) {
-      console.error('Error updating profile:', error);
+    } catch {
       toast.error('Failed to update profile');
     } finally {
       setSaving(false);
@@ -140,7 +139,6 @@ export default function UserSettingsPage() {
         confirmPassword: ''
       });
     } catch (error) {
-      console.error('Error changing password:', error);
       if (error.code === 'auth/wrong-password') {
         toast.error('Current password is incorrect');
       } else {

@@ -52,8 +52,8 @@ export function useNotifications() {
       await updateDoc(notificationRef, {
         read: true
       });
-    } catch (error) {
-      console.error('Error marking notification as read:', error);
+    } catch {
+      // Silently fail - non-critical operation
     }
   };
 
@@ -69,8 +69,7 @@ export function useNotifications() {
 
       await batch.commit();
       toast.success('All notifications marked as read');
-    } catch (error) {
-      console.error('Error marking all as read:', error);
+    } catch {
       toast.error('Failed to mark all as read');
     }
   };
@@ -96,7 +95,7 @@ export async function createNotification(userId, type, title, message, link, dat
       createdAt: serverTimestamp(),
       data
     });
-  } catch (error) {
-    console.error('Error creating notification:', error);
+  } catch {
+    // Silently fail - notification creation is non-critical
   }
 }

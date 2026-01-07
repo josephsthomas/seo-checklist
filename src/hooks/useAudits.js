@@ -58,7 +58,6 @@ export function useAudits(limitCount = 20) {
         setLoading(false);
       },
       (err) => {
-        console.error('Error fetching audits:', err);
         setError(err.message);
         setLoading(false);
       }
@@ -74,7 +73,6 @@ export function useAudits(limitCount = 20) {
       toast.success('Audit saved successfully!');
       return auditId;
     } catch (err) {
-      console.error('Error saving audit:', err);
       toast.error(err.message || 'Failed to save audit');
       throw err;
     }
@@ -86,7 +84,6 @@ export function useAudits(limitCount = 20) {
       await deleteAudit(auditId);
       toast.success('Audit deleted successfully!');
     } catch (err) {
-      console.error('Error deleting audit:', err);
       toast.error(err.message || 'Failed to delete audit');
       throw err;
     }
@@ -99,7 +96,6 @@ export function useAudits(limitCount = 20) {
       toast.success('Share link created!');
       return result;
     } catch (err) {
-      console.error('Error creating share link:', err);
       toast.error(err.message || 'Failed to create share link');
       throw err;
     }
@@ -111,7 +107,6 @@ export function useAudits(limitCount = 20) {
       await revokeShareLink(auditId);
       toast.success('Share link revoked');
     } catch (err) {
-      console.error('Error revoking share link:', err);
       toast.error(err.message || 'Failed to revoke share link');
       throw err;
     }

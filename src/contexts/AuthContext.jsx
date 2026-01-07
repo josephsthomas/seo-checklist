@@ -110,8 +110,8 @@ export function AuthProvider({ children }) {
       if (docSnap.exists()) {
         setUserProfile({ id: uid, ...docSnap.data() });
       }
-    } catch (error) {
-      console.error('Error fetching user profile:', error);
+    } catch {
+      // Silently fail - profile will be null
     }
   };
 

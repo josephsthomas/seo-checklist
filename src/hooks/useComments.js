@@ -72,7 +72,6 @@ export function useComments(projectId, itemId) {
         await createMentionNotifications(mentions, projectId, itemId, text);
       }
     } catch (error) {
-      console.error('Error adding comment:', error);
       toast.error('Failed to add comment');
       throw error;
     }
@@ -87,7 +86,6 @@ export function useComments(projectId, itemId) {
       });
       toast.success('Comment updated');
     } catch (error) {
-      console.error('Error updating comment:', error);
       toast.error('Failed to update comment');
       throw error;
     }
@@ -98,7 +96,6 @@ export function useComments(projectId, itemId) {
       await deleteDoc(doc(db, 'comments', commentId));
       toast.success('Comment deleted');
     } catch (error) {
-      console.error('Error deleting comment:', error);
       toast.error('Failed to delete comment');
       throw error;
     }
@@ -128,8 +125,8 @@ async function createMentionNotifications(userIds, projectId, itemId, commentTex
         createdAt: serverTimestamp(),
         data: { projectId, itemId }
       });
-    } catch (error) {
-      console.error('Error creating mention notification:', error);
+    } catch {
+      // Silently fail - mention notification is non-critical
     }
   }
 }

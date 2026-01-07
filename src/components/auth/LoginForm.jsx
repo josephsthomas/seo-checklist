@@ -17,8 +17,8 @@ export default function LoginForm() {
     try {
       await login(email, password);
       navigate('/');
-    } catch (error) {
-      console.error('Login failed:', error);
+    } catch {
+      // Error already shown via toast in AuthContext
     } finally {
       setLoading(false);
     }
@@ -29,8 +29,8 @@ export default function LoginForm() {
     try {
       await loginWithGoogle();
       navigate('/');
-    } catch (error) {
-      console.error('Google login failed:', error);
+    } catch {
+      // Error already shown via toast in AuthContext
     } finally {
       setLoading(false);
     }

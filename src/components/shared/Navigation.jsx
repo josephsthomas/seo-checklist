@@ -67,8 +67,8 @@ export default function Navigation() {
     try {
       await logout();
       navigate('/login');
-    } catch (error) {
-      console.error('Logout failed:', error);
+    } catch {
+      // Error already shown via toast in AuthContext
     }
   };
 

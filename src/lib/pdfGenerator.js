@@ -60,8 +60,8 @@ export function generateChecklistPDF(options) {
     try {
       doc.addImage(logo, 'PNG', 20, yPosition, 40, 20);
       yPosition += 30;
-    } catch (error) {
-      console.warn('Failed to add logo:', error);
+    } catch {
+      // Silently fail - logo is non-critical for PDF generation
     }
   }
 

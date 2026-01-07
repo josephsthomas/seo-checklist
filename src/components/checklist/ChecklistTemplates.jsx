@@ -247,7 +247,7 @@ export default function ChecklistTemplates({ onApplyTemplate, onClose }) {
                 </div>
               </div>
               <p className="text-charcoal-600 dark:text-charcoal-300 mb-6">
-                Are you sure you want to delete <strong>"{deleteConfirm.name}"</strong>?
+                Are you sure you want to delete <strong>&ldquo;{deleteConfirm.name}&rdquo;</strong>?
                 This template will be permanently removed.
               </p>
               <div className="flex justify-end gap-3">
