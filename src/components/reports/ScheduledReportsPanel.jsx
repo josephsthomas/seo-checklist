@@ -144,65 +144,6 @@ const TIMEZONES = [
   { id: 'Australia/Perth', label: 'Perth (AWST)', offset: 8 }
 ];
 
-// Generate mock scheduled reports
-function generateMockSchedules() {
-  return [
-    {
-      id: '1',
-      name: 'Weekly Technical Audit - Main Site',
-      reportType: 'technical-audit',
-      frequency: 'weekly',
-      dayOfWeek: 1,
-      time: '09:00',
-      timezone: 'America/New_York',
-      recipients: ['team@example.com', 'manager@example.com'],
-      format: 'pdf',
-      isActive: true,
-      lastRun: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000),
-      nextRun: addDays(new Date(), 5),
-      config: { url: 'https://example.com', depth: 3, includeScreenshots: true },
-      createdAt: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000),
-      runCount: 4,
-      lastStatus: 'success'
-    },
-    {
-      id: '2',
-      name: 'Monthly Accessibility Report',
-      reportType: 'accessibility-audit',
-      frequency: 'monthly',
-      dayOfMonth: 1,
-      time: '08:00',
-      timezone: 'America/Chicago',
-      recipients: ['accessibility@example.com'],
-      format: 'pdf',
-      isActive: true,
-      lastRun: new Date(Date.now() - 15 * 24 * 60 * 60 * 1000),
-      nextRun: addMonths(new Date(), 1),
-      config: { url: 'https://example.com', wcagLevel: 'AA', includeFixSuggestions: true },
-      createdAt: new Date(Date.now() - 60 * 24 * 60 * 60 * 1000),
-      runCount: 2,
-      lastStatus: 'success'
-    },
-    {
-      id: '3',
-      name: 'Daily Progress Summary',
-      reportType: 'content-progress',
-      frequency: 'daily',
-      time: '18:00',
-      timezone: 'America/Los_Angeles',
-      recipients: ['project-lead@example.com'],
-      format: 'xlsx',
-      isActive: false,
-      lastRun: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000),
-      nextRun: null,
-      config: { projectId: 'proj-123', includeAssignments: true },
-      createdAt: new Date(Date.now() - 14 * 24 * 60 * 60 * 1000),
-      runCount: 10,
-      lastStatus: 'paused'
-    }
-  ];
-}
-
 export default function ScheduledReportsPanel() {
   const [schedules, setSchedules] = useState([]);
   const [showCreateModal, setShowCreateModal] = useState(false);
@@ -210,10 +151,8 @@ export default function ScheduledReportsPanel() {
   const [expandedId, setExpandedId] = useState(null);
   const [filter, setFilter] = useState('all'); // all, active, paused
 
-  // Load mock data
-  useEffect(() => {
-    setSchedules(generateMockSchedules());
-  }, []);
+  // TODO: Load scheduled reports from Firestore
+  // Reports will be populated when users create scheduled reports
 
   // Filter schedules
   const filteredSchedules = schedules.filter(schedule => {
