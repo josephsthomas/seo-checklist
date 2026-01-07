@@ -1,10 +1,11 @@
-import React, { useState, useMemo } from 'react';
-import { Search, Book, Video, FileText, Filter, ExternalLink } from 'lucide-react';
+import { useState, useMemo, useDeferredValue } from 'react';
+import { Search, Book, Video, FileText } from 'lucide-react';
 import { resources, resourceCategories, resourceTypes, difficultyLevels } from '../../data/resources';
 import ReactMarkdown from 'react-markdown';
 
 export default function ResourceLibrary() {
   const [searchQuery, setSearchQuery] = useState('');
+  const deferredSearchQuery = useDeferredValue(searchQuery);
   const [selectedCategory, setSelectedCategory] = useState('All');
   const [selectedType, setSelectedType] = useState('All');
   const [selectedDifficulty, setSelectedDifficulty] = useState('All');
@@ -12,9 +13,9 @@ export default function ResourceLibrary() {
 
   const filteredResources = useMemo(() => {
     return resources.filter(resource => {
-      // Enhanced search: split query into words for better matching
-      if (searchQuery !== '') {
-        const queryWords = searchQuery.toLowerCase().trim().split(/\s+/);
+      // Enhanced search: split query into words for better matching (using deferred for performance)
+      if (deferredSearchQuery !== '') {
+        const queryWords = deferredSearchQuery.toLowerCase().trim().split(/\s+/);
         const searchableText = [
           resource.title,
           resource.description,
@@ -34,7 +35,7 @@ export default function ResourceLibrary() {
 
       return matchesCategory && matchesType && matchesDifficulty;
     });
-  }, [searchQuery, selectedCategory, selectedType, selectedDifficulty]);
+  }, [deferredSearchQuery, selectedCategory, selectedType, selectedDifficulty]);
 
   const getTypeIcon = (type) => {
     switch (type) {

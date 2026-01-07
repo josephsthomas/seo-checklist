@@ -368,6 +368,7 @@ export function ToolHelpButton({ onClick, className = '' }) {
 /**
  * Hook to use tool help panel
  */
+// eslint-disable-next-line react-refresh/only-export-components
 export function useToolHelp() {
   const [isOpen, setIsOpen] = useState(false);
 
@@ -379,4 +380,5 @@ export function useToolHelp() {
   };
 }
 
+// eslint-disable-next-line react-refresh/only-export-components
 export { TOOL_HELP, getToolIdFromPath };

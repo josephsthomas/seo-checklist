@@ -21,6 +21,8 @@ import {
 } from 'lucide-react';
 import { validateSchema, formatJsonLd, generateScriptTag, SCHEMA_TYPES } from '../../../lib/schema-generator/schemaGeneratorService';
 import toast from 'react-hot-toast';
+import AIExportConfirmation, { useAIExportConfirmation } from '../../shared/AIExportConfirmation';
+import { AIBadge } from '../../shared/AIDisclaimer';
 
 export default function SchemaDashboard({ results, onNewProcess, onUpdateSchema }) {
   const [expandedSchema, setExpandedSchema] = useState(0);
@@ -28,6 +30,7 @@ export default function SchemaDashboard({ results, onNewProcess, onUpdateSchema 
   const [editValue, setEditValue] = useState('');
   const [copiedIndex, setCopiedIndex] = useState(null);
   const [activeTab, setActiveTab] = useState('code'); // code, preview, validation
+  const exportConfirmation = useAIExportConfirmation();
 
   const { schemas, summary, warnings, extractedContent } = results;
 
@@ -49,7 +52,7 @@ export default function SchemaDashboard({ results, onNewProcess, onUpdateSchema 
     }
   };
 
-  const handleCopyAll = async () => {
+  const performCopyAll = async () => {
     try {
       const allCode = schemas.map(s => generateScriptTag(s.jsonLd)).join('\n\n');
       await navigator.clipboard.writeText(allCode);
@@ -62,7 +65,7 @@ export default function SchemaDashboard({ results, onNewProcess, onUpdateSchema 
     }
   };
 
-  const handleDownload = () => {
+  const performDownload = () => {
     const allCode = schemas.map(s => generateScriptTag(s.jsonLd)).join('\n\n');
     const blob = new Blob([allCode], { type: 'application/json' });
     const url = URL.createObjectURL(blob);
@@ -74,6 +77,14 @@ export default function SchemaDashboard({ results, onNewProcess, onUpdateSchema 
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
     toast.success('Schema file downloaded');
+  };
+
+  const handleCopyAll = () => {
+    exportConfirmation.requestExport(performCopyAll, 'copy', 'structured data');
+  };
+
+  const handleDownload = () => {
+    exportConfirmation.requestExport(performDownload, 'download', 'structured data');
   };
 
   const handleEdit = (index, jsonLd) => {
@@ -233,7 +244,10 @@ export default function SchemaDashboard({ results, onNewProcess, onUpdateSchema 
               <Code2 className="w-6 h-6 text-white" />
             </div>
             <div>
-              <h1 className="text-2xl font-bold text-white">Schema Generated</h1>
+              <div className="flex items-center gap-2">
+                <h1 className="text-2xl font-bold text-white">Schema Generated</h1>
+                <AIBadge />
+              </div>
               <p className="text-slate-400 text-sm">
                 {schemas.length} schema{schemas.length !== 1 ? 's' : ''} created
               </p>
@@ -548,6 +562,15 @@ export default function SchemaDashboard({ results, onNewProcess, onUpdateSchema 
           </div>
         )}
       </div>
+
+      {/* AI Export Confirmation Modal */}
+      <AIExportConfirmation
+        isOpen={exportConfirmation.isOpen}
+        onClose={exportConfirmation.handleClose}
+        onConfirm={exportConfirmation.handleConfirm}
+        exportType={exportConfirmation.exportType}
+        contentType={exportConfirmation.contentType}
+      />
     </div>
   );
 }

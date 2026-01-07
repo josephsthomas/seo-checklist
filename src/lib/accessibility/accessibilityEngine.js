@@ -3,7 +3,7 @@
  * Processes Screaming Frog accessibility data and generates WCAG compliance results
  */
 
-import { WCAG_CRITERIA, WCAG_PRINCIPLES, getCriteriaUpToLevel } from '../../data/wcagCriteria';
+import { WCAG_CRITERIA, getCriteriaUpToLevel } from '../../data/wcagCriteria';
 import { IMPACT_LEVELS, getRuleByFileName } from '../../data/axeRules';
 
 /**

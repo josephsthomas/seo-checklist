@@ -1,5 +1,4 @@
 import { useState, useEffect, useCallback } from 'react';
-import { useNavigate } from 'react-router-dom';
 import {
   Play,
   X,
@@ -415,6 +414,7 @@ export default function InteractiveTutorial({
 /**
  * Get all available tutorials
  */
+// eslint-disable-next-line react-refresh/only-export-components
 export function getTutorials() {
   return Object.values(TUTORIALS);
 }
@@ -422,6 +422,7 @@ export function getTutorials() {
 /**
  * Check if a tutorial is completed
  */
+// eslint-disable-next-line react-refresh/only-export-components
 export function isTutorialCompleted(tutorialId) {
   try {
     const completed = JSON.parse(localStorage.getItem('completedTutorials') || '[]');

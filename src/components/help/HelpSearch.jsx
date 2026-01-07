@@ -243,7 +243,7 @@ export default function HelpSearch({ isOpen, onClose }) {
                         Tools
                       </p>
                     )}
-                    {allResults.filter(r => r.type === RESULT_TYPES.TOOL).map((result, idx) => {
+                    {allResults.filter(r => r.type === RESULT_TYPES.TOOL).map((result) => {
                       const globalIdx = allResults.indexOf(result);
                       return (
                         <SearchResult

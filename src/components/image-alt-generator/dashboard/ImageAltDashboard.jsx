@@ -21,6 +21,8 @@ import {
 } from 'lucide-react';
 import { exportToExcel, exportImagesAsZip, exportToCSV } from '../../../lib/image-alt/imageAltExportService';
 import toast from 'react-hot-toast';
+import AIExportConfirmation, { useAIExportConfirmation } from '../../shared/AIExportConfirmation';
+import { AIBadge } from '../../shared/AIDisclaimer';
 
 export default function ImageAltDashboard({ results, onNewProcess, onUpdateResult }) {
   const [searchTerm, setSearchTerm] = useState('');
@@ -31,6 +33,7 @@ export default function ImageAltDashboard({ results, onNewProcess, onUpdateResul
   const [expandedId, setExpandedId] = useState(null);
   const [copiedId, setCopiedId] = useState(null);
   const [showExportMenu, setShowExportMenu] = useState(false);
+  const exportConfirmation = useAIExportConfirmation();
 
   const { images, summary, context } = results;
 
@@ -140,8 +143,7 @@ export default function ImageAltDashboard({ results, onNewProcess, onUpdateResul
     }
   };
 
-  const handleExport = async (type) => {
-    setShowExportMenu(false);
+  const performExport = async (type) => {
     try {
       switch (type) {
         case 'excel':
@@ -162,6 +164,11 @@ export default function ImageAltDashboard({ results, onNewProcess, onUpdateResul
     }
   };
 
+  const handleExport = (type) => {
+    setShowExportMenu(false);
+    exportConfirmation.requestExport(() => performExport(type), 'download', 'alt text');
+  };
+
   const getCharCountColor = (length) => {
     if (length === 0) return 'text-slate-500';
     if (length <= 100) return 'text-emerald-400';
@@ -179,7 +186,10 @@ export default function ImageAltDashboard({ results, onNewProcess, onUpdateResul
               <Image className="w-6 h-6 text-white" />
             </div>
             <div>
-              <h1 className="text-2xl font-bold text-white">Alt Text Results</h1>
+              <div className="flex items-center gap-2">
+                <h1 className="text-2xl font-bold text-white">Alt Text Results</h1>
+                <AIBadge />
+              </div>
               <p className="text-slate-400 text-sm">
                 {summary.total} images processed • {summary.success} successful
               </p>
@@ -490,6 +500,15 @@ export default function ImageAltDashboard({ results, onNewProcess, onUpdateResul
           </div>
         )}
       </div>
+
+      {/* AI Export Confirmation Modal */}
+      <AIExportConfirmation
+        isOpen={exportConfirmation.isOpen}
+        onClose={exportConfirmation.handleClose}
+        onConfirm={exportConfirmation.handleConfirm}
+        exportType={exportConfirmation.exportType}
+        contentType={exportConfirmation.contentType}
+      />
     </div>
   );
 }

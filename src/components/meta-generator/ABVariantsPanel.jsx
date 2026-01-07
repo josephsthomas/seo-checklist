@@ -1,7 +1,6 @@
 import { useState, useCallback } from 'react';
 import {
   Shuffle,
-  Plus,
   Trash2,
   Copy,
   Check,
@@ -22,7 +21,6 @@ import toast from 'react-hot-toast';
 export default function ABVariantsPanel({
   metadata,
   onSelectVariant,
-  generateVariant,
   className = ''
 }) {
   const [variants, setVariants] = useState([

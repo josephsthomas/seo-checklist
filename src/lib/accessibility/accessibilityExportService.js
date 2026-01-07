@@ -5,8 +5,8 @@
 
 import jsPDF from 'jspdf';
 import 'jspdf-autotable';
-import * as XLSX from 'xlsx';
-import { WCAG_CRITERIA, WCAG_PRINCIPLES, getCriteriaByLevel } from '../../data/wcagCriteria';
+import ExcelJS from 'exceljs';
+import { getCriteriaByLevel, WCAG_PRINCIPLES } from '../../data/wcagCriteria';
 import { COMPLIANCE_STATUS } from './accessibilityEngine';
 
 /**
@@ -21,7 +21,7 @@ export function exportAccessibilityPDF(auditResults, options = {}) {
     domainInfo = {}
   } = options;
 
-  const { scores, summary, violationsByRule, topIssues, criteriaStatus, timestamp } = auditResults;
+  const { scores, summary, topIssues, criteriaStatus, timestamp } = auditResults;
   const doc = new jsPDF();
   let yPos = 20;
 
@@ -67,7 +67,7 @@ export function exportAccessibilityPDF(auditResults, options = {}) {
     { name: 'Level AAA', score: scores.byLevel.AAA.score, color: [139, 92, 246] }
   ];
 
-  levels.forEach((level, idx) => {
+  levels.forEach((level) => {
     doc.setTextColor(55, 65, 81);
     doc.text(`${level.name}:`, 60, yPos);
     doc.setTextColor(...level.color);
@@ -299,16 +299,19 @@ export function exportAccessibilityPDF(auditResults, options = {}) {
 /**
  * Export accessibility audit to Excel
  */
-export function exportAccessibilityExcel(auditResults, options = {}) {
+export async function exportAccessibilityExcel(auditResults, options = {}) {
   const {
     filename = 'accessibility-audit.xlsx',
     domainInfo = {}
   } = options;
 
-  const { scores, summary, violationsByRule, topIssues, worstPages, criteriaStatus, timestamp } = auditResults;
-  const wb = XLSX.utils.book_new();
+  const { scores, summary, worstPages, criteriaStatus, timestamp, violationsByRule } = auditResults;
+  const wb = new ExcelJS.Workbook();
+  wb.creator = 'Content Strategy Portal';
+  wb.created = new Date();
 
   // ===== SUMMARY SHEET =====
+  const summaryWs = wb.addWorksheet('Summary');
   const summaryData = [
     ['WCAG 2.2 Accessibility Audit Report'],
     ['Domain', domainInfo.domain || 'N/A'],
@@ -337,10 +340,10 @@ export function exportAccessibilityExcel(auditResults, options = {}) {
     ['Understandable', `${scores.byPrinciple.understandable?.score || 0}%`],
     ['Robust', `${scores.byPrinciple.robust?.score || 0}%`]
   ];
-
-  const summaryWs = XLSX.utils.aoa_to_sheet(summaryData);
-  summaryWs['!cols'] = [{ wch: 25 }, { wch: 30 }];
-  XLSX.utils.book_append_sheet(wb, summaryWs, 'Summary');
+  summaryData.forEach(row => summaryWs.addRow(row));
+  summaryWs.getColumn(1).width = 25;
+  summaryWs.getColumn(2).width = 30;
+  summaryWs.getRow(1).font = { bold: true, size: 14 };
 
   // ===== VIOLATIONS SHEET =====
   const violationsData = Object.values(violationsByRule).map(v => ({
@@ -355,64 +358,75 @@ export function exportAccessibilityExcel(auditResults, options = {}) {
   }));
 
   if (violationsData.length > 0) {
-    const violationsWs = XLSX.utils.json_to_sheet(violationsData);
-    violationsWs['!cols'] = [
-      { wch: 30 }, { wch: 40 }, { wch: 12 }, { wch: 12 },
-      { wch: 20 }, { wch: 12 }, { wch: 10 }, { wch: 60 }
+    const violationsWs = wb.addWorksheet('Violations');
+    const violationHeaders = ['Rule ID', 'Violation Name', 'Impact', 'WCAG Level', 'WCAG Criteria', 'URLs Affected', 'AI Fixable', 'Fix Suggestion'];
+    violationsWs.addRow(violationHeaders);
+    violationsWs.getRow(1).font = { bold: true };
+    violationsData.forEach(v => violationsWs.addRow(Object.values(v)));
+    violationsWs.columns = [
+      { width: 30 }, { width: 40 }, { width: 12 }, { width: 12 },
+      { width: 20 }, { width: 12 }, { width: 10 }, { width: 60 }
     ];
-    XLSX.utils.book_append_sheet(wb, violationsWs, 'Violations');
   }
 
   // ===== PAGES SHEET =====
   if (worstPages?.length > 0) {
-    const pagesData = worstPages.map(p => ({
-      'URL': p.address,
-      'Total Violations': p.totalViolations,
-      'Level A': p.levelA,
-      'Level AA': p.levelAA,
-      'Level AAA': p.levelAAA,
-      'Best Practice': p.bestPractice
-    }));
-
-    const pagesWs = XLSX.utils.json_to_sheet(pagesData);
-    pagesWs['!cols'] = [
-      { wch: 70 }, { wch: 15 }, { wch: 10 }, { wch: 10 }, { wch: 10 }, { wch: 15 }
+    const pagesWs = wb.addWorksheet('Pages');
+    const pageHeaders = ['URL', 'Total Violations', 'Level A', 'Level AA', 'Level AAA', 'Best Practice'];
+    pagesWs.addRow(pageHeaders);
+    pagesWs.getRow(1).font = { bold: true };
+    worstPages.forEach(p => {
+      pagesWs.addRow([p.address, p.totalViolations, p.levelA, p.levelAA, p.levelAAA, p.bestPractice]);
+    });
+    pagesWs.columns = [
+      { width: 70 }, { width: 15 }, { width: 10 }, { width: 10 }, { width: 10 }, { width: 15 }
     ];
-    XLSX.utils.book_append_sheet(wb, pagesWs, 'Pages');
   }
 
   // ===== WCAG CRITERIA SHEET =====
-  const criteriaData = [];
+  const criteriaWs = wb.addWorksheet('WCAG Criteria');
+  const criteriaHeaders = ['Criterion ID', 'Name', 'Level', 'Principle', 'Status', 'Automation'];
+  criteriaWs.addRow(criteriaHeaders);
+  criteriaWs.getRow(1).font = { bold: true };
+
   ['A', 'AA', 'AAA'].forEach(level => {
     getCriteriaByLevel(level).forEach(c => {
       const status = criteriaStatus[c.id] || 'not_tested';
-      criteriaData.push({
-        'Criterion ID': c.id,
-        'Name': c.name,
-        'Level': level,
-        'Principle': WCAG_PRINCIPLES[c.principle] || c.principle,
-        'Status': status === COMPLIANCE_STATUS.SUPPORTS ? 'Supports' :
-                 status === COMPLIANCE_STATUS.DOES_NOT_SUPPORT ? 'Does Not Support' :
-                 status === COMPLIANCE_STATUS.PARTIALLY_SUPPORTS ? 'Partially Supports' : 'Not Tested',
-        'Automation': c.automation || 'manual'
-      });
+      criteriaWs.addRow([
+        c.id,
+        c.name,
+        level,
+        WCAG_PRINCIPLES[c.principle] || c.principle,
+        status === COMPLIANCE_STATUS.SUPPORTS ? 'Supports' :
+        status === COMPLIANCE_STATUS.DOES_NOT_SUPPORT ? 'Does Not Support' :
+        status === COMPLIANCE_STATUS.PARTIALLY_SUPPORTS ? 'Partially Supports' : 'Not Tested',
+        c.automation || 'manual'
+      ]);
     });
   });
 
-  const criteriaWs = XLSX.utils.json_to_sheet(criteriaData);
-  criteriaWs['!cols'] = [
-    { wch: 12 }, { wch: 50 }, { wch: 8 }, { wch: 18 }, { wch: 20 }, { wch: 12 }
+  criteriaWs.columns = [
+    { width: 12 }, { width: 50 }, { width: 8 }, { width: 18 }, { width: 20 }, { width: 12 }
   ];
-  XLSX.utils.book_append_sheet(wb, criteriaWs, 'WCAG Criteria');
 
-  XLSX.writeFile(wb, filename);
+  // Write file and download
+  const buffer = await wb.xlsx.writeBuffer();
+  const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement('a');
+  link.href = url;
+  link.download = filename;
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+  URL.revokeObjectURL(url);
 }
 
 /**
  * Generate VPAT (Voluntary Product Accessibility Template) Report
  * Based on Section 508 / WCAG 2.2 template
  */
-export function exportVPAT(auditResults, options = {}) {
+export async function exportVPAT(auditResults, options = {}) {
   const {
     filename = 'vpat-accessibility-conformance-report.xlsx',
     productName = 'Website',
@@ -423,9 +437,12 @@ export function exportVPAT(auditResults, options = {}) {
   } = options;
 
   const { scores, criteriaStatus, timestamp } = auditResults;
-  const wb = XLSX.utils.book_new();
+  const wb = new ExcelJS.Workbook();
+  wb.creator = 'Content Strategy Portal';
+  wb.created = new Date();
 
   // ===== ABOUT SHEET =====
+  const aboutWs = wb.addWorksheet('About');
   const aboutData = [
     ['Voluntary Product Accessibility Template (VPAT)'],
     ['WCAG 2.2 Edition'],
@@ -447,20 +464,13 @@ export function exportVPAT(auditResults, options = {}) {
     ['Level AA', `${scores.byLevel.AA.score}% (${scores.byLevel.AA.pass}/${scores.byLevel.AA.total} criteria)`],
     ['Level AAA', `${scores.byLevel.AAA.score}% (${scores.byLevel.AAA.pass}/${scores.byLevel.AAA.total} criteria)`]
   ];
-
-  const aboutWs = XLSX.utils.aoa_to_sheet(aboutData);
-  aboutWs['!cols'] = [{ wch: 25 }, { wch: 60 }];
-  XLSX.utils.book_append_sheet(wb, aboutWs, 'About');
+  aboutData.forEach(row => aboutWs.addRow(row));
+  aboutWs.getColumn(1).width = 25;
+  aboutWs.getColumn(2).width = 60;
+  aboutWs.getRow(1).font = { bold: true, size: 14 };
 
   // ===== WCAG 2.2 REPORT SHEET =====
-  // Standard VPAT format columns
-  const vpatData = [
-    ['WCAG 2.2 Report'],
-    [],
-    ['Note: Complete accessibility conformance requires manual testing in addition to automated testing.'],
-    [],
-    ['Criteria', 'Conformance Level', 'Evaluation Status', 'Remarks and Explanations']
-  ];
+  const vpatWs = wb.addWorksheet('WCAG 2.2 Report');
 
   // Map status to VPAT conformance levels
   const getConformanceLevel = (status) => {
@@ -472,9 +482,19 @@ export function exportVPAT(auditResults, options = {}) {
     }
   };
 
+  // Add header rows
+  vpatWs.addRow(['WCAG 2.2 Report']);
+  vpatWs.addRow([]);
+  vpatWs.addRow(['Note: Complete accessibility conformance requires manual testing in addition to automated testing.']);
+  vpatWs.addRow([]);
+  const headerRow = vpatWs.addRow(['Criteria', 'Conformance Level', 'Evaluation Status', 'Remarks and Explanations']);
+  headerRow.font = { bold: true };
+  vpatWs.getRow(1).font = { bold: true, size: 14 };
+
   // Add all WCAG criteria
   ['A', 'AA', 'AAA'].forEach(level => {
-    vpatData.push([`--- Level ${level} ---`, '', '', '']);
+    const sectionRow = vpatWs.addRow([`--- Level ${level} ---`, '', '', '']);
+    sectionRow.font = { bold: true };
     getCriteriaByLevel(level).forEach(c => {
       const status = criteriaStatus[c.id];
       const conformance = getConformanceLevel(status);
@@ -482,7 +502,7 @@ export function exportVPAT(auditResults, options = {}) {
         'Requires manual testing for full evaluation' :
         (status === COMPLIANCE_STATUS.DOES_NOT_SUPPORT ? 'Violations detected - remediation required' : '');
 
-      vpatData.push([
+      vpatWs.addRow([
         `${c.id} ${c.name}`,
         conformance,
         c.automation || 'automated',
@@ -491,13 +511,12 @@ export function exportVPAT(auditResults, options = {}) {
     });
   });
 
-  const vpatWs = XLSX.utils.aoa_to_sheet(vpatData);
-  vpatWs['!cols'] = [
-    { wch: 50 }, { wch: 20 }, { wch: 15 }, { wch: 50 }
+  vpatWs.columns = [
+    { width: 50 }, { width: 20 }, { width: 15 }, { width: 50 }
   ];
-  XLSX.utils.book_append_sheet(wb, vpatWs, 'WCAG 2.2 Report');
 
   // ===== LEGAL DISCLAIMER =====
+  const legalWs = wb.addWorksheet('Legal');
   const legalData = [
     ['Legal Disclaimer'],
     [],
@@ -515,12 +534,22 @@ export function exportVPAT(auditResults, options = {}) {
     ['Not Applicable', 'The criterion is not relevant to the product.'],
     ['Not Evaluated', 'The product has not been evaluated against the criterion.']
   ];
+  legalData.forEach(row => legalWs.addRow(row));
+  legalWs.getColumn(1).width = 20;
+  legalWs.getColumn(2).width = 100;
+  legalWs.getRow(1).font = { bold: true, size: 14 };
 
-  const legalWs = XLSX.utils.aoa_to_sheet(legalData);
-  legalWs['!cols'] = [{ wch: 20 }, { wch: 100 }];
-  XLSX.utils.book_append_sheet(wb, legalWs, 'Legal');
-
-  XLSX.writeFile(wb, filename);
+  // Write file and download
+  const buffer = await wb.xlsx.writeBuffer();
+  const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement('a');
+  link.href = url;
+  link.download = filename;
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+  URL.revokeObjectURL(url);
 }
 
 /**
@@ -537,8 +566,24 @@ export function exportViolationsCSV(violationsByRule, filename = 'accessibility-
     'Fix Suggestion': v.fixSuggestion || ''
   }));
 
-  const ws = XLSX.utils.json_to_sheet(data);
-  const csv = XLSX.utils.sheet_to_csv(ws);
+  // Helper to escape CSV values
+  const escapeCSV = (value) => {
+    if (value === null || value === undefined) return '';
+    const str = String(value);
+    if (str.includes(',') || str.includes('"') || str.includes('\n')) {
+      return `"${str.replace(/"/g, '""')}"`;
+    }
+    return str;
+  };
+
+  // Build CSV string
+  const headers = ['Rule ID', 'Name', 'Impact', 'WCAG Level', 'WCAG Criteria', 'URLs Affected', 'Fix Suggestion'];
+  const csvRows = [headers.join(',')];
+  data.forEach(row => {
+    const values = headers.map(h => escapeCSV(row[h]));
+    csvRows.push(values.join(','));
+  });
+  const csv = csvRows.join('\n');
 
   const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
   const link = document.createElement('a');

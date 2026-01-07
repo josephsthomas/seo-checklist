@@ -348,7 +348,7 @@ function SaveSchemaForm({ schema, onSave, onClose }) {
       <div className="bg-white dark:bg-charcoal-800 rounded-2xl shadow-2xl w-full max-w-md animate-scale-in">
         <div className="px-6 py-4 border-b border-charcoal-100 dark:border-charcoal-700 flex items-center justify-between">
           <h3 className="text-lg font-bold text-charcoal-900 dark:text-white">Save to Library</h3>
-          <button onClick={onClose} className="p-2 text-charcoal-400 hover:text-charcoal-600 dark:hover:text-charcoal-300 rounded-lg">
+          <button onClick={onClose} className="p-2 text-charcoal-400 hover:text-charcoal-600 dark:hover:text-charcoal-300 rounded-lg" aria-label="Close dialog">
             <X className="w-5 h-5" />
           </button>
         </div>
@@ -416,7 +416,7 @@ function ViewSchemaModal({ schema, onClose, onApply }) {
             <h3 className="text-lg font-bold text-charcoal-900 dark:text-white">{schema.name}</h3>
             <p className="text-sm text-charcoal-500 dark:text-charcoal-400">{schema.schemaType}</p>
           </div>
-          <button onClick={onClose} className="p-2 text-charcoal-400 hover:text-charcoal-600 dark:hover:text-charcoal-300 rounded-lg">
+          <button onClick={onClose} className="p-2 text-charcoal-400 hover:text-charcoal-600 dark:hover:text-charcoal-300 rounded-lg" aria-label="Close schema preview">
             <X className="w-5 h-5" />
           </button>
         </div>

@@ -4,7 +4,7 @@
  * Handles parsing of accessibility_all.xlsx and individual violation files
  */
 
-import * as XLSX from 'xlsx';
+import ExcelJS from 'exceljs';
 import { getRuleByFileName } from '../../data/axeRules';
 
 /**
@@ -69,19 +69,14 @@ const SUMMARY_FILE_COLUMNS = {
  * @param {string} fileName - Name of the file
  * @returns {Object} - Parsed data with rows and headers
  */
-function parseExcelFile(data, fileName) {
+async function parseExcelFile(data, fileName) {
   try {
-    const workbook = XLSX.read(data, { type: 'array' });
-    const sheetName = workbook.SheetNames[0];
-    const worksheet = workbook.Sheets[sheetName];
+    const workbook = new ExcelJS.Workbook();
+    await workbook.xlsx.load(data);
 
-    const jsonData = XLSX.utils.sheet_to_json(worksheet, {
-      header: 1,
-      defval: '',
-      raw: false
-    });
+    const worksheet = workbook.worksheets[0];
 
-    if (jsonData.length === 0) {
+    if (!worksheet || worksheet.rowCount === 0) {
       return {
         success: false,
         error: `File ${fileName} is empty`,
@@ -90,13 +85,33 @@ function parseExcelFile(data, fileName) {
       };
     }
 
-    const headers = jsonData[0].map(h => String(h).trim());
-    const rows = jsonData.slice(1).map(row => {
+    // Get headers from first row
+    const headerRow = worksheet.getRow(1);
+    const headers = [];
+    headerRow.eachCell({ includeEmpty: true }, (cell, colNumber) => {
+      headers[colNumber - 1] = String(cell.value || '').trim();
+    });
+
+    // Convert remaining rows to objects
+    const rows = [];
+    worksheet.eachRow({ includeEmpty: false }, (row, rowNumber) => {
+      if (rowNumber === 1) return; // Skip header row
+
       const obj = {};
-      headers.forEach((header, index) => {
-        obj[header] = row[index] !== undefined ? row[index] : '';
+      row.eachCell({ includeEmpty: true }, (cell, colNumber) => {
+        const header = headers[colNumber - 1];
+        if (header) {
+          let value = cell.value;
+          if (value && typeof value === 'object') {
+            if (value.text) value = value.text;
+            else if (value.hyperlink) value = value.hyperlink;
+            else if (value.result !== undefined) value = value.result;
+            else value = String(value);
+          }
+          obj[header] = value !== null && value !== undefined ? value : '';
+        }
       });
-      return obj;
+      rows.push(obj);
     });
 
     return {
@@ -123,8 +138,8 @@ function parseExcelFile(data, fileName) {
  * @param {ArrayBuffer} data - The file data
  * @returns {Object} - Parsed accessibility data with normalized columns
  */
-export function parseAccessibilityAll(data) {
-  const result = parseExcelFile(data, 'accessibility_all.xlsx');
+export async function parseAccessibilityAll(data) {
+  const result = await parseExcelFile(data, 'accessibility_all.xlsx');
 
   if (!result.success) {
     return result;
@@ -184,8 +199,8 @@ export function parseAccessibilityAll(data) {
  * @param {string} fileName - Name of the file (e.g., 'accessibility_images_require_alternate_text.xlsx')
  * @returns {Object} - Parsed violation data with rule metadata
  */
-export function parseViolationFile(data, fileName) {
-  const result = parseExcelFile(data, fileName);
+export async function parseViolationFile(data, fileName) {
+  const result = await parseExcelFile(data, fileName);
 
   if (!result.success) {
     return result;
@@ -247,8 +262,8 @@ export function parseViolationFile(data, fileName) {
  * @param {ArrayBuffer} data - The file data
  * @returns {Object} - Parsed summary data
  */
-export function parseViolationsSummary(data) {
-  const result = parseExcelFile(data, 'accessibility_violations_summary.xlsx');
+export async function parseViolationsSummary(data) {
+  const result = await parseExcelFile(data, 'accessibility_violations_summary.xlsx');
 
   if (!result.success) {
     return result;
@@ -326,7 +341,7 @@ export async function parseAccessibilityFiles(extractedFiles, onProgress = () =>
     try {
       if (fileName === 'accessibility_all.xlsx') {
         // Main accessibility file
-        result.mainData = parseAccessibilityAll(arrayBuffer);
+        result.mainData = await parseAccessibilityAll(arrayBuffer);
         if (result.mainData.success) {
           result.stats.parsedSuccessfully++;
         } else {
@@ -334,7 +349,7 @@ export async function parseAccessibilityFiles(extractedFiles, onProgress = () =>
         }
       } else if (fileName === 'accessibility_violations_summary.xlsx') {
         // Summary file
-        result.summary = parseViolationsSummary(arrayBuffer);
+        result.summary = await parseViolationsSummary(arrayBuffer);
         if (result.summary.success) {
           result.stats.parsedSuccessfully++;
         } else {
@@ -343,7 +358,7 @@ export async function parseAccessibilityFiles(extractedFiles, onProgress = () =>
       } else if (fileName.startsWith('accessibility_') && !fileName.includes('_score_') && !fileName.includes('wcag_2_')) {
         // Individual violation file
         result.stats.violationFiles++;
-        const parsed = parseViolationFile(arrayBuffer, fileName);
+        const parsed = await parseViolationFile(arrayBuffer, fileName);
         if (parsed.success) {
           result.violations[fileName] = parsed;
           result.stats.parsedSuccessfully++;

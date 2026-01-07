@@ -2,6 +2,7 @@ import { createContext, useContext, useEffect, useState } from 'react';
 
 const ThemeContext = createContext({});
 
+// eslint-disable-next-line react-refresh/only-export-components
 export const useTheme = () => {
   const context = useContext(ThemeContext);
   if (!context) {
@@ -16,8 +17,12 @@ export function ThemeProvider({ children }) {
   const [theme, setTheme] = useState(() => {
     // Check localStorage first
     if (typeof window !== 'undefined') {
-      const stored = localStorage.getItem(THEME_KEY);
-      if (stored) return stored;
+      try {
+        const stored = localStorage.getItem(THEME_KEY);
+        if (stored) return stored;
+      } catch {
+        // localStorage may be unavailable
+      }
     }
     return 'system';
   });
@@ -42,7 +47,11 @@ export function ThemeProvider({ children }) {
     setResolvedTheme(resolved);
 
     // Store preference
-    localStorage.setItem(THEME_KEY, theme);
+    try {
+      localStorage.setItem(THEME_KEY, theme);
+    } catch {
+      // localStorage may be unavailable or full
+    }
   }, [theme]);
 
   // Listen for system theme changes

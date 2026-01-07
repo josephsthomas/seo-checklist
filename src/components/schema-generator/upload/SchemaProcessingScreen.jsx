@@ -1,6 +1,6 @@
 import { Code2, Loader2, Sparkles } from 'lucide-react';
 
-export default function SchemaProcessingScreen({ progress, stage, inputType }) {
+export default function SchemaProcessingScreen({ progress, stage }) {
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 flex items-center justify-center p-4">
       <div className="max-w-md w-full text-center">

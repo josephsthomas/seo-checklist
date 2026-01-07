@@ -49,7 +49,7 @@ describe('Tooltips Library', () => {
     });
 
     it('should have non-empty tooltip text for all keys', () => {
-      Object.entries(TOOLTIPS).forEach(([key, value]) => {
+      Object.entries(TOOLTIPS).forEach(([, value]) => {
         expect(value).toBeTruthy();
         expect(typeof value).toBe('string');
         expect(value.length).toBeGreaterThan(10); // Meaningful tooltip text

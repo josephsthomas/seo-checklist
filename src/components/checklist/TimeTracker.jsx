@@ -4,7 +4,7 @@
  * Phase 9 - Batch 5
  */
 
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { Play, Square, Clock, Plus, Trash2 } from 'lucide-react';
 import { useTimeTracking } from '../../hooks/useTimeTracking';
 import { format } from 'date-fns';

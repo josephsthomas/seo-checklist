@@ -5,7 +5,7 @@
 
 import jsPDF from 'jspdf';
 import 'jspdf-autotable';
-import * as XLSX from 'xlsx';
+import ExcelJS from 'exceljs';
 import { SEVERITY } from './auditEngine';
 
 /**
@@ -238,15 +238,18 @@ export function exportToPDF(auditResults, options = {}) {
 /**
  * Export audit results to Excel
  */
-export function exportToExcel(auditResults, urlData = [], options = {}) {
+export async function exportToExcel(auditResults, urlData = [], options = {}) {
   const {
     filename = 'seo-audit-report.xlsx'
   } = options;
 
-  const wb = XLSX.utils.book_new();
+  const wb = new ExcelJS.Workbook();
+  wb.creator = 'Content Strategy Portal';
+  wb.created = new Date();
 
   // Summary sheet
   if (auditResults.summary) {
+    const summaryWs = wb.addWorksheet('Summary');
     const summaryData = [
       ['SEO Technical Audit Report'],
       ['Generated', new Date().toLocaleString()],
@@ -258,31 +261,36 @@ export function exportToExcel(auditResults, urlData = [], options = {}) {
       ['Info', auditResults.summary.info || 0],
       ['URLs Analyzed', auditResults.summary.urlsAnalyzed || 0]
     ];
-
-    const summaryWs = XLSX.utils.aoa_to_sheet(summaryData);
-    summaryWs['!cols'] = [{ wch: 20 }, { wch: 30 }];
-    XLSX.utils.book_append_sheet(wb, summaryWs, 'Summary');
+    summaryData.forEach(row => summaryWs.addRow(row));
+    summaryWs.getColumn(1).width = 20;
+    summaryWs.getColumn(2).width = 30;
+    summaryWs.getRow(1).font = { bold: true, size: 14 };
   }
 
   // Issues sheet
   if (auditResults.issues?.length > 0) {
-    const issuesData = auditResults.issues.map(issue => ({
-      'Title': issue.title,
-      'Severity': issue.severity,
-      'Priority': issue.priority,
-      'Category': issue.category,
-      'Description': issue.description,
-      'Recommendation': issue.recommendation,
-      'Affected URLs': issue.affectedUrls?.length || 0,
-      'Example URL': issue.affectedUrls?.[0] || ''
-    }));
+    const issuesWs = wb.addWorksheet('Issues');
+    const issueHeaders = ['Title', 'Severity', 'Priority', 'Category', 'Description', 'Recommendation', 'Affected URLs', 'Example URL'];
+    issuesWs.addRow(issueHeaders);
+    issuesWs.getRow(1).font = { bold: true };
 
-    const issuesWs = XLSX.utils.json_to_sheet(issuesData);
-    issuesWs['!cols'] = [
-      { wch: 40 }, { wch: 10 }, { wch: 10 }, { wch: 20 },
-      { wch: 60 }, { wch: 60 }, { wch: 15 }, { wch: 50 }
+    auditResults.issues.forEach(issue => {
+      issuesWs.addRow([
+        issue.title,
+        issue.severity,
+        issue.priority,
+        issue.category,
+        issue.description,
+        issue.recommendation,
+        issue.affectedUrls?.length || 0,
+        issue.affectedUrls?.[0] || ''
+      ]);
+    });
+
+    issuesWs.columns = [
+      { width: 40 }, { width: 10 }, { width: 10 }, { width: 20 },
+      { width: 60 }, { width: 60 }, { width: 15 }, { width: 50 }
     ];
-    XLSX.utils.book_append_sheet(wb, issuesWs, 'Issues');
   }
 
   // Affected URLs per issue
@@ -299,39 +307,48 @@ export function exportToExcel(auditResults, urlData = [], options = {}) {
     });
 
     if (affectedData.length > 0) {
-      const affectedWs = XLSX.utils.json_to_sheet(affectedData);
-      affectedWs['!cols'] = [{ wch: 40 }, { wch: 10 }, { wch: 80 }];
-      XLSX.utils.book_append_sheet(wb, affectedWs, 'Affected URLs');
+      const affectedWs = wb.addWorksheet('Affected URLs');
+      affectedWs.addRow(['Issue', 'Severity', 'URL']);
+      affectedWs.getRow(1).font = { bold: true };
+      affectedData.forEach(row => {
+        affectedWs.addRow([row['Issue'], row['Severity'], row['URL']]);
+      });
+      affectedWs.columns = [{ width: 40 }, { width: 10 }, { width: 80 }];
     }
   }
 
   // URL Data sheet
   if (urlData?.length > 0) {
-    const urlDataClean = urlData.map(row => ({
-      'URL': row.address,
-      'Status Code': row.statusCode,
-      'Indexability': row.indexability,
-      'Title': row.title1,
-      'Title Length': row.title1Length,
-      'Meta Description': row.metaDescription1,
-      'Meta Desc Length': row.metaDescription1Length,
-      'H1': row.h1,
-      'Word Count': row.wordCount,
-      'Crawl Depth': row.crawlDepth,
-      'Inlinks': row.uniqueInlinks,
-      'Outlinks': row.uniqueOutlinks,
-      'Response Time': row.responseTime,
-      'Size (bytes)': row.size,
-      'Canonical': row.canonicalLinkElement1
-    }));
+    const urlWs = wb.addWorksheet('URL Data');
+    const urlHeaders = ['URL', 'Status Code', 'Indexability', 'Title', 'Title Length', 'Meta Description', 'Meta Desc Length', 'H1', 'Word Count', 'Crawl Depth', 'Inlinks', 'Outlinks', 'Response Time', 'Size (bytes)', 'Canonical'];
+    urlWs.addRow(urlHeaders);
+    urlWs.getRow(1).font = { bold: true };
 
-    const urlWs = XLSX.utils.json_to_sheet(urlDataClean);
-    urlWs['!cols'] = [
-      { wch: 60 }, { wch: 12 }, { wch: 15 }, { wch: 40 }, { wch: 12 },
-      { wch: 50 }, { wch: 15 }, { wch: 40 }, { wch: 12 }, { wch: 12 },
-      { wch: 10 }, { wch: 10 }, { wch: 15 }, { wch: 12 }, { wch: 50 }
+    urlData.forEach(row => {
+      urlWs.addRow([
+        row.address,
+        row.statusCode,
+        row.indexability,
+        row.title1,
+        row.title1Length,
+        row.metaDescription1,
+        row.metaDescription1Length,
+        row.h1,
+        row.wordCount,
+        row.crawlDepth,
+        row.uniqueInlinks,
+        row.uniqueOutlinks,
+        row.responseTime,
+        row.size,
+        row.canonicalLinkElement1
+      ]);
+    });
+
+    urlWs.columns = [
+      { width: 60 }, { width: 12 }, { width: 15 }, { width: 40 }, { width: 12 },
+      { width: 50 }, { width: 15 }, { width: 40 }, { width: 12 }, { width: 12 },
+      { width: 10 }, { width: 10 }, { width: 15 }, { width: 12 }, { width: 50 }
     ];
-    XLSX.utils.book_append_sheet(wb, urlWs, 'URL Data');
   }
 
   // Category breakdown sheet
@@ -347,20 +364,28 @@ export function exportToExcel(auditResults, urlData = [], options = {}) {
       else categoryMap[issue.category].info++;
     });
 
-    const categoryData = Object.entries(categoryMap).map(([category, counts]) => ({
-      'Category': category,
-      'Errors': counts.errors,
-      'Warnings': counts.warnings,
-      'Info': counts.info,
-      'Total': counts.total
-    }));
+    const categoryWs = wb.addWorksheet('By Category');
+    categoryWs.addRow(['Category', 'Errors', 'Warnings', 'Info', 'Total']);
+    categoryWs.getRow(1).font = { bold: true };
 
-    const categoryWs = XLSX.utils.json_to_sheet(categoryData);
-    categoryWs['!cols'] = [{ wch: 25 }, { wch: 10 }, { wch: 10 }, { wch: 10 }, { wch: 10 }];
-    XLSX.utils.book_append_sheet(wb, categoryWs, 'By Category');
+    Object.entries(categoryMap).forEach(([category, counts]) => {
+      categoryWs.addRow([category, counts.errors, counts.warnings, counts.info, counts.total]);
+    });
+
+    categoryWs.columns = [{ width: 25 }, { width: 10 }, { width: 10 }, { width: 10 }, { width: 10 }];
   }
 
-  XLSX.writeFile(wb, filename);
+  // Write file and download
+  const buffer = await wb.xlsx.writeBuffer();
+  const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement('a');
+  link.href = url;
+  link.download = filename;
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+  URL.revokeObjectURL(url);
 }
 
 /**
@@ -369,19 +394,34 @@ export function exportToExcel(auditResults, urlData = [], options = {}) {
 export function exportToCSV(issues, filename = 'audit-issues.csv') {
   if (!issues?.length) return;
 
-  const csvData = issues.map(issue => ({
-    'Title': issue.title,
-    'Severity': issue.severity,
-    'Priority': issue.priority,
-    'Category': issue.category,
-    'Description': issue.description,
-    'Recommendation': issue.recommendation,
-    'Affected URLs': issue.affectedUrls?.length || 0
-  }));
+  // Helper to escape CSV values
+  const escapeCSV = (value) => {
+    if (value === null || value === undefined) return '';
+    const str = String(value);
+    if (str.includes(',') || str.includes('"') || str.includes('\n')) {
+      return `"${str.replace(/"/g, '""')}"`;
+    }
+    return str;
+  };
 
-  const ws = XLSX.utils.json_to_sheet(csvData);
-  const csv = XLSX.utils.sheet_to_csv(ws);
+  // Build CSV string
+  const headers = ['Title', 'Severity', 'Priority', 'Category', 'Description', 'Recommendation', 'Affected URLs'];
+  const csvRows = [headers.join(',')];
 
+  issues.forEach(issue => {
+    const row = [
+      escapeCSV(issue.title),
+      escapeCSV(issue.severity),
+      escapeCSV(issue.priority),
+      escapeCSV(issue.category),
+      escapeCSV(issue.description),
+      escapeCSV(issue.recommendation),
+      escapeCSV(issue.affectedUrls?.length || 0)
+    ];
+    csvRows.push(row.join(','));
+  });
+
+  const csv = csvRows.join('\n');
   const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
   const link = document.createElement('a');
   link.href = URL.createObjectURL(blob);

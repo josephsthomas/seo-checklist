@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import {
   Sparkles,
   X,
@@ -6,7 +6,6 @@ import {
   Zap,
   Bug,
   ChevronRight,
-  ExternalLink,
   Calendar,
   Tag
 } from 'lucide-react';
@@ -51,7 +50,11 @@ export default function WhatsNew({ isOpen, onClose }) {
   // Mark as viewed when opened
   useEffect(() => {
     if (isOpen && changelog[0]) {
-      localStorage.setItem('lastViewedChangelog', changelog[0].version);
+      try {
+        localStorage.setItem('lastViewedChangelog', changelog[0].version);
+      } catch {
+        // localStorage may be unavailable
+      }
     }
   }, [isOpen]);
 

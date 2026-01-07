@@ -88,16 +88,12 @@ export function useProjects() {
   };
 
   const getProject = async (projectId) => {
-    try {
-      const docRef = doc(db, 'projects', projectId);
-      const docSnap = await getDoc(docRef);
-      if (docSnap.exists()) {
-        return { id: docSnap.id, ...docSnap.data() };
-      }
-      return null;
-    } catch (error) {
-      throw error;
+    const docRef = doc(db, 'projects', projectId);
+    const docSnap = await getDoc(docRef);
+    if (docSnap.exists()) {
+      return { id: docSnap.id, ...docSnap.data() };
     }
+    return null;
   };
 
   return {

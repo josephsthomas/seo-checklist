@@ -22,9 +22,12 @@ function getApiConfig() {
   }
 
   if (apiKey) {
-    // Development only: Direct API access
+    // Development only: Direct API access is BLOCKED in production
     if (import.meta.env.PROD) {
-      console.warn('⚠️ Direct Claude API access in production is not recommended. Configure VITE_AI_PROXY_URL for security.');
+      throw new Error(
+        'Direct Claude API access is blocked in production builds. ' +
+        'Configure VITE_AI_PROXY_URL to use a secure backend proxy.'
+      );
     }
     return { useProxy: false, apiKey };
   }

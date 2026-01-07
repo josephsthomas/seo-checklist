@@ -1,8 +1,11 @@
+import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Github, Twitter, Linkedin, Mail, ExternalLink } from 'lucide-react';
+import { Github, Twitter, Linkedin, Mail, ExternalLink, MessageSquarePlus } from 'lucide-react';
+import FeedbackForm from '../feedback/FeedbackForm';
 
 export default function Footer() {
   const currentYear = new Date().getFullYear();
+  const [isFeedbackOpen, setIsFeedbackOpen] = useState(false);
 
   return (
     <footer className="relative mt-auto overflow-hidden">
@@ -131,25 +134,55 @@ export default function Footer() {
                   <kbd className="px-1.5 py-0.5 text-2xs font-mono rounded bg-charcoal-700 text-charcoal-400">?</kbd>
                 </button>
               </li>
+              <li>
+                <button
+                  onClick={() => setIsFeedbackOpen(true)}
+                  className="text-charcoal-400 hover:text-white text-sm transition-colors duration-200 flex items-center gap-2"
+                >
+                  <MessageSquarePlus className="w-4 h-4" />
+                  Send Feedback
+                </button>
+              </li>
             </ul>
+          </div>
+        </div>
+
+        {/* Legal Links Section */}
+        <div className="py-6 border-b border-white/10">
+          <div className="flex flex-wrap items-center justify-center gap-x-8 gap-y-2">
+            <Link to="/terms" className="text-charcoal-400 hover:text-white text-sm transition-colors duration-200">
+              Terms of Service
+            </Link>
+            <Link to="/privacy" className="text-charcoal-400 hover:text-white text-sm transition-colors duration-200">
+              Privacy & Data Policy
+            </Link>
+            <Link to="/ai-policy" className="text-charcoal-400 hover:text-white text-sm transition-colors duration-200">
+              AI Usage Policy
+            </Link>
+            <Link to="/accessibility" className="text-charcoal-400 hover:text-white text-sm transition-colors duration-200">
+              Accessibility
+            </Link>
           </div>
         </div>
 
         {/* Bottom Bar */}
         <div className="pt-8 flex flex-col sm:flex-row items-center justify-between gap-4">
-          <p className="text-charcoal-500 text-sm">
-            © {currentYear} Content Strategy Portal. All rights reserved.
-          </p>
-          <div className="flex items-center gap-6">
-            <a href="#" className="text-charcoal-500 hover:text-charcoal-300 text-sm transition-colors">
-              Privacy Policy
-            </a>
-            <a href="#" className="text-charcoal-500 hover:text-charcoal-300 text-sm transition-colors">
-              Terms of Service
-            </a>
+          <div className="text-center sm:text-left">
+            <p className="text-charcoal-500 text-sm">
+              © {currentYear} Joseph S. Thomas dba Content-Strategy.co
+            </p>
+            <p className="text-charcoal-600 text-xs mt-1">
+              All rights reserved. Independently developed and owned.
+            </p>
           </div>
+          <p className="text-charcoal-600 text-xs">
+            Content Strategy Portal v3.0
+          </p>
         </div>
       </div>
+
+      {/* Feedback Form Modal */}
+      <FeedbackForm isOpen={isFeedbackOpen} onClose={() => setIsFeedbackOpen(false)} />
     </footer>
   );
 }

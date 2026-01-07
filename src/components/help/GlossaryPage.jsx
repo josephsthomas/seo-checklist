@@ -1,17 +1,18 @@
-import React, { useState, useMemo } from 'react';
+import { useState, useMemo, useDeferredValue } from 'react';
 import { Search, BookOpen, Tag, Link as LinkIcon } from 'lucide-react';
 import { glossaryTerms, glossaryCategories } from '../../data/glossary';
 
 export default function GlossaryPage() {
   const [searchQuery, setSearchQuery] = useState('');
+  const deferredSearchQuery = useDeferredValue(searchQuery);
   const [selectedCategory, setSelectedCategory] = useState('All');
   const [selectedTerm, setSelectedTerm] = useState(null);
 
   const filteredTerms = useMemo(() => {
     return glossaryTerms.filter(term => {
-      // Enhanced search: split query into words for better matching
-      if (searchQuery !== '') {
-        const queryWords = searchQuery.toLowerCase().trim().split(/\s+/);
+      // Enhanced search: split query into words for better matching (using deferred for performance)
+      if (deferredSearchQuery !== '') {
+        const queryWords = deferredSearchQuery.toLowerCase().trim().split(/\s+/);
         const searchableText = [
           term.term,
           term.definition,
@@ -27,7 +28,7 @@ export default function GlossaryPage() {
 
       return matchesCategory;
     }).sort((a, b) => a.term.localeCompare(b.term));
-  }, [searchQuery, selectedCategory]);
+  }, [deferredSearchQuery, selectedCategory]);
 
   // Group terms by first letter
   const groupedTerms = useMemo(() => {

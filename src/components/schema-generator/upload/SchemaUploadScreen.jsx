@@ -14,6 +14,7 @@ import {
   X
 } from 'lucide-react';
 import { SCHEMA_TYPES, getSchemaCategories } from '../../../lib/schema-generator/schemaGeneratorService';
+import AIDisclaimer from '../../shared/AIDisclaimer';
 
 const INPUT_MODES = {
   PASTE: 'paste',
@@ -114,6 +115,14 @@ export default function SchemaUploadScreen({ onSubmit }) {
           <p className="text-slate-400 max-w-xl mx-auto">
             Generate schema.org JSON-LD markup from your HTML content for rich search results
           </p>
+        </div>
+
+        {/* AI Disclaimer */}
+        <div className="mb-6">
+          <AIDisclaimer
+            toolName="Structured Data Generator"
+            storageKey="ai-disclaimer-schema-dismissed"
+          />
         </div>
 
         {/* Input Mode Tabs */}

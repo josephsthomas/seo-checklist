@@ -1,8 +1,9 @@
-import { Suspense, lazy } from 'react';
+import { Suspense } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate, Link } from 'react-router-dom';
 import { Toaster } from 'react-hot-toast';
 import { AuthProvider } from './contexts/AuthContext';
 import { Home, Search as SearchIcon } from 'lucide-react';
+import { lazyWithRetry } from './utils/lazyWithRetry';
 
 // Auth Components (keep eager - needed for initial auth)
 import LoginForm from './components/auth/LoginForm';
@@ -17,50 +18,57 @@ import ErrorBoundary, { ToolErrorBoundary } from './components/shared/ErrorBound
 // Home - eager load for fast initial render
 import HomePage from './components/home/HomePage';
 
-// Lazy loaded components for code splitting
-const ProjectDashboard = lazy(() => import('./components/projects/ProjectDashboard'));
-const ProjectCreationWizard = lazy(() => import('./components/projects/ProjectCreationWizard'));
-const MyTasksPage = lazy(() => import('./components/projects/MyTasksPage'));
-const TeamManagementPage = lazy(() => import('./components/projects/TeamManagementPage'));
-const SEOChecklist = lazy(() => import('./components/checklist/SEOChecklist'));
-const ProgressDashboard = lazy(() => import('./components/projects/ProgressDashboard'));
-const ProjectHealthReport = lazy(() => import('./components/projects/ProjectHealthReport'));
+// Lazy loaded components for code splitting (with retry logic)
+const ProjectDashboard = lazyWithRetry(() => import('./components/projects/ProjectDashboard'), 'ProjectDashboard');
+const ProjectCreationWizard = lazyWithRetry(() => import('./components/projects/ProjectCreationWizard'), 'ProjectCreationWizard');
+const MyTasksPage = lazyWithRetry(() => import('./components/projects/MyTasksPage'), 'MyTasksPage');
+const TeamManagementPage = lazyWithRetry(() => import('./components/projects/TeamManagementPage'), 'TeamManagementPage');
+const SEOChecklist = lazyWithRetry(() => import('./components/checklist/SEOChecklist'), 'SEOChecklist');
+const ProgressDashboard = lazyWithRetry(() => import('./components/projects/ProgressDashboard'), 'ProgressDashboard');
+const ProjectHealthReport = lazyWithRetry(() => import('./components/projects/ProjectHealthReport'), 'ProjectHealthReport');
 
 // Activity Components - lazy load
-const ActivityPage = lazy(() => import('./components/activity/ActivityPage'));
+const ActivityPage = lazyWithRetry(() => import('./components/activity/ActivityPage'), 'ActivityPage');
 
 // Help Components - lazy load
-const ResourceLibrary = lazy(() => import('./components/help/ResourceLibrary'));
-const GlossaryPage = lazy(() => import('./components/help/GlossaryPage'));
+const ResourceLibrary = lazyWithRetry(() => import('./components/help/ResourceLibrary'), 'ResourceLibrary');
+const GlossaryPage = lazyWithRetry(() => import('./components/help/GlossaryPage'), 'GlossaryPage');
 import KeyboardShortcuts from './components/help/KeyboardShortcuts';
 import OnboardingWalkthrough from './components/help/OnboardingWalkthrough';
 import FeedbackWidget from './components/shared/FeedbackWidget';
+import CookieConsent from './components/shared/CookieConsent';
 import CommandPalette, { useCommandPalette } from './components/shared/CommandPalette';
 
-// Audit Components - lazy load (heaviest components with xlsx, jspdf)
-const AuditPage = lazy(() => import('./components/audit/AuditPage'));
-const SharedAuditView = lazy(() => import('./components/audit/shared/SharedAuditView'));
+// Audit Components - lazy load (heaviest components with exceljs, jspdf)
+const AuditPage = lazyWithRetry(() => import('./components/audit/AuditPage'), 'AuditPage');
+const SharedAuditView = lazyWithRetry(() => import('./components/audit/shared/SharedAuditView'), 'SharedAuditView');
 
 // Accessibility Components - lazy load
-const AccessibilityAuditPage = lazy(() => import('./components/accessibility/AccessibilityAuditPage'));
+const AccessibilityAuditPage = lazyWithRetry(() => import('./components/accessibility/AccessibilityAuditPage'), 'AccessibilityAuditPage');
 
 // Image Alt Generator - lazy load
-const ImageAltGeneratorPage = lazy(() => import('./components/image-alt-generator/ImageAltGeneratorPage'));
+const ImageAltGeneratorPage = lazyWithRetry(() => import('./components/image-alt-generator/ImageAltGeneratorPage'), 'ImageAltGeneratorPage');
 
 // Meta Data Generator - lazy load
-const MetaGeneratorPage = lazy(() => import('./components/meta-generator/MetaGeneratorPage'));
+const MetaGeneratorPage = lazyWithRetry(() => import('./components/meta-generator/MetaGeneratorPage'), 'MetaGeneratorPage');
 
 // Structured Data Generator - lazy load
-const SchemaGeneratorPage = lazy(() => import('./components/schema-generator/SchemaGeneratorPage'));
+const SchemaGeneratorPage = lazyWithRetry(() => import('./components/schema-generator/SchemaGeneratorPage'), 'SchemaGeneratorPage');
 
 // User Settings - lazy load
-const UserSettingsPage = lazy(() => import('./components/settings/UserSettingsPage'));
+const UserSettingsPage = lazyWithRetry(() => import('./components/settings/UserSettingsPage'), 'UserSettingsPage');
 
 // User Profile - lazy load
-const UserProfilePage = lazy(() => import('./components/profile/UserProfilePage'));
+const UserProfilePage = lazyWithRetry(() => import('./components/profile/UserProfilePage'), 'UserProfilePage');
 
 // Export Hub - lazy load
-const ExportHubPage = lazy(() => import('./components/export/ExportHubPage'));
+const ExportHubPage = lazyWithRetry(() => import('./components/export/ExportHubPage'), 'ExportHubPage');
+
+// Legal Pages - lazy load
+const TermsOfService = lazyWithRetry(() => import('./components/legal/TermsOfService'), 'TermsOfService');
+const PrivacyPolicy = lazyWithRetry(() => import('./components/legal/PrivacyPolicy'), 'PrivacyPolicy');
+const AIPolicy = lazyWithRetry(() => import('./components/legal/AIPolicy'), 'AIPolicy');
+const AccessibilityStatement = lazyWithRetry(() => import('./components/legal/AccessibilityStatement'), 'AccessibilityStatement');
 
 /**
  * Enhanced Loading Fallback with Skeleton
@@ -128,6 +136,12 @@ function AppContent() {
                   {/* Public Routes */}
                   <Route path="/login" element={<LoginForm />} />
                   <Route path="/register" element={<RegisterForm />} />
+
+                  {/* Legal Pages - Public */}
+                  <Route path="/terms" element={<TermsOfService />} />
+                  <Route path="/privacy" element={<PrivacyPolicy />} />
+                  <Route path="/ai-policy" element={<AIPolicy />} />
+                  <Route path="/accessibility" element={<AccessibilityStatement />} />
 
                   {/* Home - Portal Dashboard */}
                   <Route
@@ -294,7 +308,9 @@ function AppContent() {
                     path="/my-tasks"
                     element={
                       <ProtectedRoute>
-                        <MyTasksPage />
+                        <ToolErrorBoundary toolName="My Tasks" toolColor="primary">
+                          <MyTasksPage />
+                        </ToolErrorBoundary>
                       </ProtectedRoute>
                     }
                   />
@@ -302,7 +318,9 @@ function AppContent() {
                     path="/team"
                     element={
                       <ProtectedRoute>
-                        <TeamManagementPage />
+                        <ToolErrorBoundary toolName="Team Management" toolColor="primary">
+                          <TeamManagementPage />
+                        </ToolErrorBoundary>
                       </ProtectedRoute>
                     }
                   />
@@ -310,7 +328,9 @@ function AppContent() {
                     path="/help/resources"
                     element={
                       <ProtectedRoute>
-                        <ResourceLibrary />
+                        <ToolErrorBoundary toolName="Resource Library" toolColor="primary">
+                          <ResourceLibrary />
+                        </ToolErrorBoundary>
                       </ProtectedRoute>
                     }
                   />
@@ -318,7 +338,9 @@ function AppContent() {
                     path="/help/glossary"
                     element={
                       <ProtectedRoute>
-                        <GlossaryPage />
+                        <ToolErrorBoundary toolName="Glossary" toolColor="primary">
+                          <GlossaryPage />
+                        </ToolErrorBoundary>
                       </ProtectedRoute>
                     }
                   />
@@ -326,7 +348,9 @@ function AppContent() {
                     path="/activity"
                     element={
                       <ProtectedRoute>
-                        <ActivityPage />
+                        <ToolErrorBoundary toolName="Activity Log" toolColor="primary">
+                          <ActivityPage />
+                        </ToolErrorBoundary>
                       </ProtectedRoute>
                     }
                   />
@@ -334,7 +358,9 @@ function AppContent() {
                     path="/export"
                     element={
                       <ProtectedRoute>
-                        <ExportHubPage />
+                        <ToolErrorBoundary toolName="Export Hub" toolColor="primary">
+                          <ExportHubPage />
+                        </ToolErrorBoundary>
                       </ProtectedRoute>
                     }
                   />
@@ -346,7 +372,9 @@ function AppContent() {
                     path="/profile"
                     element={
                       <ProtectedRoute>
-                        <UserProfilePage />
+                        <ToolErrorBoundary toolName="User Profile" toolColor="primary">
+                          <UserProfilePage />
+                        </ToolErrorBoundary>
                       </ProtectedRoute>
                     }
                   />
@@ -354,7 +382,9 @@ function AppContent() {
                     path="/profile/:userId"
                     element={
                       <ProtectedRoute>
-                        <UserProfilePage />
+                        <ToolErrorBoundary toolName="User Profile" toolColor="primary">
+                          <UserProfilePage />
+                        </ToolErrorBoundary>
                       </ProtectedRoute>
                     }
                   />
@@ -362,7 +392,9 @@ function AppContent() {
                     path="/settings"
                     element={
                       <ProtectedRoute>
-                        <UserSettingsPage />
+                        <ToolErrorBoundary toolName="User Settings" toolColor="primary">
+                          <UserSettingsPage />
+                        </ToolErrorBoundary>
                       </ProtectedRoute>
                     }
                   />
@@ -440,6 +472,9 @@ function AppContent() {
 
           {/* Feedback Widget - Available on all pages */}
           <FeedbackWidget />
+
+          {/* Cookie Consent Banner - GDPR/CCPA Compliance */}
+          <CookieConsent />
         </div>
   );
 }

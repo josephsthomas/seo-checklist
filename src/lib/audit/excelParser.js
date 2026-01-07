@@ -1,4 +1,4 @@
-import * as XLSX from 'xlsx';
+import ExcelJS from 'exceljs';
 
 /**
  * Excel Parser for Screaming Frog Export Files
@@ -204,26 +204,28 @@ const INTERNAL_ALL_COLUMNS = {
   urlEncodedAddress: 'URL Encoded Address'
 };
 
+// Processing thresholds
+const LARGE_FILE_ROWS = 50000;  // Files with 50k+ rows are "large"
+const PROGRESS_UPDATE_INTERVAL = 1000; // Update progress every N rows
+
 /**
  * Parse an Excel file from ArrayBuffer
+ * Optimized for large files with progress callbacks
  * @param {ArrayBuffer} data - The Excel file data
  * @param {string} fileName - Name of the file being parsed
+ * @param {Object} options - Parsing options
  * @returns {Object} - Parsed data with rows and headers
  */
-export function parseExcelFile(data, fileName) {
+export async function parseExcelFile(data, fileName, options = {}) {
+  const { onProgress = () => {}, maxRows = Infinity } = options;
+
   try {
-    const workbook = XLSX.read(data, { type: 'array' });
-    const sheetName = workbook.SheetNames[0];
-    const worksheet = workbook.Sheets[sheetName];
+    const workbook = new ExcelJS.Workbook();
+    await workbook.xlsx.load(data);
 
-    // Get data as JSON with headers
-    const jsonData = XLSX.utils.sheet_to_json(worksheet, {
-      header: 1,
-      defval: '',
-      raw: false
-    });
+    const worksheet = workbook.worksheets[0];
 
-    if (jsonData.length === 0) {
+    if (!worksheet || worksheet.rowCount === 0) {
       return {
         success: false,
         error: `File ${fileName} is empty`,
@@ -232,16 +234,54 @@ export function parseExcelFile(data, fileName) {
       };
     }
 
-    // First row is headers
-    const headers = jsonData[0].map(h => String(h).trim());
+    const totalRows = worksheet.rowCount - 1; // Exclude header
+    const isLargeFile = totalRows > LARGE_FILE_ROWS;
 
-    // Convert remaining rows to objects
-    const rows = jsonData.slice(1).map(row => {
+    if (isLargeFile) {
+      console.info(`Large file detected: ${fileName} with ${totalRows.toLocaleString()} rows`);
+    }
+
+    // Get headers from first row
+    const headerRow = worksheet.getRow(1);
+    const headers = [];
+    headerRow.eachCell({ includeEmpty: true }, (cell, colNumber) => {
+      headers[colNumber - 1] = String(cell.value || '').trim();
+    });
+
+    // Convert remaining rows to objects with progress tracking
+    const rows = [];
+    let processedCount = 0;
+    let lastProgressUpdate = Date.now();
+
+    worksheet.eachRow({ includeEmpty: false }, (row, rowNumber) => {
+      if (rowNumber === 1) return; // Skip header row
+      if (rows.length >= maxRows) return; // Respect row limit
+
       const obj = {};
-      headers.forEach((header, index) => {
-        obj[header] = row[index] !== undefined ? row[index] : '';
+      row.eachCell({ includeEmpty: true }, (cell, colNumber) => {
+        const header = headers[colNumber - 1];
+        if (header) {
+          // Handle different cell value types
+          let value = cell.value;
+          if (value && typeof value === 'object') {
+            // Handle rich text, hyperlinks, etc.
+            if (value.text) value = value.text;
+            else if (value.hyperlink) value = value.hyperlink;
+            else if (value.result !== undefined) value = value.result;
+            else value = String(value);
+          }
+          obj[header] = value !== null && value !== undefined ? value : '';
+        }
       });
-      return obj;
+      rows.push(obj);
+
+      // Report progress for large files
+      processedCount++;
+      if (isLargeFile && (Date.now() - lastProgressUpdate > 100 || processedCount % PROGRESS_UPDATE_INTERVAL === 0)) {
+        const progress = Math.round((processedCount / totalRows) * 100);
+        onProgress(progress, `Parsing ${fileName}: ${processedCount.toLocaleString()} / ${totalRows.toLocaleString()} rows`);
+        lastProgressUpdate = Date.now();
+      }
     });
 
     return {
@@ -250,7 +290,9 @@ export function parseExcelFile(data, fileName) {
       headers,
       rows,
       rowCount: rows.length,
-      columnCount: headers.length
+      columnCount: headers.length,
+      truncated: rows.length >= maxRows,
+      totalAvailableRows: totalRows
     };
   } catch (error) {
     console.error(`Error parsing ${fileName}:`, error);
@@ -268,8 +310,8 @@ export function parseExcelFile(data, fileName) {
  * @param {ArrayBuffer} data - The file data
  * @returns {Object} - Parsed internal data with normalized column names
  */
-export function parseInternalAll(data) {
-  const result = parseExcelFile(data, 'internal_all.xlsx');
+export async function parseInternalAll(data) {
+  const result = await parseExcelFile(data, 'internal_all.xlsx');
 
   if (!result.success) {
     return result;
@@ -496,36 +538,36 @@ export async function parseAllFiles(extractedFiles, onProgress = () => {}) {
 
     // Parse based on file name
     if (fileName === 'internal_all.xlsx') {
-      parsedData.internal = parseInternalAll(file.data);
+      parsedData.internal = await parseInternalAll(file.data);
     } else if (fileName.startsWith('accessibility_')) {
       // Group all accessibility files together
       parsedData.accessibility = parsedData.accessibility || {};
-      parsedData.accessibility[fileName] = parseExcelFile(file.data, file.name);
+      parsedData.accessibility[fileName] = await parseExcelFile(file.data, file.name);
     } else if (fileName.includes('pagespeed') || fileName.includes('core_web_vitals')) {
       parsedData.pageSpeed = parsedData.pageSpeed || {};
-      parsedData.pageSpeed[fileName] = parseExcelFile(file.data, file.name);
+      parsedData.pageSpeed[fileName] = await parseExcelFile(file.data, file.name);
     } else if (fileName.includes('inlinks') || fileName.includes('outlinks') || fileName.includes('links_all')) {
       parsedData.links = parsedData.links || {};
-      parsedData.links[fileName] = parseExcelFile(file.data, file.name);
+      parsedData.links[fileName] = await parseExcelFile(file.data, file.name);
     } else if (fileName.includes('redirect')) {
       parsedData.redirects = parsedData.redirects || {};
-      parsedData.redirects[fileName] = parseExcelFile(file.data, file.name);
+      parsedData.redirects[fileName] = await parseExcelFile(file.data, file.name);
     } else if (fileName.includes('canonical')) {
       parsedData.canonicals = parsedData.canonicals || {};
-      parsedData.canonicals[fileName] = parseExcelFile(file.data, file.name);
+      parsedData.canonicals[fileName] = await parseExcelFile(file.data, file.name);
     } else if (fileName.includes('title') || fileName.includes('meta_description') || fileName.includes('h1') || fileName.includes('h2')) {
-      parsedData.content[fileName] = parseExcelFile(file.data, file.name);
+      parsedData.content[fileName] = await parseExcelFile(file.data, file.name);
     } else if (fileName.includes('image')) {
       parsedData.images = parsedData.images || {};
-      parsedData.images[fileName] = parseExcelFile(file.data, file.name);
+      parsedData.images[fileName] = await parseExcelFile(file.data, file.name);
     } else if (fileName.includes('structured_data') || fileName.includes('schema')) {
       parsedData.structuredData = parsedData.structuredData || {};
-      parsedData.structuredData[fileName] = parseExcelFile(file.data, file.name);
+      parsedData.structuredData[fileName] = await parseExcelFile(file.data, file.name);
     } else if (fileName.includes('security') || fileName.includes('cookie')) {
       parsedData.security = parsedData.security || {};
-      parsedData.security[fileName] = parseExcelFile(file.data, file.name);
+      parsedData.security[fileName] = await parseExcelFile(file.data, file.name);
     } else {
-      parsedData.other[fileName] = parseExcelFile(file.data, file.name);
+      parsedData.other[fileName] = await parseExcelFile(file.data, file.name);
     }
 
     processed++;

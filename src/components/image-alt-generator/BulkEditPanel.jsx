@@ -1,13 +1,10 @@
-import { useState, useCallback } from 'react';
+import { useState } from 'react';
 import {
   Edit3,
   Save,
-  X,
   CheckCircle2,
   Square,
   CheckSquare,
-  RotateCcw,
-  Wand2,
   AlertCircle,
   ChevronDown,
   ChevronUp
@@ -27,7 +24,7 @@ export default function BulkEditPanel({
   const [selectedIds, setSelectedIds] = useState(new Set());
   const [editMode, setEditMode] = useState(false);
   const [editedTexts, setEditedTexts] = useState({});
-  const [bulkAction, setBulkAction] = useState('');
+  const [, setBulkAction] = useState('');
 
   // Toggle selection for an item
   const toggleSelect = (id) => {

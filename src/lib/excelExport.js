@@ -1,11 +1,14 @@
-import * as XLSX from 'xlsx';
+import ExcelJS from 'exceljs';
 import { format } from 'date-fns';
 
-export function exportToExcel(items, completions, project) {
+export async function exportToExcel(items, completions, project) {
   // Create a new workbook
-  const wb = XLSX.utils.book_new();
+  const wb = new ExcelJS.Workbook();
+  wb.creator = 'SEO Checklist Pro';
+  wb.created = new Date();
 
   // Sheet 1: Overview
+  const wsOverview = wb.addWorksheet('Overview');
   const overviewData = [
     ['SEO CHECKLIST REPORT'],
     [''],
@@ -26,21 +29,25 @@ export function exportToExcel(items, completions, project) {
     ['MEDIUM:', items.filter(i => i.priority === 'MEDIUM').length],
     ['LOW:', items.filter(i => i.priority === 'LOW').length],
   ];
-  const wsOverview = XLSX.utils.aoa_to_sheet(overviewData);
-  XLSX.utils.book_append_sheet(wb, wsOverview, 'Overview');
+  overviewData.forEach(row => wsOverview.addRow(row));
+
+  // Style the title
+  wsOverview.getRow(1).font = { bold: true, size: 14 };
 
   // Sheet 2: By Phase
-  const phaseData = [
-    ['ID', 'Item', 'Phase', 'Priority', 'Owner', 'Category', 'Status', 'Risk Level', 'Effort', 'Deliverable Type']
-  ];
+  const wsByPhase = wb.addWorksheet('By Phase');
+  const phaseHeader = ['ID', 'Item', 'Phase', 'Priority', 'Owner', 'Category', 'Status', 'Risk Level', 'Effort', 'Deliverable Type'];
+  wsByPhase.addRow(phaseHeader);
+  wsByPhase.getRow(1).font = { bold: true };
 
   const phases = ['Discovery', 'Strategy', 'Build', 'Pre-Launch', 'Launch', 'Post-Launch'];
   phases.forEach(phase => {
     const phaseItems = items.filter(item => item.phase === phase);
     if (phaseItems.length > 0) {
-      phaseData.push([`--- ${phase.toUpperCase()} ---`]);
+      const sectionRow = wsByPhase.addRow([`--- ${phase.toUpperCase()} ---`]);
+      sectionRow.font = { bold: true };
       phaseItems.forEach(item => {
-        phaseData.push([
+        wsByPhase.addRow([
           item.id,
           item.item,
           item.phase,
@@ -53,25 +60,24 @@ export function exportToExcel(items, completions, project) {
           item.deliverableType
         ]);
       });
-      phaseData.push([]); // Empty row between phases
+      wsByPhase.addRow([]); // Empty row between phases
     }
   });
 
-  const wsByPhase = XLSX.utils.aoa_to_sheet(phaseData);
-  XLSX.utils.book_append_sheet(wb, wsByPhase, 'By Phase');
-
   // Sheet 3: By Priority
-  const priorityData = [
-    ['ID', 'Item', 'Phase', 'Priority', 'Owner', 'Status', 'Risk Level']
-  ];
+  const wsByPriority = wb.addWorksheet('By Priority');
+  const priorityHeader = ['ID', 'Item', 'Phase', 'Priority', 'Owner', 'Status', 'Risk Level'];
+  wsByPriority.addRow(priorityHeader);
+  wsByPriority.getRow(1).font = { bold: true };
 
   const priorities = ['CRITICAL', 'HIGH', 'MEDIUM', 'LOW'];
   priorities.forEach(priority => {
     const priorityItems = items.filter(item => item.priority === priority);
     if (priorityItems.length > 0) {
-      priorityData.push([`--- ${priority} ---`]);
+      const sectionRow = wsByPriority.addRow([`--- ${priority} ---`]);
+      sectionRow.font = { bold: true };
       priorityItems.forEach(item => {
-        priorityData.push([
+        wsByPriority.addRow([
           item.id,
           item.item,
           item.phase,
@@ -81,25 +87,24 @@ export function exportToExcel(items, completions, project) {
           item.riskLevel || ''
         ]);
       });
-      priorityData.push([]);
+      wsByPriority.addRow([]);
     }
   });
 
-  const wsByPriority = XLSX.utils.aoa_to_sheet(priorityData);
-  XLSX.utils.book_append_sheet(wb, wsByPriority, 'By Priority');
-
   // Sheet 4: By Owner
-  const ownerData = [
-    ['ID', 'Item', 'Phase', 'Owner', 'Priority', 'Status']
-  ];
+  const wsByOwner = wb.addWorksheet('By Owner');
+  const ownerHeader = ['ID', 'Item', 'Phase', 'Owner', 'Priority', 'Status'];
+  wsByOwner.addRow(ownerHeader);
+  wsByOwner.getRow(1).font = { bold: true };
 
   const owners = [...new Set(items.map(item => item.owner))].sort();
   owners.forEach(owner => {
     const ownerItems = items.filter(item => item.owner === owner);
     if (ownerItems.length > 0) {
-      ownerData.push([`--- ${owner} ---`]);
+      const sectionRow = wsByOwner.addRow([`--- ${owner} ---`]);
+      sectionRow.font = { bold: true };
       ownerItems.forEach(item => {
-        ownerData.push([
+        wsByOwner.addRow([
           item.id,
           item.item,
           item.phase,
@@ -108,20 +113,18 @@ export function exportToExcel(items, completions, project) {
           completions[item.id] ? 'Completed' : 'Not Started'
         ]);
       });
-      ownerData.push([]);
+      wsByOwner.addRow([]);
     }
   });
 
-  const wsByOwner = XLSX.utils.aoa_to_sheet(ownerData);
-  XLSX.utils.book_append_sheet(wb, wsByOwner, 'By Owner');
-
   // Sheet 5: All Items
-  const allItemsData = [
-    ['ID', 'Phase', 'Priority', 'Item', 'Owner', 'Category', 'Project Types', 'Effort Level', 'Risk Level', 'Deliverable Type', 'Status']
-  ];
+  const wsAllItems = wb.addWorksheet('All Items');
+  const allItemsHeader = ['ID', 'Phase', 'Priority', 'Item', 'Owner', 'Category', 'Project Types', 'Effort Level', 'Risk Level', 'Deliverable Type', 'Status'];
+  wsAllItems.addRow(allItemsHeader);
+  wsAllItems.getRow(1).font = { bold: true };
 
   items.forEach(item => {
-    allItemsData.push([
+    wsAllItems.addRow([
       item.id,
       item.phase,
       item.priority,
@@ -136,19 +139,29 @@ export function exportToExcel(items, completions, project) {
     ]);
   });
 
-  const wsAllItems = XLSX.utils.aoa_to_sheet(allItemsData);
-
   // Add auto-filter to all items sheet
-  wsAllItems['!autofilter'] = { ref: XLSX.utils.encode_range({
-    s: { r: 0, c: 0 },
-    e: { r: allItemsData.length - 1, c: 10 }
-  })};
+  wsAllItems.autoFilter = {
+    from: { row: 1, column: 1 },
+    to: { row: items.length + 1, column: 11 }
+  };
 
-  XLSX.utils.book_append_sheet(wb, wsAllItems, 'All Items');
+  // Auto-fit columns
+  wsAllItems.columns.forEach(column => {
+    column.width = 15;
+  });
 
   // Generate filename
   const filename = `SEO_Checklist_${project?.name.replace(/\s+/g, '_') || 'Export'}_${format(new Date(), 'yyyy-MM-dd')}.xlsx`;
 
-  // Write file
-  XLSX.writeFile(wb, filename);
+  // Write file - create buffer and download
+  const buffer = await wb.xlsx.writeBuffer();
+  const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement('a');
+  link.href = url;
+  link.download = filename;
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+  URL.revokeObjectURL(url);
 }

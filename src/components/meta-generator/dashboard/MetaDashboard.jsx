@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import { useState, useMemo } from 'react';
 import {
   Tags,
   Search,
@@ -14,12 +14,13 @@ import {
   Eye,
   AlertCircle,
   CheckCircle,
-  ExternalLink,
   Twitter,
   Facebook
 } from 'lucide-react';
 import { generateHtmlCode } from '../../../lib/meta-generator/metaGeneratorService';
 import toast from 'react-hot-toast';
+import AIExportConfirmation, { useAIExportConfirmation } from '../../shared/AIExportConfirmation';
+import { AIBadge } from '../../shared/AIDisclaimer';
 
 // Helper to safely extract hostname from URL
 const getHostname = (url) => {
@@ -36,8 +37,9 @@ export default function MetaDashboard({ results, onNewProcess, onUpdateMetadata 
   const [editingField, setEditingField] = useState(null);
   const [editValue, setEditValue] = useState('');
   const [copiedField, setCopiedField] = useState(null);
+  const exportConfirmation = useAIExportConfirmation();
 
-  const { metadata, extractedContent, context, fileName } = results;
+  const { metadata, context, fileName } = results;
 
   // Generate HTML code
   const htmlCode = useMemo(() => {
@@ -81,7 +83,7 @@ export default function MetaDashboard({ results, onNewProcess, onUpdateMetadata 
     }
   };
 
-  const handleCopyAll = async () => {
+  const performCopyAll = async () => {
     try {
       await navigator.clipboard.writeText(htmlCode);
       setCopiedField('all');
@@ -93,7 +95,7 @@ export default function MetaDashboard({ results, onNewProcess, onUpdateMetadata 
     }
   };
 
-  const handleDownloadHtml = () => {
+  const performDownloadHtml = () => {
     const blob = new Blob([htmlCode], { type: 'text/html' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
@@ -104,6 +106,14 @@ export default function MetaDashboard({ results, onNewProcess, onUpdateMetadata 
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
     toast.success('HTML file downloaded');
+  };
+
+  const handleCopyAll = () => {
+    exportConfirmation.requestExport(performCopyAll, 'copy', 'metadata');
+  };
+
+  const handleDownloadHtml = () => {
+    exportConfirmation.requestExport(performDownloadHtml, 'download', 'metadata');
   };
 
   const renderEditableField = (field, label, value, maxLength, multiline = false) => {
@@ -193,7 +203,10 @@ export default function MetaDashboard({ results, onNewProcess, onUpdateMetadata 
               <Tags className="w-6 h-6 text-white" />
             </div>
             <div>
-              <h1 className="text-2xl font-bold text-white">Metadata Generated</h1>
+              <div className="flex items-center gap-2">
+                <h1 className="text-2xl font-bold text-white">Metadata Generated</h1>
+                <AIBadge />
+              </div>
               <p className="text-slate-400 text-sm">{fileName}</p>
             </div>
           </div>
@@ -451,6 +464,15 @@ export default function MetaDashboard({ results, onNewProcess, onUpdateMetadata 
           </div>
         )}
       </div>
+
+      {/* AI Export Confirmation Modal */}
+      <AIExportConfirmation
+        isOpen={exportConfirmation.isOpen}
+        onClose={exportConfirmation.handleClose}
+        onConfirm={exportConfirmation.handleConfirm}
+        exportType={exportConfirmation.exportType}
+        contentType={exportConfirmation.contentType}
+      />
     </div>
   );
 }

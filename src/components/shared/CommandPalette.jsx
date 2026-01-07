@@ -296,6 +296,7 @@ export default function CommandPalette({ isOpen, onClose }) {
 }
 
 // Hook to manage command palette state
+// eslint-disable-next-line react-refresh/only-export-components
 export function useCommandPalette() {
   const [isOpen, setIsOpen] = useState(false);
 
