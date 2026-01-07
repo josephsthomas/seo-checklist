@@ -1,8 +1,7 @@
 import { Suspense } from 'react';
-import { BrowserRouter as Router, Routes, Route, Navigate, Link } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { Toaster } from 'react-hot-toast';
-import { AuthProvider } from './contexts/AuthContext';
-import { Home, Search as SearchIcon } from 'lucide-react';
+import { AuthProvider, useAuth } from './contexts/AuthContext';
 import { lazyWithRetry } from './utils/lazyWithRetry';
 
 // Auth Components (keep eager - needed for initial auth)
@@ -14,11 +13,21 @@ import EmailVerificationBanner from './components/auth/EmailVerificationBanner';
 
 // Layout Components (keep eager - always needed)
 import Navigation from './components/shared/Navigation';
+import PublicNavigation from './components/public/PublicNavigation';
 import Footer from './components/shared/Footer';
 import ErrorBoundary, { ToolErrorBoundary } from './components/shared/ErrorBoundary';
 
 // Home - eager load for fast initial render
 import HomePage from './components/home/HomePage';
+
+// Public Pages - eager load for fast marketing site
+import LandingPage from './components/public/LandingPage';
+import AboutPage from './components/public/AboutPage';
+import FeaturesPage from './components/public/FeaturesPage';
+import FeatureDetailPage from './components/public/FeatureDetailPage';
+import HelpCenterPage from './components/public/HelpCenterPage';
+import GettingStartedPage from './components/public/GettingStartedPage';
+import PublicNotFoundPage from './components/public/NotFoundPage';
 
 // Lazy loaded components for code splitting (with retry logic)
 const ProjectDashboard = lazyWithRetry(() => import('./components/projects/ProjectDashboard'), 'ProjectDashboard');
@@ -92,51 +101,95 @@ function PageLoader() {
 }
 
 /**
- * 404 Not Found Page
+ * Routes that should use public navigation (marketing site)
  */
-function NotFoundPage() {
-  return (
-    <div className="min-h-screen bg-gradient-to-b from-charcoal-50 to-white flex items-center justify-center">
-      <div className="text-center max-w-md mx-auto px-4">
-        <div className="w-24 h-24 bg-gradient-to-br from-charcoal-100 to-charcoal-200 rounded-2xl flex items-center justify-center mx-auto mb-6">
-          <SearchIcon className="w-12 h-12 text-charcoal-400" />
-        </div>
-        <h1 className="text-6xl font-bold text-charcoal-900 mb-2">404</h1>
-        <p className="text-xl text-charcoal-600 mb-6">Page not found</p>
-        <p className="text-charcoal-500 mb-8">
-          The page you&apos;re looking for doesn&apos;t exist or has been moved.
-        </p>
-        <Link
-          to="/"
-          className="btn btn-primary inline-flex items-center gap-2"
-        >
-          <Home className="w-4 h-4" />
-          Go to Home
-        </Link>
-      </div>
-    </div>
-  );
+const PUBLIC_ROUTES = [
+  '/',
+  '/about',
+  '/features',
+  '/help',
+  '/login',
+  '/register',
+  '/forgot-password',
+  '/terms',
+  '/privacy',
+  '/ai-policy'
+];
+
+/**
+ * Check if current route should show public navigation
+ */
+function isPublicRoute(pathname) {
+  // Exact matches
+  if (PUBLIC_ROUTES.includes(pathname)) return true;
+  // Pattern matches
+  if (pathname.startsWith('/features/')) return true;
+  if (pathname.startsWith('/help/')) return true;
+  return false;
+}
+
+/**
+ * Smart Home component - shows LandingPage for guests, redirects to dashboard for users
+ */
+function SmartHome() {
+  const { currentUser, loading } = useAuth();
+
+  if (loading) {
+    return <PageLoader />;
+  }
+
+  // If logged in, redirect to dashboard
+  if (currentUser) {
+    return <Navigate to="/dashboard" replace />;
+  }
+
+  // Otherwise show landing page
+  return <LandingPage />;
 }
 
 // Wrapper component to use hooks inside Router
 function AppContent() {
   const commandPalette = useCommandPalette();
+  const location = useLocation();
+  const { currentUser } = useAuth();
+  const showPublicNav = isPublicRoute(location.pathname) && !currentUser;
 
   return (
     <div className="min-h-screen bg-charcoal-50 dark:bg-charcoal-900 flex flex-col">
       <a href="#main-content" className="skip-link">
         Skip to main content
       </a>
-      <Navigation />
-      <EmailVerificationBanner />
-      <CommandPalette isOpen={commandPalette.isOpen} onClose={commandPalette.close} />
-      <OnboardingWalkthrough />
-      <KeyboardShortcuts />
+      {/* Show appropriate navigation based on route and auth state */}
+      {showPublicNav ? <PublicNavigation /> : <Navigation />}
+      {currentUser && <EmailVerificationBanner />}
+      {currentUser && <CommandPalette isOpen={commandPalette.isOpen} onClose={commandPalette.close} />}
+      {currentUser && <OnboardingWalkthrough />}
+      {currentUser && <KeyboardShortcuts />}
           <main id="main-content" className="flex-1" role="main">
             <ErrorBoundary variant="page" message="Failed to load this page. This might be a temporary issue.">
               <Suspense fallback={<PageLoader />}>
                 <Routes>
-                  {/* Public Routes */}
+                  {/* ============================================ */}
+                  {/* PUBLIC MARKETING WEBSITE ROUTES             */}
+                  {/* ============================================ */}
+
+                  {/* Home - Smart routing based on auth state */}
+                  <Route path="/" element={<SmartHome />} />
+
+                  {/* About */}
+                  <Route path="/about" element={<AboutPage />} />
+
+                  {/* Features */}
+                  <Route path="/features" element={<FeaturesPage />} />
+                  <Route path="/features/:featureSlug" element={<FeatureDetailPage />} />
+
+                  {/* Help (public) */}
+                  <Route path="/help" element={<HelpCenterPage />} />
+                  <Route path="/help/getting-started" element={<GettingStartedPage />} />
+                  <Route path="/help/resources" element={<ResourceLibrary />} />
+                  <Route path="/help/glossary" element={<GlossaryPage />} />
+
+                  {/* Auth Routes */}
                   <Route path="/login" element={<LoginForm />} />
                   <Route path="/register" element={<RegisterForm />} />
                   <Route path="/forgot-password" element={<ForgotPassword />} />
@@ -147,9 +200,13 @@ function AppContent() {
                   <Route path="/ai-policy" element={<AIPolicy />} />
                   <Route path="/accessibility" element={<AccessibilityStatement />} />
 
-                  {/* Home - Portal Dashboard */}
+                  {/* ============================================ */}
+                  {/* AUTHENTICATED APP ROUTES                    */}
+                  {/* ============================================ */}
+
+                  {/* Dashboard - Authenticated Home */}
                   <Route
-                    path="/"
+                    path="/dashboard"
                     element={
                       <ProtectedRoute>
                         <HomePage />
@@ -329,26 +386,6 @@ function AppContent() {
                     }
                   />
                   <Route
-                    path="/help/resources"
-                    element={
-                      <ProtectedRoute>
-                        <ToolErrorBoundary toolName="Resource Library" toolColor="primary">
-                          <ResourceLibrary />
-                        </ToolErrorBoundary>
-                      </ProtectedRoute>
-                    }
-                  />
-                  <Route
-                    path="/help/glossary"
-                    element={
-                      <ProtectedRoute>
-                        <ToolErrorBoundary toolName="Glossary" toolColor="primary">
-                          <GlossaryPage />
-                        </ToolErrorBoundary>
-                      </ProtectedRoute>
-                    }
-                  />
-                  <Route
                     path="/activity"
                     element={
                       <ProtectedRoute>
@@ -404,7 +441,7 @@ function AppContent() {
                   />
 
                   {/* 404 Route */}
-                  <Route path="*" element={<NotFoundPage />} />
+                  <Route path="*" element={<PublicNotFoundPage />} />
                 </Routes>
               </Suspense>
             </ErrorBoundary>
