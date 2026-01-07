@@ -196,7 +196,7 @@ export default function PrivacyPolicy() {
               <li><strong>Objection:</strong> Object to processing based on legitimate interests</li>
             </ul>
             <p className="text-charcoal-600 mt-4">
-              To exercise any of these rights, contact us at <strong>privacy@content-strategy.co</strong>.
+              To exercise any of these rights, use the contact form on our website.
               We will respond within 30 days.
             </p>
           </section>
@@ -275,18 +275,6 @@ export default function PrivacyPolicy() {
               email or through a notice on the Service. Your continued use of the Service after changes constitutes
               acceptance of the updated policy.
             </p>
-          </section>
-
-          {/* Contact */}
-          <section className="card p-8 mb-6">
-            <h2 className="text-xl font-semibold text-charcoal-900 mb-4">Contact Us</h2>
-            <p className="text-charcoal-600 mb-4">
-              For privacy-related questions or to exercise your data rights:
-            </p>
-            <div className="bg-charcoal-50 rounded-lg p-4">
-              <p className="text-charcoal-700 font-medium">Joseph S. Thomas dba Content-Strategy.co</p>
-              <p className="text-charcoal-600">Email: privacy@content-strategy.co</p>
-            </div>
           </section>
 
           {/* Related Policies */}

@@ -181,18 +181,14 @@ export default function AccessibilityStatement() {
           <section className="card p-8 mb-6">
             <h2 className="text-xl font-semibold text-charcoal-900 mb-4 flex items-center gap-2">
               <MessageSquare className="w-5 h-5 text-purple-500" />
-              Feedback & Contact Information
+              Feedback
             </h2>
             <p className="text-charcoal-600 mb-4">
               We welcome your feedback on the accessibility of the Content Strategy Portal. Please let us
-              know if you encounter accessibility barriers:
+              know if you encounter accessibility barriers by using the feedback widget available on every page.
             </p>
-            <div className="bg-charcoal-50 rounded-lg p-4 mb-4">
-              <p className="text-charcoal-700 font-medium">Joseph S. Thomas dba Content-Strategy.co</p>
-              <p className="text-charcoal-600">Email: accessibility@content-strategy.co</p>
-            </div>
             <p className="text-charcoal-600 mb-4">
-              When contacting us, please include:
+              When providing feedback, please include:
             </p>
             <ul className="list-disc list-inside text-charcoal-600 space-y-2">
               <li>The web address (URL) of the content</li>

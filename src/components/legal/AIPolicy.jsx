@@ -318,18 +318,6 @@ export default function AIPolicy() {
             </div>
           </section>
 
-          {/* Contact */}
-          <section className="card p-8 mb-6">
-            <h2 className="text-xl font-semibold text-charcoal-900 mb-4">Questions About AI Features</h2>
-            <p className="text-charcoal-600 mb-4">
-              If you have questions about our AI features or this policy:
-            </p>
-            <div className="bg-charcoal-50 rounded-lg p-4">
-              <p className="text-charcoal-700 font-medium">Joseph S. Thomas dba Content-Strategy.co</p>
-              <p className="text-charcoal-600">Email: ai-support@content-strategy.co</p>
-            </div>
-          </section>
-
           {/* Related Policies */}
           <section className="card p-8 bg-charcoal-50">
             <h2 className="text-xl font-semibold text-charcoal-900 mb-4">Related Policies</h2>

@@ -56,10 +56,10 @@ describe('AccessibilityStatement', () => {
       expect(screen.getByText(/AI-Generated Content/i)).toBeInTheDocument();
     });
 
-    it('renders feedback section with contact info', () => {
+    it('renders feedback section', () => {
       renderWithRouter(<AccessibilityStatement />);
-      expect(screen.getByText('Feedback & Contact Information')).toBeInTheDocument();
-      expect(screen.getByText(/accessibility@content-strategy.co/i)).toBeInTheDocument();
+      expect(screen.getByText('Feedback')).toBeInTheDocument();
+      expect(screen.getByText(/feedback widget/i)).toBeInTheDocument();
     });
 
     it('renders enforcement procedure section', () => {

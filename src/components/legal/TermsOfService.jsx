@@ -256,7 +256,7 @@ export default function TermsOfService() {
           <section className="card p-8 mb-6">
             <h2 className="text-xl font-semibold text-charcoal-900 mb-4">Governing Law & Disputes</h2>
             <p className="text-charcoal-600 mb-4">
-              These Terms shall be governed by and construed in accordance with the laws of the State of [Your State],
+              These Terms shall be governed by and construed in accordance with the laws of the State of Tennessee,
               without regard to its conflict of law provisions.
             </p>
             <p className="text-charcoal-600">
@@ -274,18 +274,6 @@ export default function TermsOfService() {
               posting the new Terms on this page and updating the &quot;Last updated&quot; date. Your continued use of the Service
               after such changes constitutes your acceptance of the new Terms.
             </p>
-          </section>
-
-          {/* Contact */}
-          <section className="card p-8 mb-6">
-            <h2 className="text-xl font-semibold text-charcoal-900 mb-4">Contact Information</h2>
-            <p className="text-charcoal-600 mb-4">
-              If you have any questions about these Terms, please contact us:
-            </p>
-            <div className="bg-charcoal-50 rounded-lg p-4">
-              <p className="text-charcoal-700 font-medium">Joseph S. Thomas dba Content-Strategy.co</p>
-              <p className="text-charcoal-600">Email: legal@content-strategy.co</p>
-            </div>
           </section>
 
           {/* Related Policies */}
