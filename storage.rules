@@ -1,7 +1,30 @@
 rules_version = '2';
 service firebase.storage {
   match /b/{bucket}/o {
-    // Phase 9: File Attachments Storage Rules
+    // User avatar uploads - users can manage their own avatars
+    match /users/{userId}/avatar {
+      // Allow read if authenticated (for profile viewing)
+      allow read: if request.auth != null;
+
+      // Allow write only for the user's own avatar
+      // File size limit: 2MB, images only
+      allow create, update: if request.auth != null &&
+                     request.auth.uid == userId &&
+                     request.resource.size < 2 * 1024 * 1024 &&
+                     request.resource.contentType.matches('image/.*');
+
+      // Allow delete only for the user's own avatar
+      allow delete: if request.auth != null &&
+                     request.auth.uid == userId;
+    }
+
+    // Feedback screenshots - authenticated users can upload
+    match /feedback/{fileName} {
+      allow write: if request.auth != null &&
+                    request.resource.size < 5 * 1024 * 1024 &&
+                    request.resource.contentType.matches('image/.*');
+      allow read: if false; // Only admins via Firebase Console
+    }
 
     // Project files - authenticated users can upload/download
     match /projects/{projectId}/items/{itemId}/{filename} {

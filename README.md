@@ -30,6 +30,14 @@ A comprehensive SEO and content strategy platform for agencies and enterprise te
 - **Schema Generator**: JSON-LD structured data for 15+ schema types
 - **Image Alt Generator**: Bulk alt text generation for images
 
+### Authentication & Account Management
+- **Secure Registration**: Scroll-to-accept policy modals for Terms of Service, Privacy Policy, and AI Usage Policy
+- **Password Security**: Strength meter with visual feedback and requirements checklist
+- **Email Verification**: Automatic verification emails with resend capability
+- **Password Reset**: Self-service forgot password flow via email
+- **Account Settings**: Profile management, avatar upload, notification preferences
+- **Account Deletion**: Self-service account deletion with data cleanup
+
 ### Resource Library
 - 200+ SEO resources organized by category
 - Video tutorials and documentation
@@ -103,9 +111,13 @@ npm run lint     # Run ESLint
 ## Security
 
 - Firebase Authentication with email/password and Google OAuth
+- Email verification required for new accounts
+- Password strength requirements enforced (8+ characters)
+- Scroll-to-accept policy agreements for legal compliance
 - Firestore security rules enforce data access
 - AI API calls require secure backend proxy in production
 - No sensitive data stored in client-side code
+- Secure account deletion with data cleanup
 
 ## Support
 

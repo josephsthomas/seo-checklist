@@ -62,6 +62,22 @@ Firebase handles authentication, database, and file storage.
    - Add support email
    - Click **Save**
 
+### 1.2.1 Configure Email Templates (Important!)
+
+The application uses email verification and password reset. Configure these templates:
+
+1. In Firebase Console, go to **Authentication → Templates**
+2. Configure **Email address verification**:
+   - Customize the sender name (e.g., "Content Strategy Portal")
+   - Edit the subject and body as desired
+   - Ensure the action URL is correct
+3. Configure **Password reset**:
+   - Customize the sender name
+   - Edit the subject line (e.g., "Reset your Content Strategy Portal password")
+   - Customize the email body
+
+**Note:** Firebase uses action URLs that handle verification/reset in the Firebase-hosted page. The user will be redirected back to your app after completing the action.
+
 ### 1.3 Create Firestore Database
 
 1. Go to **Build → Firestore Database**
@@ -73,52 +89,25 @@ Firebase handles authentication, database, and file storage.
 ### 1.4 Configure Firestore Security Rules
 
 1. In Firestore, go to **Rules** tab
-2. Replace the default rules with:
-
-```javascript
-rules_version = '2';
-service cloud.firestore {
-  match /databases/{database}/documents {
-    // Users can only access their own data
-    match /users/{userId} {
-      allow read, write: if request.auth != null && request.auth.uid == userId;
-    }
-
-    // Projects - users can access their own projects
-    match /projects/{projectId} {
-      allow read, write: if request.auth != null &&
-        resource.data.userId == request.auth.uid;
-      allow create: if request.auth != null;
-    }
-
-    // Audits - users can access their own audits
-    match /audits/{auditId} {
-      allow read, write: if request.auth != null &&
-        resource.data.userId == request.auth.uid;
-      allow create: if request.auth != null;
-    }
-
-    // Shared audits - anyone with the link can read
-    match /sharedAudits/{shareId} {
-      allow read: if true;
-      allow write: if request.auth != null;
-    }
-
-    // Team members
-    match /teams/{teamId}/members/{memberId} {
-      allow read, write: if request.auth != null;
-    }
-
-    // Feedback submissions - authenticated users can create
-    match /feedback/{feedbackId} {
-      allow create: if request.auth != null;
-      // Note: Reading/managing feedback requires admin access via Firebase Console or Cloud Functions
-    }
-  }
-}
-```
-
+2. Replace the default rules with the contents of `firestore.rules` from this repository
 3. Click **Publish**
+
+The rules file includes:
+- User profile access with settings subcollection for notification preferences
+- Project access with team member permissions
+- Checklist completions and custom items
+- Comments and notifications
+- Activity logging
+- Task assignments and time entries
+- File attachments
+- Feedback submissions
+- Shared audit links (public read access)
+
+**Important:** The rules are designed to:
+- Allow users to manage their own profiles and settings
+- Support team collaboration on projects
+- Enable account deletion (users can delete their own data)
+- Protect feedback from public read access
 
 ### 1.5 Enable Cloud Storage
 
@@ -131,33 +120,18 @@ service cloud.firestore {
 ### 1.6 Configure Storage Security Rules
 
 1. In Storage, go to **Rules** tab
-2. Replace with:
-
-```javascript
-rules_version = '2';
-service firebase.storage {
-  match /b/{bucket}/o {
-    // User uploads
-    match /uploads/{userId}/{allPaths=**} {
-      allow read, write: if request.auth != null && request.auth.uid == userId;
-    }
-
-    // Shared files (read-only for anyone with link)
-    match /shared/{allPaths=**} {
-      allow read: if true;
-      allow write: if request.auth != null;
-    }
-
-    // Feedback screenshots - authenticated users can upload
-    match /feedback-screenshots/{fileName} {
-      allow write: if request.auth != null;
-      // Read access limited to admins via Firebase Console
-    }
-  }
-}
-```
-
+2. Replace with the contents of `storage.rules` from this repository
 3. Click **Publish**
+
+The storage rules include:
+- **User avatars** (`/users/{userId}/avatar`): 2MB limit, images only
+- **Feedback screenshots** (`/feedback/*`): 5MB limit, images only
+- **Project attachments** (`/projects/{projectId}/items/*`): 10MB limit, documents/images
+
+**File type restrictions:**
+- Avatars: Images only (JPEG, PNG, GIF, WebP)
+- Screenshots: Images only
+- Attachments: Images, PDF, Word, Excel, CSV, TXT
 
 ### 1.7 Get Firebase Configuration
 
@@ -363,9 +337,20 @@ After getting your Vercel URL, go back to Railway and update the CORS configurat
 ### 4.2 Test the Deployment
 
 1. Visit your Vercel URL
-2. Create a test account
-3. Test each feature:
-   - [ ] User registration/login
+2. Test the authentication flow:
+   - [ ] User registration with policy acceptance (scroll all 3 policies)
+   - [ ] Password strength meter works correctly
+   - [ ] Email verification email received
+   - [ ] Email verification banner appears after login
+   - [ ] Resend verification email works
+   - [ ] Password reset flow works
+   - [ ] Google OAuth login works
+3. Test account management:
+   - [ ] Profile settings update correctly
+   - [ ] Avatar upload/remove works
+   - [ ] Password change works
+   - [ ] Account deletion works (test with throwaway account)
+4. Test core features:
    - [ ] Create a project
    - [ ] Upload audit file
    - [ ] Run accessibility scan
@@ -429,6 +414,26 @@ After getting your Vercel URL, go back to Railway and update the CORS configurat
 - Check that the user is authenticated
 - Ensure storage bucket name is correct
 
+### Email verification not received
+- Check spam/junk folder
+- Verify Email/Password provider is enabled
+- Check Firebase Authentication → Templates for email configuration
+- Ensure sender email is verified (for custom domains)
+
+### Password reset email not received
+- Same troubleshooting as email verification
+- Check that the email address exists in Firebase Auth
+
+### Avatar upload fails
+- Check Storage rules allow `/users/{userId}/avatar`
+- Verify file is under 2MB and is an image
+- Check browser console for CORS errors
+
+### Account deletion fails
+- User must re-authenticate with correct password
+- Check Firestore rules allow user to delete their own data
+- Check for cascading delete issues in Firestore
+
 ---
 
 ## Security Checklist
@@ -441,6 +446,10 @@ Before going live:
 - [ ] Anthropic API key is not exposed in frontend code
 - [ ] Environment variables are set correctly in each platform
 - [ ] HTTPS is enforced on all endpoints
+- [ ] Email verification templates are configured
+- [ ] Password reset templates are configured
+- [ ] Policy documents (Terms, Privacy, AI Usage) are up to date
+- [ ] Account deletion properly cleans up all user data
 
 ---
 
