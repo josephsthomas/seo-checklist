@@ -89,8 +89,9 @@ function DueDateItem({ item, onComplete, onDelete }) {
       <button
         onClick={() => onDelete(item.id)}
         className="p-1 text-charcoal-400 hover:text-red-500 hover:bg-red-50 rounded transition-colors"
+        aria-label={`Delete due date: ${item.title}`}
       >
-        <X className="w-4 h-4" />
+        <X className="w-4 h-4" aria-hidden="true" />
       </button>
     </div>
   );

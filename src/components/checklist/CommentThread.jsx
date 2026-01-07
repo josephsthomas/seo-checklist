@@ -140,15 +140,15 @@ export default function CommentThread({ comments, loading, onAddComment, project
                       <div className="flex gap-1">
                         <button
                           className="p-1 text-charcoal-400 hover:text-charcoal-600"
-                          title="Edit"
+                          aria-label="Edit comment"
                         >
-                          <Edit2 className="w-4 h-4" />
+                          <Edit2 className="w-4 h-4" aria-hidden="true" />
                         </button>
                         <button
                           className="p-1 text-charcoal-400 hover:text-red-600"
-                          title="Delete"
+                          aria-label="Delete comment"
                         >
-                          <Trash2 className="w-4 h-4" />
+                          <Trash2 className="w-4 h-4" aria-hidden="true" />
                         </button>
                       </div>
                     )}

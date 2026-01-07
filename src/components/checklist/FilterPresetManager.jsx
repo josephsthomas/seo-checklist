@@ -5,7 +5,7 @@
  */
 
 import { useState, useEffect } from 'react';
-import { Save, Star, Trash2, Edit2, Download, Upload, X, Check, CheckCircle } from 'lucide-react';
+import { Save, Star, Trash2, Edit2, Download, Upload, X, Check, CheckCircle, AlertTriangle } from 'lucide-react';
 import { getFilterPresets, saveFilterPreset, deleteFilterPreset } from '../../utils/storageHelpers';
 import toast from 'react-hot-toast';
 
@@ -74,6 +74,7 @@ export default function FilterPresetManager({ currentFilters, onApplyPreset, onC
   const [editingPreset, setEditingPreset] = useState(null);
   const [newPresetName, setNewPresetName] = useState('');
   const [newPresetDescription, setNewPresetDescription] = useState('');
+  const [deleteConfirm, setDeleteConfirm] = useState(null);
 
   useEffect(() => {
     loadPresets();
@@ -124,14 +125,19 @@ export default function FilterPresetManager({ currentFilters, onApplyPreset, onC
   };
 
   const handleDeletePreset = (presetId) => {
-    if (window.confirm('Are you sure you want to delete this preset?')) {
-      const success = deleteFilterPreset(presetId);
+    setDeleteConfirm(presetId);
+  };
+
+  const confirmDeletePreset = () => {
+    if (deleteConfirm) {
+      const success = deleteFilterPreset(deleteConfirm);
       if (success) {
         toast.success('Preset deleted');
         loadPresets();
       } else {
         toast.error('Failed to delete preset');
       }
+      setDeleteConfirm(null);
     }
   };
 
@@ -442,6 +448,37 @@ export default function FilterPresetManager({ currentFilters, onApplyPreset, onC
           </div>
         </div>
       </div>
+
+      {/* Delete Confirmation Modal */}
+      {deleteConfirm && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-[60]" role="dialog" aria-modal="true" aria-labelledby="delete-preset-title">
+          <div className="bg-white rounded-lg shadow-xl max-w-sm w-full mx-4 p-6">
+            <div className="flex items-center gap-3 mb-4">
+              <div className="w-10 h-10 rounded-full bg-red-100 flex items-center justify-center">
+                <AlertTriangle className="w-5 h-5 text-red-600" />
+              </div>
+              <h3 id="delete-preset-title" className="text-lg font-semibold text-charcoal-900">Delete Preset</h3>
+            </div>
+            <p className="text-charcoal-600 mb-6">
+              Are you sure you want to delete this preset? This action cannot be undone.
+            </p>
+            <div className="flex justify-end gap-3">
+              <button
+                onClick={() => setDeleteConfirm(null)}
+                className="px-4 py-2 text-charcoal-700 bg-charcoal-100 hover:bg-charcoal-200 rounded-lg transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={confirmDeletePreset}
+                className="px-4 py-2 text-white bg-red-600 hover:bg-red-700 rounded-lg transition-colors"
+              >
+                Delete
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

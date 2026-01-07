@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useProjects } from '../../hooks/useProjects';
-import { ArrowLeft, ArrowRight, Check, X, HelpCircle, Info, Lightbulb } from 'lucide-react';
+import { ArrowLeft, ArrowRight, Check, X, HelpCircle, Info, Lightbulb, AlertTriangle } from 'lucide-react';
 import { format } from 'date-fns';
 
 // Help content for each project type
@@ -65,6 +65,7 @@ export default function ProjectCreationWizard() {
   const [currentStep, setCurrentStep] = useState(1);
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState({});
+  const [showCancelConfirm, setShowCancelConfirm] = useState(false);
 
   const [formData, setFormData] = useState({
     name: '',
@@ -164,9 +165,18 @@ export default function ProjectCreationWizard() {
   };
 
   const handleCancel = () => {
-    if (window.confirm('Are you sure you want to cancel? All entered data will be lost.')) {
+    // Check if any data has been entered
+    const hasData = formData.name || formData.clientName || formData.description || formData.notes;
+    if (hasData) {
+      setShowCancelConfirm(true);
+    } else {
       navigate('/planner');
     }
+  };
+
+  const confirmCancel = () => {
+    setShowCancelConfirm(false);
+    navigate('/planner');
   };
 
   return (
@@ -609,6 +619,37 @@ export default function ProjectCreationWizard() {
           </div>
         </div>
       </div>
+
+      {/* Cancel Confirmation Modal */}
+      {showCancelConfirm && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50" role="dialog" aria-modal="true" aria-labelledby="cancel-title">
+          <div className="bg-white rounded-lg shadow-xl max-w-sm w-full mx-4 p-6">
+            <div className="flex items-center gap-3 mb-4">
+              <div className="w-10 h-10 rounded-full bg-amber-100 flex items-center justify-center">
+                <AlertTriangle className="w-5 h-5 text-amber-600" />
+              </div>
+              <h3 id="cancel-title" className="text-lg font-semibold text-charcoal-900">Discard Changes?</h3>
+            </div>
+            <p className="text-charcoal-600 mb-6">
+              You have unsaved changes. Are you sure you want to cancel? All entered data will be lost.
+            </p>
+            <div className="flex justify-end gap-3">
+              <button
+                onClick={() => setShowCancelConfirm(false)}
+                className="px-4 py-2 text-charcoal-700 bg-charcoal-100 hover:bg-charcoal-200 rounded-lg transition-colors"
+              >
+                Continue Editing
+              </button>
+              <button
+                onClick={confirmCancel}
+                className="px-4 py-2 text-white bg-red-600 hover:bg-red-700 rounded-lg transition-colors"
+              >
+                Discard
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
