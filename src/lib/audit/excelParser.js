@@ -204,13 +204,21 @@ const INTERNAL_ALL_COLUMNS = {
   urlEncodedAddress: 'URL Encoded Address'
 };
 
+// Processing thresholds
+const LARGE_FILE_ROWS = 50000;  // Files with 50k+ rows are "large"
+const PROGRESS_UPDATE_INTERVAL = 1000; // Update progress every N rows
+
 /**
  * Parse an Excel file from ArrayBuffer
+ * Optimized for large files with progress callbacks
  * @param {ArrayBuffer} data - The Excel file data
  * @param {string} fileName - Name of the file being parsed
+ * @param {Object} options - Parsing options
  * @returns {Object} - Parsed data with rows and headers
  */
-export async function parseExcelFile(data, fileName) {
+export async function parseExcelFile(data, fileName, options = {}) {
+  const { onProgress = () => {}, maxRows = Infinity } = options;
+
   try {
     const workbook = new ExcelJS.Workbook();
     await workbook.xlsx.load(data);
@@ -226,6 +234,13 @@ export async function parseExcelFile(data, fileName) {
       };
     }
 
+    const totalRows = worksheet.rowCount - 1; // Exclude header
+    const isLargeFile = totalRows > LARGE_FILE_ROWS;
+
+    if (isLargeFile) {
+      console.info(`Large file detected: ${fileName} with ${totalRows.toLocaleString()} rows`);
+    }
+
     // Get headers from first row
     const headerRow = worksheet.getRow(1);
     const headers = [];
@@ -233,10 +248,14 @@ export async function parseExcelFile(data, fileName) {
       headers[colNumber - 1] = String(cell.value || '').trim();
     });
 
-    // Convert remaining rows to objects
+    // Convert remaining rows to objects with progress tracking
     const rows = [];
+    let processedCount = 0;
+    let lastProgressUpdate = Date.now();
+
     worksheet.eachRow({ includeEmpty: false }, (row, rowNumber) => {
       if (rowNumber === 1) return; // Skip header row
+      if (rows.length >= maxRows) return; // Respect row limit
 
       const obj = {};
       row.eachCell({ includeEmpty: true }, (cell, colNumber) => {
@@ -255,6 +274,14 @@ export async function parseExcelFile(data, fileName) {
         }
       });
       rows.push(obj);
+
+      // Report progress for large files
+      processedCount++;
+      if (isLargeFile && (Date.now() - lastProgressUpdate > 100 || processedCount % PROGRESS_UPDATE_INTERVAL === 0)) {
+        const progress = Math.round((processedCount / totalRows) * 100);
+        onProgress(progress, `Parsing ${fileName}: ${processedCount.toLocaleString()} / ${totalRows.toLocaleString()} rows`);
+        lastProgressUpdate = Date.now();
+      }
     });
 
     return {
@@ -263,7 +290,9 @@ export async function parseExcelFile(data, fileName) {
       headers,
       rows,
       rowCount: rows.length,
-      columnCount: headers.length
+      columnCount: headers.length,
+      truncated: rows.length >= maxRows,
+      totalAvailableRows: totalRows
     };
   } catch (error) {
     console.error(`Error parsing ${fileName}:`, error);

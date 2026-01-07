@@ -59,9 +59,9 @@ export default function PageAuditView({ url, urlData, issues, onBack }) {
 
   const getPriorityBadge = (priority) => {
     const styles = {
-      [PRIORITY.MUST]: 'bg-red-100 text-red-700',
-      [PRIORITY.SHOULD]: 'bg-amber-100 text-amber-700',
-      [PRIORITY.COULD]: 'bg-blue-100 text-blue-700'
+      [PRIORITY.MUST]: 'bg-red-100 text-red-700 border border-red-200',
+      [PRIORITY.SHOULD]: 'bg-amber-100 text-amber-700 border border-amber-200',
+      [PRIORITY.COULD]: 'bg-blue-100 text-blue-700 border border-blue-200'
     };
     return (
       <span className={`px-2 py-0.5 text-xs font-medium rounded ${styles[priority] || styles[PRIORITY.COULD]}`}>

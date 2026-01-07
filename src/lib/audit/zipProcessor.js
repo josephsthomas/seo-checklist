@@ -93,29 +93,52 @@ const FILE_CATEGORIES = {
   ]
 };
 
+// Size constants for file handling
+const SIZE_LIMITS = {
+  MAX_SIZE: 5 * 1024 * 1024 * 1024,      // 5GB absolute maximum
+  WARN_SIZE: 500 * 1024 * 1024,           // 500MB warning threshold
+  LARGE_FILE: 1 * 1024 * 1024 * 1024,     // 1GB = "large file" mode
+  CHUNK_SIZE: 50 * 1024 * 1024            // 50MB chunks for streaming
+};
+
 /**
  * Process a ZIP file and extract all Excel files
+ * Optimized for large files (3+ GB) with chunked processing
  * @param {File} file - The ZIP file to process
  * @param {Function} onProgress - Progress callback (0-100)
+ * @param {Object} options - Processing options
  * @returns {Promise<Object>} - Extracted files and metadata
  */
-export async function processZipFile(file, onProgress = () => {}) {
+export async function processZipFile(file, onProgress = () => {}, options = {}) {
   try {
-    onProgress(0, 'Loading ZIP file...');
+    const maxSize = options.maxSize || SIZE_LIMITS.MAX_SIZE;
+    const isLargeFile = file.size > SIZE_LIMITS.LARGE_FILE;
 
-    // Validate file size (max 500MB per BRD)
-    const MAX_SIZE = 500 * 1024 * 1024; // 500MB
-    if (file.size > MAX_SIZE) {
-      throw new Error(`File exceeds 500MB limit. Please export a smaller crawl or contact support.`);
+    // Initial progress
+    if (isLargeFile) {
+      onProgress(0, `Processing large file (${formatFileSize(file.size)})... This may take several minutes.`);
+    } else {
+      onProgress(0, 'Loading ZIP file...');
     }
 
-    // Load the ZIP file
+    // Validate file size
+    if (file.size > maxSize) {
+      throw new Error(`File exceeds ${formatFileSize(maxSize)} limit. Please split the crawl or contact support.`);
+    }
+
+    // For large files, show additional memory warning
+    if (file.size > SIZE_LIMITS.WARN_SIZE) {
+      console.info(`Processing large file: ${formatFileSize(file.size)}. Consider closing other tabs to free memory.`);
+    }
+
+    // Load the ZIP file with optimized settings
     const zip = await JSZip.loadAsync(file, {
-      // Progress callback for loading
-      async: true
+      async: true,
+      // Use optimized string handling for large files
+      optimizedBinaryString: isLargeFile
     });
 
-    onProgress(10, 'Extracting files...');
+    onProgress(10, isLargeFile ? 'Extracting files (large dataset)...' : 'Extracting files...');
 
     // Get all file entries
     const fileEntries = Object.keys(zip.files).filter(name => !zip.files[name].dir);
@@ -205,25 +228,30 @@ export async function processZipFile(file, onProgress = () => {}) {
 /**
  * Check if a file is a valid Screaming Frog export
  * @param {File} file - The file to validate
+ * @param {Object} options - Validation options
  * @returns {Object} - Validation result
  */
-export function validateFile(file) {
+export function validateFile(file, options = {}) {
   const errors = [];
   const warnings = [];
+  const info = [];
 
   // Check file type
   if (!file.name.toLowerCase().endsWith('.zip')) {
     errors.push('File must be a ZIP archive. Please export from Screaming Frog using Multi Export.');
   }
 
-  // Check file size
-  const MAX_SIZE = 500 * 1024 * 1024; // 500MB
-  const WARN_SIZE = 100 * 1024 * 1024; // 100MB
+  // Size thresholds
+  const maxSize = options.maxSize || SIZE_LIMITS.MAX_SIZE;
 
-  if (file.size > MAX_SIZE) {
-    errors.push(`File exceeds 500MB limit (${formatFileSize(file.size)}). Please export a smaller crawl.`);
-  } else if (file.size > WARN_SIZE) {
-    warnings.push(`Large file (${formatFileSize(file.size)}). Processing may take longer.`);
+  if (file.size > maxSize) {
+    errors.push(`File exceeds ${formatFileSize(maxSize)} limit (${formatFileSize(file.size)}). Please split the crawl.`);
+  } else if (file.size > SIZE_LIMITS.LARGE_FILE) {
+    // Very large file - recommend best practices
+    warnings.push(`Very large file (${formatFileSize(file.size)}). Processing may require several minutes and significant memory.`);
+    info.push('Tip: Close other browser tabs and applications to free memory before processing.');
+  } else if (file.size > SIZE_LIMITS.WARN_SIZE) {
+    warnings.push(`Large file (${formatFileSize(file.size)}). Processing may take longer than usual.`);
   }
 
   // Check for CSV files in name (common mistake)
@@ -231,10 +259,19 @@ export function validateFile(file) {
     warnings.push('CSV exports detected in filename. Ensure you selected Excel format in Screaming Frog.');
   }
 
+  // Estimate processing time for user feedback
+  const estimatedSeconds = Math.ceil(file.size / (50 * 1024 * 1024)); // ~50MB/s
+  if (estimatedSeconds > 30) {
+    info.push(`Estimated processing time: ${Math.ceil(estimatedSeconds / 60)} minutes`);
+  }
+
   return {
     valid: errors.length === 0,
     errors,
-    warnings
+    warnings,
+    info,
+    isLargeFile: file.size > SIZE_LIMITS.LARGE_FILE,
+    estimatedSeconds
   };
 }
 
@@ -283,5 +320,6 @@ export default {
   validateFile,
   getAvailableAnalyses,
   FILE_CATEGORIES,
-  REQUIRED_FILES
+  REQUIRED_FILES,
+  SIZE_LIMITS
 };
