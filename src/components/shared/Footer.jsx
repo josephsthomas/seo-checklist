@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Github, Twitter, Linkedin, Mail, MessageSquarePlus } from 'lucide-react';
+import { MessageSquarePlus } from 'lucide-react';
 import FeedbackForm from '../feedback/FeedbackForm';
 
 export default function Footer() {
@@ -38,46 +38,10 @@ export default function Footer() {
                 </span>
               </div>
             </Link>
-            <p className="text-charcoal-300 text-sm max-w-md leading-relaxed mb-6">
+            <p className="text-charcoal-300 text-sm max-w-md leading-relaxed">
               Your all-in-one content and SEO suite for organic health & visibility.
               Streamline your workflow with powerful tools designed for modern content professionals.
             </p>
-
-            {/* Social Links */}
-            <div className="flex items-center gap-3" role="list" aria-label="Social media links">
-              <a
-                href="#"
-                className="w-9 h-9 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 hover:border-white/20 flex items-center justify-center text-charcoal-400 hover:text-white transition-all duration-200"
-                aria-label="Follow us on Twitter"
-                role="listitem"
-              >
-                <Twitter className="w-4 h-4" aria-hidden="true" />
-              </a>
-              <a
-                href="#"
-                className="w-9 h-9 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 hover:border-white/20 flex items-center justify-center text-charcoal-400 hover:text-white transition-all duration-200"
-                aria-label="Connect on LinkedIn"
-                role="listitem"
-              >
-                <Linkedin className="w-4 h-4" aria-hidden="true" />
-              </a>
-              <a
-                href="#"
-                className="w-9 h-9 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 hover:border-white/20 flex items-center justify-center text-charcoal-400 hover:text-white transition-all duration-200"
-                aria-label="View our GitHub"
-                role="listitem"
-              >
-                <Github className="w-4 h-4" aria-hidden="true" />
-              </a>
-              <a
-                href="mailto:support@flipside.com"
-                className="w-9 h-9 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 hover:border-white/20 flex items-center justify-center text-charcoal-400 hover:text-white transition-all duration-200"
-                aria-label="Send us an email"
-                role="listitem"
-              >
-                <Mail className="w-4 h-4" aria-hidden="true" />
-              </a>
-            </div>
           </div>
 
           {/* Features */}

@@ -468,7 +468,7 @@ export default function ProgressDashboard() {
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-lg font-bold text-charcoal-900">All Projects</h2>
             <Link
-              to="/planner"
+              to="/app/planner"
               className="text-sm text-primary-600 font-medium flex items-center gap-1 hover:gap-2 transition-all"
             >
               Manage Projects
@@ -483,7 +483,7 @@ export default function ProgressDashboard() {
               </div>
               <h3 className="font-semibold text-charcoal-900 mb-2">No Projects Yet</h3>
               <p className="text-charcoal-500 mb-4">Create your first project to track progress</p>
-              <Link to="/planner/new" className="btn btn-primary">
+              <Link to="/app/planner/new" className="btn btn-primary">
                 Create Project
               </Link>
             </div>

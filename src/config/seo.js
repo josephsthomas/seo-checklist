@@ -141,17 +141,7 @@ export const organizationSchema = {
   url: SITE_URL,
   logo: `${SITE_URL}/logo.png`,
   description: SITE_DESCRIPTION,
-  foundingDate: '2024',
-  sameAs: [
-    'https://twitter.com/csp_seo',
-    'https://linkedin.com/company/content-strategy-portal',
-    'https://github.com/content-strategy-portal'
-  ],
-  contactPoint: {
-    '@type': 'ContactPoint',
-    contactType: 'Customer Support',
-    email: 'support@contentstrategyportal.com'
-  }
+  foundingDate: '2024'
 };
 
 /**

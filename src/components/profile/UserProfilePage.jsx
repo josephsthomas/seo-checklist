@@ -214,7 +214,7 @@ export default function UserProfilePage() {
             {/* Actions */}
             {isOwnProfile && (
               <Link
-                to="/settings"
+                to="/app/settings"
                 className="btn btn-secondary flex items-center gap-2"
               >
                 <Settings className="w-4 h-4" />
@@ -264,7 +264,7 @@ export default function UserProfilePage() {
                 </h2>
                 {isOwnProfile && (
                   <Link
-                    to="/planner"
+                    to="/app/planner"
                     className="text-sm text-primary-600 hover:text-primary-700 font-medium flex items-center gap-1"
                   >
                     View All
@@ -329,7 +329,7 @@ export default function UserProfilePage() {
 
               {isOwnProfile && (
                 <Link
-                  to="/activity"
+                  to="/app/activity"
                   className="block mt-4 text-center text-sm text-primary-600 hover:text-primary-700 font-medium"
                 >
                   View Full Activity

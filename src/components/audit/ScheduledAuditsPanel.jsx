@@ -28,7 +28,7 @@ import {
   PauseCircle,
   PlayCircle
 } from 'lucide-react';
-import { format, formatDistanceToNow, addDays, addWeeks, addMonths, subDays } from 'date-fns';
+import { format, formatDistanceToNow, addDays, addWeeks, addMonths } from 'date-fns';
 import toast from 'react-hot-toast';
 import InfoTooltip from '../common/InfoTooltip';
 
@@ -99,113 +99,6 @@ const TIMEZONES = [
   { id: 'Australia/Perth', label: 'Perth (AWST)', offset: 8 }
 ];
 
-// Generate mock scheduled audits
-function generateMockAudits() {
-  return [
-    {
-      id: '1',
-      name: 'Main Site Weekly Audit',
-      url: 'https://example.com',
-      frequency: 'weekly',
-      dayOfWeek: 1,
-      time: '03:00',
-      timezone: 'America/New_York',
-      depth: 3,
-      categories: ['meta', 'headings', 'images', 'links', 'performance'],
-      isActive: true,
-      alerts: {
-        enabled: true,
-        email: 'alerts@example.com',
-        scoreThreshold: 70,
-        criticalThreshold: 5,
-        notifyOnNewIssues: true
-      },
-      lastRun: {
-        date: subDays(new Date(), 2),
-        score: 78,
-        issues: { critical: 3, warnings: 12, info: 8 },
-        duration: 45,
-        pagesScanned: 156
-      },
-      history: [
-        { date: subDays(new Date(), 2), score: 78, issues: 23 },
-        { date: subDays(new Date(), 9), score: 75, issues: 28 },
-        { date: subDays(new Date(), 16), score: 72, issues: 32 },
-        { date: subDays(new Date(), 23), score: 74, issues: 29 }
-      ],
-      nextRun: addDays(new Date(), 5),
-      createdAt: subDays(new Date(), 30),
-      runCount: 4
-    },
-    {
-      id: '2',
-      name: 'Blog Section Daily Check',
-      url: 'https://example.com/blog',
-      frequency: 'daily',
-      time: '06:00',
-      timezone: 'America/Chicago',
-      depth: 2,
-      categories: ['meta', 'headings', 'images'],
-      isActive: true,
-      alerts: {
-        enabled: true,
-        email: 'content@example.com',
-        scoreThreshold: 80,
-        criticalThreshold: 3,
-        notifyOnNewIssues: true
-      },
-      lastRun: {
-        date: subDays(new Date(), 1),
-        score: 85,
-        issues: { critical: 1, warnings: 5, info: 3 },
-        duration: 12,
-        pagesScanned: 45
-      },
-      history: [
-        { date: subDays(new Date(), 1), score: 85, issues: 9 },
-        { date: subDays(new Date(), 2), score: 84, issues: 10 },
-        { date: subDays(new Date(), 3), score: 86, issues: 8 },
-        { date: subDays(new Date(), 4), score: 83, issues: 11 }
-      ],
-      nextRun: addDays(new Date(), 1),
-      createdAt: subDays(new Date(), 14),
-      runCount: 14
-    },
-    {
-      id: '3',
-      name: 'E-commerce Monthly Deep Scan',
-      url: 'https://shop.example.com',
-      frequency: 'monthly',
-      dayOfMonth: 1,
-      time: '02:00',
-      timezone: 'America/Los_Angeles',
-      depth: 5,
-      categories: ['meta', 'headings', 'images', 'links', 'performance', 'security', 'mobile'],
-      isActive: false,
-      alerts: {
-        enabled: false,
-        email: '',
-        scoreThreshold: 60,
-        criticalThreshold: 10,
-        notifyOnNewIssues: false
-      },
-      lastRun: {
-        date: subDays(new Date(), 35),
-        score: 68,
-        issues: { critical: 8, warnings: 24, info: 15 },
-        duration: 180,
-        pagesScanned: 523
-      },
-      history: [
-        { date: subDays(new Date(), 35), score: 68, issues: 47 }
-      ],
-      nextRun: null,
-      createdAt: subDays(new Date(), 60),
-      runCount: 1
-    }
-  ];
-}
-
 export default function ScheduledAuditsPanel() {
   const [audits, setAudits] = useState([]);
   const [showCreateModal, setShowCreateModal] = useState(false);
@@ -214,10 +107,8 @@ export default function ScheduledAuditsPanel() {
   const [viewingHistory, setViewingHistory] = useState(null);
   const [filter, setFilter] = useState('all');
 
-  // Load mock data
-  useEffect(() => {
-    setAudits(generateMockAudits());
-  }, []);
+  // TODO: Load scheduled audits from Firestore
+  // Audits will be populated when users create scheduled audits
 
   // Filter audits
   const filteredAudits = audits.filter(audit => {

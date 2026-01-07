@@ -95,41 +95,10 @@ export default function AuditLogViewer() {
       setLoading(true);
 
       try {
-        // Simulate fetching logs (in production, this would be a real Firestore query)
-        await new Promise(resolve => setTimeout(resolve, 800));
-
-        // Generate mock logs
-        const mockLogs = Array.from({ length: 150 }, (_, i) => {
-          const actions = Object.keys(ACTION_TYPES);
-          const action = actions[Math.floor(Math.random() * actions.length)];
-          const resource = RESOURCE_TYPES[Math.floor(Math.random() * RESOURCE_TYPES.length)];
-          const users = ['John Doe', 'Sarah Miller', 'Mike Johnson', 'Emily Chen', 'Alex Thompson'];
-          const user = users[Math.floor(Math.random() * users.length)];
-
-          return {
-            id: `log-${i}`,
-            action,
-            resource,
-            resourceId: `res-${Math.floor(Math.random() * 1000)}`,
-            resourceName: `${resource} #${Math.floor(Math.random() * 100)}`,
-            userId: `user-${Math.floor(Math.random() * 5)}`,
-            userName: user,
-            userEmail: `${user.toLowerCase().replace(' ', '.')}@example.com`,
-            ipAddress: `192.168.${Math.floor(Math.random() * 255)}.${Math.floor(Math.random() * 255)}`,
-            userAgent: 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7)',
-            timestamp: subDays(new Date(), Math.random() * 30),
-            details: {
-              previousValue: action === 'UPDATE' ? 'Old Value' : null,
-              newValue: action === 'UPDATE' ? 'New Value' : null,
-              changes: action === 'UPDATE' ? ['field1', 'field2'] : null,
-            },
-            success: Math.random() > 0.05,
-            errorMessage: Math.random() > 0.95 ? 'Permission denied' : null,
-          };
-        }).sort((a, b) => b.timestamp - a.timestamp);
-
-        setLogs(mockLogs);
-        setTotalPages(Math.ceil(mockLogs.length / ITEMS_PER_PAGE));
+        // TODO: Implement real Firestore query for audit logs
+        // For now, start with empty logs - real logging will be added when audit logging is implemented
+        setLogs([]);
+        setTotalPages(1);
       } catch (err) {
         console.error('Error fetching logs:', err);
         toast.error('Failed to load audit logs');
@@ -409,6 +378,14 @@ export default function AuditLogViewer() {
             <div className="p-8 text-center">
               <div className="w-12 h-12 border-4 border-charcoal-200 dark:border-charcoal-700 border-t-primary-500 rounded-full animate-spin mx-auto mb-4" />
               <p className="text-charcoal-500 dark:text-charcoal-400">Loading audit logs...</p>
+            </div>
+          ) : logs.length === 0 ? (
+            <div className="p-12 text-center">
+              <Activity className="w-12 h-12 text-charcoal-300 dark:text-charcoal-600 mx-auto mb-4" />
+              <h3 className="text-lg font-medium text-charcoal-900 dark:text-white mb-2">No Audit Logs Yet</h3>
+              <p className="text-charcoal-500 dark:text-charcoal-400 max-w-md mx-auto">
+                Audit logging tracks user actions across the platform. Logs will appear here as users interact with the system.
+              </p>
             </div>
           ) : (
             <>
