@@ -101,35 +101,14 @@ function PageLoader() {
 }
 
 /**
- * Routes that should use public navigation (marketing site)
+ * Check if current route is part of the authenticated app
  */
-const PUBLIC_ROUTES = [
-  '/',
-  '/about',
-  '/features',
-  '/help',
-  '/login',
-  '/register',
-  '/forgot-password',
-  '/terms',
-  '/privacy',
-  '/ai-policy'
-];
-
-/**
- * Check if current route should show public navigation
- */
-function isPublicRoute(pathname) {
-  // Exact matches
-  if (PUBLIC_ROUTES.includes(pathname)) return true;
-  // Pattern matches
-  if (pathname.startsWith('/features/')) return true;
-  if (pathname.startsWith('/help/')) return true;
-  return false;
+function isAppRoute(pathname) {
+  return pathname.startsWith('/app');
 }
 
 /**
- * Smart Home component - shows LandingPage for guests, redirects to dashboard for users
+ * Smart Home component - shows LandingPage for guests, redirects to app for users
  */
 function SmartHome() {
   const { currentUser, loading } = useAuth();
@@ -138,9 +117,9 @@ function SmartHome() {
     return <PageLoader />;
   }
 
-  // If logged in, redirect to dashboard
+  // If logged in, redirect to app dashboard
   if (currentUser) {
-    return <Navigate to="/dashboard" replace />;
+    return <Navigate to="/app" replace />;
   }
 
   // Otherwise show landing page
@@ -152,7 +131,8 @@ function AppContent() {
   const commandPalette = useCommandPalette();
   const location = useLocation();
   const { currentUser } = useAuth();
-  const showPublicNav = isPublicRoute(location.pathname) && !currentUser;
+  // Show public nav on marketing pages when not logged in, or when logged in but on public pages outside /app
+  const showPublicNav = !isAppRoute(location.pathname) && !currentUser;
 
   return (
     <div className="min-h-screen bg-charcoal-50 dark:bg-charcoal-900 flex flex-col">
@@ -201,12 +181,12 @@ function AppContent() {
                   <Route path="/accessibility" element={<AccessibilityStatement />} />
 
                   {/* ============================================ */}
-                  {/* AUTHENTICATED APP ROUTES                    */}
+                  {/* AUTHENTICATED APP ROUTES (/app/...)        */}
                   {/* ============================================ */}
 
-                  {/* Dashboard - Authenticated Home */}
+                  {/* App Dashboard - Authenticated Home */}
                   <Route
-                    path="/dashboard"
+                    path="/app"
                     element={
                       <ProtectedRoute>
                         <HomePage />
@@ -218,7 +198,7 @@ function AppContent() {
                   {/* CONTENT PLANNER ROUTES                      */}
                   {/* ============================================ */}
                   <Route
-                    path="/planner"
+                    path="/app/planner"
                     element={
                       <ProtectedRoute>
                         <ToolErrorBoundary toolName="Content Planner" toolColor="primary">
@@ -228,7 +208,7 @@ function AppContent() {
                     }
                   />
                   <Route
-                    path="/planner/new"
+                    path="/app/planner/new"
                     element={
                       <ProtectedRoute>
                         <ToolErrorBoundary toolName="Project Creation" toolColor="primary">
@@ -238,7 +218,7 @@ function AppContent() {
                     }
                   />
                   <Route
-                    path="/planner/projects/:projectId"
+                    path="/app/planner/projects/:projectId"
                     element={
                       <ProtectedRoute>
                         <ToolErrorBoundary toolName="Content Checklist" toolColor="primary">
@@ -248,7 +228,7 @@ function AppContent() {
                     }
                   />
                   <Route
-                    path="/planner/progress"
+                    path="/app/planner/progress"
                     element={
                       <ProtectedRoute>
                         <ToolErrorBoundary toolName="Progress Dashboard" toolColor="primary">
@@ -258,7 +238,7 @@ function AppContent() {
                     }
                   />
                   <Route
-                    path="/planner/projects/:projectId/health"
+                    path="/app/planner/projects/:projectId/health"
                     element={
                       <ProtectedRoute>
                         <ToolErrorBoundary toolName="Project Health Report" toolColor="primary">
@@ -268,16 +248,11 @@ function AppContent() {
                     }
                   />
 
-                  {/* Legacy routes - redirect to new paths */}
-                  <Route path="/projects" element={<Navigate to="/planner" replace />} />
-                  <Route path="/projects/new" element={<Navigate to="/planner/new" replace />} />
-                  <Route path="/projects/:projectId" element={<Navigate to="/planner/projects/:projectId" replace />} />
-
                   {/* ============================================ */}
                   {/* TECHNICAL AUDIT TOOL ROUTES                 */}
                   {/* ============================================ */}
                   <Route
-                    path="/audit"
+                    path="/app/audit"
                     element={
                       <ProtectedRoute>
                         <ToolErrorBoundary toolName="Technical Audit" toolColor="cyan">
@@ -287,7 +262,7 @@ function AppContent() {
                     }
                   />
                   <Route
-                    path="/audit/:auditId"
+                    path="/app/audit/:auditId"
                     element={
                       <ProtectedRoute>
                         <ToolErrorBoundary toolName="Technical Audit" toolColor="cyan">
@@ -296,7 +271,7 @@ function AppContent() {
                       </ProtectedRoute>
                     }
                   />
-                  {/* Shared audit view - public access */}
+                  {/* Shared audit view - public access (keeps old path for sharing) */}
                   <Route
                     path="/audit/shared/:shareId"
                     element={
@@ -310,7 +285,7 @@ function AppContent() {
                   {/* ACCESSIBILITY ANALYZER ROUTES               */}
                   {/* ============================================ */}
                   <Route
-                    path="/accessibility"
+                    path="/app/accessibility"
                     element={
                       <ProtectedRoute>
                         <ToolErrorBoundary toolName="Accessibility Analyzer" toolColor="purple">
@@ -324,7 +299,7 @@ function AppContent() {
                   {/* IMAGE ALT TEXT GENERATOR ROUTES             */}
                   {/* ============================================ */}
                   <Route
-                    path="/image-alt"
+                    path="/app/image-alt"
                     element={
                       <ProtectedRoute>
                         <ToolErrorBoundary toolName="Image Alt Text Generator" toolColor="emerald">
@@ -338,7 +313,7 @@ function AppContent() {
                   {/* META DATA GENERATOR ROUTES                  */}
                   {/* ============================================ */}
                   <Route
-                    path="/meta-generator"
+                    path="/app/meta-generator"
                     element={
                       <ProtectedRoute>
                         <ToolErrorBoundary toolName="Meta Data Generator" toolColor="amber">
@@ -352,7 +327,7 @@ function AppContent() {
                   {/* STRUCTURED DATA GENERATOR ROUTES            */}
                   {/* ============================================ */}
                   <Route
-                    path="/schema-generator"
+                    path="/app/schema-generator"
                     element={
                       <ProtectedRoute>
                         <ToolErrorBoundary toolName="Structured Data Generator" toolColor="rose">
@@ -363,10 +338,10 @@ function AppContent() {
                   />
 
                   {/* ============================================ */}
-                  {/* SHARED ROUTES                               */}
+                  {/* SHARED APP ROUTES                           */}
                   {/* ============================================ */}
                   <Route
-                    path="/my-tasks"
+                    path="/app/my-tasks"
                     element={
                       <ProtectedRoute>
                         <ToolErrorBoundary toolName="My Tasks" toolColor="primary">
@@ -376,7 +351,7 @@ function AppContent() {
                     }
                   />
                   <Route
-                    path="/team"
+                    path="/app/team"
                     element={
                       <ProtectedRoute>
                         <ToolErrorBoundary toolName="Team Management" toolColor="primary">
@@ -386,7 +361,7 @@ function AppContent() {
                     }
                   />
                   <Route
-                    path="/activity"
+                    path="/app/activity"
                     element={
                       <ProtectedRoute>
                         <ToolErrorBoundary toolName="Activity Log" toolColor="primary">
@@ -396,7 +371,7 @@ function AppContent() {
                     }
                   />
                   <Route
-                    path="/export"
+                    path="/app/export"
                     element={
                       <ProtectedRoute>
                         <ToolErrorBoundary toolName="Export Hub" toolColor="primary">
@@ -410,7 +385,7 @@ function AppContent() {
                   {/* USER PROFILE & SETTINGS                     */}
                   {/* ============================================ */}
                   <Route
-                    path="/profile"
+                    path="/app/profile"
                     element={
                       <ProtectedRoute>
                         <ToolErrorBoundary toolName="User Profile" toolColor="primary">
@@ -420,7 +395,7 @@ function AppContent() {
                     }
                   />
                   <Route
-                    path="/profile/:userId"
+                    path="/app/profile/:userId"
                     element={
                       <ProtectedRoute>
                         <ToolErrorBoundary toolName="User Profile" toolColor="primary">
@@ -430,7 +405,7 @@ function AppContent() {
                     }
                   />
                   <Route
-                    path="/settings"
+                    path="/app/settings"
                     element={
                       <ProtectedRoute>
                         <ToolErrorBoundary toolName="User Settings" toolColor="primary">
@@ -439,6 +414,25 @@ function AppContent() {
                       </ProtectedRoute>
                     }
                   />
+
+                  {/* ============================================ */}
+                  {/* LEGACY REDIRECTS                            */}
+                  {/* ============================================ */}
+                  <Route path="/dashboard" element={<Navigate to="/app" replace />} />
+                  <Route path="/planner" element={<Navigate to="/app/planner" replace />} />
+                  <Route path="/planner/*" element={<Navigate to="/app/planner" replace />} />
+                  <Route path="/projects" element={<Navigate to="/app/planner" replace />} />
+                  <Route path="/projects/*" element={<Navigate to="/app/planner" replace />} />
+                  <Route path="/audit" element={<Navigate to="/app/audit" replace />} />
+                  <Route path="/my-tasks" element={<Navigate to="/app/my-tasks" replace />} />
+                  <Route path="/team" element={<Navigate to="/app/team" replace />} />
+                  <Route path="/activity" element={<Navigate to="/app/activity" replace />} />
+                  <Route path="/export" element={<Navigate to="/app/export" replace />} />
+                  <Route path="/profile" element={<Navigate to="/app/profile" replace />} />
+                  <Route path="/settings" element={<Navigate to="/app/settings" replace />} />
+                  <Route path="/image-alt" element={<Navigate to="/app/image-alt" replace />} />
+                  <Route path="/meta-generator" element={<Navigate to="/app/meta-generator" replace />} />
+                  <Route path="/schema-generator" element={<Navigate to="/app/schema-generator" replace />} />
 
                   {/* 404 Route */}
                   <Route path="*" element={<PublicNotFoundPage />} />

@@ -85,7 +85,7 @@ export default function Navigation() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
           {/* Logo/Brand */}
-          <Link to="/" className="flex items-center gap-3 group">
+          <Link to="/app" className="flex items-center gap-3 group">
             <div className="relative">
               <div className="w-9 h-9 bg-gradient-to-br from-primary-500 to-primary-600 rounded-xl flex items-center justify-center shadow-sm group-hover:shadow-md group-hover:shadow-primary-500/25 transition-all duration-300">
                 <span className="text-white font-bold text-sm">CS</span>
@@ -106,9 +106,9 @@ export default function Navigation() {
           <div className="hidden md:flex items-center gap-1">
             {/* Home Link */}
             <Link
-              to="/"
-              className={`nav-link ${isActive('/') ? 'nav-link-active' : ''}`}
-              aria-current={isActive('/') ? 'page' : undefined}
+              to="/app"
+              className={`nav-link ${isActive('/app') ? 'nav-link-active' : ''}`}
+              aria-current={isActive('/app') ? 'page' : undefined}
             >
               <Home className="w-4 h-4" aria-hidden="true" />
               <span>Home</span>
@@ -170,9 +170,9 @@ export default function Navigation() {
             </div>
 
             <Link
-              to="/my-tasks"
-              className={`nav-link ${isActive('/my-tasks') ? 'nav-link-active' : ''}`}
-              aria-current={isActive('/my-tasks') ? 'page' : undefined}
+              to="/app/my-tasks"
+              className={`nav-link ${isActive('/app/my-tasks') ? 'nav-link-active' : ''}`}
+              aria-current={isActive('/app/my-tasks') ? 'page' : undefined}
             >
               <CheckSquare className="w-4 h-4" aria-hidden="true" />
               <span>My Tasks</span>
@@ -180,9 +180,9 @@ export default function Navigation() {
 
             {hasPermission(userProfile?.role, 'canManageTeam') && (
               <Link
-                to="/team"
-                className={`nav-link ${isActive('/team') ? 'nav-link-active' : ''}`}
-                aria-current={isActive('/team') ? 'page' : undefined}
+                to="/app/team"
+                className={`nav-link ${isActive('/app/team') ? 'nav-link-active' : ''}`}
+                aria-current={isActive('/app/team') ? 'page' : undefined}
               >
                 <Users className="w-4 h-4" aria-hidden="true" />
                 <span>Team</span>
@@ -293,7 +293,7 @@ export default function Navigation() {
 
             {/* User Menu */}
             <div className="flex items-center gap-3 pl-4 ml-2 border-l border-charcoal-200 dark:border-charcoal-700">
-              <Link to="/profile" className="flex items-center gap-3 hover:opacity-80 transition-opacity">
+              <Link to="/app/profile" className="flex items-center gap-3 hover:opacity-80 transition-opacity">
                 <div className="text-right">
                   <p className="text-sm font-medium text-charcoal-900 dark:text-charcoal-100">
                     {userProfile?.name || currentUser.displayName || currentUser.email}
@@ -340,11 +340,11 @@ export default function Navigation() {
           <div id="mobile-menu" className="md:hidden py-4 border-t border-charcoal-100 animate-fade-in-down">
             <div className="space-y-1" role="menu">
               <Link
-                to="/"
+                to="/app"
                 onClick={() => setMobileMenuOpen(false)}
-                className={`nav-link ${isActive('/') ? 'nav-link-active' : ''}`}
+                className={`nav-link ${isActive('/app') ? 'nav-link-active' : ''}`}
                 role="menuitem"
-                aria-current={isActive('/') ? 'page' : undefined}
+                aria-current={isActive('/app') ? 'page' : undefined}
               >
                 <Home className="w-5 h-5" aria-hidden="true" />
                 <span>Home</span>
@@ -376,11 +376,11 @@ export default function Navigation() {
               </div>
 
               <Link
-                to="/my-tasks"
+                to="/app/my-tasks"
                 onClick={() => setMobileMenuOpen(false)}
-                className={`nav-link ${isActive('/my-tasks') ? 'nav-link-active' : ''}`}
+                className={`nav-link ${isActive('/app/my-tasks') ? 'nav-link-active' : ''}`}
                 role="menuitem"
-                aria-current={isActive('/my-tasks') ? 'page' : undefined}
+                aria-current={isActive('/app/my-tasks') ? 'page' : undefined}
               >
                 <CheckSquare className="w-5 h-5" aria-hidden="true" />
                 <span>My Tasks</span>
@@ -388,11 +388,11 @@ export default function Navigation() {
 
               {hasPermission(userProfile?.role, 'canManageTeam') && (
                 <Link
-                  to="/team"
+                  to="/app/team"
                   onClick={() => setMobileMenuOpen(false)}
-                  className={`nav-link ${isActive('/team') ? 'nav-link-active' : ''}`}
+                  className={`nav-link ${isActive('/app/team') ? 'nav-link-active' : ''}`}
                   role="menuitem"
-                  aria-current={isActive('/team') ? 'page' : undefined}
+                  aria-current={isActive('/app/team') ? 'page' : undefined}
                 >
                   <Users className="w-5 h-5" aria-hidden="true" />
                   <span>Team</span>
@@ -401,7 +401,7 @@ export default function Navigation() {
 
               <div className="px-3 py-4 border-t border-charcoal-100 mt-3">
                 <Link
-                  to="/profile"
+                  to="/app/profile"
                   onClick={() => setMobileMenuOpen(false)}
                   className="flex items-center gap-3 mb-4 hover:opacity-80 transition-opacity"
                 >
