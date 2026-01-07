@@ -3,49 +3,54 @@
  * Generates Excel reports and processes images with embedded metadata
  */
 
-import * as XLSX from 'xlsx';
+import ExcelJS from 'exceljs';
 import JSZip from 'jszip';
 
 /**
  * Export results to Excel
  */
-export function exportToExcel(results, options = {}) {
+export async function exportToExcel(results, options = {}) {
   const { filename = 'image-alt-text-report.xlsx' } = options;
 
   // Create workbook
-  const wb = XLSX.utils.book_new();
+  const wb = new ExcelJS.Workbook();
+  wb.creator = 'Content Strategy Portal';
+  wb.created = new Date();
 
   // Sheet 1: Alt Text Results
-  const resultsData = results.map((r, idx) => ({
-    '#': idx + 1,
-    'Original Filename': r.original_filename,
-    'New Filename': r.filename,
-    'Alt Text': r.alt_text,
-    'Character Count': r.alt_text?.length || 0,
-    'Decorative': r.is_decorative ? 'Yes' : 'No',
-    'Detected Elements': r.detected_elements?.join(', ') || '',
-    'Confidence': `${Math.round((r.confidence || 0) * 100)}%`,
-    'File Size (KB)': Math.round((r.file_size || 0) / 1024),
-    'Status': r.error ? `Error: ${r.error}` : 'Success'
-  }));
+  const ws1 = wb.addWorksheet('Alt Text Results');
+  const resultHeaders = ['#', 'Original Filename', 'New Filename', 'Alt Text', 'Character Count', 'Decorative', 'Detected Elements', 'Confidence', 'File Size (KB)', 'Status'];
+  ws1.addRow(resultHeaders);
+  ws1.getRow(1).font = { bold: true };
 
-  const ws1 = XLSX.utils.json_to_sheet(resultsData);
+  results.forEach((r, idx) => {
+    ws1.addRow([
+      idx + 1,
+      r.original_filename,
+      r.filename,
+      r.alt_text,
+      r.alt_text?.length || 0,
+      r.is_decorative ? 'Yes' : 'No',
+      r.detected_elements?.join(', ') || '',
+      `${Math.round((r.confidence || 0) * 100)}%`,
+      Math.round((r.file_size || 0) / 1024),
+      r.error ? `Error: ${r.error}` : 'Success'
+    ]);
+  });
 
   // Set column widths
-  ws1['!cols'] = [
-    { wch: 5 },   // #
-    { wch: 30 },  // Original Filename
-    { wch: 30 },  // New Filename
-    { wch: 60 },  // Alt Text
-    { wch: 12 },  // Char Count
-    { wch: 10 },  // Decorative
-    { wch: 40 },  // Detected Elements
-    { wch: 12 },  // Confidence
-    { wch: 12 },  // File Size
-    { wch: 20 }   // Status
+  ws1.columns = [
+    { width: 5 },   // #
+    { width: 30 },  // Original Filename
+    { width: 30 },  // New Filename
+    { width: 60 },  // Alt Text
+    { width: 12 },  // Char Count
+    { width: 10 },  // Decorative
+    { width: 40 },  // Detected Elements
+    { width: 12 },  // Confidence
+    { width: 12 },  // File Size
+    { width: 20 }   // Status
   ];
-
-  XLSX.utils.book_append_sheet(wb, ws1, 'Alt Text Results');
 
   // Sheet 2: Summary
   const successCount = results.filter(r => !r.error).length;
@@ -53,23 +58,27 @@ export function exportToExcel(results, options = {}) {
   const avgLength = results.reduce((sum, r) => sum + (r.alt_text?.length || 0), 0) / results.length;
   const overLimitCount = results.filter(r => (r.alt_text?.length || 0) > 125).length;
 
-  const summaryData = [
-    { Metric: 'Total Images', Value: results.length },
-    { Metric: 'Successfully Processed', Value: successCount },
-    { Metric: 'Failed', Value: results.length - successCount },
-    { Metric: 'Decorative Images', Value: decorativeCount },
-    { Metric: 'Average Alt Text Length', Value: Math.round(avgLength) },
-    { Metric: 'Over 125 Characters', Value: overLimitCount },
-    { Metric: 'Generated On', Value: new Date().toLocaleString() }
-  ];
+  const ws2 = wb.addWorksheet('Summary');
+  ws2.addRow(['Metric', 'Value']);
+  ws2.getRow(1).font = { bold: true };
 
-  const ws2 = XLSX.utils.json_to_sheet(summaryData);
-  ws2['!cols'] = [{ wch: 25 }, { wch: 30 }];
-  XLSX.utils.book_append_sheet(wb, ws2, 'Summary');
+  const summaryData = [
+    ['Total Images', results.length],
+    ['Successfully Processed', successCount],
+    ['Failed', results.length - successCount],
+    ['Decorative Images', decorativeCount],
+    ['Average Alt Text Length', Math.round(avgLength)],
+    ['Over 125 Characters', overLimitCount],
+    ['Generated On', new Date().toLocaleString()]
+  ];
+  summaryData.forEach(row => ws2.addRow(row));
+
+  ws2.getColumn(1).width = 25;
+  ws2.getColumn(2).width = 30;
 
   // Generate and download
-  const wbout = XLSX.write(wb, { bookType: 'xlsx', type: 'array' });
-  const blob = new Blob([wbout], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+  const buffer = await wb.xlsx.writeBuffer();
+  const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
 
   downloadBlob(blob, filename);
 }
@@ -130,7 +139,7 @@ export async function exportAll(results, options = {}) {
   const dateStr = new Date().toISOString().split('T')[0];
   const prefix = domainInfo?.domain || 'batch';
 
-  exportToExcel(results, {
+  await exportToExcel(results, {
     filename: excelFilename || `${prefix}-alt-text-${dateStr}.xlsx`
   });
 

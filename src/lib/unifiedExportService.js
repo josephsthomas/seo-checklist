@@ -5,7 +5,7 @@
 
 import jsPDF from 'jspdf';
 import 'jspdf-autotable';
-import * as XLSX from 'xlsx';
+import ExcelJS from 'exceljs';
 import JSZip from 'jszip';
 
 /**
@@ -32,28 +32,42 @@ function getTimestamp() {
 /**
  * Export to Excel format
  */
-export function exportToExcel(data, options = {}) {
+export async function exportToExcel(data, options = {}) {
   const {
     filename = 'export.xlsx',
     sheets = [{ name: 'Data', data }],
     columnWidths = {}
   } = options;
 
-  const wb = XLSX.utils.book_new();
+  const wb = new ExcelJS.Workbook();
+  wb.creator = 'Content Strategy Portal';
+  wb.created = new Date();
 
   sheets.forEach(sheet => {
-    const ws = XLSX.utils.json_to_sheet(sheet.data);
+    const ws = wb.addWorksheet(sheet.name);
 
-    // Apply column widths if provided
-    if (columnWidths[sheet.name]) {
-      ws['!cols'] = columnWidths[sheet.name].map(w => ({ wch: w }));
+    if (sheet.data.length > 0) {
+      // Add headers from first row keys
+      const headers = Object.keys(sheet.data[0]);
+      ws.addRow(headers);
+      ws.getRow(1).font = { bold: true };
+
+      // Add data rows
+      sheet.data.forEach(row => {
+        ws.addRow(headers.map(h => row[h]));
+      });
+
+      // Apply column widths if provided
+      if (columnWidths[sheet.name]) {
+        columnWidths[sheet.name].forEach((width, index) => {
+          ws.getColumn(index + 1).width = width;
+        });
+      }
     }
-
-    XLSX.utils.book_append_sheet(wb, ws, sheet.name);
   });
 
-  const wbout = XLSX.write(wb, { bookType: 'xlsx', type: 'array' });
-  const blob = new Blob([wbout], {
+  const buffer = await wb.xlsx.writeBuffer();
+  const blob = new Blob([buffer], {
     type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
   });
 
@@ -219,14 +233,24 @@ export async function batchExport(items, format, options = {}) {
   for (const item of items) {
     try {
       if (format === 'xlsx') {
-        const wb = XLSX.utils.book_new();
-        const ws = XLSX.utils.json_to_sheet(item.data);
-        XLSX.utils.book_append_sheet(wb, ws, 'Data');
-        const wbout = XLSX.write(wb, { bookType: 'xlsx', type: 'array' });
+        const wb = new ExcelJS.Workbook();
+        wb.creator = 'Content Strategy Portal';
+        const ws = wb.addWorksheet('Data');
+
+        if (item.data.length > 0) {
+          const headers = Object.keys(item.data[0]);
+          ws.addRow(headers);
+          ws.getRow(1).font = { bold: true };
+          item.data.forEach(row => {
+            ws.addRow(headers.map(h => row[h]));
+          });
+        }
+
+        const buffer = await wb.xlsx.writeBuffer();
         files.push({
           name: item.filename || `${item.id}.xlsx`,
           type: 'blob',
-          content: new Blob([wbout])
+          content: new Blob([buffer])
         });
       } else if (format === 'json') {
         files.push({

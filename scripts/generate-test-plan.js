@@ -3,7 +3,7 @@
  * Enterprise-grade test plan covering all 10 phases
  */
 
-import * as XLSX from 'xlsx';
+import ExcelJS from 'exceljs';
 import { fileURLToPath } from 'url';
 import { dirname, join } from 'path';
 
@@ -11,7 +11,9 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
 // Create workbook
-const wb = XLSX.utils.book_new();
+const wb = new ExcelJS.Workbook();
+wb.creator = 'Content Strategy Portal';
+wb.created = new Date();
 
 // Overview Sheet
 const overviewData = [
@@ -54,9 +56,12 @@ const overviewData = [
   ['SKIP', 'Test intentionally skipped']
 ];
 
-const overviewWs = XLSX.utils.aoa_to_sheet(overviewData);
-overviewWs['!cols'] = [{ wch: 25 }, { wch: 50 }, { wch: 15 }];
-XLSX.utils.book_append_sheet(wb, overviewWs, 'Overview');
+const overviewWs = wb.addWorksheet('Overview');
+overviewData.forEach(row => overviewWs.addRow(row));
+overviewWs.getColumn(1).width = 25;
+overviewWs.getColumn(2).width = 50;
+overviewWs.getColumn(3).width = 15;
+overviewWs.getRow(1).font = { bold: true, size: 14 };
 
 // Phase 1-3: Audit Engine Tests
 const phase1_3Data = [
@@ -122,9 +127,10 @@ const phase1_3Data = [
   ['AE-045', 'Edge Case', 'Handle null/undefined values', '1. Process data with null fields\n2. Verify null safety', 'No crashes, defaults applied', 'P1', 'NOT RUN', '']
 ];
 
-const phase1_3Ws = XLSX.utils.aoa_to_sheet(phase1_3Data);
-phase1_3Ws['!cols'] = [{ wch: 10 }, { wch: 15 }, { wch: 40 }, { wch: 50 }, { wch: 40 }, { wch: 10 }, { wch: 10 }, { wch: 20 }];
-XLSX.utils.book_append_sheet(wb, phase1_3Ws, 'Phase 1-3 Audit Engine');
+const phase1_3Ws = wb.addWorksheet('Phase 1-3 Audit Engine');
+phase1_3Data.forEach(row => phase1_3Ws.addRow(row));
+phase1_3Ws.columns = [{ width: 10 }, { width: 15 }, { width: 40 }, { width: 50 }, { width: 40 }, { width: 10 }, { width: 10 }, { width: 20 }];
+phase1_3Ws.getRow(1).font = { bold: true };
 
 // Phase 4: Issue Explorer Tests
 const phase4Data = [
@@ -173,9 +179,10 @@ const phase4Data = [
   ['IE-028', 'Performance', 'Search large dataset quickly', '1. Search 100+ issues\n2. Time response', 'Results appear in <200ms', 'P2', 'NOT RUN', '']
 ];
 
-const phase4Ws = XLSX.utils.aoa_to_sheet(phase4Data);
-phase4Ws['!cols'] = [{ wch: 10 }, { wch: 15 }, { wch: 40 }, { wch: 50 }, { wch: 40 }, { wch: 10 }, { wch: 10 }, { wch: 20 }];
-XLSX.utils.book_append_sheet(wb, phase4Ws, 'Phase 4 Issue Explorer');
+const phase4Ws = wb.addWorksheet('Phase 4 Issue Explorer');
+phase4Data.forEach(row => phase4Ws.addRow(row));
+phase4Ws.columns = [{ width: 10 }, { width: 15 }, { width: 40 }, { width: 50 }, { width: 40 }, { width: 10 }, { width: 10 }, { width: 20 }];
+phase4Ws.getRow(1).font = { bold: true };
 
 // Phase 5: Page Audit View Tests
 const phase5Data = [
@@ -214,9 +221,10 @@ const phase5Data = [
   ['PA-022', 'Edge Case', 'Handle non-existent URL data', '1. Try to view URL not in dataset\n2. Check handling', 'Appropriate error or empty state', 'P2', 'NOT RUN', '']
 ];
 
-const phase5Ws = XLSX.utils.aoa_to_sheet(phase5Data);
-phase5Ws['!cols'] = [{ wch: 10 }, { wch: 15 }, { wch: 40 }, { wch: 50 }, { wch: 40 }, { wch: 10 }, { wch: 10 }, { wch: 20 }];
-XLSX.utils.book_append_sheet(wb, phase5Ws, 'Phase 5 Page Audit View');
+const phase5Ws = wb.addWorksheet('Phase 5 Page Audit View');
+phase5Data.forEach(row => phase5Ws.addRow(row));
+phase5Ws.columns = [{ width: 10 }, { width: 15 }, { width: 40 }, { width: 50 }, { width: 40 }, { width: 10 }, { width: 10 }, { width: 20 }];
+phase5Ws.getRow(1).font = { bold: true };
 
 // Phase 6: URL Data Table Tests
 const phase6Data = [
@@ -253,9 +261,10 @@ const phase6Data = [
   ['UT-018', 'Performance', 'Pagination large dataset', '1. Paginate through 1000+ rows\n2. Check responsiveness', 'Instant page transitions', 'P2', 'NOT RUN', '']
 ];
 
-const phase6Ws = XLSX.utils.aoa_to_sheet(phase6Data);
-phase6Ws['!cols'] = [{ wch: 10 }, { wch: 15 }, { wch: 40 }, { wch: 50 }, { wch: 40 }, { wch: 10 }, { wch: 10 }, { wch: 20 }];
-XLSX.utils.book_append_sheet(wb, phase6Ws, 'Phase 6 URL Data Table');
+const phase6Ws = wb.addWorksheet('Phase 6 URL Data Table');
+phase6Data.forEach(row => phase6Ws.addRow(row));
+phase6Ws.columns = [{ width: 10 }, { width: 15 }, { width: 40 }, { width: 50 }, { width: 40 }, { width: 10 }, { width: 10 }, { width: 20 }];
+phase6Ws.getRow(1).font = { bold: true };
 
 // Phase 7: AI Integration Tests
 const phase7Data = [
@@ -300,9 +309,10 @@ const phase7Data = [
   ['AI-024', 'Performance', 'Concurrent requests handled', '1. Open multiple pages\n2. Generate simultaneously', 'All requests complete successfully', 'P2', 'NOT RUN', '']
 ];
 
-const phase7Ws = XLSX.utils.aoa_to_sheet(phase7Data);
-phase7Ws['!cols'] = [{ wch: 10 }, { wch: 15 }, { wch: 40 }, { wch: 50 }, { wch: 40 }, { wch: 10 }, { wch: 10 }, { wch: 20 }];
-XLSX.utils.book_append_sheet(wb, phase7Ws, 'Phase 7 AI Integration');
+const phase7Ws = wb.addWorksheet('Phase 7 AI Integration');
+phase7Data.forEach(row => phase7Ws.addRow(row));
+phase7Ws.columns = [{ width: 10 }, { width: 15 }, { width: 40 }, { width: 50 }, { width: 40 }, { width: 10 }, { width: 10 }, { width: 20 }];
+phase7Ws.getRow(1).font = { bold: true };
 
 // Phase 8: Export Tests
 const phase8Data = [
@@ -339,9 +349,10 @@ const phase8Data = [
   ['EX-020', 'Edge Case', 'Handle special chars in export', '1. Export with unicode URLs/titles\n2. Check encoding', 'Special characters preserved', 'P2', 'NOT RUN', '']
 ];
 
-const phase8Ws = XLSX.utils.aoa_to_sheet(phase8Data);
-phase8Ws['!cols'] = [{ wch: 10 }, { wch: 15 }, { wch: 40 }, { wch: 50 }, { wch: 40 }, { wch: 10 }, { wch: 10 }, { wch: 20 }];
-XLSX.utils.book_append_sheet(wb, phase8Ws, 'Phase 8 Exports');
+const phase8Ws = wb.addWorksheet('Phase 8 Exports');
+phase8Data.forEach(row => phase8Ws.addRow(row));
+phase8Ws.columns = [{ width: 10 }, { width: 15 }, { width: 40 }, { width: 50 }, { width: 40 }, { width: 10 }, { width: 10 }, { width: 20 }];
+phase8Ws.getRow(1).font = { bold: true };
 
 // Phase 9: Save & Share Tests
 const phase9Data = [
@@ -396,9 +407,10 @@ const phase9Data = [
   ['SS-032', 'Edge Case', 'Concurrent share access', '1. Multiple users access same link\n2. Check behavior', 'All users can view simultaneously', 'P2', 'NOT RUN', '']
 ];
 
-const phase9Ws = XLSX.utils.aoa_to_sheet(phase9Data);
-phase9Ws['!cols'] = [{ wch: 10 }, { wch: 15 }, { wch: 40 }, { wch: 50 }, { wch: 40 }, { wch: 10 }, { wch: 10 }, { wch: 20 }];
-XLSX.utils.book_append_sheet(wb, phase9Ws, 'Phase 9 Save & Share');
+const phase9Ws = wb.addWorksheet('Phase 9 Save & Share');
+phase9Data.forEach(row => phase9Ws.addRow(row));
+phase9Ws.columns = [{ width: 10 }, { width: 15 }, { width: 40 }, { width: 50 }, { width: 40 }, { width: 10 }, { width: 10 }, { width: 20 }];
+phase9Ws.getRow(1).font = { bold: true };
 
 // Phase 10: Performance Tests
 const phase10Data = [
@@ -432,9 +444,10 @@ const phase10Data = [
   ['PF-015', 'Network', 'Gzip compression enabled', '1. Check response headers\n2. Verify compression', 'Responses gzip compressed', 'P2', 'NOT RUN', '']
 ];
 
-const phase10Ws = XLSX.utils.aoa_to_sheet(phase10Data);
-phase10Ws['!cols'] = [{ wch: 10 }, { wch: 15 }, { wch: 40 }, { wch: 50 }, { wch: 40 }, { wch: 10 }, { wch: 10 }, { wch: 20 }];
-XLSX.utils.book_append_sheet(wb, phase10Ws, 'Phase 10 Performance');
+const phase10Ws = wb.addWorksheet('Phase 10 Performance');
+phase10Data.forEach(row => phase10Ws.addRow(row));
+phase10Ws.columns = [{ width: 10 }, { width: 15 }, { width: 40 }, { width: 50 }, { width: 40 }, { width: 10 }, { width: 10 }, { width: 20 }];
+phase10Ws.getRow(1).font = { bold: true };
 
 // Cross-Cutting Concerns Tests
 const crossCuttingData = [
@@ -473,13 +486,14 @@ const crossCuttingData = [
   ['CC-020', 'Responsive', 'Tablet layout (768px)', '1. View at 768px width\n2. Check layout', 'Proper tablet layout', 'P2', 'NOT RUN', '']
 ];
 
-const crossCuttingWs = XLSX.utils.aoa_to_sheet(crossCuttingData);
-crossCuttingWs['!cols'] = [{ wch: 10 }, { wch: 15 }, { wch: 40 }, { wch: 50 }, { wch: 40 }, { wch: 10 }, { wch: 10 }, { wch: 20 }];
-XLSX.utils.book_append_sheet(wb, crossCuttingWs, 'Cross-Cutting Concerns');
+const crossCuttingWs = wb.addWorksheet('Cross-Cutting Concerns');
+crossCuttingData.forEach(row => crossCuttingWs.addRow(row));
+crossCuttingWs.columns = [{ width: 10 }, { width: 15 }, { width: 40 }, { width: 50 }, { width: 40 }, { width: 10 }, { width: 10 }, { width: 20 }];
+crossCuttingWs.getRow(1).font = { bold: true };
 
 // Write file
 const outputPath = join(__dirname, '..', 'QA_Test_Plan_Flipside_SEO_Portal.xlsx');
-XLSX.writeFile(wb, outputPath);
+await wb.xlsx.writeFile(outputPath);
 
 console.log(`Test plan generated: ${outputPath}`);
 console.log('Total test cases: 204');
