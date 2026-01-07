@@ -70,7 +70,24 @@ export default function FileUpload({ projectId, itemId }) {
   };
 
   if (loading) {
-    return <div className="text-sm text-charcoal-500">Loading attachments...</div>;
+    return (
+      <div className="space-y-4">
+        {/* Upload area skeleton */}
+        <div className="h-32 bg-charcoal-100 rounded-lg animate-pulse" />
+        {/* Attachment list skeleton */}
+        <div className="space-y-2">
+          {[1, 2].map(i => (
+            <div key={i} className="flex items-center gap-3 p-3 bg-charcoal-100 rounded-lg animate-pulse">
+              <div className="w-10 h-10 bg-charcoal-200 rounded" />
+              <div className="flex-1 space-y-2">
+                <div className="h-4 bg-charcoal-200 rounded w-3/4" />
+                <div className="h-3 bg-charcoal-200 rounded w-1/2" />
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    );
   }
 
   return (
