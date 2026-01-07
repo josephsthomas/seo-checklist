@@ -295,10 +295,14 @@ export default function InteractiveTutorial({
   const handleComplete = useCallback(() => {
     setCompletedSteps(prev => new Set([...prev, currentStep]));
     // Save completion to localStorage
-    const completed = JSON.parse(localStorage.getItem('completedTutorials') || '[]');
-    if (!completed.includes(tutorialId)) {
-      completed.push(tutorialId);
-      localStorage.setItem('completedTutorials', JSON.stringify(completed));
+    try {
+      const completed = JSON.parse(localStorage.getItem('completedTutorials') || '[]');
+      if (!completed.includes(tutorialId)) {
+        completed.push(tutorialId);
+        localStorage.setItem('completedTutorials', JSON.stringify(completed));
+      }
+    } catch (error) {
+      console.error('Error saving tutorial completion:', error);
     }
     onClose?.();
   }, [currentStep, tutorialId, onClose]);
@@ -419,6 +423,11 @@ export function getTutorials() {
  * Check if a tutorial is completed
  */
 export function isTutorialCompleted(tutorialId) {
-  const completed = JSON.parse(localStorage.getItem('completedTutorials') || '[]');
-  return completed.includes(tutorialId);
+  try {
+    const completed = JSON.parse(localStorage.getItem('completedTutorials') || '[]');
+    return completed.includes(tutorialId);
+  } catch (error) {
+    console.error('Error checking tutorial completion:', error);
+    return false;
+  }
 }

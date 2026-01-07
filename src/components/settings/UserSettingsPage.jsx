@@ -67,9 +67,13 @@ export default function UserSettingsPage() {
     }
 
     // Load appearance settings
-    const savedAppearance = localStorage.getItem('appearanceSettings');
-    if (savedAppearance) {
-      setAppearance(JSON.parse(savedAppearance));
+    try {
+      const savedAppearance = localStorage.getItem('appearanceSettings');
+      if (savedAppearance) {
+        setAppearance(JSON.parse(savedAppearance));
+      }
+    } catch (error) {
+      console.error('Error loading appearance settings:', error);
     }
   }, [userProfile, currentUser]);
 
