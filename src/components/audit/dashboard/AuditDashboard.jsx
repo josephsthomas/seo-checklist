@@ -1,5 +1,4 @@
-import React, { useState, useMemo, useRef, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useState, useMemo, useRef, useEffect } from 'react';
 import toast from 'react-hot-toast';
 import {
   ArrowLeft,
@@ -14,7 +13,6 @@ import {
   ChevronDown,
   ChevronUp,
   Search,
-  Filter,
   LayoutDashboard,
   ListChecks,
   Table,
@@ -26,8 +24,7 @@ import {
   X,
   Loader2,
   Globe,
-  Clock,
-  Link2
+  Clock
 } from 'lucide-react';
 import { SEVERITY, PRIORITY } from '../../../lib/audit/auditEngine';
 import { exportToPDF, exportToExcel } from '../../../lib/audit/exportService';
@@ -47,7 +44,6 @@ const TABS = {
 };
 
 export default function AuditDashboard({ auditResults, domainInfo, urlData = [], onNewAudit }) {
-  const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState(TABS.OVERVIEW);
   const [selectedUrl, setSelectedUrl] = useState(null);
   const [expandedIssues, setExpandedIssues] = useState({});
@@ -85,18 +81,6 @@ export default function AuditDashboard({ auditResults, domainInfo, urlData = [],
   }, [showExportMenu]);
 
   const { issues, stats, healthScore, urlCount, timestamp } = auditResults;
-
-  // Group issues by category
-  const issuesByCategory = useMemo(() => {
-    const grouped = {};
-    issues.forEach(issue => {
-      if (!grouped[issue.category]) {
-        grouped[issue.category] = [];
-      }
-      grouped[issue.category].push(issue);
-    });
-    return grouped;
-  }, [issues]);
 
   // Filter issues
   const filteredIssues = useMemo(() => {

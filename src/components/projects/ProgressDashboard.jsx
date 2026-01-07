@@ -1,12 +1,8 @@
-import React, { useState, useMemo } from 'react';
+import { useState, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import {
   TrendingUp,
-  TrendingDown,
-  Minus,
   BarChart3,
-  PieChart,
-  Users,
   Calendar,
   ChevronRight,
   AlertTriangle,
@@ -14,12 +10,10 @@ import {
   Clock,
   Target,
   ArrowRight,
-  Filter,
   Download
 } from 'lucide-react';
 import { useProjects } from '../../hooks/useProjects';
-import { useChecklist } from '../../hooks/useChecklist';
-import { format, formatDistanceToNow, differenceInDays, isAfter } from 'date-fns';
+import { differenceInDays, isAfter } from 'date-fns';
 
 // Priority colors
 const PRIORITY_COLORS = {
@@ -161,10 +155,9 @@ function ProjectProgressCard({ project, stats }) {
  * Phase breakdown chart
  */
 function PhaseBreakdown({ projectsData }) {
-  const phases = ['Discovery', 'Strategy', 'Build', 'Pre-Launch', 'Launch', 'Post-Launch'];
-
   // Aggregate progress by phase across all projects
   const phaseStats = useMemo(() => {
+    const phases = ['Discovery', 'Strategy', 'Build', 'Pre-Launch', 'Launch', 'Post-Launch'];
     return phases.map(phase => {
       let totalItems = 0;
       let completedItems = 0;
@@ -223,9 +216,8 @@ function PhaseBreakdown({ projectsData }) {
  * Priority distribution chart
  */
 function PriorityDistribution({ projectsData }) {
-  const priorities = ['CRITICAL', 'HIGH', 'MEDIUM', 'LOW'];
-
   const priorityStats = useMemo(() => {
+    const priorities = ['CRITICAL', 'HIGH', 'MEDIUM', 'LOW'];
     const totals = { CRITICAL: 0, HIGH: 0, MEDIUM: 0, LOW: 0 };
     const completed = { CRITICAL: 0, HIGH: 0, MEDIUM: 0, LOW: 0 };
 

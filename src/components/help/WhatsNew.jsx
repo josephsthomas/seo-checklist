@@ -80,7 +80,7 @@ export default function WhatsNew({ isOpen, onClose }) {
               <Sparkles className="w-6 h-6 text-white" />
             </div>
             <div>
-              <h2 id="whats-new-title" className="text-xl font-bold text-charcoal-900">What's New</h2>
+              <h2 id="whats-new-title" className="text-xl font-bold text-charcoal-900">What&apos;s New</h2>
               <p className="text-sm text-charcoal-500">Latest updates and improvements</p>
             </div>
           </div>

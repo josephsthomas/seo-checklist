@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react';
+import { useState, useCallback } from 'react';
 import toast from 'react-hot-toast';
 import JSZip from 'jszip';
 import ImageAltUploadScreen from './upload/ImageAltUploadScreen';
@@ -33,8 +33,8 @@ export default function ImageAltGeneratorPage() {
     try {
       let imageFiles = [];
 
-      // Check if it's a ZIP file
-      if (files.length === 1 && files[0].name.endsWith('.zip')) {
+      // Check if it's a ZIP file (case-insensitive)
+      if (files.length === 1 && files[0].name.toLowerCase().endsWith('.zip')) {
         setView(VIEWS.PROCESSING);
         setStage('Extracting ZIP file...');
         setProgress(10);

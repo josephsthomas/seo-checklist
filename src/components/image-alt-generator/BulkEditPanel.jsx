@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react';
+import { useState, useCallback } from 'react';
 import {
   Edit3,
   Save,
@@ -66,7 +66,7 @@ export default function BulkEditPanel({
   // Save all edits
   const saveEdits = () => {
     const updatedResults = results.map((r, idx) => {
-      if (editedTexts.hasOwnProperty(idx)) {
+      if (Object.prototype.hasOwnProperty.call(editedTexts, idx)) {
         return { ...r, alt_text: editedTexts[idx] };
       }
       return r;
@@ -244,7 +244,7 @@ export default function BulkEditPanel({
                   <p className="text-xs font-medium text-charcoal-500 truncate mb-1">
                     {result.original_filename || result.filename}
                   </p>
-                  {editMode && editedTexts.hasOwnProperty(idx) ? (
+                  {editMode && Object.prototype.hasOwnProperty.call(editedTexts, idx) ? (
                     <textarea
                       value={editedTexts[idx]}
                       onChange={(e) => setEditedTexts(prev => ({ ...prev, [idx]: e.target.value }))}

@@ -1,4 +1,3 @@
-import React from 'react';
 import { Link, useParams } from 'react-router-dom';
 import {
   User,
@@ -9,7 +8,6 @@ import {
   FolderOpen,
   Clock,
   CheckCircle2,
-  TrendingUp,
   Users,
   Settings,
   ArrowLeft,
@@ -140,7 +138,7 @@ export default function UserProfilePage() {
             <User className="w-10 h-10 text-charcoal-400" />
           </div>
           <h2 className="text-xl font-semibold text-charcoal-900 mb-2">Profile Not Found</h2>
-          <p className="text-charcoal-500 mb-4">This user profile doesn't exist or is not accessible.</p>
+          <p className="text-charcoal-500 mb-4">This user profile doesn&apos;t exist or is not accessible.</p>
           <Link to="/" className="btn btn-primary">
             Go Home
           </Link>

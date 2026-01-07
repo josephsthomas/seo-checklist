@@ -17,6 +17,21 @@ export const STORAGE_KEYS = {
   TIME_ENTRIES: 'seo-checklist-time-entries-v1',
   PROJECT_METADATA: 'seo-checklist-project-metadata-v1',
   RECENT_ACTIVITY: 'seo-checklist-recent-activity-v1',
+
+};
+
+/**
+ * Debounce utility function
+ * @param {Function} fn - Function to debounce
+ * @param {number} delay - Delay in milliseconds
+ * @returns {Function} Debounced function
+ */
+export const debounce = (fn, delay = 300) => {
+  let timeoutId;
+  return (...args) => {
+    clearTimeout(timeoutId);
+    timeoutId = setTimeout(() => fn(...args), delay);
+  };
 };
 
 /**
@@ -362,6 +377,7 @@ export const clearPhase9Data = () => {
 
 export default {
   STORAGE_KEYS,
+  debounce,
   getStorageItem,
   setStorageItem,
   removeStorageItem,

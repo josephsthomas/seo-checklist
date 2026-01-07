@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect, useRef } from 'react';
 import {
   Image,
   Download,
@@ -33,6 +33,43 @@ export default function ImageAltDashboard({ results, onNewProcess, onUpdateResul
   const [showExportMenu, setShowExportMenu] = useState(false);
 
   const { images, summary, context } = results;
+
+  // Create and manage Object URLs for image thumbnails
+  const imageUrlsRef = useRef(new Map());
+
+  const imageUrls = useMemo(() => {
+    const urls = new Map();
+    images.forEach(img => {
+      if (img.file) {
+        // Reuse existing URL if we have one for this image
+        const existingUrl = imageUrlsRef.current.get(img.id);
+        if (existingUrl) {
+          urls.set(img.id, existingUrl);
+        } else {
+          const newUrl = URL.createObjectURL(img.file);
+          urls.set(img.id, newUrl);
+        }
+      }
+    });
+    return urls;
+  }, [images]);
+
+  // Clean up Object URLs when images change or component unmounts
+  useEffect(() => {
+    // Revoke URLs that are no longer needed
+    imageUrlsRef.current.forEach((url, id) => {
+      if (!imageUrls.has(id)) {
+        URL.revokeObjectURL(url);
+      }
+    });
+    // Update ref with current URLs
+    imageUrlsRef.current = new Map(imageUrls);
+
+    // Cleanup on unmount
+    return () => {
+      imageUrlsRef.current.forEach(url => URL.revokeObjectURL(url));
+    };
+  }, [imageUrls]);
 
   // Filter and sort images
   const filteredImages = useMemo(() => {
@@ -92,10 +129,15 @@ export default function ImageAltDashboard({ results, onNewProcess, onUpdateResul
   };
 
   const handleCopy = async (text, id) => {
-    await navigator.clipboard.writeText(text);
-    setCopiedId(id);
-    setTimeout(() => setCopiedId(null), 2000);
-    toast.success('Copied to clipboard');
+    try {
+      await navigator.clipboard.writeText(text);
+      setCopiedId(id);
+      setTimeout(() => setCopiedId(null), 2000);
+      toast.success('Copied to clipboard');
+    } catch (error) {
+      console.error('Failed to copy:', error);
+      toast.error('Failed to copy to clipboard');
+    }
   };
 
   const handleExport = async (type) => {
@@ -267,9 +309,9 @@ export default function ImageAltDashboard({ results, onNewProcess, onUpdateResul
                 <div className="flex items-start gap-4">
                   {/* Thumbnail */}
                   <div className="w-16 h-16 bg-slate-700 rounded-lg overflow-hidden flex-shrink-0">
-                    {img.file && (
+                    {imageUrls.get(img.id) && (
                       <img
-                        src={URL.createObjectURL(img.file)}
+                        src={imageUrls.get(img.id)}
                         alt=""
                         className="w-full h-full object-cover"
                       />

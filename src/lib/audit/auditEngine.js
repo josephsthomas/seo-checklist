@@ -192,10 +192,6 @@ function checkIndexability(rows) {
   const issues = [];
   const nonIndexable = rows.filter(r => r.indexability?.toLowerCase() !== 'indexable');
   const blocked = rows.filter(r => r.indexabilityStatus?.toLowerCase().includes('blocked'));
-  const noindex = rows.filter(r =>
-    r.metaRobots1?.toLowerCase().includes('noindex') ||
-    r.xRobotsTag1?.toLowerCase().includes('noindex')
-  );
 
   if (nonIndexable.length > 0) {
     issues.push({

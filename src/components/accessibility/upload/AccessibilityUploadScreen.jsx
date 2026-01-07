@@ -1,8 +1,7 @@
-import React, { useState, useCallback } from 'react';
+import { useState, useCallback } from 'react';
 import { useDropzone } from 'react-dropzone';
 import {
   Upload,
-  FileArchive,
   AlertCircle,
   CheckCircle,
   HelpCircle,
@@ -282,7 +281,7 @@ export default function AccessibilityUploadScreen({ onFileSelect }) {
             <div className="mt-4 p-3 rounded-xl bg-emerald-100 border border-emerald-200">
               <p className="text-sm text-emerald-800 font-medium flex items-center gap-2">
                 <CheckCircle className="w-4 h-4" />
-                You're ready to upload! Drag and drop your ZIP file above.
+                You&apos;re ready to upload! Drag and drop your ZIP file above.
               </p>
             </div>
           )}
@@ -320,18 +319,18 @@ export default function AccessibilityUploadScreen({ onFileSelect }) {
                     <h5 className="font-semibold text-purple-900 mb-1">What does this tool analyze?</h5>
                     <p className="text-sm text-purple-800">
                       The Accessibility Analyzer processes Axe-core accessibility test results from Screaming Frog
-                      and maps them to WCAG 2.2 success criteria. You'll get compliance scores, violation details,
+                      and maps them to WCAG 2.2 success criteria. You&apos;ll get compliance scores, violation details,
                       and AI-powered remediation suggestions for each issue.
                     </p>
                   </div>
                 </div>
               </div>
 
-              {/* What you'll get */}
+              {/* What you will get */}
               <div>
                 <h5 className="font-semibold text-charcoal-900 mb-3 flex items-center gap-2">
                   <span className="w-6 h-6 rounded-lg bg-charcoal-100 flex items-center justify-center text-xs font-bold text-charcoal-600">1</span>
-                  What you'll get from the audit
+                  What you&apos;ll get from the audit
                 </h5>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 ml-8">
                   {[
@@ -391,7 +390,7 @@ export default function AccessibilityUploadScreen({ onFileSelect }) {
                 </li>
                 <li className="flex items-start gap-3">
                   <span className="w-6 h-6 rounded-lg bg-purple-100 text-purple-700 flex items-center justify-center text-xs font-bold flex-shrink-0">3</span>
-                  <span>Check <strong className="text-charcoal-900">"Enable Accessibility"</strong></span>
+                  <span>Check <strong className="text-charcoal-900">&quot;Enable Accessibility&quot;</strong></span>
                 </li>
                 <li className="flex items-start gap-3">
                   <span className="w-6 h-6 rounded-lg bg-purple-100 text-purple-700 flex items-center justify-center text-xs font-bold flex-shrink-0">4</span>

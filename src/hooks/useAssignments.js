@@ -2,7 +2,6 @@ import { useState, useEffect } from 'react';
 import {
   collection,
   query,
-  where,
   onSnapshot,
   doc,
   getDoc,
@@ -253,7 +252,7 @@ export function useMyTasks() {
           if (assignment?.assignedTo?.includes(currentUser.uid)) {
             tasks.push({
               projectId,
-              itemId: parseInt(itemId),
+              itemId: parseInt(itemId, 10),
               ...assignment
             });
           }

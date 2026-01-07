@@ -11,8 +11,6 @@ import {
   FileText,
   Link2,
   Clock,
-  Shield,
-  Smartphone,
   Zap
 } from 'lucide-react';
 import { SEVERITY, PRIORITY } from '../../../lib/audit/auditEngine';

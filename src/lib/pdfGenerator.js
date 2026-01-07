@@ -21,8 +21,7 @@ export function generateChecklistPDF(options) {
     clientName = '',
     exportType = 'executive', // 'executive' or 'detailed'
     includeCompleted = true,
-    logo = null,
-    brandColor = '#2563eb'
+    logo = null
   } = options;
 
   const doc = new jsPDF();
@@ -61,8 +60,8 @@ export function generateChecklistPDF(options) {
     try {
       doc.addImage(logo, 'PNG', 20, yPosition, 40, 20);
       yPosition += 30;
-    } catch (error) {
-      console.warn('Failed to add logo:', error);
+    } catch {
+      // Silently fail - logo is non-critical for PDF generation
     }
   }
 

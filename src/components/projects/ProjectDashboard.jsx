@@ -1,9 +1,8 @@
-import React, { useState, useMemo } from 'react';
+import { useState, useMemo } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useProjects } from '../../hooks/useProjects';
-import { Plus, Search, Calendar, TrendingUp, AlertCircle, FolderOpen, CheckCircle, ClipboardList, Users, RefreshCw, HelpCircle, Lightbulb, BarChart3 } from 'lucide-react';
+import { Plus, Search, Calendar, TrendingUp, FolderOpen, CheckCircle, ClipboardList, Users, RefreshCw, Lightbulb, BarChart3 } from 'lucide-react';
 import ProjectCard from './ProjectCard';
-import { format } from 'date-fns';
 
 export default function ProjectDashboard() {
   const { projects, loading } = useProjects();
@@ -195,7 +194,7 @@ export default function ProjectDashboard() {
                 <div className="bg-charcoal-50 rounded-xl p-6 max-w-2xl mx-auto text-left">
                   <h4 className="text-sm font-semibold text-charcoal-700 mb-4 flex items-center gap-2">
                     <Lightbulb className="w-4 h-4 text-amber-500" />
-                    What's included in each project:
+                    What&apos;s included in each project:
                   </h4>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     {[

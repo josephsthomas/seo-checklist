@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import {
   Settings,
   User,
@@ -6,20 +6,16 @@ import {
   Palette,
   Shield,
   Key,
-  LogOut,
   ChevronRight,
-  Check,
-  Camera,
   Mail,
   Building,
   Save,
   Loader2
 } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
-import { doc, getDoc, setDoc } from 'firebase/firestore';
+import { doc, setDoc } from 'firebase/firestore';
 import { db } from '../../lib/firebase';
-import { updateProfile, updateEmail, updatePassword, EmailAuthProvider, reauthenticateWithCredential } from 'firebase/auth';
-import { auth } from '../../lib/firebase';
+import { updateProfile, updatePassword, EmailAuthProvider, reauthenticateWithCredential } from 'firebase/auth';
 import toast from 'react-hot-toast';
 import NotificationPreferences from '../shared/NotificationPreferences';
 
@@ -71,9 +67,13 @@ export default function UserSettingsPage() {
     }
 
     // Load appearance settings
-    const savedAppearance = localStorage.getItem('appearanceSettings');
-    if (savedAppearance) {
-      setAppearance(JSON.parse(savedAppearance));
+    try {
+      const savedAppearance = localStorage.getItem('appearanceSettings');
+      if (savedAppearance) {
+        setAppearance(JSON.parse(savedAppearance));
+      }
+    } catch {
+      // Silently fail - use default appearance settings
     }
   }, [userProfile, currentUser]);
 
@@ -99,8 +99,7 @@ export default function UserSettingsPage() {
       }, { merge: true });
 
       toast.success('Profile updated successfully');
-    } catch (error) {
-      console.error('Error updating profile:', error);
+    } catch {
       toast.error('Failed to update profile');
     } finally {
       setSaving(false);
@@ -140,7 +139,6 @@ export default function UserSettingsPage() {
         confirmPassword: ''
       });
     } catch (error) {
-      console.error('Error changing password:', error);
       if (error.code === 'auth/wrong-password') {
         toast.error('Current password is incorrect');
       } else {

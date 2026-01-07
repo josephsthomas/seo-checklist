@@ -1,14 +1,11 @@
-import React, { useState, useEffect, useCallback } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useState, useEffect, useCallback } from 'react';
+import { useNavigate } from 'react-router-dom';
 import {
   Play,
-  Pause,
-  SkipForward,
   X,
   ChevronLeft,
   ChevronRight,
   CheckCircle2,
-  Circle,
   Target,
   Lightbulb,
   ArrowRight
@@ -273,7 +270,6 @@ export default function InteractiveTutorial({
 }) {
   const [currentStep, setCurrentStep] = useState(0);
   const [completedSteps, setCompletedSteps] = useState(new Set());
-  const navigate = useNavigate();
 
   const tutorial = TUTORIALS[tutorialId];
 
@@ -299,10 +295,14 @@ export default function InteractiveTutorial({
   const handleComplete = useCallback(() => {
     setCompletedSteps(prev => new Set([...prev, currentStep]));
     // Save completion to localStorage
-    const completed = JSON.parse(localStorage.getItem('completedTutorials') || '[]');
-    if (!completed.includes(tutorialId)) {
-      completed.push(tutorialId);
-      localStorage.setItem('completedTutorials', JSON.stringify(completed));
+    try {
+      const completed = JSON.parse(localStorage.getItem('completedTutorials') || '[]');
+      if (!completed.includes(tutorialId)) {
+        completed.push(tutorialId);
+        localStorage.setItem('completedTutorials', JSON.stringify(completed));
+      }
+    } catch (error) {
+      console.error('Error saving tutorial completion:', error);
     }
     onClose?.();
   }, [currentStep, tutorialId, onClose]);
@@ -423,6 +423,11 @@ export function getTutorials() {
  * Check if a tutorial is completed
  */
 export function isTutorialCompleted(tutorialId) {
-  const completed = JSON.parse(localStorage.getItem('completedTutorials') || '[]');
-  return completed.includes(tutorialId);
+  try {
+    const completed = JSON.parse(localStorage.getItem('completedTutorials') || '[]');
+    return completed.includes(tutorialId);
+  } catch (error) {
+    console.error('Error checking tutorial completion:', error);
+    return false;
+  }
 }

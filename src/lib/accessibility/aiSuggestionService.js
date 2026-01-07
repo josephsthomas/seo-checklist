@@ -90,7 +90,7 @@ async function callClaude(prompt, maxTokens = 1024) {
  */
 export async function suggestViolationFix(violation, options = {}) {
   const { ruleId, name, impact, wcagCriteria, htmlElement, selector, help } = violation;
-  const { url, pageContext } = options;
+  const { url } = options;
 
   // Get WCAG criteria details
   const criteriaDetails = wcagCriteria?.map(id => {

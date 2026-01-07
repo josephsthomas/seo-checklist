@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import {
   X,
   Plus,
@@ -40,6 +40,8 @@ export default function AddCustomItemModal({ isOpen, onClose, onSave, editItem =
     dueDate: ''
   });
   const [saving, setSaving] = useState(false);
+  const [errors, setErrors] = useState({});
+  const [touched, setTouched] = useState({});
 
   // Reset form when opening or when editing different item
   useEffect(() => {
@@ -67,12 +69,37 @@ export default function AddCustomItemModal({ isOpen, onClose, onSave, editItem =
           dueDate: ''
         });
       }
+      // Reset validation state
+      setErrors({});
+      setTouched({});
     }
   }, [isOpen, editItem]);
 
+  // Validate field
+  const validateField = (name, value) => {
+    if (name === 'title' && !value.trim()) {
+      return 'Title is required';
+    }
+    return '';
+  };
+
+  // Handle field blur for real-time validation
+  const handleBlur = (field) => {
+    setTouched(prev => ({ ...prev, [field]: true }));
+    const error = validateField(field, formData[field]);
+    setErrors(prev => ({ ...prev, [field]: error }));
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!formData.title.trim()) return;
+
+    // Validate all fields
+    const titleError = validateField('title', formData.title);
+    if (titleError) {
+      setErrors({ title: titleError });
+      setTouched({ title: true });
+      return;
+    }
 
     setSaving(true);
     try {
@@ -133,12 +160,28 @@ export default function AddCustomItemModal({ isOpen, onClose, onSave, editItem =
             <input
               type="text"
               value={formData.title}
-              onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+              onChange={(e) => {
+                setFormData({ ...formData, title: e.target.value });
+                if (touched.title) {
+                  setErrors(prev => ({ ...prev, title: validateField('title', e.target.value) }));
+                }
+              }}
+              onBlur={() => handleBlur('title')}
               placeholder="Enter item title..."
-              className="w-full px-4 py-2.5 border border-charcoal-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-              required
+              className={`w-full px-4 py-2.5 border rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent ${
+                errors.title && touched.title
+                  ? 'border-red-300 bg-red-50'
+                  : 'border-charcoal-200'
+              }`}
+              aria-invalid={errors.title && touched.title ? 'true' : 'false'}
+              aria-describedby={errors.title ? 'title-error' : undefined}
               autoFocus
             />
+            {errors.title && touched.title && (
+              <p id="title-error" className="mt-1.5 text-sm text-red-600" role="alert">
+                {errors.title}
+              </p>
+            )}
           </div>
 
           {/* Description */}

@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react';
+import { useState, useCallback } from 'react';
 import {
   Shuffle,
   Plus,
@@ -87,11 +87,16 @@ export default function ABVariantsPanel({
 
   // Copy variant
   const copyVariant = async (variant) => {
-    const text = `Title: ${variant.title}\n\nDescription: ${variant.description}`;
-    await navigator.clipboard.writeText(text);
-    setCopiedId(variant.id);
-    setTimeout(() => setCopiedId(null), 2000);
-    toast.success('Copied to clipboard');
+    try {
+      const text = `Title: ${variant.title}\n\nDescription: ${variant.description}`;
+      await navigator.clipboard.writeText(text);
+      setCopiedId(variant.id);
+      setTimeout(() => setCopiedId(null), 2000);
+      toast.success('Copied to clipboard');
+    } catch (error) {
+      console.error('Failed to copy:', error);
+      toast.error('Failed to copy variant');
+    }
   };
 
   // Character count status

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 import {
   MessageSquarePlus,
@@ -80,8 +80,7 @@ export default function FeedbackWidget() {
 
       setIsSubmitted(true);
       toast.success('Thank you for your feedback!');
-    } catch (error) {
-      console.error('Error submitting feedback:', error);
+    } catch {
       toast.error('Failed to submit feedback. Please try again.');
     } finally {
       setIsSubmitting(false);

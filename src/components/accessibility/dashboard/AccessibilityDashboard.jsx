@@ -1,11 +1,8 @@
-import React, { useState, useMemo, useRef, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useState, useMemo, useRef, useEffect } from 'react';
 import toast from 'react-hot-toast';
 import {
   ArrowLeft,
   Download,
-  Share2,
-  Save,
   AlertCircle,
   AlertTriangle,
   Info,
@@ -14,22 +11,16 @@ import {
   ChevronDown,
   ChevronUp,
   Search,
-  Filter,
   LayoutDashboard,
   ListChecks,
   Table,
   FileSpreadsheet,
   FileText,
-  Copy,
   Check,
-  Lock,
   X,
-  Loader2,
-  Globe,
   Clock,
   Shield,
   Eye,
-  Ear,
   Hand,
   Wrench,
   Sparkles,
@@ -37,14 +28,12 @@ import {
   Accessibility
 } from 'lucide-react';
 import { WCAG_PRINCIPLES, WCAG_CRITERIA, getCriteriaByLevel } from '../../../data/wcagCriteria';
-import { IMPACT_LEVELS } from '../../../data/axeRules';
 import { COMPLIANCE_STATUS } from '../../../lib/accessibility/accessibilityEngine';
 import {
   exportAccessibilityPDF,
   exportAccessibilityExcel,
   exportVPAT
 } from '../../../lib/accessibility/accessibilityExportService';
-import { getStaticFixSuggestion, isAIAvailable } from '../../../lib/accessibility/aiSuggestionService';
 
 // View tabs
 const TABS = {
@@ -79,7 +68,6 @@ const IMPACT_COLORS = {
 };
 
 export default function AccessibilityDashboard({ auditResults, domainInfo, onNewAudit }) {
-  const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState(TABS.OVERVIEW);
   const [expandedIssues, setExpandedIssues] = useState({});
   const [filterLevel, setFilterLevel] = useState('all');
@@ -139,13 +127,6 @@ export default function AccessibilityDashboard({ auditResults, domainInfo, onNew
     if (score >= 70) return 'Good';
     if (score >= 50) return 'Needs Work';
     return 'Poor';
-  };
-
-  const getScoreGradient = (score) => {
-    if (score >= 90) return 'from-emerald-500 to-emerald-600';
-    if (score >= 70) return 'from-emerald-400 to-emerald-500';
-    if (score >= 50) return 'from-amber-400 to-amber-500';
-    return 'from-red-500 to-red-600';
   };
 
   const getImpactIcon = (impact) => {

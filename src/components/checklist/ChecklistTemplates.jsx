@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import {
   FileText,
   ClipboardList,
@@ -9,14 +9,14 @@ import {
   Plus,
   Copy,
   Trash2,
-  Edit3,
   Check,
   X,
   ChevronRight,
   Star,
   Clock,
   Users,
-  Save
+  Save,
+  AlertTriangle
 } from 'lucide-react';
 import { useChecklistTemplates, DEFAULT_TEMPLATES } from '../../hooks/useChecklistTemplates';
 import { format } from 'date-fns';
@@ -34,8 +34,20 @@ export default function ChecklistTemplates({ onApplyTemplate, onClose }) {
   const { templates, loading, createTemplate, deleteTemplate, duplicateTemplate } = useChecklistTemplates();
   const [activeTab, setActiveTab] = useState('default');
   const [showCreateForm, setShowCreateForm] = useState(false);
+  const [deleteConfirm, setDeleteConfirm] = useState(null);
 
   const allTemplates = activeTab === 'default' ? DEFAULT_TEMPLATES : templates;
+
+  const handleDeleteClick = (template) => {
+    setDeleteConfirm(template);
+  };
+
+  const confirmDelete = async () => {
+    if (deleteConfirm) {
+      await deleteTemplate(deleteConfirm.id);
+      setDeleteConfirm(null);
+    }
+  };
 
   const handleApply = (template) => {
     onApplyTemplate(template);
@@ -178,11 +190,12 @@ export default function ChecklistTemplates({ onApplyTemplate, onClose }) {
                             <Copy className="w-4 h-4" />
                           </button>
                           <button
-                            onClick={() => deleteTemplate(template.id)}
+                            onClick={() => handleDeleteClick(template)}
                             className="p-2 text-charcoal-400 hover:text-red-600 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors"
                             title="Delete"
+                            aria-label={`Delete template: ${template.name}`}
                           >
-                            <Trash2 className="w-4 h-4" />
+                            <Trash2 className="w-4 h-4" aria-hidden="true" />
                           </button>
                         </>
                       )}
@@ -209,6 +222,52 @@ export default function ChecklistTemplates({ onApplyTemplate, onClose }) {
           onCreate={createTemplate}
         />
       )}
+
+      {/* Delete Confirmation Modal */}
+      {deleteConfirm && (
+        <div
+          className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-charcoal-900/60 dark:bg-charcoal-950/80 backdrop-blur-sm"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="delete-template-title"
+        >
+          <div className="bg-white dark:bg-charcoal-800 rounded-2xl shadow-2xl w-full max-w-md animate-scale-in">
+            <div className="p-6">
+              <div className="flex items-center gap-4 mb-4">
+                <div className="w-12 h-12 bg-red-100 dark:bg-red-900/30 rounded-full flex items-center justify-center">
+                  <AlertTriangle className="w-6 h-6 text-red-600 dark:text-red-400" />
+                </div>
+                <div>
+                  <h3 id="delete-template-title" className="text-lg font-bold text-charcoal-900 dark:text-white">
+                    Delete Template
+                  </h3>
+                  <p className="text-sm text-charcoal-500 dark:text-charcoal-400">
+                    This action cannot be undone
+                  </p>
+                </div>
+              </div>
+              <p className="text-charcoal-600 dark:text-charcoal-300 mb-6">
+                Are you sure you want to delete <strong>&ldquo;{deleteConfirm.name}&rdquo;</strong>?
+                This template will be permanently removed.
+              </p>
+              <div className="flex justify-end gap-3">
+                <button
+                  onClick={() => setDeleteConfirm(null)}
+                  className="btn btn-secondary"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={confirmDelete}
+                  className="btn bg-red-500 hover:bg-red-600 text-white"
+                >
+                  Delete Template
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
@@ -218,6 +277,21 @@ function CreateTemplateForm({ onClose, onCreate }) {
   const [description, setDescription] = useState('');
   const [selectedCategories, setSelectedCategories] = useState([]);
   const [saving, setSaving] = useState(false);
+  const [errors, setErrors] = useState({});
+  const [touched, setTouched] = useState({});
+
+  const validateField = (fieldName, value) => {
+    if (fieldName === 'name' && !value.trim()) {
+      return 'Template name is required';
+    }
+    return '';
+  };
+
+  const handleBlur = (field, value) => {
+    setTouched(prev => ({ ...prev, [field]: true }));
+    const error = validateField(field, value);
+    setErrors(prev => ({ ...prev, [field]: error }));
+  };
 
   const CATEGORY_OPTIONS = [
     'Technical SEO',
@@ -239,7 +313,14 @@ function CreateTemplateForm({ onClose, onCreate }) {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!name.trim()) return;
+
+    // Validate before submit
+    const nameError = validateField('name', name);
+    if (nameError) {
+      setErrors({ name: nameError });
+      setTouched({ name: true });
+      return;
+    }
 
     setSaving(true);
     await onCreate({
@@ -276,16 +357,29 @@ function CreateTemplateForm({ onClose, onCreate }) {
         <form onSubmit={handleSubmit} className="p-6 space-y-4">
           <div>
             <label className="block text-sm font-medium text-charcoal-700 dark:text-charcoal-300 mb-2">
-              Template Name
+              Template Name *
             </label>
             <input
               type="text"
               value={name}
-              onChange={(e) => setName(e.target.value)}
+              onChange={(e) => {
+                setName(e.target.value);
+                if (touched.name) {
+                  setErrors(prev => ({ ...prev, name: validateField('name', e.target.value) }));
+                }
+              }}
+              onBlur={() => handleBlur('name', name)}
               placeholder="e.g., Blog Post Optimization"
-              className="input"
-              required
+              className={`input ${errors.name && touched.name ? 'border-red-300 bg-red-50 dark:border-red-700 dark:bg-red-900/20' : ''}`}
+              aria-invalid={errors.name && touched.name ? 'true' : 'false'}
+              aria-describedby={errors.name ? 'template-name-error' : undefined}
+              autoFocus
             />
+            {errors.name && touched.name && (
+              <p id="template-name-error" className="mt-1.5 text-sm text-red-600 dark:text-red-400" role="alert">
+                {errors.name}
+              </p>
+            )}
           </div>
 
           <div>

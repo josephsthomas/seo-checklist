@@ -15,7 +15,7 @@ import {
 import { db } from '../lib/firebase';
 import { useAuth } from '../contexts/AuthContext';
 import toast from 'react-hot-toast';
-import { isAfter, isBefore, addDays, startOfDay, endOfDay, differenceInDays } from 'date-fns';
+import { isAfter, isBefore, addDays, startOfDay, differenceInDays } from 'date-fns';
 
 /**
  * Hook for managing due dates and reminders

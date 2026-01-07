@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import {
   Bell,
   X,
@@ -10,7 +10,6 @@ import {
   Trophy,
   Reply,
   Mail,
-  Monitor,
   Volume2,
   VolumeX
 } from 'lucide-react';

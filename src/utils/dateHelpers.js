@@ -16,9 +16,7 @@ import {
   isPast,
   isFuture,
   startOfWeek,
-  endOfWeek,
-  startOfMonth,
-  endOfMonth
+  endOfWeek
 } from 'date-fns';
 
 /**

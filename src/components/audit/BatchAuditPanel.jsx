@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useEffect } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import {
   Globe,
   Upload,
@@ -6,7 +6,6 @@ import {
   Pause,
   X,
   Check,
-  AlertCircle,
   Clock,
   Download,
   Trash2,
@@ -14,9 +13,7 @@ import {
   FileText,
   BarChart2,
   ChevronDown,
-  ChevronRight,
-  Loader2,
-  Save
+  Loader2
 } from 'lucide-react';
 import { format } from 'date-fns';
 import toast from 'react-hot-toast';
@@ -49,31 +46,6 @@ export default function BatchAuditPanel({ onClose, onStartBatch }) {
     }
   }, []);
 
-  // Save results to localStorage when batch completes
-  const saveCurrentBatch = useCallback(() => {
-    if (results.length === 0) return;
-
-    const batchData = {
-      id: Date.now().toString(),
-      completedAt: new Date().toISOString(),
-      urls,
-      results,
-      summary: {
-        totalUrls: urls.length,
-        avgScore: Math.round(results.reduce((acc, r) => acc + r.healthScore, 0) / results.length),
-        totalIssues: results.reduce((acc, r) => acc + r.issueCount, 0)
-      }
-    };
-
-    try {
-      const updatedBatches = [batchData, ...savedBatches].slice(0, 10); // Keep last 10
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(updatedBatches));
-      setSavedBatches(updatedBatches);
-      toast.success('Batch results saved');
-    } catch (err) {
-      console.error('Error saving batch:', err);
-    }
-  }, [results, urls, savedBatches]);
 
   // Export results as CSV
   const exportAsCSV = () => {

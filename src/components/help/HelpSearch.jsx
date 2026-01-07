@@ -1,17 +1,14 @@
-import React, { useState, useEffect, useRef, useMemo } from 'react';
+import { useState, useEffect, useRef, useMemo, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   Search,
   X,
   Book,
-  FileText,
-  Wrench,
   ChevronRight,
   Command,
   Sparkles,
   BookOpen,
-  HelpCircle,
-  ExternalLink
+  HelpCircle
 } from 'lucide-react';
 import { glossaryTerms } from '../../data/glossary';
 import { getActiveTools } from '../../config/tools';
@@ -123,6 +120,24 @@ export default function HelpSearch({ isOpen, onClose }) {
     }
   }, [isOpen]);
 
+  // Handle selecting a result
+  const handleSelect = useCallback((result) => {
+    if (result.action === 'keyboard') {
+      onClose();
+      setTimeout(() => {
+        window.dispatchEvent(new KeyboardEvent('keydown', { key: '?' }));
+      }, 100);
+    } else if (result.action === 'feedback') {
+      onClose();
+      // Trigger feedback widget
+      const feedbackBtn = document.querySelector('[data-feedback-trigger]');
+      if (feedbackBtn) feedbackBtn.click();
+    } else if (result.path) {
+      onClose();
+      navigate(result.path);
+    }
+  }, [onClose, navigate]);
+
   // Handle keyboard navigation
   useEffect(() => {
     const handleKeyDown = (e) => {
@@ -152,7 +167,7 @@ export default function HelpSearch({ isOpen, onClose }) {
 
     document.addEventListener('keydown', handleKeyDown);
     return () => document.removeEventListener('keydown', handleKeyDown);
-  }, [isOpen, allResults, selectedIndex, onClose]);
+  }, [isOpen, allResults, selectedIndex, onClose, handleSelect]);
 
   // Scroll selected item into view
   useEffect(() => {
@@ -163,23 +178,6 @@ export default function HelpSearch({ isOpen, onClose }) {
       }
     }
   }, [selectedIndex]);
-
-  const handleSelect = (result) => {
-    if (result.action === 'keyboard') {
-      onClose();
-      setTimeout(() => {
-        window.dispatchEvent(new KeyboardEvent('keydown', { key: '?' }));
-      }, 100);
-    } else if (result.action === 'feedback') {
-      onClose();
-      // Trigger feedback widget
-      const feedbackBtn = document.querySelector('[data-feedback-trigger]');
-      if (feedbackBtn) feedbackBtn.click();
-    } else if (result.path) {
-      onClose();
-      navigate(result.path);
-    }
-  };
 
   if (!isOpen) return null;
 
@@ -224,7 +222,7 @@ export default function HelpSearch({ isOpen, onClose }) {
             {allResults.length === 0 ? (
               <div className="py-12 text-center">
                 <Search className="w-12 h-12 text-charcoal-200 mx-auto mb-3" />
-                <p className="text-charcoal-500">No results found for "{query}"</p>
+                <p className="text-charcoal-500">No results found for &quot;{query}&quot;</p>
                 <p className="text-charcoal-400 text-sm mt-1">Try a different search term</p>
               </div>
             ) : (

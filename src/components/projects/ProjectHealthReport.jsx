@@ -1,14 +1,12 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import {
   ArrowLeft,
-  Share2,
   Download,
   CheckCircle2,
   Clock,
   AlertTriangle,
   TrendingUp,
-  Users,
   Calendar,
   Target,
   BarChart3,
@@ -20,7 +18,7 @@ import { useProjects } from '../../hooks/useProjects';
 import { useChecklist } from '../../hooks/useChecklist';
 import { useProjectActivityLog } from '../../hooks/useActivityLog';
 import { checklistData } from '../../data/checklistData';
-import { format, differenceInDays } from 'date-fns';
+import { format } from 'date-fns';
 import toast from 'react-hot-toast';
 
 /**
@@ -202,12 +200,17 @@ export default function ProjectHealthReport() {
     };
   }, [project, completions]);
 
-  const copyLink = () => {
-    const url = window.location.href;
-    navigator.clipboard.writeText(url);
-    setCopied(true);
-    toast.success('Link copied to clipboard');
-    setTimeout(() => setCopied(false), 2000);
+  const copyLink = async () => {
+    try {
+      const url = window.location.href;
+      await navigator.clipboard.writeText(url);
+      setCopied(true);
+      toast.success('Link copied to clipboard');
+      setTimeout(() => setCopied(false), 2000);
+    } catch (error) {
+      console.error('Failed to copy:', error);
+      toast.error('Failed to copy link');
+    }
   };
 
   if (loading) {

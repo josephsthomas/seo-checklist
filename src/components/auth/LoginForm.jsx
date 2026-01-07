@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 import { Mail, Lock, LogIn, Chrome } from 'lucide-react';
@@ -17,8 +17,8 @@ export default function LoginForm() {
     try {
       await login(email, password);
       navigate('/');
-    } catch (error) {
-      console.error('Login failed:', error);
+    } catch {
+      // Error already shown via toast in AuthContext
     } finally {
       setLoading(false);
     }
@@ -29,8 +29,8 @@ export default function LoginForm() {
     try {
       await loginWithGoogle();
       navigate('/');
-    } catch (error) {
-      console.error('Google login failed:', error);
+    } catch {
+      // Error already shown via toast in AuthContext
     } finally {
       setLoading(false);
     }
@@ -122,7 +122,7 @@ export default function LoginForm() {
           </div>
 
           <p className="mt-6 text-center text-sm text-charcoal-600">
-            Don't have an account?{' '}
+            Don&apos;t have an account?{' '}
             <Link to="/register" className="text-primary-600 hover:text-primary-700 font-medium">
               Sign up
             </Link>

@@ -1,4 +1,3 @@
-import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { ChevronRight, Home } from 'lucide-react';
 
@@ -69,7 +68,6 @@ function buildBreadcrumbTrail(pathname) {
 export default function Breadcrumb({
   items, // Optional custom items array
   className = '',
-  showHome = true,
   separator = 'chevron', // 'chevron' | 'slash'
   projectName = null, // Optional project name to display
   auditDomain = null, // Optional audit domain to display

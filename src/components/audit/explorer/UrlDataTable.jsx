@@ -7,7 +7,6 @@ import {
   ChevronLeft,
   ChevronRight,
   Columns,
-  ExternalLink,
   Check,
   X,
   Filter

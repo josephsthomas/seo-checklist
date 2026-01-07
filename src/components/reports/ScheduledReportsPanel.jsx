@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import {
   Calendar,
   Clock,
@@ -10,7 +10,6 @@ import {
   Play,
   Pause,
   CheckCircle,
-  AlertCircle,
   FileText,
   BarChart3,
   Shield,
@@ -21,11 +20,9 @@ import {
   ChevronUp,
   X,
   Save,
-  Settings,
   Bell,
   Users,
   Download,
-  Eye,
   RefreshCw,
   PauseCircle,
   PlayCircle
@@ -662,8 +659,8 @@ export default function ScheduledReportsPanel() {
               </div>
             </div>
             <p className="text-charcoal-600 dark:text-charcoal-300 mb-6">
-              Are you sure you want to delete "<strong>{deleteConfirm.name}</strong>"?
-              You'll have 5 seconds to undo this action.
+              Are you sure you want to delete &quot;<strong>{deleteConfirm.name}</strong>&quot;?
+              You&apos;ll have 5 seconds to undo this action.
             </p>
             <div className="flex gap-3">
               <button
@@ -926,7 +923,7 @@ function ScheduleFormModal({ schedule, onSave, onClose }) {
                   </label>
                   <select
                     value={formData.dayOfMonth}
-                    onChange={(e) => setFormData(prev => ({ ...prev, dayOfMonth: parseInt(e.target.value) }))}
+                    onChange={(e) => setFormData(prev => ({ ...prev, dayOfMonth: parseInt(e.target.value, 10) }))}
                     className="input"
                   >
                     {Array.from({ length: 28 }, (_, i) => i + 1).map(day => (

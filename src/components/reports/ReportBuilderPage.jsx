@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useMemo, useRef } from 'react';
+import { useState, useCallback, useMemo, useRef } from 'react';
 import {
   Plus,
   Save,
@@ -7,12 +7,9 @@ import {
   EyeOff,
   Trash2,
   Copy,
-  Settings,
   ChevronLeft,
   ChevronRight,
-  GripVertical,
   X,
-  Check,
   FileText,
   BarChart3,
   Table,
@@ -24,17 +21,10 @@ import {
   Users,
   Code,
   Layout,
-  Palette,
-  Move,
   Maximize2,
   Minimize2,
-  RotateCcw,
-  Layers,
   PanelLeftClose,
   PanelLeft,
-  Printer,
-  Share2,
-  Clock,
   FolderOpen
 } from 'lucide-react';
 import { format } from 'date-fns';
@@ -85,7 +75,6 @@ export default function ReportBuilderPage() {
   const [isPreviewMode, setIsPreviewMode] = useState(false);
   const [showSidebar, setShowSidebar] = useState(true);
   const [selectedWidget, setSelectedWidget] = useState(null);
-  const [draggedWidget, setDraggedWidget] = useState(null);
   const [showTemplates, setShowTemplates] = useState(true);
   const [showSavedReports, setShowSavedReports] = useState(false);
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
@@ -970,7 +959,7 @@ export default function ReportBuilderPage() {
                     max={WIDGET_TYPES[selectedWidgetData.type].maxSize.w}
                     value={selectedWidgetData.position.w}
                     onChange={(e) => updateWidget(selectedWidgetData.id, {
-                      position: { ...selectedWidgetData.position, w: parseInt(e.target.value) || 1 }
+                      position: { ...selectedWidgetData.position, w: parseInt(e.target.value, 10) || 1 }
                     })}
                     className="input text-sm"
                   />
@@ -983,7 +972,7 @@ export default function ReportBuilderPage() {
                     max={WIDGET_TYPES[selectedWidgetData.type].maxSize.h}
                     value={selectedWidgetData.position.h}
                     onChange={(e) => updateWidget(selectedWidgetData.id, {
-                      position: { ...selectedWidgetData.position, h: parseInt(e.target.value) || 1 }
+                      position: { ...selectedWidgetData.position, h: parseInt(e.target.value, 10) || 1 }
                     })}
                     className="input text-sm"
                   />
@@ -1005,7 +994,7 @@ export default function ReportBuilderPage() {
                     max={GRID_COLS - selectedWidgetData.position.w}
                     value={selectedWidgetData.position.x}
                     onChange={(e) => updateWidget(selectedWidgetData.id, {
-                      position: { ...selectedWidgetData.position, x: parseInt(e.target.value) || 0 }
+                      position: { ...selectedWidgetData.position, x: parseInt(e.target.value, 10) || 0 }
                     })}
                     className="input text-sm"
                   />
@@ -1017,7 +1006,7 @@ export default function ReportBuilderPage() {
                     min={0}
                     value={selectedWidgetData.position.y}
                     onChange={(e) => updateWidget(selectedWidgetData.id, {
-                      position: { ...selectedWidgetData.position, y: parseInt(e.target.value) || 0 }
+                      position: { ...selectedWidgetData.position, y: parseInt(e.target.value, 10) || 0 }
                     })}
                     className="input text-sm"
                   />

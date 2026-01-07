@@ -3,8 +3,8 @@
  * Processes Screaming Frog accessibility data and generates WCAG compliance results
  */
 
-import { WCAG_CRITERIA, WCAG_LEVELS, WCAG_PRINCIPLES, getCriteriaUpToLevel } from '../../data/wcagCriteria';
-import { AXE_RULES, IMPACT_LEVELS, getRuleByFileName } from '../../data/axeRules';
+import { WCAG_CRITERIA, WCAG_PRINCIPLES, getCriteriaUpToLevel } from '../../data/wcagCriteria';
+import { IMPACT_LEVELS, getRuleByFileName } from '../../data/axeRules';
 
 /**
  * Compliance status values
@@ -145,13 +145,13 @@ function parseMainAccessibilityData(accessibilityData) {
     contentType: row['Content Type'] || '',
     statusCode: row['Status Code'] || '',
     indexability: row['Indexability'] || '',
-    allViolations: parseInt(row['All Violations']) || 0,
-    bestPracticeViolations: parseInt(row['Best Practice Violations']) || 0,
-    wcag20AViolations: parseInt(row['WCAG 2.0 A Violations']) || 0,
-    wcag20AAViolations: parseInt(row['WCAG 2.0 AA Violations']) || 0,
-    wcag20AAAViolations: parseInt(row['WCAG 2.0 AAA Violations']) || 0,
-    wcag21AAViolations: parseInt(row['WCAG 2.1 AA Violations']) || 0,
-    wcag22AAViolations: parseInt(row['WCAG 2.2 AA Violations']) || 0
+    allViolations: parseInt(row['All Violations'], 10) || 0,
+    bestPracticeViolations: parseInt(row['Best Practice Violations'], 10) || 0,
+    wcag20AViolations: parseInt(row['WCAG 2.0 A Violations'], 10) || 0,
+    wcag20AAViolations: parseInt(row['WCAG 2.0 AA Violations'], 10) || 0,
+    wcag20AAAViolations: parseInt(row['WCAG 2.0 AAA Violations'], 10) || 0,
+    wcag21AAViolations: parseInt(row['WCAG 2.1 AA Violations'], 10) || 0,
+    wcag22AAViolations: parseInt(row['WCAG 2.2 AA Violations'], 10) || 0
   }));
 
   return {
@@ -211,7 +211,7 @@ async function processViolationFiles(accessibilityData, onProgress) {
         contentType: row['Content Type'] || '',
         statusCode: row['Status Code'] || '',
         indexability: row['Indexability'] || '',
-        violations: parseInt(row['All Violations']) || 0
+        violations: parseInt(row['All Violations'], 10) || 0
       }))
     };
 

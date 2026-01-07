@@ -1,10 +1,9 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import {
   BarChart2,
   Users,
   Activity,
   TrendingUp,
-  TrendingDown,
   FileSearch,
   Accessibility,
   Image,
@@ -12,18 +11,12 @@ import {
   Code2,
   ClipboardList,
   Download,
-  Calendar,
-  Filter,
   RefreshCcw,
-  ChevronDown,
   ArrowUpRight,
   ArrowDownRight,
-  Minus,
-  FileText
+  Minus
 } from 'lucide-react';
 import { format, subDays, startOfWeek, startOfMonth, eachDayOfInterval } from 'date-fns';
-import { collection, query, where, orderBy, getDocs, Timestamp } from 'firebase/firestore';
-import { db } from '../../lib/firebase';
 import toast from 'react-hot-toast';
 
 const TOOL_ICONS = {

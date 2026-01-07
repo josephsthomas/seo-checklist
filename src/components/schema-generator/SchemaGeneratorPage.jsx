@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react';
+import { useState, useCallback } from 'react';
 import toast from 'react-hot-toast';
 import SchemaUploadScreen from './upload/SchemaUploadScreen';
 import SchemaProcessingScreen from './upload/SchemaProcessingScreen';
@@ -63,7 +63,6 @@ export default function SchemaGeneratorPage() {
       toast.success(`Generated ${schemaResults.schemas.length} schema(s)!`);
 
     } catch (err) {
-      console.error('Processing error:', err);
       setError(err.message);
       setView(VIEWS.ERROR);
       toast.error(err.message);

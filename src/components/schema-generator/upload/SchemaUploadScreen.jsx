@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react';
+import { useState, useCallback } from 'react';
 import { useDropzone } from 'react-dropzone';
 import {
   Code2,
@@ -11,7 +11,6 @@ import {
   Sparkles,
   CheckCircle,
   Zap,
-  Search,
   X
 } from 'lucide-react';
 import { SCHEMA_TYPES, getSchemaCategories } from '../../../lib/schema-generator/schemaGeneratorService';

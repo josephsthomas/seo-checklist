@@ -61,7 +61,7 @@ export default function TimeTracker({ projectId, itemId, estimatedHours }) {
   };
 
   const handleAddManualEntry = async () => {
-    const minutes = parseInt(manualMinutes);
+    const minutes = parseInt(manualMinutes, 10);
     if (!minutes || minutes <= 0) {
       return;
     }
@@ -79,7 +79,31 @@ export default function TimeTracker({ projectId, itemId, estimatedHours }) {
   const isOverBudget = variance && variance > 0;
 
   if (loading) {
-    return <div className="text-sm text-charcoal-500">Loading time tracking...</div>;
+    return (
+      <div className="space-y-4">
+        {/* Timer controls skeleton */}
+        <div className="p-4 bg-charcoal-100 rounded-lg animate-pulse">
+          <div className="flex items-center justify-between mb-3">
+            <div className="h-5 bg-charcoal-200 rounded w-28" />
+            <div className="h-8 bg-charcoal-200 rounded w-24" />
+          </div>
+          <div className="h-10 bg-charcoal-200 rounded w-full" />
+        </div>
+        {/* Summary skeleton */}
+        <div className="grid grid-cols-2 gap-4 p-4 bg-charcoal-100 rounded-lg animate-pulse">
+          <div className="space-y-2">
+            <div className="h-3 bg-charcoal-200 rounded w-20" />
+            <div className="h-6 bg-charcoal-200 rounded w-24" />
+          </div>
+          <div className="space-y-2">
+            <div className="h-3 bg-charcoal-200 rounded w-20" />
+            <div className="h-6 bg-charcoal-200 rounded w-16" />
+          </div>
+        </div>
+        {/* Button skeleton */}
+        <div className="h-10 bg-charcoal-100 rounded-lg animate-pulse" />
+      </div>
+    );
   }
 
   return (

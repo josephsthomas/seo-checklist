@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import { useState, useMemo } from 'react';
 import {
   FileText,
   Download,
@@ -8,15 +8,9 @@ import {
   AlertCircle,
   MinusCircle,
   Eye,
-  Printer,
-  Mail,
   ChevronDown,
   ChevronRight,
-  Building,
-  Calendar,
-  User,
-  ExternalLink,
-  Save
+  Calendar
 } from 'lucide-react';
 import { format } from 'date-fns';
 import toast from 'react-hot-toast';

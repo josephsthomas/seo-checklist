@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react';
+import { useState, useCallback } from 'react';
 import toast from 'react-hot-toast';
 import MetaUploadScreen from './upload/MetaUploadScreen';
 import MetaProcessingScreen from './upload/MetaProcessingScreen';
@@ -70,7 +70,6 @@ export default function MetaGeneratorPage() {
       toast.success('Metadata generated successfully!');
 
     } catch (err) {
-      console.error('Processing error:', err);
       setError(err.message);
       setView(VIEWS.ERROR);
       toast.error(err.message);

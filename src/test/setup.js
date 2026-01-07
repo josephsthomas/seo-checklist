@@ -18,7 +18,7 @@ const localStorageMock = {
   removeItem: vi.fn(),
   clear: vi.fn(),
 };
-global.localStorage = localStorageMock;
+globalThis.localStorage = localStorageMock;
 
 // Mock clipboard API
 Object.assign(navigator, {

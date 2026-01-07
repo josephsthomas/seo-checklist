@@ -57,8 +57,7 @@ export function useChecklist(projectId) {
           [itemId]: newValue
         });
       }
-    } catch (error) {
-      console.error('Error toggling item:', error);
+    } catch {
       toast.error('Failed to update item');
       // Revert on error
       setCompletions(prev => ({
@@ -93,8 +92,7 @@ export function useChecklist(projectId) {
       }
 
       toast.success(`Updated ${itemIds.length} items`);
-    } catch (error) {
-      console.error('Error bulk updating items:', error);
+    } catch {
       toast.error('Failed to update items');
     }
   };

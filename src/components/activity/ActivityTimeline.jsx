@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import { useState, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import {
   Clock,
@@ -11,21 +11,19 @@ import {
   Code2,
   MessageSquare,
   Users,
-  FileText,
   Upload,
   Download,
   Link2,
   Star,
   Bell,
   Settings,
-  Filter,
   ChevronDown,
   ChevronUp,
   Calendar,
   ArrowRight
 } from 'lucide-react';
 import { useActivityLog } from '../../hooks/useActivityLog';
-import { format, formatDistanceToNow, isToday, isYesterday, isThisWeek, startOfDay, isSameDay } from 'date-fns';
+import { format, formatDistanceToNow, isToday, isYesterday, isThisWeek, startOfDay } from 'date-fns';
 
 // Activity type icons
 const ACTIVITY_ICONS = {

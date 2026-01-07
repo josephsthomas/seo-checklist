@@ -74,7 +74,7 @@ describe('URL Validation', () => {
       });
 
       it('should reject domains without TLD', () => {
-        const result = validateUrl('https://localhost');
+        const _result = validateUrl('https://localhost');
         // localhost is a special case that should be valid with warning
         // But a regular domain without TLD should fail
         const result2 = validateUrl('https://examplecom');

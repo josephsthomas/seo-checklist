@@ -1,23 +1,21 @@
-import React, { useState, useEffect } from 'react';
-import { X, User, Calendar, Clock, MessageSquare, Activity, Check, AlertCircle, CalendarClock, HelpCircle, Info } from 'lucide-react';
+import { useState, useEffect, useRef } from 'react';
+import { X, Calendar, Clock, Activity, Check, AlertCircle, CalendarClock, HelpCircle } from 'lucide-react';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 import { useComments } from '../../hooks/useComments';
 import { useAssignments } from '../../hooks/useAssignments';
 import { useActivityLog } from '../../hooks/useActivityLog';
-import { useAuth } from '../../contexts/AuthContext';
 import { TASK_STATUS, TASK_STATUS_LABELS } from '../../utils/roles';
 import CommentThread from './CommentThread';
 import TimeTracker from './TimeTracker';
 import FileUpload from './FileUpload';
-import { format, parseISO } from 'date-fns';
+import { format } from 'date-fns';
 import {
   formatDate,
   getRelativeDate,
   isOverdue,
   isDueSoon,
-  getDueDateColor,
-  getDueDateBadgeColor
+  getDueDateColor
 } from '../../utils/dateHelpers';
 
 // Help tooltips for form fields
@@ -55,7 +53,6 @@ function Tooltip({ text, children }) {
 
 export default function ItemDetailModal({ item, projectId, isOpen, onClose, onToggleComplete, isCompleted }) {
   const [activeTab, setActiveTab] = useState('details');
-  const { currentUser } = useAuth();
   const { comments, loading: commentsLoading, addComment } = useComments(projectId, item?.id);
   const { assignments, assignTask, updateTaskStatus, updateTimeline } = useAssignments(projectId);
   const { activities } = useActivityLog(projectId);
@@ -86,6 +83,8 @@ export default function ItemDetailModal({ item, projectId, isOpen, onClose, onTo
     }
   }, [assignment]);
 
+  const closeButtonRef = useRef(null);
+
   // Keyboard navigation: Escape key to close modal
   useEffect(() => {
     const handleEscape = (e) => {
@@ -97,6 +96,13 @@ export default function ItemDetailModal({ item, projectId, isOpen, onClose, onTo
     document.addEventListener('keydown', handleEscape);
     return () => document.removeEventListener('keydown', handleEscape);
   }, [isOpen, onClose]);
+
+  // Focus management: focus close button when modal opens
+  useEffect(() => {
+    if (isOpen && closeButtonRef.current) {
+      closeButtonRef.current.focus();
+    }
+  }, [isOpen]);
 
   if (!isOpen || !item) return null;
 
@@ -172,6 +178,7 @@ export default function ItemDetailModal({ item, projectId, isOpen, onClose, onTo
                 </h3>
               </div>
               <button
+                ref={closeButtonRef}
                 onClick={onClose}
                 className="ml-4 text-charcoal-400 hover:text-charcoal-500"
                 aria-label="Close modal"

@@ -4,6 +4,25 @@
  */
 
 const CLAUDE_API_URL = 'https://api.anthropic.com/v1/messages';
+const API_TIMEOUT_MS = 30000; // 30 second timeout
+
+/**
+ * Fetch with timeout
+ */
+async function fetchWithTimeout(url, options, timeoutMs = API_TIMEOUT_MS) {
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
+
+  try {
+    const response = await fetch(url, {
+      ...options,
+      signal: controller.signal
+    });
+    return response;
+  } finally {
+    clearTimeout(timeoutId);
+  }
+}
 
 /**
  * Get API configuration
@@ -206,7 +225,7 @@ export async function generateMetadata(extractedContent, options = {}) {
     let response;
 
     if (config.useProxy) {
-      response = await fetch(config.proxyUrl, {
+      response = await fetchWithTimeout(config.proxyUrl, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -215,7 +234,7 @@ export async function generateMetadata(extractedContent, options = {}) {
         })
       });
     } else {
-      response = await fetch(CLAUDE_API_URL, {
+      response = await fetchWithTimeout(CLAUDE_API_URL, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

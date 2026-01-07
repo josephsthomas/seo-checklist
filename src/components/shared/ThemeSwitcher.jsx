@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { Sun, Moon, Monitor, ChevronDown, Check } from 'lucide-react';
 import { useTheme } from '../../contexts/ThemeContext';
 
@@ -9,7 +9,7 @@ const themes = [
 ];
 
 export default function ThemeSwitcher({ variant = 'dropdown' }) {
-  const { theme, setTheme, resolvedTheme, isDark } = useTheme();
+  const { theme, setTheme, isDark } = useTheme();
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef(null);
 

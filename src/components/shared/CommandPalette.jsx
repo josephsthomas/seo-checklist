@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, useRef, useMemo } from 'react';
+import { useState, useEffect, useCallback, useRef, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   Search,
@@ -142,6 +142,12 @@ export default function CommandPalette({ isOpen, onClose }) {
     }
   }, [selectedIndex, flatCommands.length]);
 
+  // Execute a command
+  const executeCommand = useCallback((command) => {
+    command.action();
+    onClose();
+  }, [onClose]);
+
   // Handle keyboard navigation
   const handleKeyDown = useCallback((e) => {
     switch (e.key) {
@@ -164,12 +170,7 @@ export default function CommandPalette({ isOpen, onClose }) {
         onClose();
         break;
     }
-  }, [flatCommands, selectedIndex, onClose]);
-
-  const executeCommand = useCallback((command) => {
-    command.action();
-    onClose();
-  }, [onClose]);
+  }, [flatCommands, selectedIndex, onClose, executeCommand]);
 
   if (!isOpen) return null;
 
