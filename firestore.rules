@@ -28,6 +28,11 @@ service cloud.firestore {
       allow create: if isAuthenticated() && request.auth.uid == userId;
       allow update: if isOwner(userId);
       allow delete: if isOwner(userId);
+
+      // User settings subcollection - notification preferences, etc.
+      match /settings/{settingId} {
+        allow read, write: if isOwner(userId);
+      }
     }
 
     // Projects collection - project owners and team members can access
@@ -97,6 +102,19 @@ service cloud.firestore {
                      request.resource.data.uploadedBy == request.auth.uid;
       allow delete: if isAuthenticated() &&
                      resource.data.uploadedBy == request.auth.uid;
+    }
+
+    // Feedback collection - authenticated users can submit feedback
+    match /feedback/{feedbackId} {
+      allow read: if false; // Only admins via Firebase Console
+      allow create: if isAuthenticated() &&
+                     request.resource.data.userId == request.auth.uid;
+    }
+
+    // Shared audits - public read access for shared links
+    match /sharedAudits/{shareId} {
+      allow read: if true;
+      allow write: if isAuthenticated();
     }
 
     // Default deny all other access

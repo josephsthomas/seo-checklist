@@ -49,27 +49,27 @@ export default function CommandPalette({ isOpen, onClose }) {
   const commands = useMemo(() => {
     const baseCommands = [
       // Navigation
-      { id: 'home', category: COMMAND_CATEGORIES.NAVIGATION, icon: Home, label: 'Go to Home', action: () => navigate('/') },
-      { id: 'my-tasks', category: COMMAND_CATEGORIES.NAVIGATION, icon: CheckSquare, label: 'My Tasks', action: () => navigate('/my-tasks') },
-      { id: 'activity', category: COMMAND_CATEGORIES.NAVIGATION, icon: Activity, label: 'Activity Feed', action: () => navigate('/activity') },
-      { id: 'profile', category: COMMAND_CATEGORIES.NAVIGATION, icon: User, label: 'My Profile', action: () => navigate('/profile') },
-      { id: 'team', category: COMMAND_CATEGORIES.NAVIGATION, icon: Users, label: 'Team Management', action: () => navigate('/team') },
+      { id: 'home', category: COMMAND_CATEGORIES.NAVIGATION, icon: Home, label: 'Go to Home', action: () => navigate('/app') },
+      { id: 'my-tasks', category: COMMAND_CATEGORIES.NAVIGATION, icon: CheckSquare, label: 'My Tasks', action: () => navigate('/app/my-tasks') },
+      { id: 'activity', category: COMMAND_CATEGORIES.NAVIGATION, icon: Activity, label: 'Activity Feed', action: () => navigate('/app/activity') },
+      { id: 'profile', category: COMMAND_CATEGORIES.NAVIGATION, icon: User, label: 'My Profile', action: () => navigate('/app/profile') },
+      { id: 'team', category: COMMAND_CATEGORIES.NAVIGATION, icon: Users, label: 'Team Management', action: () => navigate('/app/team') },
 
       // Tools
-      { id: 'planner', category: COMMAND_CATEGORIES.TOOLS, icon: ClipboardList, label: 'Content Planner', keywords: ['projects', 'checklist'], action: () => navigate('/planner') },
-      { id: 'audit', category: COMMAND_CATEGORIES.TOOLS, icon: FileSearch, label: 'Technical Audit', keywords: ['seo', 'crawl'], action: () => navigate('/audit') },
-      { id: 'accessibility', category: COMMAND_CATEGORIES.TOOLS, icon: Accessibility, label: 'Accessibility Analyzer', keywords: ['a11y', 'wcag'], action: () => navigate('/accessibility') },
-      { id: 'image-alt', category: COMMAND_CATEGORIES.TOOLS, icon: Image, label: 'Image Alt Generator', keywords: ['alt text', 'images'], action: () => navigate('/image-alt') },
-      { id: 'meta', category: COMMAND_CATEGORIES.TOOLS, icon: Tags, label: 'Meta Generator', keywords: ['title', 'description'], action: () => navigate('/meta-generator') },
-      { id: 'schema', category: COMMAND_CATEGORIES.TOOLS, icon: Code2, label: 'Schema Generator', keywords: ['structured data', 'json-ld'], action: () => navigate('/schema-generator') },
+      { id: 'planner', category: COMMAND_CATEGORIES.TOOLS, icon: ClipboardList, label: 'Content Planner', keywords: ['projects', 'checklist'], action: () => navigate('/app/planner') },
+      { id: 'audit', category: COMMAND_CATEGORIES.TOOLS, icon: FileSearch, label: 'Technical Audit', keywords: ['seo', 'crawl'], action: () => navigate('/app/audit') },
+      { id: 'accessibility', category: COMMAND_CATEGORIES.TOOLS, icon: Accessibility, label: 'Accessibility Analyzer', keywords: ['a11y', 'wcag'], action: () => navigate('/app/accessibility') },
+      { id: 'image-alt', category: COMMAND_CATEGORIES.TOOLS, icon: Image, label: 'Image Alt Generator', keywords: ['alt text', 'images'], action: () => navigate('/app/image-alt') },
+      { id: 'meta', category: COMMAND_CATEGORIES.TOOLS, icon: Tags, label: 'Meta Generator', keywords: ['title', 'description'], action: () => navigate('/app/meta-generator') },
+      { id: 'schema', category: COMMAND_CATEGORIES.TOOLS, icon: Code2, label: 'Schema Generator', keywords: ['structured data', 'json-ld'], action: () => navigate('/app/schema-generator') },
 
       // Quick Actions
-      { id: 'new-project', category: COMMAND_CATEGORIES.ACTIONS, icon: Plus, label: 'Create New Project', action: () => navigate('/planner/new') },
-      { id: 'export', category: COMMAND_CATEGORIES.ACTIONS, icon: Download, label: 'Export Hub', action: () => navigate('/export') },
+      { id: 'new-project', category: COMMAND_CATEGORIES.ACTIONS, icon: Plus, label: 'Create New Project', action: () => navigate('/app/planner/new') },
+      { id: 'export', category: COMMAND_CATEGORIES.ACTIONS, icon: Download, label: 'Export Hub', action: () => navigate('/app/export') },
       { id: 'toggle-theme', category: COMMAND_CATEGORIES.ACTIONS, icon: isDark ? Sun : Moon, label: isDark ? 'Switch to Light Mode' : 'Switch to Dark Mode', action: toggleTheme },
 
       // Settings
-      { id: 'settings', category: COMMAND_CATEGORIES.SETTINGS, icon: Settings, label: 'User Settings', action: () => navigate('/settings') },
+      { id: 'settings', category: COMMAND_CATEGORIES.SETTINGS, icon: Settings, label: 'User Settings', action: () => navigate('/app/settings') },
       { id: 'resources', category: COMMAND_CATEGORIES.SETTINGS, icon: BookOpen, label: 'Resource Library', action: () => navigate('/help/resources') },
       { id: 'glossary', category: COMMAND_CATEGORIES.SETTINGS, icon: FolderOpen, label: 'Content Glossary', action: () => navigate('/help/glossary') },
       { id: 'help', category: COMMAND_CATEGORIES.SETTINGS, icon: HelpCircle, label: 'Help & Support', keywords: ['documentation'], action: () => {} },
@@ -82,7 +82,7 @@ export default function CommandPalette({ isOpen, onClose }) {
       icon: FolderOpen,
       label: project.name,
       sublabel: project.clientName,
-      action: () => navigate(`/planner/projects/${project.id}`),
+      action: () => navigate(`/app/planner/projects/${project.id}`),
     }));
 
     return [...baseCommands, ...recentProjects];

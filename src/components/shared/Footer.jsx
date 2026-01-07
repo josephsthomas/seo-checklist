@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Github, Twitter, Linkedin, Mail, ExternalLink, MessageSquarePlus } from 'lucide-react';
+import { Github, Twitter, Linkedin, Mail, MessageSquarePlus } from 'lucide-react';
 import FeedbackForm from '../feedback/FeedbackForm';
 
 export default function Footer() {
@@ -80,41 +80,57 @@ export default function Footer() {
             </div>
           </div>
 
-          {/* Tools */}
+          {/* Features */}
           <div>
-            <h3 className="text-white font-semibold mb-4">Tools</h3>
+            <h3 className="text-white font-semibold mb-4">Features</h3>
             <ul className="space-y-2.5">
               <li>
-                <Link to="/planner" className="text-charcoal-400 hover:text-white text-sm transition-colors duration-200 flex items-center gap-2 group">
+                <Link to="/features/planner" className="text-charcoal-400 hover:text-white text-sm transition-colors duration-200">
                   Content Planner
-                  <ExternalLink className="w-3 h-3 opacity-0 group-hover:opacity-100 transition-opacity" />
                 </Link>
               </li>
               <li>
-                <Link to="/audit" className="text-charcoal-400 hover:text-white text-sm transition-colors duration-200 flex items-center gap-2 group">
+                <Link to="/features/audit" className="text-charcoal-400 hover:text-white text-sm transition-colors duration-200">
                   Technical Audit
-                  <span className="px-1.5 py-0.5 text-2xs font-medium rounded bg-cyan-500/20 text-cyan-400">New</span>
                 </Link>
               </li>
               <li>
-                <span className="text-charcoal-500 text-sm flex items-center gap-2">
-                  Analytics Dashboard
-                  <span className="px-1.5 py-0.5 text-2xs font-medium rounded bg-charcoal-700 text-charcoal-400">Soon</span>
-                </span>
+                <Link to="/features/accessibility" className="text-charcoal-400 hover:text-white text-sm transition-colors duration-200">
+                  Accessibility Analyzer
+                </Link>
               </li>
               <li>
-                <span className="text-charcoal-500 text-sm flex items-center gap-2">
-                  Content Optimizer
-                  <span className="px-1.5 py-0.5 text-2xs font-medium rounded bg-charcoal-700 text-charcoal-400">Soon</span>
-                </span>
+                <Link to="/features/meta-generator" className="text-charcoal-400 hover:text-white text-sm transition-colors duration-200">
+                  Meta Generator
+                </Link>
+              </li>
+              <li>
+                <Link to="/features/schema-generator" className="text-charcoal-400 hover:text-white text-sm transition-colors duration-200">
+                  Schema Generator
+                </Link>
+              </li>
+              <li>
+                <Link to="/features/image-alt" className="text-charcoal-400 hover:text-white text-sm transition-colors duration-200">
+                  Image Alt Generator
+                </Link>
               </li>
             </ul>
           </div>
 
-          {/* Resources */}
+          {/* Help & Resources */}
           <div>
-            <h3 className="text-white font-semibold mb-4">Resources</h3>
+            <h3 className="text-white font-semibold mb-4">Help & Resources</h3>
             <ul className="space-y-2.5">
+              <li>
+                <Link to="/help" className="text-charcoal-400 hover:text-white text-sm transition-colors duration-200">
+                  Help Center
+                </Link>
+              </li>
+              <li>
+                <Link to="/help/getting-started" className="text-charcoal-400 hover:text-white text-sm transition-colors duration-200">
+                  Getting Started
+                </Link>
+              </li>
               <li>
                 <Link to="/help/resources" className="text-charcoal-400 hover:text-white text-sm transition-colors duration-200">
                   Resource Library
@@ -122,17 +138,13 @@ export default function Footer() {
               </li>
               <li>
                 <Link to="/help/glossary" className="text-charcoal-400 hover:text-white text-sm transition-colors duration-200">
-                  Content Glossary
+                  SEO Glossary
                 </Link>
               </li>
               <li>
-                <button
-                  onClick={() => window.dispatchEvent(new KeyboardEvent('keydown', { key: '?' }))}
-                  className="text-charcoal-400 hover:text-white text-sm transition-colors duration-200 flex items-center gap-2"
-                >
-                  Keyboard Shortcuts
-                  <kbd className="px-1.5 py-0.5 text-2xs font-mono rounded bg-charcoal-700 text-charcoal-400">?</kbd>
-                </button>
+                <Link to="/about" className="text-charcoal-400 hover:text-white text-sm transition-colors duration-200">
+                  About
+                </Link>
               </li>
               <li>
                 <button

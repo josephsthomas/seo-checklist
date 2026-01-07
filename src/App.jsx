@@ -1,22 +1,34 @@
 import { Suspense } from 'react';
-import { BrowserRouter as Router, Routes, Route, Navigate, Link } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from 'react-router-dom';
+import { HelmetProvider } from 'react-helmet-async';
 import { Toaster } from 'react-hot-toast';
-import { AuthProvider } from './contexts/AuthContext';
-import { Home, Search as SearchIcon } from 'lucide-react';
+import { AuthProvider, useAuth } from './contexts/AuthContext';
 import { lazyWithRetry } from './utils/lazyWithRetry';
 
 // Auth Components (keep eager - needed for initial auth)
 import LoginForm from './components/auth/LoginForm';
 import RegisterForm from './components/auth/RegisterForm';
+import ForgotPassword from './components/auth/ForgotPassword';
 import ProtectedRoute from './components/auth/ProtectedRoute';
+import EmailVerificationBanner from './components/auth/EmailVerificationBanner';
 
 // Layout Components (keep eager - always needed)
 import Navigation from './components/shared/Navigation';
+import PublicNavigation from './components/public/PublicNavigation';
 import Footer from './components/shared/Footer';
 import ErrorBoundary, { ToolErrorBoundary } from './components/shared/ErrorBoundary';
 
 // Home - eager load for fast initial render
 import HomePage from './components/home/HomePage';
+
+// Public Pages - eager load for fast marketing site
+import LandingPage from './components/public/LandingPage';
+import AboutPage from './components/public/AboutPage';
+import FeaturesPage from './components/public/FeaturesPage';
+import FeatureDetailPage from './components/public/FeatureDetailPage';
+import HelpCenterPage from './components/public/HelpCenterPage';
+import GettingStartedPage from './components/public/GettingStartedPage';
+import PublicNotFoundPage from './components/public/NotFoundPage';
 
 // Lazy loaded components for code splitting (with retry logic)
 const ProjectDashboard = lazyWithRetry(() => import('./components/projects/ProjectDashboard'), 'ProjectDashboard');
@@ -90,52 +102,78 @@ function PageLoader() {
 }
 
 /**
- * 404 Not Found Page
+ * Check if current route is part of the authenticated app
  */
-function NotFoundPage() {
-  return (
-    <div className="min-h-screen bg-gradient-to-b from-charcoal-50 to-white flex items-center justify-center">
-      <div className="text-center max-w-md mx-auto px-4">
-        <div className="w-24 h-24 bg-gradient-to-br from-charcoal-100 to-charcoal-200 rounded-2xl flex items-center justify-center mx-auto mb-6">
-          <SearchIcon className="w-12 h-12 text-charcoal-400" />
-        </div>
-        <h1 className="text-6xl font-bold text-charcoal-900 mb-2">404</h1>
-        <p className="text-xl text-charcoal-600 mb-6">Page not found</p>
-        <p className="text-charcoal-500 mb-8">
-          The page you&apos;re looking for doesn&apos;t exist or has been moved.
-        </p>
-        <Link
-          to="/"
-          className="btn btn-primary inline-flex items-center gap-2"
-        >
-          <Home className="w-4 h-4" />
-          Go to Home
-        </Link>
-      </div>
-    </div>
-  );
+function isAppRoute(pathname) {
+  return pathname.startsWith('/app');
+}
+
+/**
+ * Smart Home component - shows LandingPage for guests, redirects to app for users
+ */
+function SmartHome() {
+  const { currentUser, loading } = useAuth();
+
+  if (loading) {
+    return <PageLoader />;
+  }
+
+  // If logged in, redirect to app dashboard
+  if (currentUser) {
+    return <Navigate to="/app" replace />;
+  }
+
+  // Otherwise show landing page
+  return <LandingPage />;
 }
 
 // Wrapper component to use hooks inside Router
 function AppContent() {
   const commandPalette = useCommandPalette();
+  const location = useLocation();
+  const { currentUser } = useAuth();
+  // Show public nav on marketing pages when not logged in, or when logged in but on public pages outside /app
+  const showPublicNav = !isAppRoute(location.pathname) && !currentUser;
 
   return (
     <div className="min-h-screen bg-charcoal-50 dark:bg-charcoal-900 flex flex-col">
       <a href="#main-content" className="skip-link">
         Skip to main content
       </a>
-      <Navigation />
-      <CommandPalette isOpen={commandPalette.isOpen} onClose={commandPalette.close} />
-      <OnboardingWalkthrough />
-      <KeyboardShortcuts />
+      {/* Show appropriate navigation based on route and auth state */}
+      {showPublicNav ? <PublicNavigation /> : <Navigation />}
+      {currentUser && <EmailVerificationBanner />}
+      {currentUser && <CommandPalette isOpen={commandPalette.isOpen} onClose={commandPalette.close} />}
+      {currentUser && <OnboardingWalkthrough />}
+      {currentUser && <KeyboardShortcuts />}
           <main id="main-content" className="flex-1" role="main">
             <ErrorBoundary variant="page" message="Failed to load this page. This might be a temporary issue.">
               <Suspense fallback={<PageLoader />}>
                 <Routes>
-                  {/* Public Routes */}
+                  {/* ============================================ */}
+                  {/* PUBLIC MARKETING WEBSITE ROUTES             */}
+                  {/* ============================================ */}
+
+                  {/* Home - Smart routing based on auth state */}
+                  <Route path="/" element={<SmartHome />} />
+
+                  {/* About */}
+                  <Route path="/about" element={<AboutPage />} />
+
+                  {/* Features */}
+                  <Route path="/features" element={<FeaturesPage />} />
+                  <Route path="/features/:featureSlug" element={<FeatureDetailPage />} />
+
+                  {/* Help (public) */}
+                  <Route path="/help" element={<HelpCenterPage />} />
+                  <Route path="/help/getting-started" element={<GettingStartedPage />} />
+                  <Route path="/help/resources" element={<ResourceLibrary />} />
+                  <Route path="/help/glossary" element={<GlossaryPage />} />
+
+                  {/* Auth Routes */}
                   <Route path="/login" element={<LoginForm />} />
                   <Route path="/register" element={<RegisterForm />} />
+                  <Route path="/forgot-password" element={<ForgotPassword />} />
 
                   {/* Legal Pages - Public */}
                   <Route path="/terms" element={<TermsOfService />} />
@@ -143,9 +181,13 @@ function AppContent() {
                   <Route path="/ai-policy" element={<AIPolicy />} />
                   <Route path="/accessibility" element={<AccessibilityStatement />} />
 
-                  {/* Home - Portal Dashboard */}
+                  {/* ============================================ */}
+                  {/* AUTHENTICATED APP ROUTES (/app/...)        */}
+                  {/* ============================================ */}
+
+                  {/* App Dashboard - Authenticated Home */}
                   <Route
-                    path="/"
+                    path="/app"
                     element={
                       <ProtectedRoute>
                         <HomePage />
@@ -157,7 +199,7 @@ function AppContent() {
                   {/* CONTENT PLANNER ROUTES                      */}
                   {/* ============================================ */}
                   <Route
-                    path="/planner"
+                    path="/app/planner"
                     element={
                       <ProtectedRoute>
                         <ToolErrorBoundary toolName="Content Planner" toolColor="primary">
@@ -167,7 +209,7 @@ function AppContent() {
                     }
                   />
                   <Route
-                    path="/planner/new"
+                    path="/app/planner/new"
                     element={
                       <ProtectedRoute>
                         <ToolErrorBoundary toolName="Project Creation" toolColor="primary">
@@ -177,7 +219,7 @@ function AppContent() {
                     }
                   />
                   <Route
-                    path="/planner/projects/:projectId"
+                    path="/app/planner/projects/:projectId"
                     element={
                       <ProtectedRoute>
                         <ToolErrorBoundary toolName="Content Checklist" toolColor="primary">
@@ -187,7 +229,7 @@ function AppContent() {
                     }
                   />
                   <Route
-                    path="/planner/progress"
+                    path="/app/planner/progress"
                     element={
                       <ProtectedRoute>
                         <ToolErrorBoundary toolName="Progress Dashboard" toolColor="primary">
@@ -197,7 +239,7 @@ function AppContent() {
                     }
                   />
                   <Route
-                    path="/planner/projects/:projectId/health"
+                    path="/app/planner/projects/:projectId/health"
                     element={
                       <ProtectedRoute>
                         <ToolErrorBoundary toolName="Project Health Report" toolColor="primary">
@@ -207,16 +249,11 @@ function AppContent() {
                     }
                   />
 
-                  {/* Legacy routes - redirect to new paths */}
-                  <Route path="/projects" element={<Navigate to="/planner" replace />} />
-                  <Route path="/projects/new" element={<Navigate to="/planner/new" replace />} />
-                  <Route path="/projects/:projectId" element={<Navigate to="/planner/projects/:projectId" replace />} />
-
                   {/* ============================================ */}
                   {/* TECHNICAL AUDIT TOOL ROUTES                 */}
                   {/* ============================================ */}
                   <Route
-                    path="/audit"
+                    path="/app/audit"
                     element={
                       <ProtectedRoute>
                         <ToolErrorBoundary toolName="Technical Audit" toolColor="cyan">
@@ -226,7 +263,7 @@ function AppContent() {
                     }
                   />
                   <Route
-                    path="/audit/:auditId"
+                    path="/app/audit/:auditId"
                     element={
                       <ProtectedRoute>
                         <ToolErrorBoundary toolName="Technical Audit" toolColor="cyan">
@@ -235,7 +272,7 @@ function AppContent() {
                       </ProtectedRoute>
                     }
                   />
-                  {/* Shared audit view - public access */}
+                  {/* Shared audit view - public access (keeps old path for sharing) */}
                   <Route
                     path="/audit/shared/:shareId"
                     element={
@@ -249,7 +286,7 @@ function AppContent() {
                   {/* ACCESSIBILITY ANALYZER ROUTES               */}
                   {/* ============================================ */}
                   <Route
-                    path="/accessibility"
+                    path="/app/accessibility"
                     element={
                       <ProtectedRoute>
                         <ToolErrorBoundary toolName="Accessibility Analyzer" toolColor="purple">
@@ -263,7 +300,7 @@ function AppContent() {
                   {/* IMAGE ALT TEXT GENERATOR ROUTES             */}
                   {/* ============================================ */}
                   <Route
-                    path="/image-alt"
+                    path="/app/image-alt"
                     element={
                       <ProtectedRoute>
                         <ToolErrorBoundary toolName="Image Alt Text Generator" toolColor="emerald">
@@ -277,7 +314,7 @@ function AppContent() {
                   {/* META DATA GENERATOR ROUTES                  */}
                   {/* ============================================ */}
                   <Route
-                    path="/meta-generator"
+                    path="/app/meta-generator"
                     element={
                       <ProtectedRoute>
                         <ToolErrorBoundary toolName="Meta Data Generator" toolColor="amber">
@@ -291,7 +328,7 @@ function AppContent() {
                   {/* STRUCTURED DATA GENERATOR ROUTES            */}
                   {/* ============================================ */}
                   <Route
-                    path="/schema-generator"
+                    path="/app/schema-generator"
                     element={
                       <ProtectedRoute>
                         <ToolErrorBoundary toolName="Structured Data Generator" toolColor="rose">
@@ -302,10 +339,10 @@ function AppContent() {
                   />
 
                   {/* ============================================ */}
-                  {/* SHARED ROUTES                               */}
+                  {/* SHARED APP ROUTES                           */}
                   {/* ============================================ */}
                   <Route
-                    path="/my-tasks"
+                    path="/app/my-tasks"
                     element={
                       <ProtectedRoute>
                         <ToolErrorBoundary toolName="My Tasks" toolColor="primary">
@@ -315,7 +352,7 @@ function AppContent() {
                     }
                   />
                   <Route
-                    path="/team"
+                    path="/app/team"
                     element={
                       <ProtectedRoute>
                         <ToolErrorBoundary toolName="Team Management" toolColor="primary">
@@ -325,27 +362,7 @@ function AppContent() {
                     }
                   />
                   <Route
-                    path="/help/resources"
-                    element={
-                      <ProtectedRoute>
-                        <ToolErrorBoundary toolName="Resource Library" toolColor="primary">
-                          <ResourceLibrary />
-                        </ToolErrorBoundary>
-                      </ProtectedRoute>
-                    }
-                  />
-                  <Route
-                    path="/help/glossary"
-                    element={
-                      <ProtectedRoute>
-                        <ToolErrorBoundary toolName="Glossary" toolColor="primary">
-                          <GlossaryPage />
-                        </ToolErrorBoundary>
-                      </ProtectedRoute>
-                    }
-                  />
-                  <Route
-                    path="/activity"
+                    path="/app/activity"
                     element={
                       <ProtectedRoute>
                         <ToolErrorBoundary toolName="Activity Log" toolColor="primary">
@@ -355,7 +372,7 @@ function AppContent() {
                     }
                   />
                   <Route
-                    path="/export"
+                    path="/app/export"
                     element={
                       <ProtectedRoute>
                         <ToolErrorBoundary toolName="Export Hub" toolColor="primary">
@@ -369,7 +386,7 @@ function AppContent() {
                   {/* USER PROFILE & SETTINGS                     */}
                   {/* ============================================ */}
                   <Route
-                    path="/profile"
+                    path="/app/profile"
                     element={
                       <ProtectedRoute>
                         <ToolErrorBoundary toolName="User Profile" toolColor="primary">
@@ -379,7 +396,7 @@ function AppContent() {
                     }
                   />
                   <Route
-                    path="/profile/:userId"
+                    path="/app/profile/:userId"
                     element={
                       <ProtectedRoute>
                         <ToolErrorBoundary toolName="User Profile" toolColor="primary">
@@ -389,7 +406,7 @@ function AppContent() {
                     }
                   />
                   <Route
-                    path="/settings"
+                    path="/app/settings"
                     element={
                       <ProtectedRoute>
                         <ToolErrorBoundary toolName="User Settings" toolColor="primary">
@@ -399,8 +416,27 @@ function AppContent() {
                     }
                   />
 
+                  {/* ============================================ */}
+                  {/* LEGACY REDIRECTS                            */}
+                  {/* ============================================ */}
+                  <Route path="/dashboard" element={<Navigate to="/app" replace />} />
+                  <Route path="/planner" element={<Navigate to="/app/planner" replace />} />
+                  <Route path="/planner/*" element={<Navigate to="/app/planner" replace />} />
+                  <Route path="/projects" element={<Navigate to="/app/planner" replace />} />
+                  <Route path="/projects/*" element={<Navigate to="/app/planner" replace />} />
+                  <Route path="/audit" element={<Navigate to="/app/audit" replace />} />
+                  <Route path="/my-tasks" element={<Navigate to="/app/my-tasks" replace />} />
+                  <Route path="/team" element={<Navigate to="/app/team" replace />} />
+                  <Route path="/activity" element={<Navigate to="/app/activity" replace />} />
+                  <Route path="/export" element={<Navigate to="/app/export" replace />} />
+                  <Route path="/profile" element={<Navigate to="/app/profile" replace />} />
+                  <Route path="/settings" element={<Navigate to="/app/settings" replace />} />
+                  <Route path="/image-alt" element={<Navigate to="/app/image-alt" replace />} />
+                  <Route path="/meta-generator" element={<Navigate to="/app/meta-generator" replace />} />
+                  <Route path="/schema-generator" element={<Navigate to="/app/schema-generator" replace />} />
+
                   {/* 404 Route */}
-                  <Route path="*" element={<NotFoundPage />} />
+                  <Route path="*" element={<PublicNotFoundPage />} />
                 </Routes>
               </Suspense>
             </ErrorBoundary>
@@ -481,11 +517,13 @@ function AppContent() {
 
 function App() {
   return (
-    <AuthProvider>
-      <Router>
-        <AppContent />
-      </Router>
-    </AuthProvider>
+    <HelmetProvider>
+      <AuthProvider>
+        <Router>
+          <AppContent />
+        </Router>
+      </AuthProvider>
+    </HelmetProvider>
   );
 }
 

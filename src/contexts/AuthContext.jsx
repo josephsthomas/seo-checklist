@@ -6,10 +6,16 @@ import {
   onAuthStateChanged,
   GoogleAuthProvider,
   signInWithPopup,
-  updateProfile
+  updateProfile,
+  sendPasswordResetEmail,
+  sendEmailVerification,
+  deleteUser,
+  EmailAuthProvider,
+  reauthenticateWithCredential
 } from 'firebase/auth';
-import { doc, setDoc, getDoc } from 'firebase/firestore';
-import { auth, db } from '../lib/firebase';
+import { doc, setDoc, getDoc, deleteDoc, collection, query, where, getDocs, writeBatch } from 'firebase/firestore';
+import { ref, listAll, deleteObject } from 'firebase/storage';
+import { auth, db, storage } from '../lib/firebase';
 import toast from 'react-hot-toast';
 
 const AuthContext = createContext({});
@@ -36,16 +42,20 @@ export function AuthProvider({ children }) {
       // Update display name
       await updateProfile(user, { displayName });
 
+      // Send email verification
+      await sendEmailVerification(user);
+
       // Create user profile in Firestore
       await setDoc(doc(db, 'users', user.uid), {
         email: user.email,
         name: displayName,
         role: 'project_manager', // Default role
         createdAt: new Date(),
-        avatar: null
+        avatar: null,
+        emailVerified: false
       });
 
-      toast.success('Account created successfully!');
+      toast.success('Account created! Please check your email to verify your account.');
       return user;
     } catch (error) {
       toast.error(error.message);
@@ -79,7 +89,8 @@ export function AuthProvider({ children }) {
           name: user.displayName,
           role: 'project_manager',
           createdAt: new Date(),
-          avatar: user.photoURL
+          avatar: user.photoURL,
+          emailVerified: true // Google accounts are already verified
         });
       }
 
@@ -103,6 +114,98 @@ export function AuthProvider({ children }) {
     }
   };
 
+  // Reset password
+  const resetPassword = async (email) => {
+    try {
+      await sendPasswordResetEmail(auth, email);
+      return true;
+    } catch (error) {
+      throw error;
+    }
+  };
+
+  // Resend verification email
+  const resendVerificationEmail = async () => {
+    try {
+      if (currentUser && !currentUser.emailVerified) {
+        await sendEmailVerification(currentUser);
+        toast.success('Verification email sent! Please check your inbox.');
+        return true;
+      } else if (currentUser?.emailVerified) {
+        toast.success('Your email is already verified!');
+        return true;
+      }
+    } catch (error) {
+      if (error.code === 'auth/too-many-requests') {
+        toast.error('Too many requests. Please wait a few minutes and try again.');
+      } else {
+        toast.error('Failed to send verification email. Please try again.');
+      }
+      throw error;
+    }
+  };
+
+  // Delete user account and all associated data
+  const deleteAccount = async (password) => {
+    try {
+      if (!currentUser) {
+        throw new Error('No user logged in');
+      }
+
+      // Re-authenticate the user before deletion
+      const credential = EmailAuthProvider.credential(currentUser.email, password);
+      await reauthenticateWithCredential(currentUser, credential);
+
+      const userId = currentUser.uid;
+
+      // Delete user's projects and related data
+      const batch = writeBatch(db);
+
+      // Delete user's projects
+      const projectsQuery = query(collection(db, 'projects'), where('ownerId', '==', userId));
+      const projectsSnapshot = await getDocs(projectsQuery);
+      projectsSnapshot.forEach((projectDoc) => {
+        batch.delete(projectDoc.ref);
+      });
+
+      // Delete user's notification settings
+      const notificationSettingsRef = doc(db, 'users', userId, 'settings', 'notifications');
+      batch.delete(notificationSettingsRef);
+
+      // Delete user profile
+      const userRef = doc(db, 'users', userId);
+      batch.delete(userRef);
+
+      // Execute batch delete
+      await batch.commit();
+
+      // Delete user's files from storage
+      try {
+        const userStorageRef = ref(storage, `users/${userId}`);
+        const files = await listAll(userStorageRef);
+        await Promise.all(files.items.map(file => deleteObject(file)));
+      } catch {
+        // Silently fail if no files exist or storage error
+      }
+
+      // Delete Firebase Auth user
+      await deleteUser(currentUser);
+
+      setUserProfile(null);
+      toast.success('Your account has been permanently deleted.');
+      return true;
+    } catch (error) {
+      if (error.code === 'auth/wrong-password') {
+        toast.error('Incorrect password. Please try again.');
+      } else if (error.code === 'auth/requires-recent-login') {
+        toast.error('Please log out and log back in before deleting your account.');
+      } else {
+        toast.error('Failed to delete account. Please try again.');
+      }
+      throw error;
+    }
+  };
+
   // Fetch user profile from Firestore
   const fetchUserProfile = async (uid) => {
     try {
@@ -113,6 +216,20 @@ export function AuthProvider({ children }) {
       }
     } catch {
       // Silently fail - profile will be null
+    }
+  };
+
+  // Refresh user to get updated emailVerified status
+  const refreshUser = async () => {
+    if (currentUser) {
+      await currentUser.reload();
+      setCurrentUser({ ...auth.currentUser });
+
+      // Update emailVerified in Firestore if changed
+      if (currentUser.emailVerified) {
+        const userRef = doc(db, 'users', currentUser.uid);
+        await setDoc(userRef, { emailVerified: true }, { merge: true });
+      }
     }
   };
 
@@ -137,6 +254,10 @@ export function AuthProvider({ children }) {
     login,
     loginWithGoogle,
     logout,
+    resetPassword,
+    resendVerificationEmail,
+    deleteAccount,
+    refreshUser,
     loading
   };
 
