@@ -1122,7 +1122,7 @@ function AuditScheduleFormModal({ audit, onSave, onClose }) {
                   </label>
                   <select
                     value={formData.dayOfMonth}
-                    onChange={(e) => setFormData(prev => ({ ...prev, dayOfMonth: parseInt(e.target.value) }))}
+                    onChange={(e) => setFormData(prev => ({ ...prev, dayOfMonth: parseInt(e.target.value, 10) }))}
                     className="input"
                   >
                     {Array.from({ length: 28 }, (_, i) => i + 1).map(day => (
@@ -1266,7 +1266,7 @@ function AuditScheduleFormModal({ audit, onSave, onClose }) {
                         value={formData.alerts.scoreThreshold}
                         onChange={(e) => setFormData(prev => ({
                           ...prev,
-                          alerts: { ...prev.alerts, scoreThreshold: parseInt(e.target.value) }
+                          alerts: { ...prev.alerts, scoreThreshold: parseInt(e.target.value, 10) }
                         }))}
                         className="flex-1"
                       />
@@ -1290,7 +1290,7 @@ function AuditScheduleFormModal({ audit, onSave, onClose }) {
                       value={formData.alerts.criticalThreshold}
                       onChange={(e) => setFormData(prev => ({
                         ...prev,
-                        alerts: { ...prev.alerts, criticalThreshold: parseInt(e.target.value) }
+                        alerts: { ...prev.alerts, criticalThreshold: parseInt(e.target.value, 10) }
                       }))}
                       className="input w-24"
                     />

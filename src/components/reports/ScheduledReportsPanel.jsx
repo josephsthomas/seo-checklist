@@ -923,7 +923,7 @@ function ScheduleFormModal({ schedule, onSave, onClose }) {
                   </label>
                   <select
                     value={formData.dayOfMonth}
-                    onChange={(e) => setFormData(prev => ({ ...prev, dayOfMonth: parseInt(e.target.value) }))}
+                    onChange={(e) => setFormData(prev => ({ ...prev, dayOfMonth: parseInt(e.target.value, 10) }))}
                     className="input"
                   >
                     {Array.from({ length: 28 }, (_, i) => i + 1).map(day => (

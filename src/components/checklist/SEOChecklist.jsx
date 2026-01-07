@@ -94,7 +94,7 @@ export default function SEOChecklist() {
   useEffect(() => {
     const itemId = searchParams.get('itemId');
     if (itemId) {
-      const item = checklistData.find(i => i.id === parseInt(itemId));
+      const item = checklistData.find(i => i.id === parseInt(itemId, 10));
       if (item) {
         setSelectedItem(item);
       }

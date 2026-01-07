@@ -252,7 +252,7 @@ export function useMyTasks() {
           if (assignment?.assignedTo?.includes(currentUser.uid)) {
             tasks.push({
               projectId,
-              itemId: parseInt(itemId),
+              itemId: parseInt(itemId, 10),
               ...assignment
             });
           }

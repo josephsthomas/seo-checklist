@@ -37,19 +37,29 @@ export default function SchemaDashboard({ results, onNewProcess, onUpdateSchema 
   }, [schemas]);
 
   const handleCopy = async (jsonLd, index) => {
-    const code = generateScriptTag(jsonLd);
-    await navigator.clipboard.writeText(code);
-    setCopiedIndex(index);
-    setTimeout(() => setCopiedIndex(null), 2000);
-    toast.success('Schema copied to clipboard');
+    try {
+      const code = generateScriptTag(jsonLd);
+      await navigator.clipboard.writeText(code);
+      setCopiedIndex(index);
+      setTimeout(() => setCopiedIndex(null), 2000);
+      toast.success('Schema copied to clipboard');
+    } catch (error) {
+      console.error('Failed to copy:', error);
+      toast.error('Failed to copy schema');
+    }
   };
 
   const handleCopyAll = async () => {
-    const allCode = schemas.map(s => generateScriptTag(s.jsonLd)).join('\n\n');
-    await navigator.clipboard.writeText(allCode);
-    setCopiedIndex('all');
-    setTimeout(() => setCopiedIndex(null), 2000);
-    toast.success('All schemas copied to clipboard');
+    try {
+      const allCode = schemas.map(s => generateScriptTag(s.jsonLd)).join('\n\n');
+      await navigator.clipboard.writeText(allCode);
+      setCopiedIndex('all');
+      setTimeout(() => setCopiedIndex(null), 2000);
+      toast.success('All schemas copied to clipboard');
+    } catch (error) {
+      console.error('Failed to copy:', error);
+      toast.error('Failed to copy schemas');
+    }
   };
 
   const handleDownload = () => {

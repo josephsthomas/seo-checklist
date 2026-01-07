@@ -959,7 +959,7 @@ export default function ReportBuilderPage() {
                     max={WIDGET_TYPES[selectedWidgetData.type].maxSize.w}
                     value={selectedWidgetData.position.w}
                     onChange={(e) => updateWidget(selectedWidgetData.id, {
-                      position: { ...selectedWidgetData.position, w: parseInt(e.target.value) || 1 }
+                      position: { ...selectedWidgetData.position, w: parseInt(e.target.value, 10) || 1 }
                     })}
                     className="input text-sm"
                   />
@@ -972,7 +972,7 @@ export default function ReportBuilderPage() {
                     max={WIDGET_TYPES[selectedWidgetData.type].maxSize.h}
                     value={selectedWidgetData.position.h}
                     onChange={(e) => updateWidget(selectedWidgetData.id, {
-                      position: { ...selectedWidgetData.position, h: parseInt(e.target.value) || 1 }
+                      position: { ...selectedWidgetData.position, h: parseInt(e.target.value, 10) || 1 }
                     })}
                     className="input text-sm"
                   />
@@ -994,7 +994,7 @@ export default function ReportBuilderPage() {
                     max={GRID_COLS - selectedWidgetData.position.w}
                     value={selectedWidgetData.position.x}
                     onChange={(e) => updateWidget(selectedWidgetData.id, {
-                      position: { ...selectedWidgetData.position, x: parseInt(e.target.value) || 0 }
+                      position: { ...selectedWidgetData.position, x: parseInt(e.target.value, 10) || 0 }
                     })}
                     className="input text-sm"
                   />
@@ -1006,7 +1006,7 @@ export default function ReportBuilderPage() {
                     min={0}
                     value={selectedWidgetData.position.y}
                     onChange={(e) => updateWidget(selectedWidgetData.id, {
-                      position: { ...selectedWidgetData.position, y: parseInt(e.target.value) || 0 }
+                      position: { ...selectedWidgetData.position, y: parseInt(e.target.value, 10) || 0 }
                     })}
                     className="input text-sm"
                   />

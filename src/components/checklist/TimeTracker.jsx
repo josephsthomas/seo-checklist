@@ -61,7 +61,7 @@ export default function TimeTracker({ projectId, itemId, estimatedHours }) {
   };
 
   const handleAddManualEntry = async () => {
-    const minutes = parseInt(manualMinutes);
+    const minutes = parseInt(manualMinutes, 10);
     if (!minutes || minutes <= 0) {
       return;
     }

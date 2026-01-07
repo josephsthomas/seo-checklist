@@ -230,7 +230,7 @@ export default function ImageAltUploadScreen({ onFileSelect }) {
                   <input
                     type="number"
                     value={context.charLimit}
-                    onChange={(e) => setContext(prev => ({ ...prev, charLimit: parseInt(e.target.value) || 125 }))}
+                    onChange={(e) => setContext(prev => ({ ...prev, charLimit: parseInt(e.target.value, 10) || 125 }))}
                     min={50}
                     max={250}
                     className="w-full px-3 py-2 bg-slate-700 border border-slate-600 rounded-lg text-white focus:outline-none focus:border-emerald-500"
