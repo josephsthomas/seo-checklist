@@ -13,6 +13,7 @@ import {
   Code,
   X
 } from 'lucide-react';
+import AIDisclaimer from '../../shared/AIDisclaimer';
 
 const SUPPORTED_FORMATS = ['DOCX', 'PDF', 'HTML', 'Markdown', 'TXT'];
 const TONE_OPTIONS = ['Professional', 'Conversational', 'Technical', 'Creative', 'Persuasive'];
@@ -83,6 +84,14 @@ export default function MetaUploadScreen({ onFileSelect }) {
           <p className="text-slate-400 max-w-xl mx-auto">
             Upload a document to generate AI-powered SEO metadata including titles, descriptions, and social tags
           </p>
+        </div>
+
+        {/* AI Disclaimer */}
+        <div className="mb-6">
+          <AIDisclaimer
+            toolName="Meta Data Generator"
+            storageKey="ai-disclaimer-meta-dismissed"
+          />
         </div>
 
         {/* Upload Zone */}

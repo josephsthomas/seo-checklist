@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
-import { Mail, Lock, User, Chrome } from 'lucide-react';
+import { Mail, Lock, User, Chrome, CheckSquare, Square } from 'lucide-react';
 
 export default function RegisterForm() {
   const [formData, setFormData] = useState({
@@ -10,6 +10,7 @@ export default function RegisterForm() {
     password: '',
     confirmPassword: ''
   });
+  const [agreedToTerms, setAgreedToTerms] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const { signup, loginWithGoogle } = useAuth();
@@ -25,6 +26,10 @@ export default function RegisterForm() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    if (!agreedToTerms) {
+      return setError('You must agree to the Terms of Service and Privacy Policy to create an account');
+    }
 
     if (formData.password !== formData.confirmPassword) {
       return setError('Passwords do not match');
@@ -47,6 +52,10 @@ export default function RegisterForm() {
   };
 
   const handleGoogleSignup = async () => {
+    if (!agreedToTerms) {
+      return setError('You must agree to the Terms of Service and Privacy Policy to create an account');
+    }
+
     setLoading(true);
     try {
       await loginWithGoogle();
@@ -161,6 +170,52 @@ export default function RegisterForm() {
                   aria-required="true"
                 />
               </div>
+            </div>
+
+            {/* Terms of Service Agreement */}
+            <div className="form-group">
+              <button
+                type="button"
+                onClick={() => setAgreedToTerms(!agreedToTerms)}
+                className="flex items-start gap-3 w-full p-3 rounded-lg border border-charcoal-200 hover:border-primary-300 hover:bg-charcoal-50 transition-colors text-left"
+                role="checkbox"
+                aria-checked={agreedToTerms}
+              >
+                {agreedToTerms ? (
+                  <CheckSquare className="w-5 h-5 text-primary-600 flex-shrink-0 mt-0.5" aria-hidden="true" />
+                ) : (
+                  <Square className="w-5 h-5 text-charcoal-400 flex-shrink-0 mt-0.5" aria-hidden="true" />
+                )}
+                <span className="text-sm text-charcoal-600">
+                  I agree to the{' '}
+                  <Link
+                    to="/terms"
+                    target="_blank"
+                    className="text-primary-600 hover:text-primary-700 underline"
+                    onClick={(e) => e.stopPropagation()}
+                  >
+                    Terms of Service
+                  </Link>
+                  ,{' '}
+                  <Link
+                    to="/privacy"
+                    target="_blank"
+                    className="text-primary-600 hover:text-primary-700 underline"
+                    onClick={(e) => e.stopPropagation()}
+                  >
+                    Privacy Policy
+                  </Link>
+                  , and{' '}
+                  <Link
+                    to="/ai-policy"
+                    target="_blank"
+                    className="text-primary-600 hover:text-primary-700 underline"
+                    onClick={(e) => e.stopPropagation()}
+                  >
+                    AI Usage Policy
+                  </Link>
+                </span>
+              </button>
             </div>
 
             <button

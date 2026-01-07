@@ -13,6 +13,7 @@ import {
   CheckCircle,
   X
 } from 'lucide-react';
+import AIDisclaimer from '../../shared/AIDisclaimer';
 
 const SUPPORTED_FORMATS = ['JPG', 'PNG', 'WebP', 'GIF', 'TIFF', 'BMP'];
 const TONE_OPTIONS = ['Professional', 'Casual', 'Technical', 'Creative'];
@@ -68,6 +69,14 @@ export default function ImageAltUploadScreen({ onFileSelect }) {
           <p className="text-slate-400 max-w-xl mx-auto">
             Upload images to generate AI-powered, WCAG-compliant alt text with SEO-friendly filenames
           </p>
+        </div>
+
+        {/* AI Disclaimer */}
+        <div className="mb-6">
+          <AIDisclaimer
+            toolName="Image Alt Text Generator"
+            storageKey="ai-disclaimer-alt-dismissed"
+          />
         </div>
 
         {/* Upload Zone */}

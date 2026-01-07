@@ -63,6 +63,11 @@ const UserProfilePage = lazyWithRetry(() => import('./components/profile/UserPro
 // Export Hub - lazy load
 const ExportHubPage = lazyWithRetry(() => import('./components/export/ExportHubPage'), 'ExportHubPage');
 
+// Legal Pages - lazy load
+const TermsOfService = lazyWithRetry(() => import('./components/legal/TermsOfService'), 'TermsOfService');
+const PrivacyPolicy = lazyWithRetry(() => import('./components/legal/PrivacyPolicy'), 'PrivacyPolicy');
+const AIPolicy = lazyWithRetry(() => import('./components/legal/AIPolicy'), 'AIPolicy');
+
 /**
  * Enhanced Loading Fallback with Skeleton
  */
@@ -129,6 +134,11 @@ function AppContent() {
                   {/* Public Routes */}
                   <Route path="/login" element={<LoginForm />} />
                   <Route path="/register" element={<RegisterForm />} />
+
+                  {/* Legal Pages - Public */}
+                  <Route path="/terms" element={<TermsOfService />} />
+                  <Route path="/privacy" element={<PrivacyPolicy />} />
+                  <Route path="/ai-policy" element={<AIPolicy />} />
 
                   {/* Home - Portal Dashboard */}
                   <Route

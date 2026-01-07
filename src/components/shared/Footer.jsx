@@ -135,19 +135,34 @@ export default function Footer() {
           </div>
         </div>
 
+        {/* Legal Links Section */}
+        <div className="pb-8 border-b border-white/10">
+          <div className="flex flex-wrap items-center justify-center gap-x-8 gap-y-2">
+            <Link to="/terms" className="text-charcoal-400 hover:text-white text-sm transition-colors duration-200">
+              Terms of Service
+            </Link>
+            <Link to="/privacy" className="text-charcoal-400 hover:text-white text-sm transition-colors duration-200">
+              Privacy & Data Policy
+            </Link>
+            <Link to="/ai-policy" className="text-charcoal-400 hover:text-white text-sm transition-colors duration-200">
+              AI Usage Policy
+            </Link>
+          </div>
+        </div>
+
         {/* Bottom Bar */}
         <div className="pt-8 flex flex-col sm:flex-row items-center justify-between gap-4">
-          <p className="text-charcoal-500 text-sm">
-            © {currentYear} Content Strategy Portal. All rights reserved.
-          </p>
-          <div className="flex items-center gap-6">
-            <a href="#" className="text-charcoal-500 hover:text-charcoal-300 text-sm transition-colors">
-              Privacy Policy
-            </a>
-            <a href="#" className="text-charcoal-500 hover:text-charcoal-300 text-sm transition-colors">
-              Terms of Service
-            </a>
+          <div className="text-center sm:text-left">
+            <p className="text-charcoal-500 text-sm">
+              © {currentYear} Joseph S. Thomas dba Content-Strategy.co
+            </p>
+            <p className="text-charcoal-600 text-xs mt-1">
+              All rights reserved. Independently developed and owned.
+            </p>
           </div>
+          <p className="text-charcoal-600 text-xs">
+            Content Strategy Portal v3.0
+          </p>
         </div>
       </div>
     </footer>
