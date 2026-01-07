@@ -1,4 +1,4 @@
-import { useState, useMemo, useEffect } from 'react';
+import { useState, useMemo, useEffect, useCallback } from 'react';
 import { useParams, useSearchParams } from 'react-router-dom';
 import { useProjects } from '../../hooks/useProjects';
 import { useChecklist } from '../../hooks/useChecklist';
@@ -18,30 +18,70 @@ import FilterPresetManager from './FilterPresetManager';
 import PdfExportModal from './PdfExportModal';
 import HelpTooltip from '../help/HelpTooltip';
 import ProjectLinkedItems from '../projects/ProjectLinkedItems';
+import { debounce } from '../../utils/storageHelpers';
 
 const PRIORITIES = ['CRITICAL', 'HIGH', 'MEDIUM', 'LOW'];
 const PHASES = ['Discovery', 'Strategy', 'Build', 'Pre-Launch', 'Launch', 'Post-Launch'];
 
+// Default filter state
+const DEFAULT_FILTERS = {
+  phase: '',
+  priority: '',
+  owner: '',
+  category: '',
+  showCompleted: true
+};
+
 export default function SEOChecklist() {
   const { projectId } = useParams();
   const [searchParams] = useSearchParams();
-  const { getProject } = useProjects();
+  const { getProject, updateProject } = useProjects();
   const { completions, toggleItem, loading: checklistLoading } = useChecklist(projectId);
 
   const [project, setProject] = useState(null);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
+  const [debouncedSearchQuery, setDebouncedSearchQuery] = useState('');
   const [selectedItem, setSelectedItem] = useState(null);
   const [showPresetManager, setShowPresetManager] = useState(false);
   const [showPdfExport, setShowPdfExport] = useState(false);
-  const [filters, setFilters] = useState({
-    phase: '',
-    priority: '',
-    owner: '',
-    category: '',
-    showCompleted: true
-  });
+  const [filters, setFilters] = useState(DEFAULT_FILTERS);
   const [expandedPhases, setExpandedPhases] = useState(PHASES);
+
+  // Debounced search handler
+  const debouncedSetSearch = useCallback(
+    debounce((value) => setDebouncedSearchQuery(value), 300),
+    []
+  );
+
+  // Handle search input change with debouncing
+  const handleSearchChange = useCallback((e) => {
+    const value = e.target.value;
+    setSearchQuery(value); // Update immediately for UI
+    debouncedSetSearch(value); // Debounce the actual filter
+  }, [debouncedSetSearch]);
+
+  // Debounced save to Firebase
+  const debouncedSaveUIState = useCallback(
+    debounce((newFilters, newExpandedPhases) => {
+      if (projectId) {
+        updateProject(projectId, {
+          uiState: {
+            filters: newFilters,
+            expandedPhases: newExpandedPhases
+          }
+        }).catch(err => console.error('Failed to save UI state:', err));
+      }
+    }, 1000),
+    [projectId, updateProject]
+  );
+
+  // Persist filters and expanded phases to Firebase (debounced)
+  useEffect(() => {
+    if (project && projectId) {
+      debouncedSaveUIState(filters, expandedPhases);
+    }
+  }, [filters, expandedPhases, project, projectId, debouncedSaveUIState]);
 
   const handleApplyPreset = (presetFilters) => {
     setFilters(prev => ({
@@ -66,6 +106,15 @@ export default function SEOChecklist() {
       if (projectId) {
         const projectData = await getProject(projectId);
         setProject(projectData);
+        // Load saved UI state from Firebase
+        if (projectData?.uiState) {
+          if (projectData.uiState.filters) {
+            setFilters(prev => ({ ...prev, ...projectData.uiState.filters }));
+          }
+          if (projectData.uiState.expandedPhases) {
+            setExpandedPhases(projectData.uiState.expandedPhases);
+          }
+        }
       }
       setLoading(false);
     };
@@ -83,11 +132,12 @@ export default function SEOChecklist() {
       );
     }
 
-    // Apply search
-    if (searchQuery) {
+    // Apply search (using debounced query for performance)
+    if (debouncedSearchQuery) {
+      const query = debouncedSearchQuery.toLowerCase();
       items = items.filter(item =>
-        item.item.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        item.category.toLowerCase().includes(searchQuery.toLowerCase())
+        item.item.toLowerCase().includes(query) ||
+        item.category.toLowerCase().includes(query)
       );
     }
 
@@ -109,7 +159,7 @@ export default function SEOChecklist() {
     }
 
     return items;
-  }, [project, searchQuery, filters, completions]);
+  }, [project, debouncedSearchQuery, filters, completions]);
 
   // Group items by phase
   const itemsByPhase = useMemo(() => {
@@ -241,8 +291,9 @@ export default function SEOChecklist() {
                 type="text"
                 placeholder="Search checklist items..."
                 value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
+                onChange={handleSearchChange}
                 className="input pl-10 w-full"
+                aria-label="Search checklist items"
               />
             </div>
             <div className="flex gap-2">

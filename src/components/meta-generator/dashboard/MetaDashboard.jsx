@@ -70,17 +70,27 @@ export default function MetaDashboard({ results, onNewProcess, onUpdateMetadata 
   };
 
   const handleCopy = async (text, field) => {
-    await navigator.clipboard.writeText(text);
-    setCopiedField(field);
-    setTimeout(() => setCopiedField(null), 2000);
-    toast.success('Copied to clipboard');
+    try {
+      await navigator.clipboard.writeText(text);
+      setCopiedField(field);
+      setTimeout(() => setCopiedField(null), 2000);
+      toast.success('Copied to clipboard');
+    } catch (error) {
+      console.error('Failed to copy:', error);
+      toast.error('Failed to copy to clipboard. Please copy manually.');
+    }
   };
 
   const handleCopyAll = async () => {
-    await navigator.clipboard.writeText(htmlCode);
-    setCopiedField('all');
-    setTimeout(() => setCopiedField(null), 2000);
-    toast.success('HTML code copied to clipboard');
+    try {
+      await navigator.clipboard.writeText(htmlCode);
+      setCopiedField('all');
+      setTimeout(() => setCopiedField(null), 2000);
+      toast.success('HTML code copied to clipboard');
+    } catch (error) {
+      console.error('Failed to copy:', error);
+      toast.error('Failed to copy to clipboard. Please copy manually.');
+    }
   };
 
   const handleDownloadHtml = () => {

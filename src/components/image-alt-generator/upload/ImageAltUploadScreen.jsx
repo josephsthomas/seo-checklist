@@ -54,7 +54,7 @@ export default function ImageAltUploadScreen({ onFileSelect }) {
   };
 
   const totalSize = files.reduce((sum, f) => sum + f.size, 0);
-  const isZip = files.length === 1 && files[0].name.endsWith('.zip');
+  const isZip = files.length === 1 && files[0].name.toLowerCase().endsWith('.zip');
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 py-8 px-4">

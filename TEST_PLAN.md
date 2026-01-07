@@ -6,6 +6,7 @@ This test plan covers all aspects of the Content Strategy Portal application, in
 
 **Final Status: All critical defects FIXED**
 **Batch 1 Enhancement Status: 4 high-impact fixes completed**
+**Batch 2 Enhancement Status: 5 UX improvements completed**
 
 ---
 
@@ -331,7 +332,33 @@ This test plan covers all aspects of the Content Strategy Portal application, in
 
 ---
 
-*Test Plan Version: 3.0*
+## 16. Batch 2 - UX & Accessibility Improvements
+
+### 16.1 UX Enhancements
+| Enhancement | Location | Implementation | Status |
+|-------------|----------|----------------|--------|
+| Search debouncing | SEOChecklist.jsx | 300ms debounce on search input | FIXED |
+| Filter state persistence | SEOChecklist.jsx | Saves to Firebase project.uiState | FIXED |
+| Clipboard error handling | MetaDashboard.jsx | Try-catch with user-friendly error | FIXED |
+| Case-insensitive ZIP | ImageAltUploadScreen.jsx | toLowerCase() on extension check | FIXED |
+| Debounce utility | storageHelpers.js | Reusable debounce function | ADDED |
+
+### 16.2 Files Modified in Batch 2
+- `src/components/checklist/SEOChecklist.jsx` - Debouncing + Firebase UI state
+- `src/components/meta-generator/dashboard/MetaDashboard.jsx` - Clipboard error handling
+- `src/components/image-alt-generator/upload/ImageAltUploadScreen.jsx` - ZIP detection
+- `src/utils/storageHelpers.js` - Added debounce utility
+
+### 16.3 Batch 2 Verification
+| Check | Result |
+|-------|--------|
+| All tests pass | ✓ 71/71 tests pass |
+| Build succeeds | ✓ Built in 18.89s |
+| No new ESLint errors | ✓ 0 errors |
+
+---
+
+*Test Plan Version: 4.0*
 *Last Updated: 2026-01-07*
 *Testing Framework: Vitest 4.0.16*
-*Total Defects Fixed: 306 (49 errors + 253 warnings + 4 enhancements)*
+*Total Defects Fixed: 311 (49 errors + 253 warnings + 9 enhancements)*
