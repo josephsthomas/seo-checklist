@@ -1,8 +1,11 @@
+import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Github, Twitter, Linkedin, Mail, ExternalLink } from 'lucide-react';
+import { Github, Twitter, Linkedin, Mail, ExternalLink, MessageSquarePlus } from 'lucide-react';
+import FeedbackForm from '../feedback/FeedbackForm';
 
 export default function Footer() {
   const currentYear = new Date().getFullYear();
+  const [isFeedbackOpen, setIsFeedbackOpen] = useState(false);
 
   return (
     <footer className="relative mt-auto overflow-hidden">
@@ -131,6 +134,15 @@ export default function Footer() {
                   <kbd className="px-1.5 py-0.5 text-2xs font-mono rounded bg-charcoal-700 text-charcoal-400">?</kbd>
                 </button>
               </li>
+              <li>
+                <button
+                  onClick={() => setIsFeedbackOpen(true)}
+                  className="text-charcoal-400 hover:text-white text-sm transition-colors duration-200 flex items-center gap-2"
+                >
+                  <MessageSquarePlus className="w-4 h-4" />
+                  Send Feedback
+                </button>
+              </li>
             </ul>
           </div>
         </div>
@@ -168,6 +180,9 @@ export default function Footer() {
           </p>
         </div>
       </div>
+
+      {/* Feedback Form Modal */}
+      <FeedbackForm isOpen={isFeedbackOpen} onClose={() => setIsFeedbackOpen(false)} />
     </footer>
   );
 }
