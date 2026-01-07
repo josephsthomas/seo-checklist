@@ -1,5 +1,6 @@
 import { useState, useMemo, useEffect, useCallback } from 'react';
 import { useParams, useSearchParams } from 'react-router-dom';
+import toast from 'react-hot-toast';
 import { useProjects } from '../../hooks/useProjects';
 import { useChecklist } from '../../hooks/useChecklist';
 import { checklistData } from '../../data/checklistData';
@@ -197,8 +198,14 @@ export default function SEOChecklist() {
     );
   };
 
-  const handleExport = () => {
-    exportToExcel(checklistData, completions, project);
+  const handleExport = async () => {
+    try {
+      await exportToExcel(checklistData, completions, project);
+      toast.success('Excel exported successfully');
+    } catch (err) {
+      console.error('Excel export failed:', err);
+      toast.error('Failed to export Excel. Please try again.');
+    }
   };
 
   if (loading || checklistLoading) {

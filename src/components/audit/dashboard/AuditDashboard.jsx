@@ -1,4 +1,4 @@
-import { useState, useMemo, useRef, useEffect } from 'react';
+import { useState, useMemo, useRef, useEffect, useDeferredValue } from 'react';
 import toast from 'react-hot-toast';
 import {
   ArrowLeft,
@@ -50,6 +50,7 @@ export default function AuditDashboard({ auditResults, domainInfo, urlData = [],
   const [filterSeverity, setFilterSeverity] = useState('all');
   const [filterCategory, setFilterCategory] = useState('all');
   const [searchQuery, setSearchQuery] = useState('');
+  const deferredSearchQuery = useDeferredValue(searchQuery);
   const [showExportMenu, setShowExportMenu] = useState(false);
   const [exporting, setExporting] = useState(false);
   const [saving, setSaving] = useState(false);
@@ -82,13 +83,13 @@ export default function AuditDashboard({ auditResults, domainInfo, urlData = [],
 
   const { issues, stats, healthScore, urlCount, timestamp } = auditResults;
 
-  // Filter issues
+  // Filter issues (using deferred search for performance)
   const filteredIssues = useMemo(() => {
     return issues.filter(issue => {
       if (filterSeverity !== 'all' && issue.severity !== filterSeverity) return false;
       if (filterCategory !== 'all' && issue.category !== filterCategory) return false;
-      if (searchQuery) {
-        const query = searchQuery.toLowerCase();
+      if (deferredSearchQuery) {
+        const query = deferredSearchQuery.toLowerCase();
         return (
           issue.title.toLowerCase().includes(query) ||
           issue.description.toLowerCase().includes(query)
@@ -96,7 +97,7 @@ export default function AuditDashboard({ auditResults, domainInfo, urlData = [],
       }
       return true;
     });
-  }, [issues, filterSeverity, filterCategory, searchQuery]);
+  }, [issues, filterSeverity, filterCategory, deferredSearchQuery]);
 
   // Get health score color
   const getHealthScoreColor = (score) => {
@@ -720,11 +721,12 @@ export default function AuditDashboard({ auditResults, domainInfo, urlData = [],
 
                   {usePassword && (
                     <input
-                      type="text"
+                      type="password"
                       value={sharePassword}
                       onChange={(e) => setSharePassword(e.target.value)}
                       placeholder="Enter password"
                       className="input w-full mb-4"
+                      autoComplete="new-password"
                     />
                   )}
 

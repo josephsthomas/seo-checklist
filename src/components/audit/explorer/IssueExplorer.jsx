@@ -241,7 +241,7 @@ export default function IssueExplorer({ issues, onSelectUrl, onClose }) {
               </button>
             )}
             {onClose && (
-              <button onClick={onClose} className="p-2 hover:bg-charcoal-100 rounded-lg">
+              <button onClick={onClose} className="p-2 hover:bg-charcoal-100 rounded-lg" aria-label="Close issue explorer">
                 <X className="w-5 h-5" />
               </button>
             )}
