@@ -115,7 +115,7 @@ export async function exportImagesAsZip(results, options = {}) {
  * Embed EXIF data in JPEG image
  * Note: This is a simplified version - full EXIF manipulation would require piexifjs
  */
-async function embedExifData(file, altText) {
+async function embedExifData(file, _altText) {
   // For now, return original file data
   // Full EXIF embedding would require additional library like piexifjs
   return await file.arrayBuffer();

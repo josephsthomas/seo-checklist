@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react';
+import { useState, useCallback } from 'react';
 import toast from 'react-hot-toast';
 import SchemaUploadScreen from './upload/SchemaUploadScreen';
 import SchemaProcessingScreen from './upload/SchemaProcessingScreen';

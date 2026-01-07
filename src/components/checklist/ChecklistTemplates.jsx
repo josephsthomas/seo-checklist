@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import {
   FileText,
   ClipboardList,
@@ -9,7 +9,6 @@ import {
   Plus,
   Copy,
   Trash2,
-  Edit3,
   Check,
   X,
   ChevronRight,

@@ -21,8 +21,7 @@ export function generateChecklistPDF(options) {
     clientName = '',
     exportType = 'executive', // 'executive' or 'detailed'
     includeCompleted = true,
-    logo = null,
-    brandColor = '#2563eb'
+    logo = null
   } = options;
 
   const doc = new jsPDF();

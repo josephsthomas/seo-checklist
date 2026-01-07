@@ -135,7 +135,7 @@ export function useSchemaLibrary() {
     const schema = schemas.find(s => s.id === schemaId);
     if (!schema) return null;
 
-    const { id, createdAt, updatedAt, usageCount, lastUsedAt, ...schemaData } = schema;
+    const { ...schemaData } = schema;
     return saveSchema({
       ...schemaData,
       name: `${schema.name} (Copy)`,

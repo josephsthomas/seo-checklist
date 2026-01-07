@@ -1,19 +1,15 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import {
   Shield,
   Search,
-  Filter,
   Download,
-  Calendar,
   User,
   Activity,
-  FileText,
   Settings,
   Trash2,
   Edit3,
   Plus,
   Eye,
-  ExternalLink,
   ChevronDown,
   ChevronLeft,
   ChevronRight,
@@ -22,9 +18,7 @@ import {
   RefreshCcw,
   X
 } from 'lucide-react';
-import { format, subDays, startOfDay, endOfDay } from 'date-fns';
-import { collection, query, where, orderBy, limit, getDocs, startAfter, Timestamp } from 'firebase/firestore';
-import { db } from '../../lib/firebase';
+import { format, subDays } from 'date-fns';
 import toast from 'react-hot-toast';
 import InfoTooltip from '../common/InfoTooltip';
 

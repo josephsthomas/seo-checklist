@@ -1,9 +1,9 @@
-import React, { useState, useMemo } from 'react';
+import { useState, useMemo } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useMyTasks } from '../../hooks/useAssignments';
 import { useProjects } from '../../hooks/useProjects';
 import { checklistData } from '../../data/checklistData';
-import { Calendar, Clock, AlertCircle, CheckCircle, Filter, ClipboardList, ArrowRight, Inbox, Search, RefreshCw } from 'lucide-react';
+import { Calendar, Clock, AlertCircle, CheckCircle, ClipboardList, ArrowRight, Inbox, Search, RefreshCw } from 'lucide-react';
 import { format, isAfter, isBefore, addDays, startOfDay } from 'date-fns';
 import { TASK_STATUS_LABELS } from '../../utils/roles';
 
@@ -60,9 +60,10 @@ export default function MyTasksPage() {
           if (!a.dueDate) return 1;
           if (!b.dueDate) return -1;
           return a.dueDate.toDate() - b.dueDate.toDate();
-        case 'priority':
+        case 'priority': {
           const priorityOrder = { 'CRITICAL': 0, 'HIGH': 1, 'MEDIUM': 2, 'LOW': 3 };
           return priorityOrder[a.item.priority] - priorityOrder[b.item.priority];
+        }
         case 'project':
           return a.project.name.localeCompare(b.project.name);
         default:
@@ -251,7 +252,7 @@ export default function MyTasksPage() {
                   No tasks assigned yet
                 </h3>
                 <p className="text-charcoal-600 mb-6 max-w-md mx-auto">
-                  When team members assign tasks to you from content projects, they'll appear here.
+                  When team members assign tasks to you from content projects, they&apos;ll appear here.
                   You can also assign tasks to yourself from any project checklist.
                 </p>
                 <div className="flex flex-col sm:flex-row gap-3 justify-center">
@@ -277,7 +278,7 @@ export default function MyTasksPage() {
                     </li>
                     <li className="flex items-start gap-2">
                       <span className="text-primary-500 mt-0.5">3.</span>
-                      Add your email in the "Assigned To" field
+                      Add your email in the &quot;Assigned To&quot; field
                     </li>
                   </ul>
                 </div>

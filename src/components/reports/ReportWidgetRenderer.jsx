@@ -1,4 +1,3 @@
-import React from 'react';
 import {
   TrendingUp,
   TrendingDown,
@@ -9,7 +8,6 @@ import {
   Info,
   FileText,
   BarChart3,
-  PieChart,
   Activity,
   Table as TableIcon
 } from 'lucide-react';
@@ -460,7 +458,7 @@ function SummaryWidget({ config, data }) {
       </h4>
       <div className="space-y-2 text-sm text-charcoal-600 dark:text-charcoal-400">
         <p>
-          This report provides an overview of your website's SEO health and performance metrics.
+          This report provides an overview of your website&apos;s SEO health and performance metrics.
           Key findings and recommendations are summarized below.
         </p>
         <div className="grid grid-cols-2 gap-4 mt-4">

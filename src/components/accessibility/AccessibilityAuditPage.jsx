@@ -1,5 +1,5 @@
-import React, { useState, useCallback } from 'react';
-import { AlertTriangle, ArrowLeft, RotateCcw, HelpCircle, FileWarning, FileX, Database, Lightbulb, Accessibility } from 'lucide-react';
+import { useState, useCallback } from 'react';
+import { AlertTriangle, RotateCcw, HelpCircle, FileWarning, FileX, Database, Lightbulb, Accessibility } from 'lucide-react';
 import AccessibilityUploadScreen from './upload/AccessibilityUploadScreen';
 import AccessibilityProcessingScreen from './upload/AccessibilityProcessingScreen';
 import AccessibilityDashboard from './dashboard/AccessibilityDashboard';
@@ -234,7 +234,7 @@ export default function AccessibilityAuditPage() {
         />
       );
 
-    case VIEWS.ERROR:
+    case VIEWS.ERROR: {
       const guidance = getErrorGuidance(error || '');
       const ErrorIcon = guidance.icon;
       return (
@@ -293,6 +293,7 @@ export default function AccessibilityAuditPage() {
           </div>
         </div>
       );
+    }
 
     default:
       return <AccessibilityUploadScreen onFileSelect={handleFileSelect} />;

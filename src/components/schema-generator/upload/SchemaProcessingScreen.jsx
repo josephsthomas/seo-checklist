@@ -1,4 +1,3 @@
-import React from 'react';
 import { Code2, Loader2, Sparkles } from 'lucide-react';
 
 export default function SchemaProcessingScreen({ progress, stage, inputType }) {

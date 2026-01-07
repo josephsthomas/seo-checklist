@@ -1,7 +1,6 @@
-import React, { useState, useMemo } from 'react';
+import { useState, useMemo } from 'react';
 import {
   Wrench,
-  Code2,
   Copy,
   Check,
   ChevronDown,

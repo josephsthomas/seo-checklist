@@ -40,14 +40,7 @@ class ErrorBoundary extends React.Component {
         return this.props.fallback;
       }
 
-      const { variant = 'default', toolName, toolColor = 'primary' } = this.props;
-
-      const colorVariants = {
-        primary: 'from-primary-500 to-primary-600 shadow-primary-500/25',
-        cyan: 'from-cyan-500 to-cyan-600 shadow-cyan-500/25',
-        purple: 'from-purple-500 to-purple-600 shadow-purple-500/25',
-        emerald: 'from-emerald-500 to-emerald-600 shadow-emerald-500/25'
-      };
+      const { variant = 'default', toolName } = this.props;
 
       // Full page error for tool/page level boundaries
       if (variant === 'page' || variant === 'tool') {

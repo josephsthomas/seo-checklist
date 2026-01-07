@@ -4,7 +4,7 @@
  * Phase 9 - Batch 3
  */
 
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { Save, Star, Trash2, Edit2, Download, Upload, X, Check, CheckCircle } from 'lucide-react';
 import { getFilterPresets, saveFilterPreset, deleteFilterPreset } from '../../utils/storageHelpers';
 import toast from 'react-hot-toast';
@@ -192,11 +192,9 @@ export default function FilterPresetManager({ currentFilters, onApplyPreset, onC
       return presetFilters[key] === currentFilters[key];
     }) && Object.keys(currentFilters).every(key => {
       // Only check properties that exist in preset filters
-      return presetFilters.hasOwnProperty(key) ? presetFilters[key] === currentFilters[key] : true;
+      return Object.prototype.hasOwnProperty.call(presetFilters, key) ? presetFilters[key] === currentFilters[key] : true;
     });
   };
-
-  const allPresets = [...PRESET_TEMPLATES, ...presets];
 
   return (
     <div className="fixed inset-0 z-50 overflow-y-auto" role="dialog" aria-modal="true" aria-labelledby="filter-presets-title">

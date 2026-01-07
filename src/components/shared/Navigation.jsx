@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 import {
@@ -242,7 +242,7 @@ export default function Navigation() {
                       <WhatsNewBadge />
                     </div>
                     <div>
-                      <div className="font-medium text-charcoal-900">What's New</div>
+                      <div className="font-medium text-charcoal-900">What&apos;s New</div>
                       <div className="text-xs text-charcoal-500">Latest updates & features</div>
                     </div>
                   </button>

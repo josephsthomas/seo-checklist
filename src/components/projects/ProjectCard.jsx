@@ -1,6 +1,5 @@
-import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Calendar, Users, Settings, Archive } from 'lucide-react';
+import { Calendar, Users, Settings } from 'lucide-react';
 import { format } from 'date-fns';
 
 const STATUS_COLORS = {

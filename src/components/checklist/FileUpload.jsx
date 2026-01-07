@@ -4,9 +4,9 @@
  * Phase 9 - Batch 6
  */
 
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { useDropzone } from 'react-dropzone';
-import { Upload, File, FileText, Image, Table, Trash2, Download, Loader, X } from 'lucide-react';
+import { Upload, File, FileText, Image, Table, Trash2, Download, Loader } from 'lucide-react';
 import { useFileAttachments } from '../../hooks/useFileAttachments';
 import { format } from 'date-fns';
 

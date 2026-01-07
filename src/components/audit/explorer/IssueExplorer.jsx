@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useDeferredValue } from 'react';
+import { useState, useMemo, useDeferredValue } from 'react';
 import {
   Search,
   Filter,
@@ -63,14 +63,16 @@ export default function IssueExplorer({ issues, onSelectUrl, onClose }) {
     result.sort((a, b) => {
       let comparison = 0;
       switch (sortBy) {
-        case 'severity':
+        case 'severity': {
           const severityOrder = { error: 0, warning: 1, info: 2 };
           comparison = severityOrder[a.severity] - severityOrder[b.severity];
           break;
-        case 'priority':
+        }
+        case 'priority': {
           const priorityOrder = { must: 0, should: 1, could: 2 };
           comparison = priorityOrder[a.priority] - priorityOrder[b.priority];
           break;
+        }
         case 'count':
           comparison = a.count - b.count;
           break;

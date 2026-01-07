@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import {
   Clock,
   Globe,
@@ -15,7 +15,6 @@ import {
   ChevronUp,
   X,
   Save,
-  Settings,
   History,
   Eye,
   RefreshCw,
@@ -23,7 +22,6 @@ import {
   TrendingUp,
   TrendingDown,
   Minus,
-  Link,
   Search,
   Filter,
   BarChart3,
@@ -507,7 +505,7 @@ export default function ScheduledAuditsPanel() {
               No scheduled audits
             </h3>
             <p className="text-charcoal-500 dark:text-charcoal-400 mb-4">
-              Set up automated audits to continuously monitor your site's SEO health
+              Set up automated audits to continuously monitor your site&apos;s SEO health
             </p>
             <button
               onClick={() => setShowCreateModal(true)}
@@ -826,8 +824,8 @@ export default function ScheduledAuditsPanel() {
               </div>
             </div>
             <p className="text-charcoal-600 dark:text-charcoal-300 mb-6">
-              Are you sure you want to delete "<strong>{deleteConfirm.name}</strong>"?
-              You'll have 5 seconds to undo this action.
+              Are you sure you want to delete &quot;<strong>{deleteConfirm.name}</strong>&quot;?
+              You&apos;ll have 5 seconds to undo this action.
             </p>
             <div className="flex gap-3">
               <button
@@ -901,6 +899,7 @@ function AuditScheduleFormModal({ audit, onSave, onClose }) {
   useEffect(() => {
     const newConflicts = checkConflicts();
     setConflicts(newConflicts);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [formData.time, formData.frequency, formData.url]);
 
   const handleSubmit = (e) => {

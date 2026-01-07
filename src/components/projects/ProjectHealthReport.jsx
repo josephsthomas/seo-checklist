@@ -1,14 +1,12 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import {
   ArrowLeft,
-  Share2,
   Download,
   CheckCircle2,
   Clock,
   AlertTriangle,
   TrendingUp,
-  Users,
   Calendar,
   Target,
   BarChart3,
@@ -20,7 +18,7 @@ import { useProjects } from '../../hooks/useProjects';
 import { useChecklist } from '../../hooks/useChecklist';
 import { useProjectActivityLog } from '../../hooks/useActivityLog';
 import { checklistData } from '../../data/checklistData';
-import { format, differenceInDays } from 'date-fns';
+import { format } from 'date-fns';
 import toast from 'react-hot-toast';
 
 /**

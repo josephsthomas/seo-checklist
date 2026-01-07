@@ -1,18 +1,15 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import {
   Calendar,
-  Clock,
   AlertTriangle,
   CheckCircle2,
-  ChevronRight,
   Plus,
   X,
   Flag,
   Loader2
 } from 'lucide-react';
 import { useDueDates, getDueDateUrgency } from '../../hooks/useDueDates';
-import { format, formatDistanceToNow } from 'date-fns';
 
 /**
  * Due Date Item Component

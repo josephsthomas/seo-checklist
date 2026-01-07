@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import {
   X,
   Check,
@@ -13,8 +13,7 @@ import {
   StarOff,
   Archive,
   Copy,
-  MoreHorizontal,
-  ChevronUp
+  MoreHorizontal
 } from 'lucide-react';
 
 /**

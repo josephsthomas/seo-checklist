@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import { useState, useMemo } from 'react';
 import {
   Library,
   Search,
@@ -7,7 +7,6 @@ import {
   Copy,
   Trash2,
   X,
-  ChevronDown,
   Filter,
   Check,
   FileText,
@@ -21,11 +20,10 @@ import {
   Video,
   Briefcase,
   Save,
-  Edit3,
   Eye
 } from 'lucide-react';
 import { useSchemaLibrary, SCHEMA_TYPES } from '../../hooks/useSchemaLibrary';
-import { format, formatDistanceToNow } from 'date-fns';
+import { formatDistanceToNow } from 'date-fns';
 import toast from 'react-hot-toast';
 
 const ICON_MAP = {

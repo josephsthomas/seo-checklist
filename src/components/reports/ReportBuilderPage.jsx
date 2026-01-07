@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useMemo, useRef } from 'react';
+import { useState, useCallback, useMemo, useRef } from 'react';
 import {
   Plus,
   Save,
@@ -7,12 +7,9 @@ import {
   EyeOff,
   Trash2,
   Copy,
-  Settings,
   ChevronLeft,
   ChevronRight,
-  GripVertical,
   X,
-  Check,
   FileText,
   BarChart3,
   Table,
@@ -24,17 +21,10 @@ import {
   Users,
   Code,
   Layout,
-  Palette,
-  Move,
   Maximize2,
   Minimize2,
-  RotateCcw,
-  Layers,
   PanelLeftClose,
   PanelLeft,
-  Printer,
-  Share2,
-  Clock,
   FolderOpen
 } from 'lucide-react';
 import { format } from 'date-fns';
@@ -85,7 +75,6 @@ export default function ReportBuilderPage() {
   const [isPreviewMode, setIsPreviewMode] = useState(false);
   const [showSidebar, setShowSidebar] = useState(true);
   const [selectedWidget, setSelectedWidget] = useState(null);
-  const [draggedWidget, setDraggedWidget] = useState(null);
   const [showTemplates, setShowTemplates] = useState(true);
   const [showSavedReports, setShowSavedReports] = useState(false);
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);

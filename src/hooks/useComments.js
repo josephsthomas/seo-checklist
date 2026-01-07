@@ -9,8 +9,7 @@ import {
   updateDoc,
   deleteDoc,
   doc,
-  serverTimestamp,
-  getDocs
+  serverTimestamp
 } from 'firebase/firestore';
 import { db } from '../lib/firebase';
 import { useAuth } from '../contexts/AuthContext';

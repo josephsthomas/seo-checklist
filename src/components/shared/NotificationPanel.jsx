@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { Bell, Check, CheckCheck, Trash2, X, Settings } from 'lucide-react';
+import { useState } from 'react';
+import { Bell, CheckCheck, X, Settings } from 'lucide-react';
 import { useNotifications } from '../../hooks/useNotifications';
 import { useNavigate } from 'react-router-dom';
 import { format } from 'date-fns';

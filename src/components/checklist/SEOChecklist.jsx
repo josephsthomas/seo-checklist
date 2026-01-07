@@ -1,11 +1,10 @@
-import React, { useState, useMemo, useEffect } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { useParams, useSearchParams } from 'react-router-dom';
 import { useProjects } from '../../hooks/useProjects';
 import { useChecklist } from '../../hooks/useChecklist';
 import { checklistData } from '../../data/checklistData';
 import {
   Check,
-  Filter,
   Download,
   Search,
   ChevronDown,
@@ -71,7 +70,7 @@ export default function SEOChecklist() {
       setLoading(false);
     };
     fetchProject();
-  }, [projectId]);
+  }, [projectId, getProject]);
 
   // Filter checklist items based on project type and filters
   const filteredItems = useMemo(() => {
@@ -163,7 +162,7 @@ export default function SEOChecklist() {
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
           <h2 className="text-2xl font-bold text-charcoal-900">Project not found</h2>
-          <p className="text-charcoal-600 mt-2">The project you're looking for doesn't exist.</p>
+          <p className="text-charcoal-600 mt-2">The project you&apos;re looking for doesn&apos;t exist.</p>
         </div>
       </div>
     );

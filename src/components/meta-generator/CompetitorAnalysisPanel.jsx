@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import {
   Search,
   Globe,
@@ -282,7 +282,7 @@ export default function CompetitorAnalysisPanel({ currentMeta, onClose, onApplyI
               Enter a competitor URL to analyze
             </p>
             <p className="text-sm text-charcoal-500 dark:text-charcoal-500 mt-1">
-              We'll extract their meta tags for comparison
+              We&apos;ll extract their meta tags for comparison
             </p>
           </div>
         )}
@@ -477,7 +477,7 @@ export default function CompetitorAnalysisPanel({ currentMeta, onClose, onApplyI
                   <h4 className="font-medium text-primary-900 dark:text-primary-300 mb-2">Insights</h4>
                   <ul className="text-sm text-primary-800 dark:text-primary-400 space-y-1">
                     <li>• Competitor uses action-oriented language in their title</li>
-                    <li>• Their description includes social proof ("10,000+ satisfied customers")</li>
+                    <li>• Their description includes social proof (&quot;10,000+ satisfied customers&quot;)</li>
                     <li>• They have complete Open Graph implementation for social sharing</li>
                   </ul>
                 </div>

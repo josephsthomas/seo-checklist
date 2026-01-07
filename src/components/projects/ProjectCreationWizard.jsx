@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useProjects } from '../../hooks/useProjects';
 import { ArrowLeft, ArrowRight, Check, X, HelpCircle, Info, Lightbulb } from 'lucide-react';
@@ -257,7 +257,7 @@ export default function ProjectCreationWizard() {
                   placeholder="e.g., Acme Corp Website Redesign"
                 />
                 <p className="mt-1 text-xs text-charcoal-500">
-                  Use a clear, descriptive name. Example: "ClientName - ProjectType - Year"
+                  Use a clear, descriptive name. Example: &quot;ClientName - ProjectType - Year&quot;
                 </p>
                 {errors.name && <p className="mt-1 text-sm text-red-600">{errors.name}</p>}
               </div>

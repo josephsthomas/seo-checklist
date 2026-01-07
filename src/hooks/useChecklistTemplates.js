@@ -137,7 +137,7 @@ export function useChecklistTemplates() {
     const template = templates.find(t => t.id === templateId);
     if (!template) return null;
 
-    const { id, createdAt, updatedAt, usageCount, lastUsedAt, ...templateData } = template;
+    const { ...templateData } = template;
 
     return createTemplate({
       ...templateData,

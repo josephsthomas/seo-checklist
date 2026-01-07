@@ -1,10 +1,10 @@
-import React, { useState, useCallback } from 'react';
-import { AlertTriangle, ArrowLeft, RotateCcw, HelpCircle, FileWarning, FileX, Database, Lightbulb } from 'lucide-react';
+import { useState, useCallback } from 'react';
+import { AlertTriangle, RotateCcw, HelpCircle, FileWarning, FileX, Database, Lightbulb } from 'lucide-react';
 import AuditUploadScreen from './upload/AuditUploadScreen';
 import ProcessingScreen from './upload/ProcessingScreen';
 import AuditDashboard from './dashboard/AuditDashboard';
 import { processZipFile } from '../../lib/audit/zipProcessor';
-import { parseInternalAll, extractDomainInfo, parseAllFiles } from '../../lib/audit/excelParser';
+import { parseInternalAll, extractDomainInfo } from '../../lib/audit/excelParser';
 import { runAudit } from '../../lib/audit/auditEngine';
 import toast from 'react-hot-toast';
 
@@ -209,7 +209,7 @@ export default function AuditPage() {
         />
       );
 
-    case VIEWS.ERROR:
+    case VIEWS.ERROR: {
       const guidance = getErrorGuidance(error || '');
       const ErrorIcon = guidance.icon;
       return (
@@ -268,6 +268,7 @@ export default function AuditPage() {
           </div>
         </div>
       );
+    }
 
     default:
       return <AuditUploadScreen onFileSelect={handleFileSelect} />;

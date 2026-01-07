@@ -1,14 +1,11 @@
-import React, { useState, useEffect, useCallback } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useState, useEffect, useCallback } from 'react';
+import { useNavigate } from 'react-router-dom';
 import {
   Play,
-  Pause,
-  SkipForward,
   X,
   ChevronLeft,
   ChevronRight,
   CheckCircle2,
-  Circle,
   Target,
   Lightbulb,
   ArrowRight
@@ -273,7 +270,6 @@ export default function InteractiveTutorial({
 }) {
   const [currentStep, setCurrentStep] = useState(0);
   const [completedSteps, setCompletedSteps] = useState(new Set());
-  const navigate = useNavigate();
 
   const tutorial = TUTORIALS[tutorialId];
 

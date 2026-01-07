@@ -1,4 +1,3 @@
-import React from 'react';
 import { FileArchive, CheckCircle, Loader2, Accessibility } from 'lucide-react';
 
 const STAGES = {

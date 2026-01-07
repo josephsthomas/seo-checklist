@@ -129,7 +129,7 @@ export function useExportHistory(limit = 20) {
  * Hook to get pending exports (items that haven't been exported yet)
  */
 export function usePendingExports() {
-  const [pending, setPending] = useState({
+  const [pending] = useState({
     audits: [],
     accessibility: [],
     imageAlt: [],

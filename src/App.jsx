@@ -1,4 +1,4 @@
-import React, { Suspense, lazy } from 'react';
+import { Suspense, lazy } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate, Link } from 'react-router-dom';
 import { Toaster } from 'react-hot-toast';
 import { AuthProvider } from './contexts/AuthContext';
@@ -94,7 +94,7 @@ function NotFoundPage() {
         <h1 className="text-6xl font-bold text-charcoal-900 mb-2">404</h1>
         <p className="text-xl text-charcoal-600 mb-6">Page not found</p>
         <p className="text-charcoal-500 mb-8">
-          The page you're looking for doesn't exist or has been moved.
+          The page you&apos;re looking for doesn&apos;t exist or has been moved.
         </p>
         <Link
           to="/"

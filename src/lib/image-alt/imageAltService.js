@@ -243,7 +243,7 @@ export async function processImageBatch(files, context = {}, onProgress = () => 
   for (let i = 0; i < total; i += concurrency) {
     const batch = files.slice(i, i + concurrency);
     const batchResults = await Promise.all(
-      batch.map(async (file, idx) => {
+      batch.map(async (file) => {
         try {
           const result = await generateAltText(file, context);
           return {

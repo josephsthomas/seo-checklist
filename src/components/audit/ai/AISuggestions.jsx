@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react';
+import { useState, useCallback } from 'react';
 import {
   Sparkles,
   RefreshCw,
@@ -315,7 +315,7 @@ export default function AISuggestions({ pageData }) {
       ) : !loading && (
         <div className="px-6 py-8 text-center">
           <Sparkles className="w-12 h-12 text-charcoal-300 mx-auto mb-3" />
-          <p className="text-charcoal-500">Click "Generate Suggestions" to get AI-powered SEO recommendations</p>
+          <p className="text-charcoal-500">Click &quot;Generate Suggestions&quot; to get AI-powered SEO recommendations</p>
         </div>
       )}
     </div>

@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react';
+import { useState, useCallback } from 'react';
 import { useDropzone } from 'react-dropzone';
 import {
   Upload,
@@ -12,7 +12,6 @@ import {
   Zap,
   FileText,
   CheckCircle2,
-  Circle,
   PlayCircle,
   ChevronDown,
   ChevronUp,
@@ -258,7 +257,7 @@ export default function AuditUploadScreen({ onFileSelect }) {
             <div className="mt-4 p-3 rounded-xl bg-emerald-100 border border-emerald-200">
               <p className="text-sm text-emerald-800 font-medium flex items-center gap-2">
                 <CheckCircle className="w-4 h-4" />
-                You're ready to upload! Drag and drop your ZIP file above.
+                You&apos;re ready to upload! Drag and drop your ZIP file above.
               </p>
             </div>
           )}
@@ -297,17 +296,17 @@ export default function AuditUploadScreen({ onFileSelect }) {
                     <p className="text-sm text-primary-800">
                       The Technical Audit tool analyzes your Screaming Frog export to identify SEO issues
                       across 31 categories including indexability, content quality, page speed, and more.
-                      You'll get actionable recommendations with AI-powered suggestions to fix each issue.
+                      You&apos;ll get actionable recommendations with AI-powered suggestions to fix each issue.
                     </p>
                   </div>
                 </div>
               </div>
 
-              {/* What you'll need */}
+              {/* What you will need */}
               <div>
                 <h5 className="font-semibold text-charcoal-900 mb-3 flex items-center gap-2">
                   <span className="w-6 h-6 rounded-lg bg-charcoal-100 flex items-center justify-center text-xs font-bold text-charcoal-600">1</span>
-                  What you'll need
+                  What you&apos;ll need
                 </h5>
                 <ul className="space-y-2 text-sm text-charcoal-600 ml-8">
                   <li className="flex items-start gap-2">
@@ -325,11 +324,11 @@ export default function AuditUploadScreen({ onFileSelect }) {
                 </ul>
               </div>
 
-              {/* What you'll get */}
+              {/* What you will get */}
               <div>
                 <h5 className="font-semibold text-charcoal-900 mb-3 flex items-center gap-2">
                   <span className="w-6 h-6 rounded-lg bg-charcoal-100 flex items-center justify-center text-xs font-bold text-charcoal-600">2</span>
-                  What you'll get from the audit
+                  What you&apos;ll get from the audit
                 </h5>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 ml-8">
                   {[

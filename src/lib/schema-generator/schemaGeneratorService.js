@@ -173,7 +173,7 @@ export function extractHtmlContent(html) {
 /**
  * Detect potential content types from HTML
  */
-function detectContentTypes(doc, headings, paragraphs) {
+function detectContentTypes(doc, headings, _paragraphs) {
   const types = [];
 
   // Check for FAQ patterns
@@ -302,7 +302,7 @@ export async function generateSchema(htmlContent, options = {}) {
  * Build the prompt for Claude
  */
 function buildPrompt(htmlContent, selectedType, pageUrl, organizationName) {
-  const { title, h1, headings, paragraphs, meta, detectedTypes, bodyText } = htmlContent;
+  const { title, h1, headings, meta, detectedTypes, bodyText } = htmlContent;
 
   let prompt = `You are an expert in schema.org structured data and SEO. Generate valid JSON-LD schema markup based on the following HTML content.
 

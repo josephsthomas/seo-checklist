@@ -1,11 +1,10 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import {
   HelpCircle,
   X,
   ChevronRight,
   Lightbulb,
   Target,
-  Sparkles,
   ExternalLink,
   Video,
   BookOpen,

@@ -6,7 +6,7 @@
 import jsPDF from 'jspdf';
 import 'jspdf-autotable';
 import * as XLSX from 'xlsx';
-import { SEVERITY, PRIORITY } from './auditEngine';
+import { SEVERITY } from './auditEngine';
 
 /**
  * Generate PDF report from audit results

@@ -6,8 +6,7 @@
 import jsPDF from 'jspdf';
 import 'jspdf-autotable';
 import * as XLSX from 'xlsx';
-import { WCAG_CRITERIA, WCAG_PRINCIPLES, WCAG_LEVELS, getCriteriaByLevel } from '../../data/wcagCriteria';
-import { IMPACT_LEVELS } from '../../data/axeRules';
+import { WCAG_CRITERIA, WCAG_PRINCIPLES, getCriteriaByLevel } from '../../data/wcagCriteria';
 import { COMPLIANCE_STATUS } from './accessibilityEngine';
 
 /**
