@@ -4,6 +4,25 @@
  */
 
 const CLAUDE_API_URL = 'https://api.anthropic.com/v1/messages';
+const API_TIMEOUT_MS = 60000; // 60 second timeout for image processing
+
+/**
+ * Fetch with timeout
+ */
+async function fetchWithTimeout(url, options, timeoutMs = API_TIMEOUT_MS) {
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
+
+  try {
+    const response = await fetch(url, {
+      ...options,
+      signal: controller.signal
+    });
+    return response;
+  } finally {
+    clearTimeout(timeoutId);
+  }
+}
 
 /**
  * Get API configuration
@@ -81,7 +100,7 @@ export async function generateAltText(imageFile, context = {}) {
     let response;
 
     if (config.useProxy) {
-      response = await fetch(config.proxyUrl, {
+      response = await fetchWithTimeout(config.proxyUrl, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -92,7 +111,7 @@ export async function generateAltText(imageFile, context = {}) {
         })
       });
     } else {
-      response = await fetch(CLAUDE_API_URL, {
+      response = await fetchWithTimeout(CLAUDE_API_URL, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -193,13 +212,14 @@ RESPOND IN JSON FORMAT ONLY:
  */
 function parseAltTextResponse(content, originalFilename) {
   try {
-    // Extract JSON from response
-    const jsonMatch = content.match(/\{[\s\S]*\}/);
+    // Extract JSON from response - use non-greedy match for safety
+    const jsonMatch = content.match(/\{[^{}]*(?:\{[^{}]*\}[^{}]*)*\}/);
     if (jsonMatch) {
       const parsed = JSON.parse(jsonMatch[0]);
 
-      // Get file extension from original
-      const ext = originalFilename.split('.').pop().toLowerCase();
+      // Get file extension from original - handle files without extension
+      const parts = originalFilename.split('.');
+      const ext = parts.length > 1 ? parts.pop().toLowerCase() : 'jpg';
 
       return {
         alt_text: parsed.alt_text || '',
@@ -221,11 +241,13 @@ function parseAltTextResponse(content, originalFilename) {
  */
 function getStaticAltTextSuggestion(filename) {
   const name = filename.replace(/\.[^/.]+$/, '').replace(/[-_]/g, ' ');
-  const ext = filename.split('.').pop().toLowerCase();
+  // Handle files without extension
+  const parts = filename.split('.');
+  const ext = parts.length > 1 ? parts.pop().toLowerCase() : 'jpg';
 
   return {
-    alt_text: `Image: ${name}`,
-    filename: name.toLowerCase().replace(/\s+/g, '-').slice(0, 50) + '.' + ext,
+    alt_text: `Image: ${name || 'Unnamed image'}`,
+    filename: (name.toLowerCase().replace(/\s+/g, '-').slice(0, 50) || 'image') + '.' + ext,
     is_decorative: false,
     detected_elements: [],
     confidence: 0.5

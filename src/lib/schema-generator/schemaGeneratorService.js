@@ -4,6 +4,25 @@
  */
 
 const CLAUDE_API_URL = 'https://api.anthropic.com/v1/messages';
+const API_TIMEOUT_MS = 30000; // 30 second timeout
+
+/**
+ * Fetch with timeout
+ */
+async function fetchWithTimeout(url, options, timeoutMs = API_TIMEOUT_MS) {
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
+
+  try {
+    const response = await fetch(url, {
+      ...options,
+      signal: controller.signal
+    });
+    return response;
+  } finally {
+    clearTimeout(timeoutId);
+  }
+}
 
 /**
  * Get API configuration
@@ -125,7 +144,7 @@ export function extractHtmlContent(html) {
   const title = doc.querySelector('title')?.textContent || '';
   const h1 = doc.querySelector('h1')?.textContent || '';
   const headings = Array.from(doc.querySelectorAll('h1, h2, h3, h4')).map(h => ({
-    level: parseInt(h.tagName[1]),
+    level: parseInt(h.tagName[1], 10),
     text: h.textContent.trim()
   }));
 
@@ -254,7 +273,7 @@ export async function generateSchema(htmlContent, options = {}) {
     let response;
 
     if (config.useProxy) {
-      response = await fetch(config.proxyUrl, {
+      response = await fetchWithTimeout(config.proxyUrl, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -263,7 +282,7 @@ export async function generateSchema(htmlContent, options = {}) {
         })
       });
     } else {
-      response = await fetch(CLAUDE_API_URL, {
+      response = await fetchWithTimeout(CLAUDE_API_URL, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

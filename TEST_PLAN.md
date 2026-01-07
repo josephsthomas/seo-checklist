@@ -5,6 +5,7 @@
 This test plan covers all aspects of the Content Strategy Portal application, including unit tests, integration tests, UI/UX testing, security testing, and accessibility compliance verification.
 
 **Final Status: All critical defects FIXED**
+**Batch 1 Enhancement Status: 4 high-impact fixes completed**
 
 ---
 
@@ -303,7 +304,34 @@ This test plan covers all aspects of the Content Strategy Portal application, in
 
 ---
 
-*Test Plan Version: 2.0*
-*Last Updated: 2026-01-06*
+---
+
+## 15. Batch 1 - High-Impact Enhancements
+
+### 15.1 Security & Data Integrity Fixes
+| Issue | Location | Fix Applied | Status |
+|-------|----------|-------------|--------|
+| Missing parseInt radix | accessibilityEngine.js | Added radix 10 to all parseInt calls | FIXED |
+| Missing parseInt radix | schemaGeneratorService.js | Added radix 10 to parseInt | FIXED |
+| API timeout not set | All AI service files | Added 30-60s timeout with AbortController | FIXED |
+| File extension edge case | imageAltService.js | Handle files without extension | FIXED |
+
+### 15.2 Files Modified in Batch 1
+- `src/lib/accessibility/accessibilityEngine.js` - parseInt radix fixes
+- `src/lib/schema-generator/schemaGeneratorService.js` - parseInt radix + API timeout
+- `src/lib/image-alt/imageAltService.js` - File extension handling + API timeout
+- `src/lib/meta-generator/metaGeneratorService.js` - API timeout
+
+### 15.3 Batch 1 Verification
+| Check | Result |
+|-------|--------|
+| All tests pass | ✓ 71/71 tests pass |
+| Build succeeds | ✓ Built in 18.86s |
+| No new ESLint errors | ✓ 0 errors |
+
+---
+
+*Test Plan Version: 3.0*
+*Last Updated: 2026-01-07*
 *Testing Framework: Vitest 4.0.16*
-*Total Defects Fixed: 302 (49 errors + 253 warnings)*
+*Total Defects Fixed: 306 (49 errors + 253 warnings + 4 enhancements)*
