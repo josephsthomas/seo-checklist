@@ -257,7 +257,7 @@ export default function MyTasksPage() {
                 </p>
                 <div className="flex flex-col sm:flex-row gap-3 justify-center">
                   <Link
-                    to="/planner"
+                    to="/app/planner"
                     className="btn btn-primary inline-flex items-center gap-2"
                   >
                     <ClipboardList className="w-4 h-4" />

@@ -233,7 +233,7 @@ export default function ProjectHealthReport() {
         <div className="text-center">
           <AlertTriangle className="w-16 h-16 text-charcoal-300 mx-auto mb-4" />
           <h2 className="text-xl font-semibold text-charcoal-900 mb-2">Project Not Found</h2>
-          <Link to="/planner" className="text-primary-600 hover:text-primary-700">
+          <Link to="/app/planner" className="text-primary-600 hover:text-primary-700">
             Go to Content Planner
           </Link>
         </div>

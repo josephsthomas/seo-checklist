@@ -351,7 +351,7 @@ export function ActivityWidget({ limit = 5, className = '' }) {
           <h3 className="font-semibold text-charcoal-900">Recent Activity</h3>
         </div>
         <Link
-          to="/activity"
+          to="/app/activity"
           className="text-sm text-primary-600 hover:text-primary-700 font-medium"
         >
           View All

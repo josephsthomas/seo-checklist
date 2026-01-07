@@ -46,7 +46,9 @@ export default function Footer() {
             {/* Social Links */}
             <div className="flex items-center gap-3" role="list" aria-label="Social media links">
               <a
-                href="#"
+                href="https://twitter.com/contentstrategyhq"
+                target="_blank"
+                rel="noopener noreferrer"
                 className="w-9 h-9 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 hover:border-white/20 flex items-center justify-center text-charcoal-400 hover:text-white transition-all duration-200"
                 aria-label="Follow us on Twitter"
                 role="listitem"
@@ -54,7 +56,9 @@ export default function Footer() {
                 <Twitter className="w-4 h-4" aria-hidden="true" />
               </a>
               <a
-                href="#"
+                href="https://linkedin.com/company/content-strategy-portal"
+                target="_blank"
+                rel="noopener noreferrer"
                 className="w-9 h-9 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 hover:border-white/20 flex items-center justify-center text-charcoal-400 hover:text-white transition-all duration-200"
                 aria-label="Connect on LinkedIn"
                 role="listitem"
@@ -62,7 +66,9 @@ export default function Footer() {
                 <Linkedin className="w-4 h-4" aria-hidden="true" />
               </a>
               <a
-                href="#"
+                href="https://github.com/content-strategy-portal"
+                target="_blank"
+                rel="noopener noreferrer"
                 className="w-9 h-9 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 hover:border-white/20 flex items-center justify-center text-charcoal-400 hover:text-white transition-all duration-200"
                 aria-label="View our GitHub"
                 role="listitem"
@@ -70,7 +76,7 @@ export default function Footer() {
                 <Github className="w-4 h-4" aria-hidden="true" />
               </a>
               <a
-                href="mailto:support@flipside.com"
+                href="mailto:support@content-strategy.co"
                 className="w-9 h-9 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 hover:border-white/20 flex items-center justify-center text-charcoal-400 hover:text-white transition-all duration-200"
                 aria-label="Send us an email"
                 role="listitem"

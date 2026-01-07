@@ -123,7 +123,7 @@ export default function LinkToProjectModal({ isOpen, onClose, item }) {
                     Create a project to link this item
                   </p>
                   <Link
-                    to="/planner/new"
+                    to="/app/planner/new"
                     className="inline-flex items-center gap-2 mt-4 px-4 py-2 bg-primary-500 text-white rounded-lg hover:bg-primary-600 transition-colors"
                   >
                     <Plus className="w-4 h-4" />

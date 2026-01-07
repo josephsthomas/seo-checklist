@@ -312,7 +312,7 @@ export default function ExportHubPage() {
                 <div className="text-center py-8 bg-white rounded-xl border border-charcoal-100">
                   <FolderOpen className="w-12 h-12 text-charcoal-300 mx-auto mb-3" />
                   <p className="text-charcoal-500">No projects yet</p>
-                  <Link to="/planner/new" className="text-primary-600 hover:text-primary-700 text-sm font-medium">
+                  <Link to="/app/planner/new" className="text-primary-600 hover:text-primary-700 text-sm font-medium">
                     Create your first project
                   </Link>
                 </div>
