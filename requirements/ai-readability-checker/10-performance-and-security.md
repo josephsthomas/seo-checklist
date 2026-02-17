@@ -11,7 +11,7 @@
 | URL fetch (server-side proxy) | < 3s | 30s (timeout) | Request to HTML response |
 | Content extraction (client) | < 500ms | 2s | HTML to structured data |
 | Single LLM API call | < 5s | 30s (timeout) | Request to parsed response |
-| All 4 LLM calls (parallel) | < 8s | 30s | Start to last completion |
+| All 3 LLM calls (parallel, MVP) | < 8s | 30s | Start to last completion |
 | Rule-based scoring | < 200ms | 500ms | Extracted data to scores |
 | Recommendation generation | < 300ms | 1s | Scores to recommendations |
 | Full analysis (end-to-end) | < 15s | 45s | User clicks Analyze to results |
@@ -46,7 +46,7 @@
 
 | Constraint | Limit |
 |---|---|
-| Concurrent LLM API calls | 4 (one per provider, in parallel) |
+| Concurrent LLM API calls | 3 MVP (Claude, OpenAI, Gemini in parallel; Perplexity added in Phase 2) |
 | Concurrent analyses per user | 1 (queue additional requests) |
 | Concurrent URL fetches per user | 1 |
 | Background Firestore writes | Non-blocking, fire-and-forget with retry |
@@ -206,7 +206,7 @@ The following monitoring capabilities are REQUIRED for launch, not optional reco
 
 ---
 
-*Document Version: 1.1*
+*Document Version: 1.2*
 *Created: 2026-02-17*
 *Last Updated: 2026-02-17*
 *Status: Draft*

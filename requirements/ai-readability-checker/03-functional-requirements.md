@@ -114,15 +114,15 @@
 
 | Category | Weight | Description |
 |---|---|---|
-| Content Structure | 25% | Heading hierarchy, semantic HTML, logical flow |
+| Content Structure | 20% | Heading hierarchy, semantic HTML, logical flow |
 | Content Clarity | 25% | Readability, complexity, answer-friendliness |
 | Technical Accessibility | 20% | Render method, crawl signals, load dependencies |
 | Metadata & Schema | 15% | Title, description, OG tags, structured data |
-| AI-Specific Signals | 15% | Freshness, authority, citation-friendliness |
+| AI-Specific Signals | 20% | Freshness, authority, citation-friendliness |
 
 - The overall score SHALL be a number from 0 to 100, rounded to the nearest integer.
 
-#### FR-2.2.2: Content Structure Scoring (25%)
+#### FR-2.2.2: Content Structure Scoring (20%)
 
 The following checks SHALL be performed:
 
@@ -185,7 +185,7 @@ The following checks SHALL be performed:
 | MS-09 | Breadcrumb markup present | BreadcrumbList schema or `<nav>` breadcrumbs | Low |
 | MS-10 | FAQ/HowTo schema when applicable | FAQ or HowTo schema present when content matches those patterns | Medium |
 
-#### FR-2.2.6: AI-Specific Signals Scoring (15%)
+#### FR-2.2.6: AI-Specific Signals Scoring (20%)
 
 | Check ID | Check | Pass Criteria | Weight |
 |---|---|---|---|
@@ -222,7 +222,7 @@ The following checks SHALL be performed:
 
 ---
 
-## 3. LLM Rendering Preview
+## 3. How AI Sees Your Content
 
 ### 3.1 Content Extraction per LLM
 
@@ -237,7 +237,7 @@ The following checks SHALL be performed:
   6. Assess the page's usefulness for answering user questions
 - Each LLM's response SHALL be displayed in a consistent, normalized format.
 
-> **Important Disclaimer (D-GEO-01):** The extraction methodology described above tests **LLM comprehension** — i.e., how well each model can parse and understand the page content when provided to it. It does **not** simulate actual crawl behavior of these models' associated web crawlers (e.g., GPTBot, Googlebot). Actual crawl behavior depends on infrastructure-level factors (robots.txt enforcement, rate limiting, JavaScript rendering pipelines) that are outside the scope of this tool. In user-facing UI, this feature should be labeled **"LLM Comprehension Preview"** (not "LLM Rendering Preview") and must include a visible disclaimer: *"This preview shows how each AI model interprets your content when provided to it. It does not simulate actual web crawling behavior."*
+> **Important Disclaimer (D-GEO-01):** The extraction methodology described above tests **LLM comprehension** — i.e., how well each model can parse and understand the page content when provided to it. It does **not** simulate actual crawl behavior of these models' associated web crawlers (e.g., GPTBot, Googlebot). Actual crawl behavior depends on infrastructure-level factors (robots.txt enforcement, rate limiting, JavaScript rendering pipelines) that are outside the scope of this tool. In user-facing UI, this feature should be labeled **"How AI Sees Your Content"** and must include a visible disclaimer: *"This preview shows how each AI model interprets your content when provided to it. It does not simulate actual web crawling behavior."*
 
 #### FR-3.1.2: Supported LLMs
 The system SHALL support rendering previews for the following LLMs:
@@ -247,7 +247,7 @@ The system SHALL support rendering previews for the following LLMs:
 | Claude (Anthropic) | Messages API | claude-sonnet-4-5-20250929 | MVP |
 | GPT (OpenAI) | Chat Completions API | gpt-4o | MVP |
 | Gemini (Google) | Generative Language API | gemini-2.0-flash | MVP |
-| Perplexity | Chat Completions API | sonar-pro | MVP |
+| Perplexity | Chat Completions API | sonar-pro | **Phase 2** — search-augmented behavior requires separate handling |
 
 #### FR-3.1.3: Response Normalization
 - Each LLM's extraction SHALL be normalized into a common data structure:
@@ -337,7 +337,11 @@ Recommendations SHALL be grouped into the following actionable categories:
 - See document `04-api-integration-and-data-architecture.md` for the complete data model.
 
 #### FR-5.1.2: Storage Limits
-- Users SHALL be limited to 100 stored analyses (oldest auto-archived after limit).
+- Storage limits SHALL be **tiered by role**:
+  - **Admin**: 500 stored analyses
+  - **Project Manager**: 250 stored analyses
+  - **All other roles**: 100 stored analyses
+- Oldest analyses are auto-archived when a user exceeds their tier's limit.
 - HTML snapshots SHALL be stored in Firebase Storage with a 90-day retention policy.
 - LLM extraction raw responses SHALL be stored for 30 days, then reduced to summary data only.
 
@@ -385,4 +389,4 @@ Recommendations SHALL be grouped into the following actionable categories:
 *Document Version: 1.1*
 *Created: 2026-02-17*
 *Last Updated: 2026-02-17*
-*Status: Draft — Updated with D-GEO-03, E-GEO-11, D-GEO-01, D-CMO-06, E-CMO-04, E-CMO-05 revisions*
+*Status: Draft — v1.2: AI-Specific Signals weight 20% (Q1), tiered storage (Q7), Perplexity Phase 2 (Q8), "How AI Sees Your Content" rename (Q5)*

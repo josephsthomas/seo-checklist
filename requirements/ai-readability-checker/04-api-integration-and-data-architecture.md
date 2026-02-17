@@ -13,12 +13,12 @@ Client (React App)
   |       |
   |       +-- Rule-Based Scoring Engine (lib/readability/scorer.js)
   |       +-- AI Analysis via Claude (lib/readability/aiAnalyzer.js)
-  |       +-- LLM Rendering Preview Engine (lib/readability/llmPreview.js)
+  |       +-- "How AI Sees Your Content" Engine (lib/readability/llmPreview.js)
   |               |
   |               +-- Claude (Anthropic) extraction
   |               +-- GPT (OpenAI) extraction
   |               +-- Gemini (Google) extraction
-  |               +-- Perplexity extraction
+  |               +-- Perplexity extraction (Phase 2)
   |
   +-- Results Aggregator (lib/readability/aggregator.js)
   |
@@ -28,7 +28,7 @@ External Services:
   +-- Anthropic (Claude API) — existing integration
   +-- OpenAI (GPT API) — new integration
   +-- Google (Gemini API) — new integration
-  +-- Perplexity (Sonar API) — new integration
+  +-- Perplexity (Sonar API) — Phase 2
   +-- Content Fetch Proxy (VITE_AI_PROXY_URL) — extended
 ```
 
@@ -42,7 +42,7 @@ External Services:
    a. Claude Analysis (scoring + extraction)
    b. OpenAI Extraction
    c. Gemini Extraction
-   d. Perplexity Extraction
+   d. (Phase 2) Perplexity Extraction
 5. AGGREGATE RESULTS
 6. CALCULATE SCORES (client-side rule engine + AI input)
 7. GENERATE RECOMMENDATIONS (rule-based + AI-generated)
@@ -152,7 +152,7 @@ Authorization: Bearer {firebase-auth-token}
 
 ```json
 {
-  "provider": "anthropic | openai | google | perplexity",
+  "provider": "anthropic | openai | google",  // "perplexity" added in Phase 2
   "model": "model-id",
   "task": "readability-extraction",
   "content": {
@@ -219,7 +219,7 @@ The proxy SHALL translate to:
 
 Claude is used for two distinct tasks:
 1. **Readability Analysis** — Scoring input for Content Clarity and AI-Specific Signals categories
-2. **Content Extraction** — LLM rendering preview (same prompt as other LLMs)
+2. **Content Extraction** — "How AI Sees Your Content" preview (same prompt as other LLMs)
 
 ### 3.3 OpenAI (GPT) — Extraction
 
@@ -272,9 +272,11 @@ The proxy SHALL translate to:
 }
 ```
 
-### 3.5 Perplexity — Extraction
+### 3.5 Perplexity — Extraction *(Phase 2)*
 
-- **Environment Variable:** VITE_PERPLEXITY_API_KEY (new, server-side only)
+> **Deferred to Phase 2.** Perplexity's Sonar model is search-augmented — it fetches live web data during inference, making its responses fundamentally different from Claude/GPT/Gemini. Adding it in Phase 2 allows time to design appropriate UX handling and score comparability disclaimers.
+
+- **Environment Variable:** PERPLEXITY_API_KEY (proxy server only)
 - **Model:** sonar-pro
 - **API:** Perplexity Chat Completions API (OpenAI-compatible)
 
@@ -431,7 +433,7 @@ Respond in valid JSON with this exact structure:
     },
     openai: { /* same structure */ },
     gemini: { /* same structure */ },
-    perplexity: { /* same structure */ }
+    perplexity: { /* same structure — Phase 2 */ }
   },
 
   // Recommendations
@@ -486,7 +488,7 @@ Respond in valid JSON with this exact structure:
 {
   userId: string,
   defaultInputMethod: 'url' | 'upload' | 'paste',
-  enabledLLMs: ['claude', 'openai', 'gemini', 'perplexity'],
+  enabledLLMs: ['claude', 'openai', 'gemini'],  // 'perplexity' added in Phase 2
   defaultExportFormat: 'pdf' | 'json',
   shareDefaultExpiry: 30,
   analysisCount: number,
@@ -564,14 +566,17 @@ match /readability/{userId}/exports/{filename} {
 
 ### 5.1 Rate Limits
 
-| API | Limit (per user) | Window | On Exceed |
-|---|---|---|---|
-| URL Fetch | 30 requests | 1 hour | Queue with wait time |
-| Claude Analysis | 20 requests | 1 hour | Fallback to rule-based only |
-| OpenAI Extraction | 20 requests | 1 hour | Skip LLM preview |
-| Gemini Extraction | 20 requests | 1 hour | Skip LLM preview |
-| Perplexity Extraction | 20 requests | 1 hour | Skip LLM preview |
-| Full Analysis | 15 analyses | 1 hour | Show countdown |
+Rate limits are **tiered by plan**:
+
+| API | Free Plan | Pro Plan | Enterprise Plan | Window | On Exceed |
+|---|---|---|---|---|---|
+| URL Fetch | 15 requests | 50 requests | Unlimited | 1 hour | Queue with wait time |
+| Claude Analysis | 10 requests | 30 requests | Unlimited | 1 hour | Fallback to rule-based only |
+| OpenAI Extraction | 10 requests | 30 requests | Unlimited | 1 hour | Skip LLM preview |
+| Gemini Extraction | 10 requests | 30 requests | Unlimited | 1 hour | Skip LLM preview |
+| Full Analysis | 10 analyses | 30 analyses | Unlimited | 1 hour | Show countdown |
+
+> **Note:** "Unlimited" for Enterprise is subject to a system-level safety cap (200/hour) to prevent runaway costs. Rate limits are enforced server-side by the proxy based on the user's plan tier.
 
 ### 5.2 Cost Estimates
 
@@ -580,7 +585,7 @@ match /readability/{userId}/exports/{filename} {
 | Claude (Anthropic) | ~$0.01-0.03 | $150/month |
 | OpenAI (GPT-4o) | ~$0.01-0.03 | $100/month |
 | Google Gemini | ~$0.005-0.015 | $50/month |
-| Perplexity (Sonar) | ~$0.005-0.02 | $50/month |
+| Perplexity (Sonar) | ~$0.005-0.02 | $50/month | *(Phase 2)* |
 
 > **Note:** When any provider's monthly cap is reached, that provider's LLM preview becomes unavailable for the remainder of the month. Rule-based scoring continues unaffected.
 
@@ -625,13 +630,13 @@ When individual LLM APIs fail, the system SHALL:
 | VITE_CLAUDE_API_KEY | Yes | Existing | Legacy client-side Anthropic key; the proxy uses its own `ANTHROPIC_API_KEY` server-side |
 | OPENAI_API_KEY | Yes | **New** | Proxy server only (NOT in client .env) |
 | GEMINI_API_KEY | Yes | **New** | Proxy server only (NOT in client .env) |
-| PERPLEXITY_API_KEY | Yes | **New** | Proxy server only (NOT in client .env) |
+| PERPLEXITY_API_KEY | Phase 2 | **New** | Proxy server only (NOT in client .env) — deferred to Phase 2 |
 
-> **Warning:** The `VITE_` prefix causes Vite to embed the variable in the client-side bundle, exposing it to end users. All third-party LLM API keys (OpenAI, Gemini, Perplexity) MUST be set on the proxy server without the `VITE_` prefix. `VITE_CLAUDE_API_KEY` is retained only for legacy client-side compatibility; production Claude calls route through the proxy's `ANTHROPIC_API_KEY`.
+> **Warning:** The `VITE_` prefix causes Vite to embed the variable in the client-side bundle, exposing it to end users. All third-party LLM API keys (OpenAI, Gemini; Perplexity in Phase 2) MUST be set on the proxy server without the `VITE_` prefix. `VITE_CLAUDE_API_KEY` is retained only for legacy client-side compatibility; production Claude calls route through the proxy's `ANTHROPIC_API_KEY`.
 
 ---
 
-*Document Version: 1.1*
+*Document Version: 1.2*
 *Created: 2026-02-17*
 *Last Updated: 2026-02-17*
-*Status: Draft*
+*Status: Draft — v1.2: Tiered rate limits by plan (Q4), Perplexity deferred to Phase 2 (Q8), "How AI Sees Your Content" rename (Q5)*

@@ -218,19 +218,19 @@ async function runAnalysis(input, onProgress) {
     onProgress(20, 'Extracting content and metadata...');
     const extracted = extractContent(html);
 
-    // Stage 3-6: Parallel LLM calls (25-85%)
+    // Stage 3-5: Parallel LLM calls (25-85%)
+    // MVP: 3 LLMs (Claude, OpenAI, Gemini). Perplexity deferred to Phase 2.
     onProgress(25, 'Analyzing with AI models...');
     // Using Promise.all (not allSettled) because each LLM function catches
     // its own errors internally and never rejects — they return error status objects instead.
     const [claudeAnalysis, ...llmExtractions] = await Promise.all([
       analyzeWithClaude(extracted, abortController.signal),
       extractWithOpenAI(extracted, abortController.signal),
-      extractWithGemini(extracted, abortController.signal),
-      extractWithPerplexity(extracted, abortController.signal)
+      extractWithGemini(extracted, abortController.signal)
     ]);
 
     // Update progress per resolved promise
-    // Each LLM completion advances progress by ~15%
+    // Each LLM completion advances progress by ~20%
 
     // Stage 7: Scoring (85-95%)
     onProgress(88, 'Calculating scores...');
@@ -340,7 +340,7 @@ async function extractWithLLM(provider, model, extracted, signal) {
 }
 ```
 
-> **Note:** Perplexity's sonar-pro is a search-augmented model and may supplement responses with external web data. Consider adding a Perplexity-specific prompt instruction: 'Only analyze the provided content. Do not search the web or include external information.'
+> **Note (Phase 2):** Perplexity's sonar-pro is a search-augmented model and may supplement responses with external web data. Perplexity integration is deferred to Phase 2 to allow proper UX handling of this fundamentally different behavior.
 
 ---
 
@@ -385,7 +385,7 @@ const CategoryChart = lazy(() => import('./ReadabilityCategoryChart'));
   id: 'readability',
   name: 'AI Readability Checker',
   shortName: 'Readability',
-  description: 'Analyze how AI search engines interpret your content. Get scores, LLM rendering previews, and actionable recommendations.',
+  description: 'Analyze how AI search engines interpret your content. See how AI sees your content, get scores, and actionable recommendations.',
   icon: ScanEye,
   path: '/app/readability',
   color: TOOL_COLORS.TEAL,
@@ -393,7 +393,7 @@ const CategoryChart = lazy(() => import('./ReadabilityCategoryChart'));
   badge: 'New',
   features: [
     'AI readability scoring',
-    'Multi-LLM rendering preview',
+    'How AI sees your content',
     'Actionable recommendations',
     'URL and HTML analysis'
   ],
@@ -443,7 +443,7 @@ None required. All functionality is achievable with existing dependencies:
 
 ---
 
-*Document Version: 1.1*
+*Document Version: 1.2*
 *Created: 2026-02-17*
 *Last Updated: 2026-02-17*
-*Status: Draft*
+*Status: Draft — v1.2: 3 LLMs for MVP (Q8), "How AI Sees Your Content" rename (Q5)*

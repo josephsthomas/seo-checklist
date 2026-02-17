@@ -42,12 +42,11 @@
 | Claude API 500 | Server error | "Claude is temporarily unavailable. Scores use rule-based analysis." | Retry button |
 | OpenAI API failure | Any error | "OpenAI preview unavailable." (shown in LLM column) | Retry button per LLM |
 | Gemini API failure | Any error | "Gemini preview unavailable." (shown in LLM column) | Retry button per LLM |
-| Perplexity API failure | Any error | "Perplexity preview unavailable." (shown in LLM column) | Retry button per LLM |
-| All LLMs failed | All 4 extraction calls fail | "AI previews are currently unavailable. Showing rule-based analysis only." | Global retry button |
+| All LLMs failed | All 3 extraction calls fail (Claude, OpenAI, Gemini) | "AI previews are currently unavailable. Showing rule-based analysis only." | Global retry button |
 | Invalid JSON response | LLM returns non-JSON | "Unexpected response from [LLM]. Preview may be incomplete." | Show raw text fallback |
 | Token limit exceeded | Content too long for LLM | Content auto-truncated; warning: "Content was truncated for [LLM] analysis." | Show truncation point |
 | Auth token expired | Firebase token expired mid-analysis | "Session expired. Please log in again." | Redirect to login |
-| User rate limit hit | 15 analyses/hour | "You've reached the hourly analysis limit (15). Resets at [time]." | Countdown |
+| User rate limit hit | Plan-based hourly limit exceeded (Free: 10, Pro: 30, Enterprise: 200) | "You've reached the hourly analysis limit for your plan ([limit]). Resets at [time]." | Countdown; upgrade CTA for Free/Pro |
 
 ### 1.4 Processing Errors
 
@@ -116,7 +115,7 @@
 | User opens expired shared link | "This shared analysis has expired" with option to log in |
 | User hits back button during processing | Return to input screen; cancel analysis |
 | User clears browser mid-analysis | Analysis lost; Firestore not yet written; no recovery needed |
-| User has 100+ analyses (storage limit) | Auto-archive oldest; show notice about archiving |
+| User exceeds storage limit (Admin: 500, PM: 250, Others: 100) | Auto-archive oldest; show notice about archiving with tier info |
 | Multiple tabs running analyses | Each tab independent; rate limits apply across tabs |
 
 ---
@@ -195,17 +194,16 @@ Used for: fatal/unrecoverable errors
 |---|---|---|
 | URL fetch proxy | Cannot analyze URLs | Show error; promote HTML upload as alternative |
 | Claude API | No AI analysis | Score uses rule-based checks only (70% weight); label "Rule-based analysis" |
-| OpenAI API | No GPT preview | Hide OpenAI column; show 3 LLMs; note "OpenAI unavailable" |
-| Gemini API | No Gemini preview | Hide Gemini column; show 3 LLMs; note "Gemini unavailable" |
-| Perplexity API | No Perplexity preview | Hide Perplexity column; show 3 LLMs; note "Perplexity unavailable" |
-| All LLM APIs | No LLM previews | Show rule-based scores only; hide LLM Preview tab entirely |
+| OpenAI API | No GPT preview | Hide OpenAI column; show 2 LLMs; note "OpenAI unavailable" |
+| Gemini API | No Gemini preview | Hide Gemini column; show 2 LLMs; note "Gemini unavailable" |
+| All LLM APIs | No LLM previews | Show rule-based scores only; hide "How AI Sees Your Content" tab entirely |
 | Firestore | Cannot save/load | Analysis works but history unavailable; results shown in-memory only |
 | Firebase Storage | Cannot save HTML snapshot | Non-blocking; log warning; analysis continues |
 | Chart.js | No radar chart | Fallback to simple HTML bar display using div widths |
 
 ---
 
-*Document Version: 1.0*
+*Document Version: 1.1*
 *Created: 2026-02-17*
 *Last Updated: 2026-02-17*
-*Status: Draft*
+*Status: Draft — v1.1: Tiered rate limits (Q4), tiered storage (Q7), Perplexity removed from MVP (Q8)*

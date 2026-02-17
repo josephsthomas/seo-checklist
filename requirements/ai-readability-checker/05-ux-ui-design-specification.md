@@ -106,7 +106,7 @@ All score colors, chart backgrounds, input fields, dropzones, code snippets, err
 **Stage Messages (with progress %):**
 1. "Fetching page content..." (0-15%)
 2. "Extracting content and metadata..." (15-25%)
-3-6. "Analyzing with AI models..." (25-85%) — **All 4 LLM calls run in parallel.** Show as a sub-checklist where each LLM checks off independently as it completes. Each completion advances progress by ~15%.
+3-5. "Analyzing with AI models..." (25-85%) — **All 3 LLM calls run in parallel (Claude, OpenAI, Gemini; Perplexity deferred to Phase 2).** Show as a sub-checklist where each LLM checks off independently as it completes. Each completion advances progress by ~20%.
 7. "Calculating scores..." (85-95%)
 8. "Finalizing results..." (95-100%)
 
@@ -147,11 +147,16 @@ All score colors, chart backgrounds, input fields, dropzones, code snippets, err
 - Each bar color-coded by score level
 - Clickable to scroll to category detail
 
-**Tab Navigation (below score):**
+**Default View: Summary**
+The results dashboard defaults to the **Summary view**, which displays all the above-the-fold content (Score Card, Quick Wins Preview, AI Visibility Summary, Citation Likelihood, Category Breakdown) without requiring tab navigation. This ensures non-technical users immediately see the most important information and actionable advice.
+
+**Tab Navigation (below summary):**
 - Tab 1: "Score Details" — check results by category
-- Tab 2: "LLM Previews" — side-by-side renderings
+- Tab 2: "How AI Sees Your Content" — side-by-side AI interpretation previews
 - Tab 3: "Recommendations" — prioritized actions
 - Tab 4: "Issues" — filterable table of all checks
+
+Users land on the Summary view by default. Tabs provide deeper drill-down for technical users. User's last-selected tab is remembered per session via component state.
 
 ### 2.4 Score Details Tab
 
@@ -159,9 +164,9 @@ All score colors, chart backgrounds, input fields, dropzones, code snippets, err
 
 **Check Items:** Status icon (green check / amber triangle / red X), title, severity badge (PASS/WARN/FAIL). Expandable detail: description, affected elements in code block, recommendation text.
 
-### 2.5 LLM Previews Tab
+### 2.5 "How AI Sees Your Content" Tab
 
-**LLM Selection:** Checkbox row to toggle 2-4 LLMs. Each with name + model label.
+**LLM Selection:** Checkbox row to toggle 2-3 LLMs (MVP: Claude, OpenAI, Gemini). Each with name + model label.
 
 **View Toggle:** "Side-by-Side" / "Diff" buttons.
 
@@ -169,7 +174,7 @@ All score colors, chart backgrounds, input fields, dropzones, code snippets, err
 
 **Coverage Summary Table:** `.table-modern` below columns showing Content%, Headings%, Entities%, Time per LLM. Sortable columns.
 
-**Responsive:** 4 cols at xl, 2 cols at lg, stacked tabs at sm.
+**Responsive:** 3 cols at xl (MVP: Claude, OpenAI, Gemini), 2 cols at lg, stacked tabs at sm.
 
 **Error per LLM:** Column shows error icon + message + "Retry" button; others display normally.
 
@@ -270,7 +275,7 @@ All animations respect `prefers-reduced-motion: reduce`.
 
 ## 8. Version Footer
 
-*Document Version: 1.1*
+*Document Version: 1.2*
 *Created: 2026-02-17*
 *Last Updated: 2026-02-17*
 *Status: Draft*

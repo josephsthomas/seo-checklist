@@ -131,7 +131,7 @@ Test each of the 50 checks individually:
 |---|---|
 | Full URL analysis flow | Mock fetch + Claude + score = complete results |
 | Full HTML upload flow | Provide HTML + run pipeline = complete results |
-| Partial LLM failure | 2 of 4 LLMs fail; remaining succeed; scores calculated |
+| Partial LLM failure | 1 of 3 LLMs fail; remaining 2 succeed; scores calculated |
 | All LLMs fail | Rule-based scoring only; no LLM preview data |
 | Claude failure fallback | Claude fails; scores use rules only (0% AI weight) |
 | Cancel mid-analysis | AbortController cancels in-flight; no partial save |
@@ -160,7 +160,7 @@ Test each of the 50 checks individually:
 | Claude extraction success | Mock returns JSON; extraction parsed correctly |
 | OpenAI extraction success | Mock returns JSON; normalized to standard format |
 | Gemini extraction success | Mock returns JSON; normalized to standard format |
-| Perplexity extraction success | Mock returns JSON; normalized to standard format |
+| Perplexity extraction success *(Phase 2)* | Mock returns JSON; normalized to standard format |
 | Rate limit handling | Mock returns 429; rate limit message shown |
 | Auth token refresh | Mock returns 401; token refreshed; retry succeeds |
 
@@ -196,17 +196,17 @@ Test each of the 50 checks individually:
 |---|---|---|
 | Score display | Render with score 85 | "85" displayed, grade "A", teal color |
 | Category chart | Render with 5 scores | Chart rendered with correct data |
-| Tab navigation | Click "LLM Previews" | Preview tab content shown |
+| Tab navigation | Click "How AI Sees Your Content" | Preview tab content shown |
 | Export dropdown | Click "Export" | PDF and JSON options shown |
 | Share button | Click "Share" | Share link generated and copied |
 | Back button | Click "New Analysis" | Returns to input screen |
 
-### 4.4 LLM Preview
+### 4.4 "How AI Sees Your Content" Preview
 
 | Test | Action | Expected |
 |---|---|---|
-| 4 LLM columns | Render with 4 extractions | 4 equal columns visible |
-| Toggle LLM off | Uncheck "Gemini" | 3 columns shown, Gemini hidden |
+| 3 LLM columns (MVP) | Render with 3 extractions (Claude, OpenAI, Gemini) | 3 equal columns visible |
+| Toggle LLM off | Uncheck "Gemini" | 2 columns shown, Gemini hidden |
 | Failed LLM | One extraction has status: error | Error state in that column, retry button |
 | Coverage table | Render with metrics | Table shows correct percentages |
 
@@ -257,7 +257,7 @@ Test each of the 50 checks individually:
 | `claude-extraction-success.json` | Valid Claude extraction response |
 | `openai-extraction-success.json` | Valid OpenAI extraction response |
 | `gemini-extraction-success.json` | Valid Gemini extraction response |
-| `perplexity-extraction-success.json` | Valid Perplexity extraction response |
+| `perplexity-extraction-success.json` | Valid Perplexity extraction response *(Phase 2)* |
 | `llm-error-429.json` | Rate limit response |
 | `llm-error-500.json` | Server error response |
 | `fetch-url-success.json` | Successful URL fetch with HTML |
@@ -275,7 +275,7 @@ Test each of the 50 checks individually:
 - [ ] Processing: progress bar advances smoothly, stages update
 - [ ] Cancel: mid-analysis cancel returns to input
 - [ ] Score: overall score and categories display correctly
-- [ ] LLM Preview: all 4 LLMs show extractions
+- [ ] "How AI Sees Your Content": all 3 LLMs show extractions (Claude, OpenAI, Gemini)
 - [ ] LLM toggle: unchecking LLMs hides columns
 - [ ] Recommendations: grouped correctly, code snippets work
 - [ ] Issues table: filters and sort work correctly
@@ -290,7 +290,7 @@ Test each of the 50 checks individually:
 
 - [ ] Invalid URL: shows inline validation error
 - [ ] Unreachable URL: shows fetch error card
-- [ ] Single LLM failure: other 3 still display
+- [ ] Single LLM failure: other 2 still display
 - [ ] All LLMs fail: rule-based results shown
 - [ ] Large file rejected: 10MB+ shows error
 - [ ] Wrong file type: .pdf rejected
@@ -318,7 +318,7 @@ Test each of the 50 checks individually:
 
 ---
 
-*Document Version: 1.0*
+*Document Version: 1.1*
 *Created: 2026-02-17*
 *Last Updated: 2026-02-17*
-*Status: Draft*
+*Status: Draft — v1.1: 3 LLMs for MVP (Q8), "How AI Sees Your Content" tab rename (Q5)*

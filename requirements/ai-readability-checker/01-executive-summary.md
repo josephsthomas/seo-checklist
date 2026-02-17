@@ -7,7 +7,7 @@ The **AI Readability Checker** is a new tool within the Content Strategy Portal 
 This tool provides two core capabilities:
 
 1. **AI Readability Assessment** — A structured, scored evaluation of how well a page's content can be parsed, understood, and cited by LLMs, covering semantic structure, content clarity, machine-readable metadata, and technical accessibility.
-2. **LLM Rendering Preview** — A side-by-side view showing users exactly what each major LLM "sees" when it processes their page, including the raw content extraction, parsed structure, and any content that is invisible or garbled to each model's crawler.
+2. **How AI Sees Your Content** — A side-by-side view showing users exactly what each major LLM "sees" when it processes their page, including the raw content extraction, parsed structure, and any content that is invisible or garbled to each model's crawler.
 
 ## 2. Business Case
 
@@ -74,7 +74,7 @@ This tool will be among the first to offer:
 - URL-based content fetching and analysis
 - HTML file upload (rendered HTML from Screaming Frog JS crawl)
 - AI Readability scoring with category breakdown
-- LLM rendering preview for: **Claude (Anthropic)**, **GPT (OpenAI)**, **Gemini (Google)**, **Perplexity**
+- "How AI Sees Your Content" preview for: **Claude (Anthropic)**, **GPT (OpenAI)**, **Gemini (Google)**
 - Actionable recommendations with priority ranking
 - Export to PDF and JSON
 - Firestore persistence of analysis history
@@ -102,7 +102,7 @@ This tool will be among the first to offer:
 
 - Users have access to Screaming Frog and can export rendered HTML (for the upload path)
 - The portal's existing Claude AI proxy (`VITE_AI_PROXY_URL`) can be extended for readability analysis
-- Third-party LLM APIs (OpenAI, Google, Perplexity) are available and permit content analysis use cases under their terms of service
+- Third-party LLM APIs (OpenAI, Google) are available and permit content analysis use cases under their terms of service (Perplexity deferred to Phase 2)
 - Users are authenticated via the existing Firebase Auth system
 
 ### 5.2 Dependencies
@@ -112,7 +112,7 @@ This tool will be among the first to offer:
 | Claude API (Anthropic) | External Service | Low — already integrated |
 | OpenAI API | New External Service | Medium — requires new API key and proxy route |
 | Google Gemini API | New External Service | Medium — requires new API key and proxy route |
-| Perplexity API | New External Service | Medium — requires new API key and proxy route |
+| Perplexity API | New External Service (Phase 2) | Low — deferred to Phase 2 |
 | Web content fetching service | New Backend Service | High — requires server-side proxy for CORS/JS rendering |
 | Screaming Frog rendered HTML format | External Tool Dependency | Low — stable export format |
 | Firebase Firestore | Existing Service | Low — already in use |
@@ -137,11 +137,12 @@ This tool will be among the first to offer:
 - Claude-powered readability assessment
 - Basic results dashboard
 
-### Phase 2: Multi-LLM Preview
-- OpenAI rendering preview integration
-- Google Gemini rendering preview integration
-- Perplexity rendering preview integration
+### Phase 2: Multi-LLM Preview & Competitive Benchmarking
+- OpenAI "How AI Sees Your Content" preview integration
+- Google Gemini "How AI Sees Your Content" preview integration
 - Side-by-side comparison view
+- Basic competitive benchmarking (industry averages, score comparison)
+- Perplexity integration (deferred from MVP)
 
 ### Phase 3: Polish & Export
 - PDF and JSON export
@@ -152,7 +153,7 @@ This tool will be among the first to offer:
 ### Phase 4: Advanced Features
 - Batch analysis
 - Trend tracking
-- Competitor comparison
+- Advanced competitor comparison (URL vs. URL)
 
 ## 7. Stakeholder Sign-Off
 
@@ -165,7 +166,7 @@ This tool will be among the first to offer:
 
 ---
 
-*Document Version: 1.1*
+*Document Version: 1.2*
 *Created: 2026-02-17*
 *Last Updated: 2026-02-17*
-*Status: Draft — Updated with D-GEO-07, E-GEO-01, E-GEO-04 revisions*
+*Status: Draft — v1.2: Perplexity deferred to Phase 2 (Q8), competitive benchmarking moved to Phase 2 (Q6), "How AI Sees Your Content" rename (Q5)*

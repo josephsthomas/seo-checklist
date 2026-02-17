@@ -200,19 +200,54 @@
 
 ---
 
+## 7. Refinement Question Decisions (v1.2)
+
+The following 10 product decisions were made by the Product Owner to resolve DEFERRED items from the stakeholder review:
+
+| Q# | Question | Decision | Impact | Docs Updated |
+|---|---|---|---|---|
+| Q1 | AI-Specific Signals category weight | **B) Increase to 20%** — steal 5% from Content Structure (25% → 20%) | Elevates AI-specific scoring to match tool's GEO positioning | 03, 11 |
+| Q2 | Batch analysis scope | **A) Keep in Phase 3** — MVP stays focused on single-URL analysis | No change needed | — |
+| Q3 | Client role permissions | **A) Keep read-only** — Clients only see shared reports | No change needed | — |
+| Q4 | Rate limit structure | **D) Tiered by plan** — Free: 10/hr, Pro: 30/hr, Enterprise: unlimited (200/hr safety cap) | Enables monetization path; unblocks agency use | 04, 08 |
+| Q5 | "LLM Rendering Preview" naming | **D) "How AI Sees Your Content"** — plain language, user-friendly | Renamed across all 11 docs | 01, 02, 03, 04, 05, 07, 08, 09, 11 |
+| Q6 | Competitive benchmarking timeline | **B) Move to Phase 2** — add basic industry benchmarks early | Key differentiator moved earlier; Phase 4 becomes advanced comparison | 01 |
+| Q7 | Storage limit per user | **C) Tiered by role** — Admin: 500, PM: 250, Others: 100 | Supports agency use without unlimited storage | 03, 08 |
+| Q8 | Perplexity search-augmented behavior | **C) Remove from MVP** — defer to Phase 2 once behavior is better understood | MVP launches with 3 LLMs (Claude, OpenAI, Gemini); Perplexity added in Phase 2 with appropriate UX | 01, 02, 03, 04, 05, 07, 08, 09, 10, 11 |
+| Q9 | Default results view mode | **A) Summary view** — Score + quick wins + AI visibility summary (detail one click away) | Summary view is the default landing; tabs provide drill-down | 05 |
+| Q10 | GEO Specialist persona | **C) Add as full new persona** — "Priya" with distinct GEO-focused goals and workflows | 5th persona added with GEO-specific user stories (citation likelihood, AI crawler access) | 02 |
+
+### DEFERRED Items Now Resolved
+
+| Original ID | Original Status | New Status |
+|---|---|---|
+| D-GEO-04 | DEFERRED | **IMPLEMENTED** (Q1) — weight increased to 20% |
+| D-OPS-01 | DEFERRED | **IMPLEMENTED** (Q4) — tiered rate limits by plan |
+| E-OPS-05 | DEFERRED | **CONFIRMED** (Q2) — batch stays Phase 3 |
+| E-OPS-09 | DEFERRED | **IMPLEMENTED** (Q7) — tiered storage by role |
+| E-OPS-11 | DEFERRED | **IMPLEMENTED** (Q6) — competitive benchmarks moved to Phase 2 |
+| D-CMO-01 | DEFERRED | **CONFIRMED** (Q3) — client role stays read-only |
+| E-UX-02 | DEFERRED | **IMPLEMENTED** (Q9) — summary view as default |
+| O-GEO-05 | DEFERRED | **IMPLEMENTED** (Q10) — GEO Specialist persona added |
+
+---
+
 ## Summary Statistics
 
 | Persona | Defects | Enhancements | Opportunities/Risks | Total | Implemented |
 |---|---|---|---|---|---|
-| SVP, GEO | 8 | 12 | 10 | 30 | 9 |
-| EVP, Agency Ops | 8 | 15 | 8 | 31 | 7 |
+| SVP, GEO | 8 | 12 | 10 | 30 | 10 |
+| EVP, Agency Ops | 8 | 15 | 8 | 31 | 11 |
 | CMO (Client) | 6 | 7 | 6 | 19 | 6 |
 | Lead Developer | 8 | 9 | 10 | 27 | 16 |
 | SVP, Technology | 6 | 8 | 9 | 23 | 8 |
-| SVP, UX Design | 7 | 8 | 7 | 22 | 11 |
-| **TOTALS** | **43** | **59** | **50** | **152** | **57** |
+| SVP, UX Design | 7 | 8 | 7 | 22 | 12 |
+| **TOTALS** | **43** | **59** | **50** | **152** | **63** |
+
+> **v1.2 update:** 6 additional items resolved via refinement questions (57 → 63 implemented).
 
 ---
 
-*Review Log Version: 1.0*
+*Review Log Version: 1.1*
 *Created: 2026-02-17*
+*Updated: 2026-02-17 — Added refinement question decisions (Q1-Q10)*

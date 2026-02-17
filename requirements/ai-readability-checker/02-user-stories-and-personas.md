@@ -50,6 +50,18 @@
 | **Portal Usage** | Reviews exports and reports from all tools |
 | **AI Readability Context** | Needs polished, exportable reports that demonstrate value to enterprise clients |
 
+### 1.5 Persona: Priya — GEO Specialist
+
+| Attribute | Detail |
+|---|---|
+| **Role** | Generative Engine Optimization (GEO) Specialist at a large enterprise publisher |
+| **Experience** | 3 years in SEO, pivoting to GEO full-time; early adopter of AI search optimization techniques |
+| **Technical Skill** | Intermediate — comfortable with structured data, prompt engineering concepts, and AI search APIs |
+| **Goals** | Maximize content citation rates in AI-generated answers across Google AI Overviews, ChatGPT, and Perplexity |
+| **Pain Points** | Existing SEO tools don't measure AI-specific signals; no visibility into how LLMs select sources to cite; rapidly evolving landscape with no standardized metrics |
+| **Portal Usage** | Uses Schema Generator and Content Planner weekly; evaluating Technical Audit for AI crawler checks |
+| **AI Readability Context** | Needs deep AI-specific analysis: citation likelihood scoring, entity clarity, definition patterns, quotable passage detection. Cares more about AI-Specific Signals and citation-worthiness than traditional readability metrics. Wants to benchmark content against competitors in AI search results. |
+
 ---
 
 ## 2. User Stories
@@ -143,7 +155,7 @@
 
 ---
 
-### 2.3 LLM Rendering Preview
+### 2.3 How AI Sees Your Content
 
 #### US-2.3.1: View Claude Rendering Preview
 **As** Sarah (SEO Specialist),
@@ -179,16 +191,19 @@
 - [ ] Integration uses the Google Gemini API
 - [ ] Highlights Google-specific considerations (structured data alignment, Knowledge Graph signals)
 
-#### US-2.3.4: View Perplexity Rendering Preview
+#### US-2.3.4: View Perplexity Preview *(Phase 2)*
 **As** Sarah (SEO Specialist),
 **I want to** see what Perplexity extracts from my page,
 **So that** I can optimize for this increasingly popular AI search engine.
+
+> **Deferred to Phase 2:** Perplexity's Sonar model is search-augmented (it fetches live web data during inference), making its responses fundamentally different from Claude/GPT/Gemini. This requires separate UX treatment and is not included in MVP.
 
 **Acceptance Criteria:**
 - [ ] A dedicated tab/panel shows Perplexity's extraction of the page content
 - [ ] Same display format as other LLM previews
 - [ ] Integration uses the Perplexity API (or equivalent)
 - [ ] Highlights citation-related signals (how likely the content is to be cited in a Perplexity answer)
+- [ ] Clearly labeled as search-augmented with appropriate disclaimers
 
 #### US-2.3.5: Side-by-Side LLM Comparison
 **As** Marcus (Web Developer),
@@ -196,7 +211,7 @@
 **So that** I can quickly identify which LLMs are missing content or interpreting it differently.
 
 **Acceptance Criteria:**
-- [ ] User can select 2-4 LLMs for side-by-side comparison
+- [ ] User can select 2-3 LLMs for side-by-side comparison (MVP: Claude, OpenAI, Gemini; Perplexity added in Phase 2)
 - [ ] Comparison view displays selected LLM extractions in equal-width columns
 - [ ] Content differences are visually highlighted (additions, omissions, reformulations)
 - [ ] A summary row shows key metrics for each LLM (content coverage %, elements detected, metadata extracted)
@@ -230,6 +245,28 @@
 - [ ] Code snippets are syntax-highlighted (HTML, JSON-LD, meta tags)
 - [ ] Snippets can be copied to clipboard with a single click
 - [ ] Code suggestions are generated based on the actual page content, not generic templates
+
+#### US-2.4.3: View Citation Likelihood Analysis
+**As** Priya (GEO Specialist),
+**I want to** see a detailed breakdown of my page's citation likelihood across AI search engines,
+**So that** I can optimize content specifically for AI-generated citations and answers.
+
+**Acceptance Criteria:**
+- [ ] Citation Likelihood score (0-100) is prominently displayed alongside the overall readability score
+- [ ] Breakdown shows which AI-Specific Signals checks contribute to or detract from citation likelihood
+- [ ] Specific feedback on quotable passages, definition patterns, and entity clarity
+- [ ] Recommendations are tagged with their impact on citation likelihood specifically
+
+#### US-2.4.4: Analyze AI Crawler Access
+**As** Priya (GEO Specialist),
+**I want to** see a comprehensive view of which AI crawlers can access my content,
+**So that** I can ensure my pages are not inadvertently blocking AI search engines from indexing.
+
+**Acceptance Criteria:**
+- [ ] Per-crawler access matrix showing GPTBot, Google-Extended, ClaudeBot, PerplexityBot, CCBot status
+- [ ] Checks both meta robots directives and robots.txt rules
+- [ ] Detects ai.txt and TDM-Reservation signals
+- [ ] Clear visual indicator per crawler: Allowed / Blocked / Partially Restricted
 
 ---
 
@@ -340,7 +377,7 @@ Export PDF -> Share with Client
 2. **Input Screen** — Enters URL, optionally provides context (industry, target keywords)
 3. **Processing Screen** — Sees progress bar with stage messages (Fetching > Analyzing > Scoring)
 4. **Results Dashboard** — Views overall score, category breakdown, and quick recommendations
-5. **LLM Preview Tab** — Compares renderings across 4 LLMs
+5. **How AI Sees Your Content Tab** — Compares AI interpretations across LLMs
 6. **Recommendations Tab** — Reviews prioritized action items
 7. **Export** — Generates PDF report
 8. **Share** — Copies shareable link for client review
@@ -353,7 +390,15 @@ View Score -> Deep Dive into Technical Issues -> Copy Code Fixes ->
 Implement Changes -> Re-analyze URL to Verify
 ```
 
-### 3.3 Tertiary Journey: Quick Check (Elena)
+### 3.3 Tertiary Journey: GEO Optimization (Priya)
+
+```
+Landing on Tool -> Enter URL -> View Score -> Focus on Citation Likelihood ->
+Deep Dive into AI-Specific Signals -> Review AI Crawler Access Matrix ->
+Check Quotable Passages -> Export JSON for Tracking -> Re-analyze After Fixes
+```
+
+### 3.4 Quaternary Journey: Quick Check (Elena)
 
 ```
 Landing on Tool -> Enter URL -> View Score & Summary -> Read Top 3 Recommendations ->
@@ -375,7 +420,7 @@ Forward Recommendations to Writing Team
 
 ---
 
-*Document Version: 1.0*
+*Document Version: 1.2*
 *Created: 2026-02-17*
 *Last Updated: 2026-02-17*
-*Status: Draft*
+*Status: Draft — Updated with GEO Specialist persona (Decision Q10), Perplexity Phase 2 deferral (Q8), "How AI Sees Your Content" rename (Q5)*

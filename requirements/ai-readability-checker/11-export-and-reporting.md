@@ -119,11 +119,11 @@ The JSON export SHALL include the complete analysis data:
     "overall": 85,
     "grade": "A",
     "categories": {
-      "contentStructure": { "score": 90, "grade": "A", "weight": 0.25 },
+      "contentStructure": { "score": 90, "grade": "A", "weight": 0.20 },
       "contentClarity": { "score": 82, "grade": "B+", "weight": 0.25 },
       "technicalAccessibility": { "score": 88, "grade": "B+", "weight": 0.20 },
       "metadataSchema": { "score": 78, "grade": "C+", "weight": 0.15 },
-      "aiSpecificSignals": { "score": 80, "grade": "B", "weight": 0.15 }
+      "aiSpecificSignals": { "score": 80, "grade": "B", "weight": 0.20 }
     }
   },
 
@@ -165,8 +165,7 @@ The JSON export SHALL include the complete analysis data:
       "processingTimeMs": 3200
     },
     "openai": { },
-    "gemini": { },
-    "perplexity": { }
+    "gemini": { }
   },
 
   "recommendations": [
@@ -339,7 +338,7 @@ Use `navigator.clipboard.writeText()` with fallback to `document.execCommand('co
 
 ---
 
-*Document Version: 1.1*
+*Document Version: 1.2*
 *Created: 2026-02-17*
 *Last Updated: 2026-02-17*
-*Status: Draft*
+*Status: Draft — v1.2: AI-Specific Signals weight updated (Q1), Perplexity removed from MVP JSON export (Q8)*
