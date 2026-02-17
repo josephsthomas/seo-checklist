@@ -44,6 +44,25 @@ Add `TEAL: 'teal'` to `TOOL_COLORS` in `tools.js`.
 
 `.card`, `.card-hover`, `.btn-primary`, `.btn-secondary`, `.btn-ghost`, `.badge`, `.input-lg`, `.tabs/.tab/.tab-active`, `.table-modern`, `.modal-*`, `react-dropzone`, `react-hot-toast`, Skeleton loaders
 
+### 1.4 Dark Mode Support
+
+The portal supports three theme modes (light, dark, system) via ThemeContext. All readability components MUST include `dark:` Tailwind variants.
+
+**Dark Mode Color Mappings:**
+| Light Mode | Dark Mode |
+|---|---|
+| bg-white | dark:bg-charcoal-800 |
+| bg-charcoal-50 | dark:bg-charcoal-900 |
+| text-charcoal-900 | dark:text-charcoal-100 |
+| text-charcoal-600 | dark:text-charcoal-400 |
+| border-charcoal-200 | dark:border-charcoal-700 |
+| bg-teal-50 | dark:bg-teal-900/20 |
+| bg-teal-100 | dark:bg-teal-800/30 |
+| text-teal-600 | dark:text-teal-400 |
+| text-teal-700 | dark:text-teal-300 |
+
+All score colors, chart backgrounds, input fields, dropzones, code snippets, error cards, and toast notifications MUST have dark mode counterparts. Reference existing dark mode patterns in Navigation.jsx and ToolCard.jsx.
+
 ---
 
 ## 2. Screen Specifications
@@ -53,6 +72,9 @@ Add `TEAL: 'teal'` to `TOOL_COLORS` in `tools.js`.
 **Tool Header:** ScanEye icon in teal gradient circle (w-14 h-14 rounded-2xl), title "AI Readability Checker" (text-3xl font-bold), subtitle "Evaluate how AI search engines interpret your content."
 
 **Tab Navigation:** Three tabs — "URL" (default, Globe icon), "Upload HTML" (Upload icon), "Paste HTML" (Code icon). Active tab uses `.tab-active` with teal underline.
+- URL tab helper: "Analyze any public web page"
+- Upload HTML tab helper: "For Screaming Frog JS-rendered exports"
+- Paste HTML tab helper: "For developers testing raw HTML"
 
 **URL Tab:**
 - Full-width `.input-lg` field, placeholder "https://example.com/your-page"
@@ -70,7 +92,7 @@ Add `TEAL: 'teal'` to `TOOL_COLORS` in `tools.js`.
 
 **Paste HTML Tab:**
 - Monospace textarea, 300px min-height
-- Character counter: "0 / 2,000,000"
+- Character counter: shows current count only (e.g., "342 characters"). Approaching-limit warning appears at 80%: "Approaching the 2MB limit." Minimum-threshold message: "Paste at least 100 characters to analyze" shown until threshold met.
 - "Analyze" button disabled until 100+ chars
 
 **History Preview (below input):**
@@ -84,16 +106,15 @@ Add `TEAL: 'teal'` to `TOOL_COLORS` in `tools.js`.
 **Stage Messages (with progress %):**
 1. "Fetching page content..." (0-15%)
 2. "Extracting content and metadata..." (15-25%)
-3. "Analyzing with Claude AI..." (25-40%)
-4. "Querying OpenAI..." (40-55%)
-5. "Querying Google Gemini..." (55-70%)
-6. "Querying Perplexity..." (70-85%)
+3-6. "Analyzing with AI models..." (25-85%) — **All 4 LLM calls run in parallel.** Show as a sub-checklist where each LLM checks off independently as it completes. Each completion advances progress by ~15%.
 7. "Calculating scores..." (85-95%)
 8. "Finalizing results..." (95-100%)
 
 **Stage Checklist:** Each stage shows checkbox icon + label + elapsed time. Completed = green check. Active = spinner + teal text. Pending = empty circle + charcoal-400.
 
 **Cancel button:** `.btn-ghost`, confirmation dialog before canceling.
+
+**Engagement Content:** Display rotating "Did you know?" factoids about AI readability during processing (e.g., "Pages with structured data are 2x more likely to appear in AI answers"). After Stage 2 completes, show a preview of the extracted page title and meta description as early partial results.
 
 ### 2.3 Results Dashboard (`/app/readability` or `/app/readability/{analysisId}`)
 
@@ -106,6 +127,20 @@ Add `TEAL: 'teal'` to `TOOL_COLORS` in `tools.js`.
 - Large score number (text-5xl font-bold), color-coded by grade
 - Grade letter in badge, one-sentence summary
 - Color: A+/A = emerald-500, B+/B = teal-500, C+/C = amber-500, D = orange-500, F = red-500
+
+**Quick Wins Preview (above tabs):**
+- Display the top 3 highest-impact, lowest-effort recommendations inline
+- Each as a compact card: priority icon + title + one-line description
+- "View All Recommendations" link scrolls to Recommendations tab
+- This ensures non-technical users see actionable advice without navigating tabs
+
+**AI Visibility Summary:**
+- A 2-3 sentence plain-English summary above the score explaining what the score means in business terms
+- Example: "Claude and GPT successfully extract your key content, but structured data gaps may reduce citation likelihood. Fixing the top 3 recommendations could improve your score by approximately 12 points."
+
+**Citation Likelihood Score:**
+- Displayed alongside the overall score as a secondary metric
+- Shows citationWorthiness (0-100) from Claude analysis with a brief label
 
 **Category Breakdown:**
 - Radar/spider chart (Chart.js) OR horizontal bar chart for 5 categories
@@ -146,6 +181,8 @@ Add `TEAL: 'teal'` to `TOOL_COLORS` in `tools.js`.
 
 ### 2.7 Issues Tab
 
+> **Note:** The Issues tab serves as a 'work queue' for triage and assignment, distinct from Score Details which is a narrative pass/fail walkthrough. Consider renaming to 'Action Items' to clarify the distinction.
+
 **Filters:** Severity dropdown, Category dropdown, Status dropdown, search text input.
 
 **Table:** `.table-modern` with sortable columns: Severity, Check ID, Title, Category, Status. Click row to expand details inline. Pagination: 20 per page.
@@ -156,8 +193,8 @@ Add `TEAL: 'teal'` to `TOOL_COLORS` in `tools.js`.
 
 | Breakpoint | Width | Adjustments |
 |---|---|---|
-| sm | < 640px | Single column, stacked cards, tabs become dropdown |
-| md | 640-767px | Two-column score+chart, stacked LLM previews |
+| sm | < 640px | Single column, stacked cards, tabs become dropdown. LLM comparison defaults to diff view (single-column unified diff) |
+| md | 640-767px | Two-column score+chart, stacked LLM previews. LLM comparison: 2-column max; selector to pick which 2 LLMs |
 | lg | 768-1023px | Two-column LLM preview, side-by-side score+chart |
 | xl | 1024px+ | Full layout, 4-column LLM preview |
 
@@ -196,7 +233,7 @@ All animations respect `prefers-reduced-motion: reduce`.
 | Page transition | fade-in-up | 300ms |
 | Tab switch | fade-in | 200ms |
 | Card hover | shadow-lg + scale-[1.01] | 200ms |
-| Score counter | Count 0 to final | 1000ms |
+| Score counter | Count 0 to final | 1000ms | Reduced motion fallback: score fades in at final value over 200ms. |
 | Progress bar | Width transition | 300ms |
 | Accordion expand | Height + fade-in | 200ms |
 | LLM column load | fade-in-up staggered (100ms) | 300ms |
@@ -218,7 +255,22 @@ All animations respect `prefers-reduced-motion: reduce`.
 
 ---
 
-*Document Version: 1.0*
+## 7. First-Use Experience
+
+**First Visit (no history):** Show a brief inline callout above the input tabs explaining:
+- What the tool does (one sentence)
+- What the user will get (score, LLM previews, recommendations)
+- How long it takes (~15 seconds)
+
+**ToolHelpPanel Entry:** Add a `readability` entry to the ToolHelpPanel config with:
+- Tips: "Analyze any public URL", "Upload Screaming Frog rendered HTML for JS-heavy sites", "Export PDF reports for client presentations"
+- Shortcuts: (define once tool-specific shortcuts are implemented)
+
+---
+
+## 8. Version Footer
+
+*Document Version: 1.1*
 *Created: 2026-02-17*
 *Last Updated: 2026-02-17*
 *Status: Draft*

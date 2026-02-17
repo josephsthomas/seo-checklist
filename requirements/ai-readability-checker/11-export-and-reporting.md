@@ -234,15 +234,20 @@ For future consideration: Excel export using ExcelJS (already installed) with:
 | Expiry | 30 days | 7 days, 30 days, 90 days, Never |
 | Access level | Read-only | Read-only (only option for MVP) |
 
+> **Note:** The 'Never' expiry option should display a warning: "Non-expiring links remain accessible indefinitely. Consider 90-day expiry for sensitive analyses."
+
 ### 2.2 Shared View
 
 The shared view (`/shared/readability/:shareToken`) SHALL:
 - Display without authentication
 - Show: overall score, category breakdown, LLM coverage summary, top recommendations
-- NOT show: full LLM extractions (to limit data exposure), history, export buttons
+- Show: LLM coverage summary table (Content%, Headings%, Entities%, Usefulness per LLM). NOT show: full LLM extraction text content, history, or export buttons
 - Include portal branding and a "Create your own analysis" CTA
 - Show expiry date: "This shared analysis expires on [date]"
 - Handle expired links with a clear "This link has expired" message
+- Include a brief "About This Report" section explaining the AI Readability score methodology in 2-3 sentences for first-time viewers
+- De-emphasize the expiry date (useful for the sharer, not the recipient)
+- Support system-theme-aware dark/light mode via `prefers-color-scheme` (ThemeContext is unavailable on public routes)
 
 ### 2.3 Revoking Shared Links
 
@@ -334,7 +339,7 @@ Use `navigator.clipboard.writeText()` with fallback to `document.execCommand('co
 
 ---
 
-*Document Version: 1.0*
+*Document Version: 1.1*
 *Created: 2026-02-17*
 *Last Updated: 2026-02-17*
 *Status: Draft*

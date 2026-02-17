@@ -159,8 +159,8 @@ The following checks SHALL be performed:
 | Check ID | Check | Pass Criteria | Weight |
 |---|---|---|---|
 | TA-01 | Server-side rendering | Content available in initial HTML (not purely JS-rendered) | Critical |
-| TA-02 | Robots meta tag | No `noindex`, `nofollow`, or `noai` directives blocking LLM access | Critical |
-| TA-03 | robots.txt | Page not blocked by `robots.txt` for major AI crawlers | High |
+| TA-02 | Robots & AI crawler directives | No `noindex`, `nofollow`, or `noai`/`noai:all` directives blocking LLM access. Specifically check for directives targeting AI crawler user-agents: **GPTBot**, **Google-Extended**, **PerplexityBot**, **ClaudeBot/anthropic-ai**, **CCBot**. Flag any `<meta name="robots">` or `<meta name="GPTBot">` (etc.) tags that restrict AI crawler access. | Critical |
+| TA-03 | robots.txt AI crawler rules | Page not blocked by `robots.txt` for major AI crawlers. Specifically parse `robots.txt` for `User-agent` rules targeting: **GPTBot**, **Google-Extended**, **PerplexityBot**, **ClaudeBot**, **anthropic-ai**, **CCBot**, and wildcard (`*`). Report per-crawler allow/disallow status. | High |
 | TA-04 | Canonical URL set | `<link rel="canonical">` present and correct | Medium |
 | TA-05 | Page load weight | Total HTML < 2MB | Medium |
 | TA-06 | Inline CSS/JS minimal | Inline styles/scripts < 20% of total page size | Low |
@@ -168,6 +168,7 @@ The following checks SHALL be performed:
 | TA-08 | No content behind interactions | Content not gated by tabs, accordions, or click-to-expand without proper HTML | High |
 | TA-09 | Image alt text coverage | > 90% of `<img>` elements have `alt` attributes | Medium |
 | TA-10 | Structured data valid | JSON-LD parses without errors | Medium |
+| TA-10.5 | AI training opt-out signals (ai.txt & TDM) | Detect presence of `/ai.txt` file (Spawning AI protocol) and `TDM-Reservation` HTTP headers (W3C Text & Data Mining reservation). Report whether these signals restrict AI training or crawling. Surface as informational finding (does not penalize score, but alerts the user to potential AI access restrictions). | Low |
 
 #### FR-2.2.5: Metadata & Schema Scoring (15%)
 
@@ -217,6 +218,7 @@ The following checks SHALL be performed:
 - Claude's qualitative assessment SHALL influence scores in the Content Clarity and AI-Specific Signals categories.
 - Claude's assessment SHALL contribute up to 30% of each influenced category's score (remainder from rule-based checks).
 - The system SHALL clearly indicate which portions of the analysis are AI-generated vs. rule-based.
+- **(E-CMO-05)** The `citationWorthiness` score returned by the Claude analysis (see FR-2.3.1, item 5) SHALL be surfaced as a **prominent secondary metric** on the results dashboard, displayed alongside the overall AI Readability Score. It should not be buried within the detailed data model only. The citation worthiness score SHALL be presented with its own visual indicator (e.g., gauge or badge) and a brief explanation of what it measures: *"How likely this content is to be quoted or cited in AI-generated answers."*
 
 ---
 
@@ -234,6 +236,8 @@ The following checks SHALL be performed:
   5. Identify any content that it cannot process or understand
   6. Assess the page's usefulness for answering user questions
 - Each LLM's response SHALL be displayed in a consistent, normalized format.
+
+> **Important Disclaimer (D-GEO-01):** The extraction methodology described above tests **LLM comprehension** — i.e., how well each model can parse and understand the page content when provided to it. It does **not** simulate actual crawl behavior of these models' associated web crawlers (e.g., GPTBot, Googlebot). Actual crawl behavior depends on infrastructure-level factors (robots.txt enforcement, rate limiting, JavaScript rendering pipelines) that are outside the scope of this tool. In user-facing UI, this feature should be labeled **"LLM Comprehension Preview"** (not "LLM Rendering Preview") and must include a visible disclaimer: *"This preview shows how each AI model interprets your content when provided to it. It does not simulate actual web crawling behavior."*
 
 #### FR-3.1.2: Supported LLMs
 The system SHALL support rendering previews for the following LLMs:
@@ -320,6 +324,8 @@ Recommendations SHALL be grouped into the following actionable categories:
 | **Content Enhancements** | Changes to content itself | Category = Content Clarity or AI Signals |
 | **Technical Fixes** | Code-level changes | Category = Technical Accessibility or Metadata |
 
+> **Audience-Based Grouping (D-CMO-06 / E-CMO-04):** In addition to the priority-based groups above, recommendations SHALL also be groupable by **target audience**: **"For Content Team"** (content clarity, structure, AI signals recommendations) vs. **"For Development Team"** (technical accessibility, metadata/schema, structured data recommendations). This enables users to filter and export/forward relevant recommendations directly to the appropriate team without requiring the recipient to triage the full list.
+
 ---
 
 ## 5. Analysis History & Persistence
@@ -376,7 +382,7 @@ Recommendations SHALL be grouped into the following actionable categories:
 
 ---
 
-*Document Version: 1.0*
+*Document Version: 1.1*
 *Created: 2026-02-17*
 *Last Updated: 2026-02-17*
-*Status: Draft*
+*Status: Draft — Updated with D-GEO-03, E-GEO-11, D-GEO-01, D-CMO-06, E-CMO-04, E-CMO-05 revisions*

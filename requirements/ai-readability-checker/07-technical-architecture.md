@@ -43,7 +43,7 @@ src/
       utils/
         htmlParser.js       # DOM parsing utilities
         textAnalysis.js     # Readability, sentence analysis
-        urlValidation.js    # URL validation (extend existing)
+        urlValidation.js    # URL validation (imports and extends existing src/lib/urlValidation.js)
         scoreCalculator.js  # Weighted score computation
         gradeMapper.js      # Score-to-grade mapping
 
@@ -61,7 +61,7 @@ src/
 | `src/config/tools.js` | Add readability tool entry + TEAL color |
 | `src/App.jsx` | Add route for `/app/readability` and `/app/readability/:id` |
 | `src/components/home/HomePage.jsx` | Add quick action for AI Readability |
-| `src/components/home/ToolCard.jsx` | Add `teal` to colorVariants |
+| `src/components/home/ToolCard.jsx` | Add `teal`, `amber`, and `rose` to colorVariants (amber and rose are pre-existing gaps) |
 | `src/utils/roles.js` | Add `canRunReadabilityCheck` permission |
 | `firestore.rules` | Add readability collections rules |
 | `storage.rules` | Add readability storage rules |
@@ -81,7 +81,7 @@ const ReadabilityPage = lazyWithRetry(
 
 <Route path="/app/readability" element={
   <ProtectedRoute>
-    <ToolErrorBoundary tool="readability" color="teal">
+    <ToolErrorBoundary toolName="AI Readability Checker" toolColor="teal">
       <ReadabilityPage />
     </ToolErrorBoundary>
   </ProtectedRoute>
@@ -89,7 +89,7 @@ const ReadabilityPage = lazyWithRetry(
 
 <Route path="/app/readability/:analysisId" element={
   <ProtectedRoute>
-    <ToolErrorBoundary tool="readability" color="teal">
+    <ToolErrorBoundary toolName="AI Readability Checker" toolColor="teal">
       <ReadabilityPage />
     </ToolErrorBoundary>
   </ProtectedRoute>
@@ -99,6 +99,9 @@ const ReadabilityPage = lazyWithRetry(
 <Route path="/shared/readability/:shareToken" element={
   <ReadabilityShareView />
 } />
+
+// Legacy redirect
+<Route path="/readability" element={<Navigate to="/app/readability" replace />} />
 ```
 
 ### 2.2 View State Machine
@@ -120,7 +123,11 @@ State transitions:
   PROCESSING -> ERROR       (fatal error)
   DASHBOARD -> INPUT        (user clicks New Analysis)
   INPUT -> DASHBOARD        (user clicks history item)
+  HISTORY -> DASHBOARD      (user clicks history item in full history view)
   Any -> INPUT              (user clicks Back / New Analysis)
+
+Guard: INPUT -> PROCESSING transition MUST abort any existing in-flight analysis first.
+The hook stores an AbortController in a useRef and aborts it before starting a new analysis.
 ```
 
 ---
@@ -163,6 +170,7 @@ const useReadabilityAnalysis = () => {
     setInputMethod, setUrl, setHtmlContent, setContext,
     analyzeUrl, analyzeHtml, cancelAnalysis, resetAnalysis
   };
+  // Cleanup: useEffect return calls abortController.current?.abort() on unmount
 };
 ```
 
@@ -212,7 +220,9 @@ async function runAnalysis(input, onProgress) {
 
     // Stage 3-6: Parallel LLM calls (25-85%)
     onProgress(25, 'Analyzing with AI models...');
-    const [claudeAnalysis, ...llmExtractions] = await Promise.allSettled([
+    // Using Promise.all (not allSettled) because each LLM function catches
+    // its own errors internally and never rejects — they return error status objects instead.
+    const [claudeAnalysis, ...llmExtractions] = await Promise.all([
       analyzeWithClaude(extracted, abortController.signal),
       extractWithOpenAI(extracted, abortController.signal),
       extractWithGemini(extracted, abortController.signal),
@@ -274,9 +284,10 @@ function extractContent(html) {
   // 8. Calculate content metrics
   const metrics = calculateMetrics(html, textContent, doc);
 
+  // rawHtml and document DOM object are NOT returned to components — only sanitized text content is exposed to prevent XSS vectors
   return {
     metadata, structuredData, headings, mainContent: cleanedContent,
-    textContent, metrics, rawHtml: html, document: doc
+    textContent, metrics
   };
 }
 ```
@@ -328,6 +339,8 @@ async function extractWithLLM(provider, model, extracted, signal) {
   }
 }
 ```
+
+> **Note:** Perplexity's sonar-pro is a search-augmented model and may supplement responses with external web data. Consider adding a Perplexity-specific prompt instruction: 'Only analyze the provided content. Do not search the web or include external information.'
 
 ---
 
@@ -397,6 +410,8 @@ const CategoryChart = lazy(() => import('./ReadabilityCategoryChart'));
 
 Add `canRunReadabilityCheck: true` to: ADMIN, PROJECT_MANAGER, SEO_SPECIALIST, DEVELOPER, CONTENT_WRITER. Set to `false` for CLIENT.
 
+> **Note:** Existing tools declare permissions in tools.js but enforcement varies. Verify how canRunAudits is enforced in the audit tool before implementing canRunReadabilityCheck. Align with the existing authorization pattern.
+
 ### 6.3 Command Palette
 
 The tool SHALL be discoverable via the existing Command Palette (Cmd+K). The tool registry entry ensures this automatically.
@@ -428,7 +443,7 @@ None required. All functionality is achievable with existing dependencies:
 
 ---
 
-*Document Version: 1.0*
+*Document Version: 1.1*
 *Created: 2026-02-17*
 *Last Updated: 2026-02-17*
 *Status: Draft*

@@ -55,6 +55,10 @@ This tool will be among the first to offer:
 | Mean Time to Results | < 15 seconds for URL input |
 | User Satisfaction (NPS) | 50+ |
 
+> **Note (D-GEO-07):** The 15-second target above is the baseline requirement. The 12-second target referenced in the Technical Performance Specification (DOC 10) is a **stretch goal** for optimized environments and should not be treated as the primary SLA.
+
+> **Secondary KPI (E-GEO-01):** **Citation Likelihood Score** — The percentage of analyzed pages that achieve a "high citation-worthiness" rating (as assessed by the Claude-powered analysis) should be tracked as a secondary quality KPI. Target: 30%+ of analyzed pages score "high" or above on citation likelihood within 90 days post-launch.
+
 ### 3.3 Business Impact Metrics
 
 | Metric | Target |
@@ -122,6 +126,7 @@ This tool will be among the first to offer:
 | LLM API pricing changes | Cost overruns | Medium | Usage tracking, per-user quotas, caching of repeat analyses |
 | Content rendering differences across LLMs | Inaccurate previews | Medium | Regular validation against actual LLM outputs; clear disclaimers |
 | JavaScript-heavy sites not rendering | Incomplete analysis | Medium | Clear UX guidance to use Screaming Frog JS crawl export instead |
+| LLM model version changes | Score inconsistency across analyses; historical comparisons become unreliable | Medium | Store model version per analysis; display version drift warnings on historical comparisons |
 
 ## 6. Timeline Considerations
 
@@ -160,7 +165,7 @@ This tool will be among the first to offer:
 
 ---
 
-*Document Version: 1.0*
+*Document Version: 1.1*
 *Created: 2026-02-17*
 *Last Updated: 2026-02-17*
-*Status: Draft*
+*Status: Draft — Updated with D-GEO-07, E-GEO-01, E-GEO-04 revisions*

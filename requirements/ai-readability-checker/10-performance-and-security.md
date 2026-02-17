@@ -14,12 +14,14 @@
 | All 4 LLM calls (parallel) | < 8s | 30s | Start to last completion |
 | Rule-based scoring | < 200ms | 500ms | Extracted data to scores |
 | Recommendation generation | < 300ms | 1s | Scores to recommendations |
-| Full analysis (end-to-end) | < 12s | 30s | User clicks Analyze to results |
+| Full analysis (end-to-end) | < 15s | 45s | User clicks Analyze to results |
 | Results dashboard render | < 300ms | 500ms | Data to interactive DOM |
 | PDF export generation | < 3s | 5s | Click to download start |
 | JSON export generation | < 500ms | 1s | Click to download start |
 | History list load | < 1s | 2s | Page load to list rendered |
 | Chart rendering | < 200ms | 500ms | Data to visible chart |
+
+> **Stretch goal:** < 12s for pages under 5,000 words.
 
 ### 1.2 Bundle Size Targets
 
@@ -124,6 +126,10 @@ The URL fetch proxy is the primary SSRF vector. Mitigations:
 | Redirect validation | Re-validate each redirect destination against the same rules |
 | Response size limit | Max 10MB response body |
 | Timeout enforcement | Hard 30-second timeout |
+| Block IPv6 private ranges | Reject ::1, fe80::/10, fc00::/7, and IPv4-mapped IPv6 (::ffff:127.0.0.1) |
+| TOCTOU pinning | Pin resolved IP to connection socket; do not re-resolve during redirect |
+| Post-redirect scheme validation | Re-validate protocol after each redirect (block gopher://, file://, dict://) |
+| Cloud metadata header filtering | Strip or block forwarding of cloud metadata tokens (X-aws-ec2-metadata-token, Metadata-Flavor) |
 
 ### 2.5 Data Privacy
 
@@ -182,7 +188,9 @@ The URL fetch proxy is the primary SSRF vector. Mitigations:
 
 ---
 
-## 4. Monitoring (Recommendations)
+## 4. Monitoring & Audit Trail (Required)
+
+The following monitoring capabilities are REQUIRED for launch, not optional recommendations.
 
 | Metric | How to Track |
 |---|---|
@@ -192,10 +200,13 @@ The URL fetch proxy is the primary SSRF vector. Mitigations:
 | Rate limit hit frequency | Log rate limit events per user |
 | Popular analyzed domains | Aggregate URL domains (anonymized) |
 | Score distribution | Aggregate scores for quality benchmarking |
+| API usage audit trail | Log userId, timestamp, provider, model, token counts, estimated cost, URL hash, status, latency to a dedicated api-usage-log Firestore collection. Retain 90 days minimum. |
+| Cost alerting | Alert operations when any LLM provider reaches 80% of monthly cap |
+| Abuse detection | Flag users exceeding 50% of their hourly rate limit consistently |
 
 ---
 
-*Document Version: 1.0*
+*Document Version: 1.1*
 *Created: 2026-02-17*
 *Last Updated: 2026-02-17*
 *Status: Draft*

@@ -347,6 +347,12 @@ Respond in valid JSON with this exact structure:
   createdAt: Timestamp,
   updatedAt: Timestamp,
 
+  // Organization & Project Context
+  organizationId: string | null,       // Future: team-level grouping
+  projectId: string | null,            // Link to Content Planner project
+  clientName: string | null,           // Client label for agency use
+  tags: [string],                      // User-defined tags for filtering
+
   // Input
   inputMethod: 'url' | 'upload' | 'paste',
   url: string | null,
@@ -464,9 +470,15 @@ Respond in valid JSON with this exact structure:
 
   // Comparison
   previousAnalysisId: string | null,
-  scoreDelta: number | null
+  scoreDelta: number | null,
+
+  // Versioning
+  scoringVersion: string,              // e.g. "1.0.0" — bumped when checks change
+  promptVersion: string,               // e.g. "1.0.0" — bumped when extraction prompt changes
 }
 ```
+
+> **Note:** Firestore enforces a 1MB maximum document size. If the combined size of `llmExtractions.*.mainContent` exceeds safe limits (approaching 800KB total document size), truncate `mainContent` fields and store full extractions in Firebase Storage with a reference URI.
 
 ### 4.2 Firestore Collection: readability-settings (per-user)
 
@@ -498,13 +510,22 @@ readability/
 
 ```javascript
 match /readability-analyses/{analysisId} {
-  allow read, write: if request.auth != null
+  // Owner read access
+  allow read: if request.auth != null
     && request.auth.uid == resource.data.userId;
 
+  // Owner create (validates userId on new document)
   allow create: if request.auth != null
     && request.resource.data.userId == request.auth.uid;
 
-  // Shared analyses readable by anyone if not expired
+  // Owner update/delete (prevents userId mutation)
+  allow update: if request.auth != null
+    && request.auth.uid == resource.data.userId
+    && request.resource.data.userId == resource.data.userId;
+  allow delete: if request.auth != null
+    && request.auth.uid == resource.data.userId;
+
+  // Shared analysis: readable by anyone with valid share token (no auth required)
   allow read: if resource.data.isShared == true
     && resource.data.shareExpiresAt > request.time;
 }
@@ -512,6 +533,28 @@ match /readability-analyses/{analysisId} {
 match /readability-settings/{userId} {
   allow read, write: if request.auth != null
     && request.auth.uid == userId;
+}
+```
+
+> **Note:** The document ID for `readability-settings` IS the user's UID. The `userId` field within the document is redundant but retained for query convenience.
+
+> **Note:** Admin/PM cross-user visibility requires a future `organizationId`-based query pattern. MVP enforces strict user-level isolation.
+
+### 4.5 Firebase Storage Rules
+
+```javascript
+match /readability/{userId}/html-snapshots/{filename} {
+  allow read, write: if request.auth != null
+    && request.auth.uid == userId
+    && request.resource.size < 10 * 1024 * 1024  // 10MB max
+    && request.resource.contentType == 'text/html';
+}
+match /readability/{userId}/exports/{filename} {
+  allow read: if request.auth != null
+    && request.auth.uid == userId;
+  allow write: if request.auth != null
+    && request.auth.uid == userId
+    && request.resource.size < 20 * 1024 * 1024;  // 20MB max
 }
 ```
 
@@ -534,10 +577,12 @@ match /readability-settings/{userId} {
 
 | API | Cost per Analysis | Monthly Cap |
 |---|---|---|
-| Claude (Anthropic) | ~$0.01-0.03 | Existing proxy budget |
+| Claude (Anthropic) | ~$0.01-0.03 | $150/month |
 | OpenAI (GPT-4o) | ~$0.01-0.03 | $100/month |
 | Google Gemini | ~$0.005-0.015 | $50/month |
 | Perplexity (Sonar) | ~$0.005-0.02 | $50/month |
+
+> **Note:** When any provider's monthly cap is reached, that provider's LLM preview becomes unavailable for the remainder of the month. Rule-based scoring continues unaffected.
 
 ### 5.3 Caching Strategy
 
@@ -577,14 +622,16 @@ When individual LLM APIs fail, the system SHALL:
 |---|---|---|---|
 | VITE_AI_PROXY_URL | Yes | Existing | Base URL for AI proxy service |
 | VITE_FIREBASE_* | Yes | Existing | Firebase configuration (7 vars) |
-| VITE_CLAUDE_API_KEY | Yes | Existing | Anthropic API key (server-side) |
-| VITE_OPENAI_API_KEY | Yes | **New** | OpenAI API key (server-side) |
-| VITE_GEMINI_API_KEY | Yes | **New** | Google Gemini API key (server-side) |
-| VITE_PERPLEXITY_API_KEY | Yes | **New** | Perplexity API key (server-side) |
+| VITE_CLAUDE_API_KEY | Yes | Existing | Legacy client-side Anthropic key; the proxy uses its own `ANTHROPIC_API_KEY` server-side |
+| OPENAI_API_KEY | Yes | **New** | Proxy server only (NOT in client .env) |
+| GEMINI_API_KEY | Yes | **New** | Proxy server only (NOT in client .env) |
+| PERPLEXITY_API_KEY | Yes | **New** | Proxy server only (NOT in client .env) |
+
+> **Warning:** The `VITE_` prefix causes Vite to embed the variable in the client-side bundle, exposing it to end users. All third-party LLM API keys (OpenAI, Gemini, Perplexity) MUST be set on the proxy server without the `VITE_` prefix. `VITE_CLAUDE_API_KEY` is retained only for legacy client-side compatibility; production Claude calls route through the proxy's `ANTHROPIC_API_KEY`.
 
 ---
 
-*Document Version: 1.0*
+*Document Version: 1.1*
 *Created: 2026-02-17*
 *Last Updated: 2026-02-17*
 *Status: Draft*
