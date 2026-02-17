@@ -234,20 +234,33 @@ The following 10 product decisions were made by the Product Owner to resolve DEF
 
 ## Summary Statistics
 
-| Persona | Defects | Enhancements | Opportunities/Risks | Total | Implemented |
-|---|---|---|---|---|---|
-| SVP, GEO | 8 | 12 | 10 | 30 | 10 |
-| EVP, Agency Ops | 8 | 15 | 8 | 31 | 11 |
-| CMO (Client) | 6 | 7 | 6 | 19 | 6 |
-| Lead Developer | 8 | 9 | 10 | 27 | 16 |
-| SVP, Technology | 6 | 8 | 9 | 23 | 8 |
-| SVP, UX Design | 7 | 8 | 7 | 22 | 12 |
-| **TOTALS** | **43** | **59** | **50** | **152** | **63** |
+| Persona | Defects | Enhancements | Opportunities/Risks | Total | Implemented (v1.1) | Implemented (v1.2) |
+|---|---|---|---|---|---|---|
+| SVP, GEO | 8 | 12 | 10 | 30 | 9 | 11 |
+| EVP, Agency Ops | 8 | 15 | 8 | 31 | 9 | 12 |
+| CMO (Client) | 6 | 7 | 6 | 19 | 6 | 6 |
+| Lead Developer | 8 | 9 | 10 | 27 | 19 | 19 |
+| SVP, Technology | 6 | 8 | 9 | 23 | 9 | 9 |
+| SVP, UX Design | 7 | 8 | 7 | 22 | 10 | 11 |
+| **TOTALS** | **43** | **59** | **50** | **152** | **62** | **68** |
 
-> **v1.2 update:** 6 additional items resolved via refinement questions (57 → 63 implemented).
+> **v1.2 corrections:**
+> - v1.1 total corrected from 57 → **62** (original summary under-counted EVP Ops by 2, Lead Dev by 3, SVP Tech by 1; over-counted SVP UX by 1)
+> - v1.2 total: 62 + 6 (refinement questions Q1, Q4, Q6, Q7, Q9, Q10) = **68 implemented**
+> - 2 additional items CONFIRMED without doc changes (Q2: E-OPS-05, Q3: D-CMO-01)
+
+### Remaining Items Breakdown
+
+| Status | Count | Description |
+|---|---|---|
+| **IMPLEMENTED** | 68 | Changes made in BRD documents |
+| **CONFIRMED** | 2 | Status quo confirmed by product decision (no doc change) |
+| **DEFERRED** | 26 | Require future product decisions or are post-MVP scope |
+| **NOTED** | 56 | Acknowledged risks, opportunities, and observations — no doc changes needed |
+| **Total** | **152** | |
 
 ---
 
-*Review Log Version: 1.1*
+*Review Log Version: 1.2*
 *Created: 2026-02-17*
-*Updated: 2026-02-17 — Added refinement question decisions (Q1-Q10)*
+*Updated: 2026-02-17 — Fixed summary statistics counting errors; added refinement question decisions (Q1-Q10)*
