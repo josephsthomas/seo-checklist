@@ -232,35 +232,69 @@ The following 10 product decisions were made by the Product Owner to resolve DEF
 
 ---
 
+## 8. Risk Review & MVP Promotions (v1.3)
+
+### 8.1 NOTED Risks Now Addressed
+
+The following NOTED items were identified as requiring BRD changes during risk review:
+
+| Original ID | Original Status | New Status | Action Taken |
+|---|---|---|---|
+| R-TECH-05 | NOTED | **IMPLEMENTED** | Added launch-blocking requirement for server-side rate limit enforcement (DOC 10, Section 5.1) |
+| R-DEV-02 | NOTED | **IMPLEMENTED** | Same — client-side enforcement alone is insufficient (DOC 10, Section 5.1) |
+| D-TECH-04 | NOTED | **IMPLEMENTED** | Added launch-blocking requirement for proxy auth token validation (DOC 10, Section 5.2) |
+| R-TECH-07 | NOTED | **IMPLEMENTED** | Added shared route abuse protection requirement (DOC 10, Section 5.3) |
+| R-DEV-06 | NOTED | **IMPLEMENTED** | CC-01 Flesch marked N/A for non-English content; weight redistributed (DOC 03, DOC 10 Section 5.4) |
+| R-TECH-01 | NOTED | **IMPLEMENTED** | Pre-launch legal review requirement added (DOC 10, Section 5.5) |
+| R-TECH-03 | NOTED | **IMPLEMENTED** | Minimum proxy resilience requirements defined (DOC 10, Section 5.6) |
+
+### 8.2 Features Promoted to MVP
+
+The following items were promoted from later phases to MVP to make the tool robust out of the box:
+
+| Original ID | Original Phase | Action Taken | Docs Updated |
+|---|---|---|---|
+| E-CMO-03 | Phase 4 (trend tracking) | **Promoted to MVP** — basic trend sparkline for re-analyzed URLs | 01, 03, 05, 07, 09 |
+| E-GEO-10 | DEFERRED | **Promoted to MVP** — GEO Strategic Brief page added to PDF export | 01, 11, 09 |
+| E-UX-04 | DEFERRED | **Promoted to MVP** — PDF export preview modal before generation | 01, 05, 07, 09, 11 |
+| E-OPS-13 | DEFERRED | **Promoted to MVP** — PDF download button on shared analysis view | 01, 09, 11 |
+| O-UX-06 | NOTED | **Promoted to MVP** — bidirectional cross-tool deep linking (Technical Audit ↔ Readability, Schema Generator ↔ Readability) | 01, 02, 07, 09 |
+
+### 8.3 Phase Timeline Corrected
+
+DOC 01 Section 6 (Timeline) was inconsistent with Section 4.1 (MVP Scope). Phase 1 now reflects the full MVP feature set including exports, history, 3 LLMs, and newly promoted items. Phase 3 renamed to "Agency & Team Features" with batch analysis moved there.
+
+---
+
 ## Summary Statistics
 
-| Persona | Defects | Enhancements | Opportunities/Risks | Total | Implemented (v1.1) | Implemented (v1.2) |
-|---|---|---|---|---|---|---|
-| SVP, GEO | 8 | 12 | 10 | 30 | 9 | 11 |
-| EVP, Agency Ops | 8 | 15 | 8 | 31 | 9 | 12 |
-| CMO (Client) | 6 | 7 | 6 | 19 | 6 | 6 |
-| Lead Developer | 8 | 9 | 10 | 27 | 19 | 19 |
-| SVP, Technology | 6 | 8 | 9 | 23 | 9 | 9 |
-| SVP, UX Design | 7 | 8 | 7 | 22 | 10 | 11 |
-| **TOTALS** | **43** | **59** | **50** | **152** | **62** | **68** |
+| Persona | Defects | Enhancements | Opportunities/Risks | Total | Implemented (v1.1) | Implemented (v1.2) | Implemented (v1.3) |
+|---|---|---|---|---|---|---|---|
+| SVP, GEO | 8 | 12 | 10 | 30 | 9 | 11 | 12 |
+| EVP, Agency Ops | 8 | 15 | 8 | 31 | 9 | 12 | 13 |
+| CMO (Client) | 6 | 7 | 6 | 19 | 6 | 6 | 7 |
+| Lead Developer | 8 | 9 | 10 | 27 | 19 | 19 | 20 |
+| SVP, Technology | 6 | 8 | 9 | 23 | 9 | 9 | 13 |
+| SVP, UX Design | 7 | 8 | 7 | 22 | 10 | 11 | 13 |
+| **TOTALS** | **43** | **59** | **50** | **152** | **62** | **68** | **78** |
 
-> **v1.2 corrections:**
-> - v1.1 total corrected from 57 → **62** (original summary under-counted EVP Ops by 2, Lead Dev by 3, SVP Tech by 1; over-counted SVP UX by 1)
-> - v1.2 total: 62 + 6 (refinement questions Q1, Q4, Q6, Q7, Q9, Q10) = **68 implemented**
-> - 2 additional items CONFIRMED without doc changes (Q2: E-OPS-05, Q3: D-CMO-01)
+> **v1.3 additions:**
+> - 7 NOTED risks addressed with BRD mitigations (R-TECH-05, R-DEV-02, D-TECH-04, R-TECH-07, R-DEV-06, R-TECH-01, R-TECH-03)
+> - 5 items promoted to MVP (E-CMO-03, E-GEO-10, E-UX-04, E-OPS-13, O-UX-06)
+> - v1.3 total: 68 + 10 = **78 implemented**
 
 ### Remaining Items Breakdown
 
 | Status | Count | Description |
 |---|---|---|
-| **IMPLEMENTED** | 68 | Changes made in BRD documents |
+| **IMPLEMENTED** | 78 | Changes made in BRD documents |
 | **CONFIRMED** | 2 | Status quo confirmed by product decision (no doc change) |
-| **DEFERRED** | 26 | Require future product decisions or are post-MVP scope |
-| **NOTED** | 56 | Acknowledged risks, opportunities, and observations — no doc changes needed |
+| **DEFERRED** | 23 | Require future product decisions or are post-MVP scope |
+| **NOTED** | 49 | Acknowledged risks, opportunities, and observations — no doc changes needed |
 | **Total** | **152** | |
 
 ---
 
-*Review Log Version: 1.2*
+*Review Log Version: 1.3*
 *Created: 2026-02-17*
-*Updated: 2026-02-17 — Fixed summary statistics counting errors; added refinement question decisions (Q1-Q10)*
+*Updated: 2026-02-17 — Risk review: 7 NOTED risks addressed as launch blockers; 5 features promoted to MVP; Phase timeline corrected*

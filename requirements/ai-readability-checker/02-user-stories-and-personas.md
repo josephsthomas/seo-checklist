@@ -350,6 +350,18 @@
 - [ ] If the audit includes rendered HTML (from Screaming Frog JS crawl), it is automatically used
 - [ ] The analysis links back to the originating audit for context
 
+#### US-2.7.1.1: Cross-Tool Deep Linking (Bidirectional)
+**As** Sarah (SEO Specialist),
+**I want to** navigate between AI Readability results and related tools (Technical Audit, Schema Generator),
+**So that** I can seamlessly combine insights from multiple tools without re-entering URLs.
+
+**Acceptance Criteria:**
+- [ ] AI Readability results include a "Run Technical Audit" button that opens Technical Audit pre-filled with the same URL
+- [ ] AI Readability results include a "Generate Schema" button that opens Schema Generator pre-filled with the URL and detected schema type
+- [ ] Technical Audit results include an "AI Readability" action button per URL (already specified in US-2.7.1)
+- [ ] Schema Generator results include a "Check AI Readability" button
+- [ ] Deep links preserve the originating tool context (breadcrumb back to source tool)
+
 #### US-2.7.2: Include in Export Hub
 **As** James (Agency Director),
 **I want to** access AI Readability reports from the Export Hub,
@@ -420,7 +432,7 @@ Forward Recommendations to Writing Team
 
 ---
 
-*Document Version: 1.2*
+*Document Version: 1.3*
 *Created: 2026-02-17*
 *Last Updated: 2026-02-17*
-*Status: Draft — Updated with GEO Specialist persona (Decision Q10), Perplexity Phase 2 deferral (Q8), "How AI Sees Your Content" rename (Q5)*
+*Status: Draft — v1.3: Cross-tool deep linking user story added (O-UX-06)*

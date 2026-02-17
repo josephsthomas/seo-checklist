@@ -206,7 +206,65 @@ The following monitoring capabilities are REQUIRED for launch, not optional reco
 
 ---
 
-*Document Version: 1.2*
+## 5. Launch-Blocking Security Requirements
+
+The following items have been identified as **launch blockers** from stakeholder risk review. They MUST be resolved before MVP release.
+
+### 5.1 Server-Side Rate Limit Enforcement (R-TECH-05, R-DEV-02)
+
+The tiered rate limits defined in DOC 04 Section 5.1 (Free: 10/hr, Pro: 30/hr, Enterprise: 200/hr) MUST be enforced **server-side** by the proxy. Client-side enforcement alone is insufficient — users can bypass it via browser DevTools or direct API calls.
+
+**Requirements:**
+- The proxy SHALL track per-user request counts using a sliding window counter (e.g., Redis or Firestore-based counter)
+- The proxy SHALL return HTTP 429 with a `Retry-After` header when limits are exceeded
+- Rate limit state SHALL be keyed by Firebase UID (extracted from the validated auth token)
+- Rate limits SHALL apply across all user sessions (multiple tabs, devices)
+
+### 5.2 Proxy Authentication Validation (D-TECH-04)
+
+The AI proxy MUST validate Firebase authentication tokens on every request. Without this, unauthenticated users can access LLM APIs directly.
+
+**Requirements:**
+- Every proxy endpoint (`/api/fetch-url`, `/api/ai/extract`) SHALL validate the `Authorization: Bearer` token using the Firebase Admin SDK
+- Invalid/expired tokens SHALL return HTTP 401 with a clear error
+- Token validation SHALL extract the user's UID and plan tier for rate limiting
+- The proxy SHALL reject requests with missing Authorization headers
+
+### 5.3 Shared Route Abuse Protection (R-TECH-07)
+
+The public shared analysis route (`/shared/readability/:shareToken`) requires basic abuse protection to prevent scraping and DDoS.
+
+**Requirements:**
+- The proxy/CDN SHALL apply IP-based rate limiting to public shared routes (e.g., 60 requests/minute per IP)
+- Share tokens SHALL be validated against Firestore (existence + not expired) before returning data
+- 404 responses for invalid tokens SHALL NOT leak information about whether the token ever existed
+- Consider adding a simple CAPTCHA or challenge for excessive access patterns
+
+### 5.4 Non-English Readability Handling (R-DEV-06)
+
+The Flesch Reading Ease formula (CC-01) is calibrated for English text only. Applying it to non-English content produces misleading scores.
+
+**Requirements:**
+- When the detected language (via `<html lang>` or content analysis) is not English, CC-01 (Flesch) SHALL be marked as "N/A — English-only metric" instead of producing a score
+- The category score for Content Clarity SHALL be recalculated excluding CC-01's weight, redistributed across remaining checks
+- A user-facing note SHALL appear: "Some readability metrics are English-only. Non-English content is scored on structure, metadata, and AI signals."
+
+### 5.5 Pre-Launch Legal Review (R-TECH-01)
+
+The 90-day HTML snapshot retention policy (DOC 03, Section 5.1.2) SHALL be reviewed with legal counsel before launch to ensure compliance with GDPR data minimization principles, particularly since analyzed HTML may contain PII.
+
+### 5.6 Proxy Resilience (R-TECH-03)
+
+The server-side proxy is a single point of failure for the entire tool (URL fetching + all LLM API calls). Minimum resilience requirements for launch:
+
+- Health check endpoint (`/health`) that monitoring can poll
+- Auto-restart on crash (PM2, systemd, or container orchestration)
+- Error rate alerting: alert operations if proxy error rate exceeds 5% over 5 minutes
+- Documented manual failover procedure
+
+---
+
+*Document Version: 1.3*
 *Created: 2026-02-17*
 *Last Updated: 2026-02-17*
-*Status: Draft*
+*Status: Draft — v1.3: Added Section 5 (launch-blocking security requirements) based on NOTED risk review*

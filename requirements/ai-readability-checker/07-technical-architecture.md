@@ -25,6 +25,9 @@ src/
       ReadabilityShareView.jsx         # Public shared analysis view
       ReadabilityCodeSnippet.jsx       # Before/after code display
       ReadabilityCoverageTable.jsx     # LLM coverage metrics table
+      ReadabilityTrendSparkline.jsx    # Score-over-time sparkline for re-analyzed URLs
+      ReadabilityPDFPreview.jsx        # PDF export preview modal with customization toggles
+      ReadabilityCrossToolLinks.jsx    # Bidirectional deep links to Technical Audit / Schema Generator
 
   lib/
     readability/
@@ -443,7 +446,7 @@ None required. All functionality is achievable with existing dependencies:
 
 ---
 
-*Document Version: 1.2*
+*Document Version: 1.3*
 *Created: 2026-02-17*
 *Last Updated: 2026-02-17*
-*Status: Draft — v1.2: 3 LLMs for MVP (Q8), "How AI Sees Your Content" rename (Q5)*
+*Status: Draft — v1.3: Added TrendSparkline, PDFPreview, and CrossToolLinks components for MVP-promoted features*

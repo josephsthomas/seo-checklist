@@ -60,6 +60,7 @@ Test each of the 50 checks individually:
 |---|---|---|
 | CC-01 pass: readable text | Flesch score 70 | status: 'pass' |
 | CC-01 fail: complex text | Flesch score 30 | status: 'fail' |
+| CC-01 skip: non-English | `<html lang="fr">` + French text | status: 'na', note: 'English-only metric' |
 | CC-02 pass: short sentences | Avg 15 words/sentence | status: 'pass' |
 | CC-02 fail: long sentences | Avg 30 words/sentence | status: 'fail' |
 
@@ -210,7 +211,44 @@ Test each of the 50 checks individually:
 | Failed LLM | One extraction has status: error | Error state in that column, retry button |
 | Coverage table | Render with metrics | Table shows correct percentages |
 
-### 4.5 Recommendations
+### 4.5 Trend Sparkline
+
+| Test | Action | Expected |
+|---|---|---|
+| No history | Render score card with no previous analyses | No sparkline shown |
+| Single analysis | Render with 1 analysis for URL | No sparkline (need 2+) |
+| Multiple analyses | Render with 5 analyses for same URL | Sparkline with 5 data points |
+| Hover tooltip | Hover over sparkline point | Date + score shown |
+| Max 10 points | URL analyzed 15 times | Only last 10 shown |
+| Trend arrow in history | URL with improving scores | ↑ arrow shown |
+
+### 4.6 PDF Preview Modal
+
+| Test | Action | Expected |
+|---|---|---|
+| Opens on export | Click "Export as PDF" | Preview modal appears |
+| Toggle sections | Uncheck "Include Methodology" | Preview updates, methodology page hidden |
+| GEO Brief toggle | Uncheck "GEO Strategic Brief" | GEO page hidden from preview |
+| Generate button | Click "Generate & Download" | PDF downloads, modal closes |
+| Cancel | Click "Cancel" | Modal closes, no download |
+
+### 4.7 Cross-Tool Links
+
+| Test | Action | Expected |
+|---|---|---|
+| Technical Audit link | Click "Run Technical Audit" | Navigates to Technical Audit with URL pre-filled |
+| Schema Generator link | Click "Generate Schema" | Navigates to Schema Generator with URL pre-filled |
+| Breadcrumb back | Click breadcrumb from linked tool | Returns to originating Readability analysis |
+
+### 4.8 Shared View PDF Download
+
+| Test | Action | Expected |
+|---|---|---|
+| Download button visible | Open shared link | "Download PDF Report" button visible |
+| PDF generates | Click download on shared view | PDF downloads with default options |
+| Expired link no download | Open expired shared link | Error page shown, no download button |
+
+### 4.9 Recommendations
 
 | Test | Action | Expected |
 |---|---|---|
@@ -281,10 +319,18 @@ Test each of the 50 checks individually:
 - [ ] Issues table: filters and sort work correctly
 - [ ] History: past analyses listed, clickable
 - [ ] Re-analysis: delta shown for same URL
-- [ ] Export PDF: generates and downloads
+- [ ] Trend sparkline: appears after 2+ analyses of same URL
+- [ ] Trend sparkline: hover shows date + score
+- [ ] Export PDF: preview modal shows before generation
+- [ ] Export PDF: GEO Strategic Brief page included by default
+- [ ] Export PDF: toggles update preview content
 - [ ] Export JSON: generates and downloads
 - [ ] Share: generates link, link opens read-only view
+- [ ] Shared view: PDF download button works
 - [ ] Shared link expiry: expired links show error
+- [ ] Cross-tool: "Run Technical Audit" link navigates correctly
+- [ ] Cross-tool: "Generate Schema" link navigates correctly
+- [ ] Non-English content: CC-01 shows N/A, other checks score normally
 
 ### 7.2 Error QA
 
@@ -318,7 +364,7 @@ Test each of the 50 checks individually:
 
 ---
 
-*Document Version: 1.1*
+*Document Version: 1.3*
 *Created: 2026-02-17*
 *Last Updated: 2026-02-17*
-*Status: Draft — v1.1: 3 LLMs for MVP (Q8), "How AI Sees Your Content" tab rename (Q5)*
+*Status: Draft — v1.3: Added tests for trend sparkline, PDF preview, shared view PDF, cross-tool links, CC-01 non-English handling*

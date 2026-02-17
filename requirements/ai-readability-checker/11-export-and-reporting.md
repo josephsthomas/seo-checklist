@@ -43,7 +43,16 @@ Use the existing portal PDF stack: **jsPDF** + **jspdf-autotable**.
 - Grouped by: Quick Wins, Structural, Content, Technical
 - Code snippets included for top 5 technical recommendations
 
-**Page 8: Methodology**
+**Page 8: GEO Strategic Brief (Optional — toggle on by default)**
+- One-page summary targeted at GEO/AI search optimization stakeholders
+- Citation Likelihood score with explanation and key contributing factors
+- AI Crawler Access matrix (per-crawler allow/block status from TA-02/TA-03)
+- Top 3 AI-Specific Signals findings (from AS-01 through AS-10)
+- Quotable Passages assessment (from AS-05)
+- 2-3 bullet points: "What to prioritize for AI search visibility"
+- This page addresses the GEO Specialist persona (Priya) and differentiates the report from generic SEO tools
+
+**Page 9: Methodology**
 - Scoring methodology explanation (weights per category)
 - List of 50 checks with brief descriptions
 - LLM models and versions used
@@ -75,8 +84,18 @@ Use the existing portal PDF stack: **jsPDF** + **jspdf-autotable**.
 | Client name | Empty | Yes — free text |
 | Client logo | None | Yes — image upload (stored in user settings) |
 | Include LLM summary | Yes | Yes — toggle |
+| Include GEO Strategic Brief | Yes | Yes — toggle |
 | Include methodology | Yes | Yes — toggle |
 | Include code snippets | Yes | Yes — toggle |
+
+#### 1.1.5 PDF Export Preview
+
+Before generating and downloading the PDF, the system SHALL display a **preview modal**:
+- Modal shows a paginated preview of the PDF layout using the selected customization options
+- User can toggle customization options (LLM summary, GEO brief, methodology, code snippets) and see the preview update
+- "Generate & Download" button initiates the PDF creation
+- "Cancel" returns to the dashboard without generating
+- Preview renders a lightweight HTML representation (not a full jsPDF render) for performance
 
 ---
 
@@ -240,7 +259,8 @@ For future consideration: Excel export using ExcelJS (already installed) with:
 The shared view (`/shared/readability/:shareToken`) SHALL:
 - Display without authentication
 - Show: overall score, category breakdown, LLM coverage summary, top recommendations
-- Show: LLM coverage summary table (Content%, Headings%, Entities%, Usefulness per LLM). NOT show: full LLM extraction text content, history, or export buttons
+- Show: LLM coverage summary table (Content%, Headings%, Entities%, Usefulness per LLM). NOT show: full LLM extraction text content or history
+- Include a **"Download PDF Report"** button that generates and downloads a PDF using the same generation logic as the authenticated export (default customization options; no client logo or custom title). This enables shared link recipients to save and forward the analysis.
 - Include portal branding and a "Create your own analysis" CTA
 - Show expiry date: "This shared analysis expires on [date]"
 - Handle expired links with a clear "This link has expired" message
@@ -338,7 +358,7 @@ Use `navigator.clipboard.writeText()` with fallback to `document.execCommand('co
 
 ---
 
-*Document Version: 1.2*
+*Document Version: 1.3*
 *Created: 2026-02-17*
 *Last Updated: 2026-02-17*
-*Status: Draft — v1.2: AI-Specific Signals weight updated (Q1), Perplexity removed from MVP JSON export (Q8)*
+*Status: Draft — v1.3: GEO Strategic Brief page added to PDF (E-GEO-10), PDF preview modal added (E-UX-04), shared view PDF download added (E-OPS-13)*

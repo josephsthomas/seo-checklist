@@ -143,7 +143,7 @@ The following checks SHALL be performed:
 
 | Check ID | Check | Pass Criteria | Weight |
 |---|---|---|---|
-| CC-01 | Flesch Reading Ease | Score >= 60 (8th grade level or below) | High |
+| CC-01 | Flesch Reading Ease | Score >= 60 (8th grade level or below). **English-only:** If page language is not English, mark as "N/A" and redistribute weight to remaining CC checks. | High |
 | CC-02 | Average sentence length | <= 20 words per sentence | Medium |
 | CC-03 | Passive voice usage | < 15% of sentences | Low |
 | CC-04 | Jargon/acronym density | < 5% of words are unexplained jargon | Medium |
@@ -358,6 +358,13 @@ Recommendations SHALL be grouped into the following actionable categories:
 - Re-analysis SHALL create a new history entry (not overwrite the previous one).
 - The results view SHALL show a delta indicator if a previous analysis exists for the same URL.
 
+#### FR-5.2.3: Basic Trend Tracking
+- When a URL has been analyzed more than once, the results dashboard SHALL display a sparkline chart showing score progression over time.
+- The sparkline SHALL appear on the overall score card, showing up to the last 10 analyses of the same URL.
+- Hovering over a sparkline data point SHALL show the date and score for that analysis.
+- The history list SHALL show a trend arrow (↑ improving, ↓ declining, → stable) next to URLs with multiple analyses.
+- This uses existing data model fields (`previousAnalysisId`, `scoreDelta`) — no new Firestore queries required beyond the user's existing history.
+
 ---
 
 ## 6. Home Screen Integration
@@ -386,7 +393,7 @@ Recommendations SHALL be grouped into the following actionable categories:
 
 ---
 
-*Document Version: 1.1*
+*Document Version: 1.3*
 *Created: 2026-02-17*
 *Last Updated: 2026-02-17*
-*Status: Draft — v1.2: AI-Specific Signals weight 20% (Q1), tiered storage (Q7), Perplexity Phase 2 (Q8), "How AI Sees Your Content" rename (Q5)*
+*Status: Draft — v1.3: CC-01 Flesch English-only handling (R-DEV-06), basic trend tracking promoted to MVP (E-CMO-03)*

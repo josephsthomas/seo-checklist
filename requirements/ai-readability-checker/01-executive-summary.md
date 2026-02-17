@@ -73,18 +73,27 @@ This tool will be among the first to offer:
 
 - URL-based content fetching and analysis
 - HTML file upload (rendered HTML from Screaming Frog JS crawl)
-- AI Readability scoring with category breakdown
+- Raw HTML paste input
+- AI Readability scoring with category breakdown (50 checks, 5 categories)
+- Citation Likelihood Score as a secondary dashboard metric
 - "How AI Sees Your Content" preview for: **Claude (Anthropic)**, **GPT (OpenAI)**, **Gemini (Google)**
-- Actionable recommendations with priority ranking
-- Export to PDF and JSON
+- Side-by-side LLM comparison with coverage metrics
+- Actionable recommendations with priority ranking and code snippets
+- Export to PDF (with optional GEO Strategic Brief page) and JSON
+- PDF export preview before generation
+- Shareable link with PDF download on shared view
 - Firestore persistence of analysis history
+- Basic trend tracking (score delta and sparkline for re-analyzed URLs)
+- Cross-tool deep linking (Technical Audit ↔ Readability, Schema Generator ↔ Readability)
+- Home screen integration (tool card, quick action, command palette)
 - Integration with existing portal authentication, theming, and navigation
 
 ### 4.2 In Scope (Post-MVP Enhancements)
 
+- Perplexity Sonar integration (Phase 2 — search-augmented behavior requires separate UX)
+- Competitive benchmarking (Phase 2 — industry averages, score comparison)
 - Batch URL analysis (CSV/sitemap import)
-- Historical trend tracking per URL
-- Competitor comparison mode
+- Advanced competitor comparison (URL vs. URL)
 - Custom scoring weight configuration
 - API endpoint for CI/CD integration
 - Slack/webhook notifications for score regressions
@@ -130,30 +139,45 @@ This tool will be among the first to offer:
 
 ## 6. Timeline Considerations
 
-### Phase 1: Foundation
-- Core analysis engine and scoring system
-- URL input with server-side fetching
-- HTML file upload
-- Claude-powered readability assessment
-- Basic results dashboard
+### Phase 1: MVP (Full Feature Set)
+- Core analysis engine and scoring system (50 checks across 5 categories)
+- URL input with server-side fetching, HTML file upload, raw HTML paste
+- Claude-powered readability assessment with citation likelihood scoring
+- "How AI Sees Your Content" preview: **Claude**, **OpenAI GPT-4o**, **Gemini 2.0 Flash**
+- Side-by-side LLM comparison view
+- Results dashboard with Summary view, Score Details, Recommendations, Issues tabs
+- Prioritized recommendations engine (rule-based + AI-generated) with code snippets
+- PDF and JSON export (with optional GEO Strategic Brief page)
+- PDF export preview before generation
+- Analysis history and Firestore persistence
+- Basic trend tracking (score delta and sparkline for re-analyzed URLs)
+- Sharing via link (with PDF download on shared view)
+- Home screen integration (tool card, quick action, command palette)
+- Cross-tool deep linking (Technical Audit ↔ Readability, Schema Generator ↔ Readability)
+- Integration with existing portal authentication, theming, and navigation
 
-### Phase 2: Multi-LLM Preview & Competitive Benchmarking
-- OpenAI "How AI Sees Your Content" preview integration
-- Google Gemini "How AI Sees Your Content" preview integration
-- Side-by-side comparison view
+### Phase 2: Competitive Benchmarking & Perplexity
+- Perplexity Sonar integration (search-augmented, separate UX handling)
 - Basic competitive benchmarking (industry averages, score comparison)
-- Perplexity integration (deferred from MVP)
+- Google AI Overview-specific optimization checks
+- Perplexity citation pattern analysis
+- ChatGPT Browse-specific signals
+- Tag recommendations by AI search platform impact
 
-### Phase 3: Polish & Export
-- PDF and JSON export
-- Analysis history and persistence
-- Recommendations engine refinement
-- Home screen integration and quick actions
+### Phase 3: Agency & Team Features
+- Batch analysis (CSV/sitemap import)
+- Team-level rate limits and organization-level controls
+- Analysis templates / saved configurations
+- Expanded white-label PDF customization
+- Board-ready executive summary export option
+- Notation/annotation capability on analyses
 
 ### Phase 4: Advanced Features
-- Batch analysis
-- Trend tracking
 - Advanced competitor comparison (URL vs. URL)
+- Scheduled/recurring analysis
+- API endpoint for CI/CD integration
+- Slack/webhook notifications for score regressions
+- Client Dashboard role with self-service access
 
 ## 7. Stakeholder Sign-Off
 
@@ -166,7 +190,7 @@ This tool will be among the first to offer:
 
 ---
 
-*Document Version: 1.2*
+*Document Version: 1.3*
 *Created: 2026-02-17*
 *Last Updated: 2026-02-17*
-*Status: Draft — v1.2: Perplexity deferred to Phase 2 (Q8), competitive benchmarking moved to Phase 2 (Q6), "How AI Sees Your Content" rename (Q5)*
+*Status: Draft — v1.3: Phase timeline corrected to match MVP scope; trend tracking, GEO Strategic Brief, PDF preview, shared view PDF export, and cross-tool deep linking promoted to MVP*

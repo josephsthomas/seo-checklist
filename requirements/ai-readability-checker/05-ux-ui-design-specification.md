@@ -120,13 +120,14 @@ All score colors, chart backgrounds, input fields, dropzones, code snippets, err
 
 **Top Action Bar:**
 - Left: "Back" button + URL with external link icon
-- Right: "Share" button, "Export" dropdown (PDF, JSON)
+- Right: "Share" button, "Export" dropdown (PDF with preview modal, JSON)
 - Re-analysis delta badge if previous analysis exists (+5 / -3)
 
 **Overall Score Card:**
 - Large score number (text-5xl font-bold), color-coded by grade
 - Grade letter in badge, one-sentence summary
 - Color: A+/A = emerald-500, B+/B = teal-500, C+/C = amber-500, D = orange-500, F = red-500
+- **Trend Sparkline:** If the same URL has been analyzed before, show a small sparkline chart (60px × 24px) below the score showing score progression over the last 10 analyses. Hover tooltip shows date + score per data point. Sparkline uses teal stroke with a subtle area fill.
 
 **Quick Wins Preview (above tabs):**
 - Display the top 3 highest-impact, lowest-effort recommendations inline
@@ -275,7 +276,7 @@ All animations respect `prefers-reduced-motion: reduce`.
 
 ## 8. Version Footer
 
-*Document Version: 1.2*
+*Document Version: 1.3*
 *Created: 2026-02-17*
 *Last Updated: 2026-02-17*
-*Status: Draft*
+*Status: Draft — v1.3: Trend sparkline on score card (E-CMO-03), PDF preview in export flow (E-UX-04)*
