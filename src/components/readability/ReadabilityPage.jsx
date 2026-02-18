@@ -209,7 +209,7 @@ export default function ReadabilityPage() {
         {/* Error Banner */}
         {(analysis.error || loadError) && (
           <div
-            className="mb-6 p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg flex items-start gap-3"
+            className="mb-6 p-4 bg-red-50 dark:bg-red-900/20 border-l-4 border-red-500 rounded-r-lg flex items-start gap-3"
             role="alert"
           >
             <AlertCircle className="w-5 h-5 text-red-500 flex-shrink-0 mt-0.5" aria-hidden="true" />

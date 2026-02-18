@@ -308,6 +308,36 @@ export default function ReadabilityShareView() {
                 </div>
               )}
 
+              {/* Recommendations (Task 18) */}
+              {data.recommendations && data.recommendations.length > 0 && (
+                <div className="bg-white dark:bg-charcoal-800 rounded-xl border border-gray-200 dark:border-charcoal-700 p-6">
+                  <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
+                    Top Recommendations
+                  </h2>
+                  <div className="space-y-3">
+                    {data.recommendations
+                      .filter(r => r.priority === 'critical' || r.priority === 'high')
+                      .slice(0, 5)
+                      .map((rec, i) => (
+                        <div key={rec.id || i} className="flex items-start gap-3 p-3 bg-gray-50 dark:bg-charcoal-700/50 rounded-lg">
+                          <span className={`text-xs font-bold px-1.5 py-0.5 rounded capitalize ${
+                            rec.priority === 'critical' ? 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300' :
+                            'bg-orange-100 text-orange-800 dark:bg-orange-900/30 dark:text-orange-300'
+                          }`}>
+                            {rec.priority}
+                          </span>
+                          <div className="min-w-0">
+                            <p className="text-sm font-medium text-gray-900 dark:text-white">{rec.title}</p>
+                            {rec.description && (
+                              <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5 line-clamp-2">{rec.description}</p>
+                            )}
+                          </div>
+                        </div>
+                      ))}
+                  </div>
+                </div>
+              )}
+
               {/* About this report */}
               <div className="bg-gray-50 dark:bg-charcoal-850 rounded-xl border border-gray-200 dark:border-charcoal-700 p-6">
                 <div className="flex items-center gap-2 mb-3">
