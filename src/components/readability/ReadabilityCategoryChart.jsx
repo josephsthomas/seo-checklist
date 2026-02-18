@@ -2,10 +2,11 @@
  * ReadabilityCategoryChart
  * Horizontal bar chart showing 5 category scores with grade badges.
  * BRD: US-2.2.2, Screen Spec #3
+ * Task 47: Includes error boundary fallback rendering
  */
 
 import React, { useRef, useEffect, useState } from 'react';
-import { BarChart3 } from 'lucide-react';
+import { BarChart3, AlertTriangle } from 'lucide-react';
 
 const CATEGORY_META = {
   contentStructure: { label: 'Content Structure', short: 'CS', order: 0 },
@@ -114,7 +115,7 @@ function CategoryBar({ category, score, grade, colors, onCategoryClick, animate 
   );
 }
 
-export default function ReadabilityCategoryChart({ categoryScores, onCategoryClick }) {
+function ReadabilityCategoryChart({ categoryScores, onCategoryClick }) {
   const [animate, setAnimate] = useState(false);
 
   useEffect(() => {
@@ -214,3 +215,70 @@ export default function ReadabilityCategoryChart({ categoryScores, onCategoryCli
     </div>
   );
 }
+
+/**
+ * Task 47: Error boundary fallback — renders HTML table if chart crashes
+ */
+class CategoryChartErrorBoundary extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = { hasError: false };
+  }
+
+  static getDerivedStateFromError() {
+    return { hasError: true };
+  }
+
+  componentDidCatch(error, info) {
+    console.error('CategoryChart render error:', error, info);
+  }
+
+  render() {
+    if (this.state.hasError) {
+      const { categoryScores } = this.props;
+      return (
+        <div className="bg-white dark:bg-charcoal-800 rounded-xl border border-gray-200 dark:border-charcoal-700 p-6">
+          <div className="flex items-center gap-2 mb-4">
+            <AlertTriangle className="w-5 h-5 text-amber-500" />
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Category Breakdown</h3>
+          </div>
+          <p className="text-sm text-gray-500 dark:text-gray-400 mb-3">Chart could not render. Showing data as table:</p>
+          <table className="w-full text-sm">
+            <thead>
+              <tr className="border-b border-gray-200 dark:border-charcoal-700">
+                <th className="text-left py-2 text-gray-600 dark:text-gray-300">Category</th>
+                <th className="text-right py-2 text-gray-600 dark:text-gray-300">Score</th>
+                <th className="text-right py-2 text-gray-600 dark:text-gray-300">Grade</th>
+              </tr>
+            </thead>
+            <tbody>
+              {categoryScores && Object.entries(categoryScores).map(([cat, data]) => {
+                const score = typeof data === 'number' ? data : data?.score ?? 0;
+                const grade = getGradeFromScore(Math.round(score));
+                const meta = CATEGORY_META[cat] || { label: cat };
+                return (
+                  <tr key={cat} className="border-b border-gray-100 dark:border-charcoal-700">
+                    <td className="py-2 text-gray-700 dark:text-gray-200">{meta.label}</td>
+                    <td className="py-2 text-right font-mono text-gray-700 dark:text-gray-200">{Math.round(score)}</td>
+                    <td className="py-2 text-right font-semibold text-gray-700 dark:text-gray-200">{grade.letter}</td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        </div>
+      );
+    }
+    return this.props.children;
+  }
+}
+
+function ReadabilityCategoryChartWithFallback(props) {
+  return (
+    <CategoryChartErrorBoundary categoryScores={props.categoryScores}>
+      <ReadabilityCategoryChart {...props} />
+    </CategoryChartErrorBoundary>
+  );
+}
+
+export default ReadabilityCategoryChartWithFallback;

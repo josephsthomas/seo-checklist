@@ -84,15 +84,26 @@ async function fetchUrlViaProxy(url, signal, authToken) {
     if (status === 404) throw new Error(`Page not found (404) at "${url}".`);
     if (status === 403) throw new Error(`Access denied by "${new URL(url).hostname}".`);
     if (status === 429) throw new Error('Rate limit reached. Please try again in a few minutes.');
-    if (status === 401) throw new Error('Session expired. Please log in again.');
+    if (status === 401) throw new Error('Session expired. Please refresh the page and log in again.');
     if (status >= 500) throw new Error('The server returned an error. Try again later.');
     throw new Error(errorData.message || `Failed to fetch URL (status ${status})`);
+  }
+
+  // Task 44: Validate response size (>10MB guard)
+  const contentLength = response.headers.get('content-length');
+  if (contentLength && parseInt(contentLength, 10) > 10 * 1024 * 1024) {
+    throw new Error('The response exceeds 10MB. Try uploading a saved copy of the page instead.');
   }
 
   const data = await response.json();
 
   if (!data.success) {
     throw new Error(data.error || 'Failed to fetch URL content');
+  }
+
+  // Also check actual HTML size after parsing
+  if (data.data?.html && new Blob([data.data.html]).size > 10 * 1024 * 1024) {
+    throw new Error('The page content exceeds 10MB. Try uploading a trimmed copy instead.');
   }
 
   return data.data;
@@ -234,6 +245,7 @@ export function useReadabilityAnalysis() {
   const [error, setError] = useState(null);
   const [partialResults, setPartialResults] = useState(null);
   const abortControllerRef = useRef(null);
+  const lastSubmissionRef = useRef({ url: null, time: 0 });
 
   // Cleanup AbortController on unmount
   useEffect(() => {
@@ -280,12 +292,17 @@ export function useReadabilityAnalysis() {
       throw new Error('You must be logged in to run an analysis.');
     }
 
-    // Get fresh Firebase auth token for proxy requests
+    // Task 49: Get fresh Firebase auth token (force refresh if needed)
     let authToken = null;
     try {
-      authToken = await currentUser.getIdToken();
+      authToken = await currentUser.getIdToken(/* forceRefresh */ false);
     } catch (tokenErr) {
-      console.warn('Could not get auth token, proceeding without:', tokenErr);
+      // Token may be expired; force refresh
+      try {
+        authToken = await currentUser.getIdToken(/* forceRefresh */ true);
+      } catch (refreshErr) {
+        console.warn('Could not refresh auth token, proceeding without:', refreshErr);
+      }
     }
 
     const controller = new AbortController();
@@ -406,6 +423,18 @@ export function useReadabilityAnalysis() {
     }
 
     const validatedUrl = validation.url;
+
+    // Task 48: Prevent duplicate submission of same URL within 5 seconds
+    const now = Date.now();
+    if (
+      lastSubmissionRef.current.url === validatedUrl &&
+      now - lastSubmissionRef.current.time < 5000
+    ) {
+      const msg = 'This URL was just submitted. Please wait a few seconds before re-analyzing.';
+      toast(msg, { icon: '\u23F3' });
+      return;
+    }
+    lastSubmissionRef.current = { url: validatedUrl, time: now };
 
     setState(STATES.FETCHING);
     setProgress({

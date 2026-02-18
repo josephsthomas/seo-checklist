@@ -41,13 +41,34 @@ export async function runFullAnalysis(htmlContent, options = {}) {
 
   if (signal?.aborted) throw new DOMException('Aborted', 'AbortError');
 
-  // Stage 3: Score content
+  // Stage 3: Score content (Task 46: wrapped in try/catch to prevent pipeline crash)
   onProgress?.({ stage: 'scoring', progress: 85, message: 'Calculating scores...' });
-  const scoring = scoreContent(extracted, aiAssessment?.available ? aiAssessment : null);
+  let scoring;
+  try {
+    scoring = scoreContent(extracted, aiAssessment?.available ? aiAssessment : null);
+  } catch (scoringErr) {
+    console.error('Scoring pipeline failed, using fallback:', scoringErr);
+    scoring = {
+      overallScore: 0,
+      grade: 'F',
+      gradeColor: 'red',
+      gradeLabel: 'Scoring Error',
+      gradeSummary: 'Scoring could not be completed. Please try again.',
+      categoryScores: {},
+      issueSummary: { critical: 0, high: 0, medium: 0, low: 0 },
+      checkResults: []
+    };
+  }
 
-  // Stage 4: Generate recommendations
+  // Stage 4: Generate recommendations (Task 46: wrapped in try/catch)
   onProgress?.({ stage: 'recommendations', progress: 90, message: 'Generating recommendations...' });
-  const recommendations = generateRecommendations(scoring, aiAssessment?.available ? aiAssessment : null);
+  let recommendations;
+  try {
+    recommendations = generateRecommendations(scoring, aiAssessment?.available ? aiAssessment : null);
+  } catch (recErr) {
+    console.error('Recommendations generation failed:', recErr);
+    recommendations = [];
+  }
 
   if (signal?.aborted) throw new DOMException('Aborted', 'AbortError');
 
