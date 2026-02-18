@@ -1,0 +1,26 @@
+{
+  "available": true,
+  "contentSummary": "This page provides a comprehensive guide to optimizing web content for AI search engines. It covers five key areas: content structure (heading hierarchy, semantic HTML), content clarity (sentence length, active voice, jargon avoidance), technical optimization (AI crawler access, page performance), structured data implementation (JSON-LD, schema types), and frequently asked questions.",
+  "qualityAssessment": "The content is well-organized with clear headings and logical flow. Paragraphs are concise and focused. The writing uses active voice effectively and avoids unnecessary jargon. The FAQ section adds value by addressing common questions directly.",
+  "qualityScore": 88,
+  "citationWorthiness": 82,
+  "citationExplanation": "The content provides specific, actionable advice on AI content optimization that could be cited as authoritative guidance. The structured approach with clear categories makes individual tips easy to reference. The FAQ format particularly supports citation as it provides direct answers to specific questions.",
+  "readabilityIssues": [
+    {
+      "title": "Add more specific examples",
+      "description": "Some sections would benefit from concrete examples showing before-and-after content improvements.",
+      "priority": "medium",
+      "group": "content",
+      "effort": "moderate",
+      "impact": "medium"
+    },
+    {
+      "title": "Include data or statistics",
+      "description": "Adding research-backed statistics about AI content consumption would strengthen the guide's authority.",
+      "priority": "low",
+      "group": "content",
+      "effort": "moderate",
+      "impact": "medium"
+    }
+  ]
+}

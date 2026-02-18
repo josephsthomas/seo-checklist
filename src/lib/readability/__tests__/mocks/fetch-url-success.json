@@ -1,0 +1,12 @@
+{
+  "success": true,
+  "html": "<!DOCTYPE html><html lang=\"en\"><head><title>Test Page</title><meta name=\"description\" content=\"A test page for URL fetch.\"></head><body><main><h1>Test Page</h1><p>This is test content fetched via URL.</p></main></body></html>",
+  "url": "https://example.com/test-page",
+  "statusCode": 200,
+  "contentType": "text/html; charset=utf-8",
+  "responseTime": 450,
+  "headers": {
+    "content-type": "text/html; charset=utf-8",
+    "x-robots-tag": "index, follow"
+  }
+}

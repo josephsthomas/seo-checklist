@@ -1,0 +1,27 @@
+{
+  "title": "Complete Guide to Content Optimization for AI Search Engines",
+  "description": "A comprehensive guide to optimizing content for AI search engines, covering structured data, readability, and SEO.",
+  "primaryTopic": "Content optimization for AI-powered search",
+  "mainContent": "This guide covers content optimization for AI search engines. It discusses content structure best practices including heading hierarchy and semantic HTML elements. The guide also covers writing for clarity with tips on sentence length, active voice, and avoiding jargon.\n\nTechnical optimization sections cover AI crawler access and page performance. Structured data implementation is discussed with focus on essential schema types and best practices.",
+  "entities": [
+    "AI search engines",
+    "content optimization",
+    "structured data",
+    "SEO",
+    "heading hierarchy",
+    "semantic HTML",
+    "JSON-LD"
+  ],
+  "usefulnessScore": 8,
+  "usefulnessExplanation": "Well-organized content with clear structure and actionable recommendations.",
+  "unprocessableContent": [],
+  "contentCoverage": 85,
+  "headingsCoverage": 95,
+  "entitiesCoverage": 78,
+  "processingTime": 2800,
+  "coverage": {
+    "content": 85,
+    "headings": 95,
+    "entities": 78
+  }
+}

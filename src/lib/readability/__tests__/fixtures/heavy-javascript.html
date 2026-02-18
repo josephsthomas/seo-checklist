@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>JavaScript Heavy SPA Page</title>
+  <meta name="description" content="A page with lots of JavaScript and little content">
+</head>
+<body>
+  <div id="root"></div>
+  <script>
+    var app = {
+      init: function() {
+        var container = document.getElementById('root');
+        container.innerHTML = '<h1>Dynamic Content</h1><p>This content is rendered by JavaScript.</p>';
+      },
+      config: {
+        apiUrl: 'https://api.example.com',
+        debug: false,
+        version: '1.0.0',
+        features: ['auth', 'analytics', 'tracking', 'chat'],
+        settings: {
+          theme: 'default',
+          language: 'en',
+          notifications: true,
+          autoSave: true
+        }
+      },
+      utils: {
+        formatDate: function(d) { return d.toISOString(); },
+        parseJSON: function(s) { return JSON.parse(s); },
+        debounce: function(fn, ms) { var t; return function() { clearTimeout(t); t = setTimeout(fn, ms); }; },
+        throttle: function(fn, ms) { var t; return function() { if (!t) { t = setTimeout(function() { t = null; fn(); }, ms); } }; },
+        deepClone: function(o) { return JSON.parse(JSON.stringify(o)); }
+      },
+      analytics: {
+        track: function(e, d) { console.log('Track:', e, d); },
+        pageView: function(p) { console.log('PageView:', p); },
+        identify: function(u) { console.log('Identify:', u); }
+      }
+    };
+    app.init();
+  </script>
+  <script>
+    (function() {
+      var tracker = {
+        events: [],
+        push: function(e) { this.events.push(e); },
+        flush: function() { this.events = []; }
+      };
+      window.tracker = tracker;
+    })();
+  </script>
+  <script>
+    // Another large script block
+    var longString = "Lorem ipsum dolor sit amet consectetur adipiscing elit sed do eiusmod tempor incididunt ut labore et dolore magna aliqua Ut enim ad minim veniam quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat";
+    var anotherLongString = "Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur Excepteur sint occaecat cupidatat non proident sunt in culpa qui officia deserunt mollit anim id est laborum";
+    console.log(longString, anotherLongString);
+  </script>
+  <noscript>
+    <p>This page requires JavaScript to function.</p>
+  </noscript>
+</body>
+</html>
