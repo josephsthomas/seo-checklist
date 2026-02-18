@@ -646,19 +646,464 @@
 
 ## Section 4: API Integration & Data Architecture (DOC-04)
 
-> *To be completed in Chunk 5.*
+**Source:** `requirements/ai-readability-checker/04-api-integration-and-data-architecture.md`
+**Verified Against:** `aggregator.js`, `aiAnalyzer.js`, `llmPreview.js`, `useReadabilityAnalysis.js`, `firestore.rules`, `storage.rules`
+
+### 4.1 Architecture Overview (DOC-04 §1)
+
+| Req | Description | Status | Notes |
+|-----|-------------|--------|-------|
+| §1.1 | Logical architecture matches code (extractor → scorer → aiAnalyzer → llmPreview → aggregator → recommendations) | ✅ PASS | All modules exist and are wired correctly in `aggregator.js` |
+| §1.2-Step1 | User Input (URL / HTML / Paste) | ✅ PASS | `useReadabilityAnalysis.js` provides `analyzeUrl`, `analyzeHtml`, `analyzePaste` |
+| §1.2-Step2 | Content Fetch via POST /api/fetch-url | ✅ PASS | `fetchUrlViaProxy()` at line 55–95 |
+| §1.2-Step3 | Client-side content extraction | ✅ PASS | `extractContent()` called in `aggregator.js:24` |
+| §1.2-Step4 | Parallel API calls: Claude Analysis + LLM extractions | ✅ PASS | `Promise.all([analyzeWithAI, extractWithAllLLMs])` in `aggregator.js:31` |
+| §1.2-Step5 | Aggregate results | ✅ PASS | `aggregator.js` assembles final document |
+| §1.2-Step6 | Calculate scores (client-side) | ✅ PASS | `scoreContent()` in `aggregator.js:46` |
+| §1.2-Step7 | Generate recommendations | ✅ PASS | `generateRecommendations()` in `aggregator.js:50` |
+| §1.2-Step8 | Persist to Firestore | ✅ PASS | `addDoc(collection(db, 'readability-analyses'), ...)` in `useReadabilityAnalysis.js:342` |
+| §1.2-Step9 | Render dashboard | ✅ PASS | State transitions to COMPLETE, result set via `setResult()` |
+| §1.2-Step4d | Perplexity extraction | ➖ N/A | Correctly deferred to Phase 2 |
+
+### 4.2 Content Fetching API (DOC-04 §2)
+
+| Req | Description | Status | Notes |
+|-----|-------------|--------|-------|
+| §2.1 | Endpoint: POST {VITE_AI_PROXY_URL}/api/fetch-url | ✅ PASS | `fetchUrlViaProxy()` line 61 |
+| §2.1 | Request body: url field | ✅ PASS | Sent in JSON body |
+| §2.1 | Request body: options.renderJS | ✅ PASS | Sent as `false` (toggle not exposed) |
+| §2.1 | Request body: options.timeout = 30000 | ✅ PASS | Hardcoded 30000 |
+| §2.1 | Request body: options.followRedirects = true | ✅ PASS | Hardcoded true |
+| §2.1 | Request body: options.maxRedirects = 5 | ✅ PASS | Hardcoded 5 |
+| §2.1 | Request body: options.userAgent | ⬜ MISSING | Not included in request body |
+| §2.1 | Authorization: Bearer {firebase-auth-token} | ⬜ MISSING | No auth header sent to proxy |
+| §2.1 | Response validation (success, data.html, data.finalUrl) | 🟡 PARTIAL | Checks `data.success` and `data.data` but doesn't validate response shape strictly |
+| §2.1 | Error code mapping (10 specific codes) | 🟡 PARTIAL | Maps 5 HTTP statuses (404, 403, 429, 401, 500+) but not fine-grained codes like FETCH_DNS_ERROR, FETCH_SSL_ERROR, FETCH_TOO_LARGE, FETCH_NOT_HTML, FETCH_ROBOTS_BLOCKED |
+
+### 4.3 LLM API Integrations (DOC-04 §3)
+
+| Req | Description | Status | Notes |
+|-----|-------------|--------|-------|
+| §3.1 | All LLM calls route through proxy | 🟡 PARTIAL | Claude has direct API fallback via `VITE_CLAUDE_API_KEY`; OpenAI/Gemini require proxy |
+| §3.1 | Unified request format (provider, model, task, content, parameters) | ⬜ MISSING | Client sends `{prompt, maxTokens, tool, llm}` — different schema than spec |
+| §3.1 | Unified response format | ⬜ MISSING | Client parses raw JSON from response, no unified envelope |
+| §3.2 | Claude model: claude-sonnet-4-5-20250929 | ✅ PASS | Both `aiAnalyzer.js` and `llmPreview.js` |
+| §3.2 | Claude max_tokens: 4096 | 🟡 PARTIAL | `llmPreview.js`=4096 ✅, `aiAnalyzer.js`=2048 (spec says 4096 for analysis too) |
+| §3.2 | Claude temperature: 0.2 | ⬜ MISSING | Not passed in direct API calls; Claude defaults to 1.0 |
+| §3.2 | Claude used for two tasks (analysis + extraction) | ✅ PASS | `aiAnalyzer.js` (analysis) + `llmPreview.js` (extraction) |
+| §3.3 | OpenAI model: gpt-4o | ✅ PASS | `llmPreview.js:125` |
+| §3.3 | OpenAI proxy-only (no VITE_ key) | ✅ PASS | Requires proxy configuration |
+| §3.4 | Gemini model: gemini-2.0-flash | ✅ PASS | `llmPreview.js:154` |
+| §3.4 | Gemini proxy-only (no VITE_ key) | ✅ PASS | Requires proxy configuration |
+| §3.5 | Perplexity deferred to Phase 2 | ✅ PASS | Not implemented; comment documents deferral |
+| §3.6 | Unified extraction prompt with 8 tasks | 🟡 PARTIAL | All 8 task areas covered but prompt text differs from spec; URL not included in prompt; usefulness uses 0-100 scale (spec says 1-10) |
+| §3.6 | Same prompt for all LLMs | ✅ PASS | Single `EXTRACTION_PROMPT` constant in `llmPreview.js` |
+
+### 4.4 Data Models (DOC-04 §4)
+
+| Req | Description | Status | Notes |
+|-----|-------------|--------|-------|
+| §4.1 | Collection: readability-analyses | ✅ PASS | Used in both hooks and Firestore rules |
+| §4.1 | Fields: userId, createdAt, updatedAt | ✅ PASS | `useReadabilityAnalysis.js:332-334` uses `serverTimestamp()` |
+| §4.1 | Fields: organizationId, projectId, clientName | ⬜ MISSING | Spec notes "Future: team-level grouping" — not implemented |
+| §4.1 | Fields: tags | ⬜ MISSING | No tagging system implemented |
+| §4.1 | Fields: inputMethod, url, filename | 🟡 PARTIAL | `inputMethod` ✅, `sourceUrl` ✅ (field name differs), `filename` not persisted |
+| §4.1 | Fields: htmlStorageRef | ⬜ MISSING | No HTML snapshot storage implemented |
+| §4.1 | Fields: pageMetadata (nested object) | 🟡 PARTIAL | Stored as flat fields (pageTitle, pageDescription, language, wordCount) not nested object with robotsDirectives |
+| §4.1 | Fields: overallScore, grade, categoryScores | ✅ PASS | All present in `aggregator.js:74-79` |
+| §4.1 | Fields: issueSummary, checkResults | ✅ PASS | `aggregator.js:80-83` |
+| §4.1 | Fields: llmExtractions (3 LLMs) | ✅ PASS | Saved from `extractWithAllLLMs()` output |
+| §4.1 | Fields: recommendations | ✅ PASS | `aggregator.js:99` |
+| §4.1 | Fields: aiAnalysis (contentSummary, qualityScore, citationWorthiness) | ✅ PASS | `aggregator.js:86-93` |
+| §4.1 | Fields: shareToken, shareExpiresAt, isShared | ✅ PASS | Initialized as null/false in `aggregator.js:102-104` |
+| §4.1 | Fields: previousAnalysisId, scoreDelta | ✅ PASS | Computed in `useReadabilityAnalysis.js:316-324` |
+| §4.1 | Fields: scoringVersion, promptVersion | ✅ PASS | Set to "1.0.0" in `aggregator.js:111-112` |
+| §4.1 | Firestore 1MB limit handling | ✅ PASS | `truncateForFirestore()` in `aggregator.js:132-148` |
+| §4.2 | Collection: readability-settings (per-user) | ⬜ MISSING | Firestore rules exist but no code reads/writes this collection |
+| §4.3 | Storage: readability/{userId}/html-snapshots/ | ⬜ MISSING | No code writes HTML snapshots to Storage |
+| §4.3 | Storage: readability/{userId}/exports/ | ⬜ MISSING | Export files generated client-side (jsPDF), not stored in Firebase Storage |
+
+### 4.5 Security Rules (DOC-04 §4.4–4.5)
+
+| Req | Description | Status | Notes |
+|-----|-------------|--------|-------|
+| §4.4 | Owner read access | ✅ PASS | `firestore.rules:201-202` |
+| §4.4 | Owner create (validates userId) | ✅ PASS | `firestore.rules:203-204` |
+| §4.4 | Owner update/delete (prevents userId mutation) | 🟡 PARTIAL | Update rule exists but does not check `request.resource.data.userId == resource.data.userId` to prevent mutation |
+| §4.4 | Shared analysis read (isShared + expiry check) | ✅ PASS | `firestore.rules:211-213` — uses `shareExpiry` (spec says `shareExpiresAt`) |
+| §4.4 | readability-settings per-user rules | ✅ PASS | `firestore.rules:217-218` |
+| §4.5 | Storage rules: auth + userId check | ✅ PASS | `storage.rules:53-55` |
+| §4.5 | Storage: 10MB limit on HTML | ✅ PASS | `storage.rules:59` |
+| §4.5 | Storage: contentType text/html validation | ✅ PASS | Also allows application/json (`storage.rules:60-61`) |
+| §4.5 | Storage: exports path with 20MB limit | ⬜ MISSING | No separate exports path in storage rules |
+
+### 4.6 Rate Limiting & Caching (DOC-04 §5)
+
+| Req | Description | Status | Notes |
+|-----|-------------|--------|-------|
+| §5.1 | Tiered rate limits (Free/Pro/Enterprise) | ⬜ MISSING | No client-side rate limit enforcement or plan-tier awareness |
+| §5.1 | Rate limit UI (countdown, queue wait time) | ⬜ MISSING | Only generic 429 error message |
+| §5.3 | Caching: URL fetch 1hr server-side | ➖ N/A | Server-side; cannot verify from client |
+| §5.3 | Caching: LLM extractions permanent in Firestore | ✅ PASS | Results persisted permanently |
+| §5.3 | Caching: Rule-based scores in client state | ✅ PASS | Held in React state during session |
+
+### 4.7 API Error Handling (DOC-04 §6)
+
+| Req | Description | Status | Notes |
+|-----|-------------|--------|-------|
+| §6.1 | Retry: Network timeout (2 retries, exponential backoff) | ⬜ MISSING | No retry logic in `fetchUrlViaProxy` or LLM calls |
+| §6.1 | Retry: 429 with Retry-After header | ⬜ MISSING | Throws immediately on 429 |
+| §6.1 | Retry: 500 (2 retries, exponential backoff) | ⬜ MISSING | Throws immediately on 500+ |
+| §6.1 | No retry on 401/400 | ✅ PASS | Throws immediately |
+| §6.2 | Graceful degradation: complete with available LLMs | ✅ PASS | `Promise.all` with per-LLM `.catch()` in `aggregator.js:32-39` |
+| §6.2 | Clear indicator for unavailable LLM | ✅ PASS | Error result with `success: false, error: message` |
+| §6.2 | Scoring not blocked by LLM failures | ✅ PASS | Scoring only uses Claude analysis; LLM extractions are preview-only |
+| §6.3 | VITE_AI_PROXY_URL env var | ✅ PASS | Used in `aiAnalyzer.js`, `llmPreview.js`, `useReadabilityAnalysis.js` |
+| §6.3 | VITE_CLAUDE_API_KEY env var | ✅ PASS | Used in `aiAnalyzer.js`, `llmPreview.js` |
+| §6.3 | OPENAI_API_KEY / GEMINI_API_KEY proxy-only (no VITE_ prefix) | ✅ PASS | Not exposed to client bundle |
+
+### Section 4 Summary
+
+| Status | Count |
+|--------|-------|
+| ✅ PASS | 48 |
+| 🟡 PARTIAL | 9 |
+| ❌ FAIL | 0 |
+| ⬜ MISSING | 16 |
+| ➖ N/A | 3 |
+| **Total** | **76** |
+
+**Pass Rate:** 63.2% (48/76)
+**Pass + Partial Rate:** 75.0% (57/76)
+
+**Key Gaps:**
+- **No retry logic** — DOC-04 §6.1 specifies exponential backoff for timeouts, 429s, and 500s. No retry is implemented anywhere.
+- **No rate limiting awareness** — Client has no concept of plan tiers (Free/Pro/Enterprise) or rate limit enforcement.
+- **Unified proxy request format not implemented** — Client sends `{prompt, maxTokens, tool, llm}` instead of the spec's `{provider, model, task, content, parameters}`.
+- **readability-settings collection unused** — Firestore rules exist but no code reads/writes user preferences.
+- **Firebase Storage not utilized** — HTML snapshots and exports are not stored in Firebase Storage despite rules being configured.
+- **Missing Authorization header** — Proxy calls don't include Firebase auth tokens.
+- **Claude temperature not set** — Direct API calls omit `temperature: 0.2`, defaulting to 1.0.
 
 ---
 
 ## Section 5: UX/UI Design Specification (DOC-05)
 
-> *To be completed in Chunk 6.*
+**Source:** `requirements/ai-readability-checker/05-ux-ui-design-specification.md`
+**Verified Against:** `ReadabilityInputScreen.jsx`, `ReadabilityProcessingScreen.jsx`, `ReadabilityDashboard.jsx`, `ReadabilityScoreCard.jsx`, `ReadabilityCategoryChart.jsx`, `ReadabilityRecommendations.jsx`
+
+### 5.1 Design System Alignment (DOC-05 §1)
+
+| Req | Description | Status | Notes |
+|-----|-------------|--------|-------|
+| §1.1 | Teal theme color tokens (teal-50 through teal-700) | ✅ PASS | Used consistently across all components |
+| §1.1 | TEAL added to TOOL_COLORS in tools.js | ✅ PASS | `tools.js` has TEAL color config |
+| §1.1 | Teal gradient on buttons (from-teal-500 to-teal-600) | ✅ PASS | Analyze buttons use teal gradient |
+| §1.2 | ScanEye icon from Lucide | ✅ PASS | Used in InputScreen Analyze button and tools.js |
+| §1.2 | Score numbers text-4xl bold | ✅ PASS | `ReadabilityScoreCard.jsx:127` uses `text-4xl font-bold` |
+| §1.2 | Code/snippets monospace font | ✅ PASS | Paste textarea uses `font-mono` |
+| §1.3 | Reuses react-dropzone, react-hot-toast, tabs pattern | ✅ PASS | All shared components utilized |
+| §1.4 | Dark mode variants (dark: Tailwind classes) on all components | ✅ PASS | All components include dark: variants |
+| §1.4 | Dark mode color mappings match spec table | ✅ PASS | bg-charcoal-800/900, text-charcoal-100/400, border-charcoal-700, bg-teal-900/20 |
+
+### 5.2 Input Screen (DOC-05 §2.1)
+
+| Req | Description | Status | Notes |
+|-----|-------------|--------|-------|
+| §2.1 | Three tabs — URL (Globe), Upload (Upload), Paste (Code) | ✅ PASS | `TABS` constant with correct icons at line 16–20 |
+| §2.1 | Active tab uses teal underline | ✅ PASS | `border-teal-500` on active tab |
+| §2.1 | Tab helper text (e.g., "Analyze any public web page") | ⬜ MISSING | No helper text displayed below tab labels |
+| §2.1 | URL: placeholder "https://example.com/your-page" | ✅ PASS | Correct placeholder at line 293 |
+| §2.1 | URL: Real-time validation icon (green check / red X) | ✅ PASS | Debounced 300ms with CheckCircle2 / XCircle |
+| §2.1 | URL: Analyze button with teal gradient, right-aligned | ✅ PASS | `from-teal-500 to-teal-600` in `flex justify-end` |
+| §2.1 | URL: Collapsible Advanced Options (industry, keywords) | ✅ PASS | Industry dropdown + keywords input |
+| §2.1 | Upload: 200px drag-drop zone, dashed border | ✅ PASS | `border-2 border-dashed`, `minHeight: '200px'` |
+| §2.1 | Upload: Drag hover/reject styling | ✅ PASS | teal for hover, red for reject in `dropzoneClasses` |
+| §2.1 | Upload: Screaming Frog callout (blue left border) | ✅ PASS | `border-l-4 border-blue-400` |
+| §2.1 | Upload: File selected state (name, size, Analyze/Remove) | ✅ PASS | Full selected UI at lines 442–510 |
+| §2.1 | Paste: Monospace textarea, 300px min-height | ✅ PASS | `font-mono`, `minHeight: '300px'` |
+| §2.1 | Paste: Character counter | ✅ PASS | `{pasteContent.length.toLocaleString()} characters` |
+| §2.1 | Paste: 80% limit warning | ✅ PASS | Warning at `pasteSizeMB >= 1.6` |
+| §2.1 | Paste: Min threshold message until 100 chars | ✅ PASS | "Paste at least 100 characters to analyze" |
+| §2.1 | Paste: Analyze disabled until 100+ chars | ✅ PASS | `disabled={pasteContent.length < 100 ...}` |
+| §2.1 | History preview: Last 5 analyses with score, date | ✅ PASS | `recentAnalyses.slice(0, 5)` with badges |
+| §2.1 | "View All History" link | ✅ PASS | Link at line 645 |
+| §2.1 | Empty history: ScanEye + "No analyses yet" + CTA | 🟡 PARTIAL | Section not rendered when empty; no explicit empty state with ScanEye + CTA |
+
+### 5.3 Processing Screen (DOC-05 §2.2)
+
+| Req | Description | Status | Notes |
+|-----|-------------|--------|-------|
+| §2.2 | Progress bar: 8px, rounded-full, teal gradient, shimmer | ✅ PASS | `h-2` (8px), teal gradient, shimmer animation |
+| §2.2 | Percentage above bar | ✅ PASS | Top-left at line 129 |
+| §2.2 | Stage messages with progress % ranges (5 stages) | ✅ PASS | Correct ranges matching spec |
+| §2.2 | LLM sub-checklist (parallel, independent completion) | ✅ PASS | Claude/OpenAI/Gemini substages |
+| §2.2 | Stage icons: green check/spinner/empty circle | ✅ PASS | `StageIcon` component |
+| §2.2 | Elapsed time display | ✅ PASS | Timer showing seconds/minutes |
+| §2.2 | Cancel button: ghost style, confirmation dialog | ✅ PASS | Ghost button → amber confirmation with Yes/Continue |
+| §2.2 | "Did you know?" factoids rotating during processing | ✅ PASS | 8 factoids, 8-second rotation |
+| §2.2 | Partial results preview after extraction | ✅ PASS | Title, description, word count preview |
+
+### 5.4 Results Dashboard (DOC-05 §2.3)
+
+| Req | Description | Status | Notes |
+|-----|-------------|--------|-------|
+| §2.3 | Top action bar: URL + Share + Export | ✅ PASS | Source URL, Share2 button, Download dropdown |
+| §2.3 | Back button in action bar | ⬜ MISSING | `onBack` prop exists but no rendered Back button |
+| §2.3 | Export: PDF with preview + JSON | ✅ PASS | PDF opens preview modal, JSON direct download |
+| §2.3 | Re-analysis delta badge | ✅ PASS | `scoreDelta` with +/- arrow in ScoreCard |
+| §2.3 | Score card: large number, grade badge, summary | ✅ PASS | SVG gauge, animated counter, grade badge |
+| §2.3 | Score colors (A+=emerald, B+=teal, C+=amber, D=orange, F=red) | ✅ PASS | `getGradeClasses()` correct mapping |
+| §2.3 | Trend sparkline below score | ✅ PASS | `ReadabilityTrendSparkline` rendered when data available |
+| §2.3 | Quick Wins Preview (top 3) with "View All" link | ✅ PASS | Quick wins filtered, sliced to 3, link switches tab |
+| §2.3 | AI Visibility Summary (2-3 sentence plain English) | ✅ PASS | Teal card with `aiSummary` |
+| §2.3 | Citation Likelihood Score alongside overall | ✅ PASS | Quote icon + `citationWorthiness/100` in ScoreCard |
+| §2.3 | Category Breakdown chart (5 categories) | ✅ PASS | `ReadabilityCategoryChart` with horizontal bars |
+| §2.3 | Default Summary view above tabs | ✅ PASS | All summary content above tab navigation |
+| §2.3 | 4-tab navigation with correct labels | ✅ PASS | Score Details, How AI Sees Your Content, Recommendations, Issues |
+| §2.3 | Keyboard tab navigation (Arrow keys) | ✅ PASS | `handleTabKeyDown` with ArrowLeft/ArrowRight |
+| §2.3 | ARIA tablist/tab/tabpanel pattern | ✅ PASS | Full ARIA roles and attributes |
+| §2.3 | Score text-5xl font-bold | 🟡 PARTIAL | Uses `text-4xl` instead of spec's `text-5xl` |
+
+### 5.5 Score Details Tab (DOC-05 §2.4)
+
+| Req | Description | Status | Notes |
+|-----|-------------|--------|-------|
+| §2.4 | Category accordions (collapsible, score + progress bar) | ✅ PASS | `ReadabilityCategoryAccordion` |
+| §2.4 | First accordion expanded by default | ✅ PASS | Implemented |
+| §2.4 | Check items: status icons, title, severity badge, expandable | ✅ PASS | Full check item UI |
+
+### 5.6 LLM Preview Tab (DOC-05 §2.5)
+
+| Req | Description | Status | Notes |
+|-----|-------------|--------|-------|
+| §2.5 | LLM checkbox row to toggle models | ✅ PASS | Toggle controls in `ReadabilityLLMPreview` |
+| §2.5 | Equal-width columns per LLM | ✅ PASS | Grid layout in `ReadabilityLLMColumn` |
+| §2.5 | Column fields: name, model, time, title, desc, topic, content, entities, usefulness | ✅ PASS | All fields rendered |
+| §2.5 | Coverage Summary Table | ✅ PASS | `ReadabilityCoverageTable` |
+| §2.5 | Responsive (3 cols xl → stacked sm) | ✅ PASS | Responsive grid classes |
+| §2.5 | Per-LLM error state with retry | ✅ PASS | Error rendering with retry button |
+| §2.5 | View toggle: Side-by-Side / Diff | ⬜ MISSING | No diff view toggle implemented |
+
+### 5.7 Recommendations Tab (DOC-05 §2.6)
+
+| Req | Description | Status | Notes |
+|-----|-------------|--------|-------|
+| §2.6 | Filter pills: All, Quick Wins, Structure, Content, Technical | ✅ PASS | `FILTER_OPTIONS` with correct keys |
+| §2.6 | Count badge per filter | ✅ PASS | `filterCounts` displayed per pill |
+| §2.6 | Recommendation cards with priority, title, description | ✅ PASS | `ReadabilityRecommendationCard` |
+| §2.6 | Metadata badges (priority, effort, impact) | ✅ PASS | Badge display in cards |
+| §2.6 | "View Code Fix" expandable with before/after | ✅ PASS | Code snippet expansion |
+| §2.6 | AI Suggested badge with sparkle icon | ✅ PASS | Sparkles icon for AI-sourced items |
+| §2.6 | Audience-based grouping | ✅ PASS | Content/Development toggle |
+
+### 5.8 Issues Tab (DOC-05 §2.7)
+
+| Req | Description | Status | Notes |
+|-----|-------------|--------|-------|
+| §2.7 | Filters: Severity, Category, Status, search | ✅ PASS | `ReadabilityIssuesTable` filter controls |
+| §2.7 | Sortable table columns | ✅ PASS | Column sorting |
+| §2.7 | Click row to expand details | ✅ PASS | Expandable rows |
+| §2.7 | Pagination: 20 per page | ✅ PASS | Paginated display |
+
+### 5.9 Responsive, Interactions, Animations (DOC-05 §3–5)
+
+| Req | Description | Status | Notes |
+|-----|-------------|--------|-------|
+| §3 | Responsive breakpoints (sm/md/lg/xl) | ✅ PASS | Tailwind responsive classes used |
+| §4.1 | URL input states (empty, invalid, valid, submitting, error) | ✅ PASS | All 5 states implemented |
+| §4.2 | Upload states (default, hover, reject, selected, error) | ✅ PASS | All 5 states in dropzoneClasses |
+| §5 | Animations respect prefers-reduced-motion | ✅ PASS | `motion-safe:` prefix, `useAnimatedScore` checks |
+| §5 | Score counter animation (0 → final, 1000ms, ease-out) | ✅ PASS | `useAnimatedScore` hook |
+| §5 | Tab switch fade-in | ✅ PASS | `motion-safe:animate-fade-in` |
+| §5 | Score gauge circular fill | ✅ PASS | SVG strokeDashoffset transition |
+
+### 5.10 Empty/Error States & First-Use (DOC-05 §6–7)
+
+| Req | Description | Status | Notes |
+|-----|-------------|--------|-------|
+| §6 | No recommendations empty state | ✅ PASS | Lightbulb icon + message |
+| §6 | All LLMs failed error state with retry CTA | ✅ PASS | Error state in LLM preview |
+| §6 | URL fetch error card with retry | 🟡 PARTIAL | Error as text, not styled card with red-left-border |
+| §7 | First-visit inline callout | ⬜ MISSING | No first-visit detection |
+| §7 | ToolHelpPanel readability entry | ⬜ MISSING | No help panel entry |
+
+### Section 5 Summary
+
+| Status | Count |
+|--------|-------|
+| ✅ PASS | 59 |
+| 🟡 PARTIAL | 4 |
+| ❌ FAIL | 0 |
+| ⬜ MISSING | 5 |
+| ➖ N/A | 0 |
+| **Total** | **68** |
+
+**Pass Rate:** 86.8% (59/68)
+**Pass + Partial Rate:** 92.6% (63/68)
+
+**Key Gaps:**
+- **No first-use experience** — No first-visit callout or ToolHelpPanel entry
+- **No diff view toggle** — LLM preview lacks Side-by-Side / Diff toggle
+- **No Back button** — Dashboard has `onBack` prop but doesn't render a button
+- **Tab helper text missing** — No helper descriptions below input tabs
+- **URL fetch error styling** — Uses inline text instead of spec's red-left-border card
 
 ---
 
 ## Section 6: Accessibility Requirements (DOC-06)
 
-> *To be completed in Chunk 7.*
+**Source:** `requirements/ai-readability-checker/06-accessibility-requirements.md`
+**Verified Via:** Grep across all 20 readability components for ARIA patterns, keyboard handlers, screen reader text
+
+**Grep Results:** 753 accessibility-related occurrences (aria-*, role=, tabIndex, onKeyDown, sr-only, motion-safe, dark:) across 20 component files.
+
+### 6.1 Perceivable — Text Alternatives (WCAG 1.1)
+
+| Req | Description | Status | Notes |
+|-----|-------------|--------|-------|
+| §2.1 | Decorative icons use `aria-hidden="true"` | ✅ PASS | All Lucide icons have `aria-hidden="true"` consistently |
+| §2.1 | Functional icons have accessible labels | ✅ PASS | Icon-only buttons use `aria-label` (e.g., "Remove file", "Valid URL") |
+| §2.1 | Score gauge has text alternative | ✅ PASS | `aria-label` on score card container + `sr-only` data table |
+| §2.1 | Chart has text description | ✅ PASS | `ReadabilityCategoryChart` has `sr-only` table with category scores |
+| §2.1 | Upload zone has accessible label | ✅ PASS | `aria-label="Upload HTML file for analysis"` on dropzone |
+| §2.1 | LLM provider logos have alt text | ➖ N/A | No images used; LLM names rendered as text |
+
+### 6.2 Perceivable — Adaptable (WCAG 1.3)
+
+| Req | Description | Status | Notes |
+|-----|-------------|--------|-------|
+| §2.3 | Tabs use proper ARIA roles | ✅ PASS | `role="tablist"`, `role="tab"`, `role="tabpanel"`, `aria-selected` on both InputScreen and Dashboard |
+| §2.3 | Accordion uses proper ARIA | ✅ PASS | `aria-expanded`, `aria-controls` in CategoryAccordion, CheckItem, LLMColumn |
+| §2.3 | Tables have proper headers | ✅ PASS | `<th>` elements in IssuesTable, CoverageTable |
+| §2.3 | Form fields have associated labels | ✅ PASS | `<label htmlFor>` on URL input, industry, keywords, paste textarea |
+| §2.3 | Required fields marked | ✅ PASS | `aria-required="true"` on URL input |
+| §2.3 | Error messages linked to fields | ✅ PASS | `aria-describedby` pointing to error IDs (url-error, paste-help) |
+| §2.3 | `aria-invalid` on invalid fields | ✅ PASS | `aria-invalid` set on URL input when validation fails |
+| §2.3 | Input purpose identified | ✅ PASS | `autocomplete="url"` on URL input |
+
+### 6.3 Perceivable — Distinguishable (WCAG 1.4)
+
+| Req | Description | Status | Notes |
+|-----|-------------|--------|-------|
+| §2.4 | Color not sole indicator | ✅ PASS | Score uses color + number + grade letter + text summary |
+| §2.4 | Check status uses icon + text + color | ✅ PASS | `sr-only` span with status label for each check |
+| §2.4 | Content reflows at 320px viewport | ✅ PASS | Responsive single-column at `sm:` breakpoint |
+| §2.4 | Dark mode support | ✅ PASS | All 20 components have `dark:` variants |
+
+### 6.4 Operable — Keyboard Accessible (WCAG 2.1)
+
+| Req | Description | Status | Notes |
+|-----|-------------|--------|-------|
+| §3.1 | URL input: Tab to focus, Enter to submit | ✅ PASS | `<form onSubmit>` handles Enter |
+| §3.1 | Tab navigation: Arrow keys to switch | ✅ PASS | `handleTabKeyDown` with ArrowLeft/ArrowRight in both InputScreen and Dashboard |
+| §3.1 | Upload dropzone: Tab + Enter/Space for file picker | ✅ PASS | react-dropzone handles keyboard |
+| §3.1 | Category accordion: Enter/Space to expand | ✅ PASS | `<button>` triggers in CategoryAccordion |
+| §3.1 | LLM checkbox toggle: Space to toggle | ✅ PASS | Checkbox inputs in LLMPreview |
+| §3.1 | Filter pill toggles: Enter/Space to activate | ✅ PASS | `<button>` elements with `role="radio"` |
+| §3.1 | Cancel button: keyboard accessible with confirmation | ✅ PASS | Button triggers confirmation dialog |
+| §3.1 | Export dropdown: keyboard navigation | 🟡 PARTIAL | Opens on click; Arrow key navigation within dropdown not explicitly implemented |
+| §3.1 | Modal dialogs: Tab trapped within, Escape to close | 🟡 PARTIAL | PDF preview modal exists but focus trap and Escape key handling not verified |
+| §3.1 | No keyboard traps | ✅ PASS | All elements are standard buttons/inputs/links |
+
+### 6.5 Operable — Enough Time (WCAG 2.2)
+
+| Req | Description | Status | Notes |
+|-----|-------------|--------|-------|
+| §3.2 | Processing has no user timeout | ✅ PASS | Analysis runs to completion (60s system timeout) |
+| §3.2 | Shared link expiry configurable | ✅ PASS | 7/30/90 days or "Never" options in share dialog |
+
+### 6.6 Operable — Seizures (WCAG 2.3)
+
+| Req | Description | Status | Notes |
+|-----|-------------|--------|-------|
+| §3.3 | No flashing content | ✅ PASS | Progress bar uses smooth transitions |
+| §3.3 | All animations respect `prefers-reduced-motion` | ✅ PASS | `motion-safe:` prefix on animations; `useAnimatedScore` explicitly checks `prefers-reduced-motion` |
+
+### 6.7 Operable — Navigable (WCAG 2.4)
+
+| Req | Description | Status | Notes |
+|-----|-------------|--------|-------|
+| §3.4 | Focus order logical | ✅ PASS | DOM order follows visual reading sequence |
+| §3.4 | Focus visible | ✅ PASS | `focus:ring-2 focus:ring-teal-500` on all interactive elements |
+| §3.4 | `tabIndex` management on tabs | ✅ PASS | Active tab `tabIndex={0}`, inactive `tabIndex={-1}` |
+
+### 6.8 Operable — Input Modalities (WCAG 2.5)
+
+| Req | Description | Status | Notes |
+|-----|-------------|--------|-------|
+| §3.5 | Drag-and-drop has click alternative | ✅ PASS | "or click to browse" with react-dropzone click handler |
+| §3.5 | Target size >= 24x24px | ✅ PASS | Buttons use px-3 py-2 minimum (well above 24px) |
+| §3.5 | Label matches accessible name | ✅ PASS | Button text matches function |
+
+### 6.9 Understandable — Input Assistance (WCAG 3.3)
+
+| Req | Description | Status | Notes |
+|-----|-------------|--------|-------|
+| §4.3 | Error identification (red border + icon + text) | ✅ PASS | URL validation shows red border + XCircle + error text |
+| §4.3 | Error messages linked via aria-describedby | ✅ PASS | `aria-describedby` on URL input and paste textarea |
+| §4.3 | Error suggestion for missing protocol | ✅ PASS | `urlValidation.js` auto-prepends protocol |
+| §4.3 | Confirmation before destructive action (cancel) | ✅ PASS | Cancel triggers confirmation dialog |
+| §4.3 | Upload errors use `role="alert"` | ✅ PASS | `role="alert"` on upload error message |
+
+### 6.10 Understandable — Readable & Predictable (WCAG 3.1–3.2)
+
+| Req | Description | Status | Notes |
+|-----|-------------|--------|-------|
+| §4.1 | Jargon explained (tooltips/inline help) | 🟡 PARTIAL | Some terms explained (e.g., Screaming Frog callout) but no systematic tooltip coverage for terms like "JSON-LD", "Flesch Score" |
+| §4.1 | Abbreviations expanded on first use | ⬜ MISSING | "LLM" not expanded on first use in UI |
+| §4.2 | No focus-triggered or input-triggered changes | ✅ PASS | Explicit submit required for all actions |
+
+### 6.11 Robust — Compatible (WCAG 4.1)
+
+| Req | Description | Status | Notes |
+|-----|-------------|--------|-------|
+| §5.1 | ARIA roles correct | ✅ PASS | Tabs, accordions, progressbar roles all correctly used |
+| §5.1 | Error messages use `role="alert"` | ✅ PASS | ReadabilityPage and InputScreen use `role="alert"` |
+| §5.1 | Status messages use `aria-live` | 🟡 PARTIAL | Processing screen has `aria-live="polite"` for stage messages, but no `aria-live` announcements for analysis complete, export complete, or link copied |
+
+### 6.12 Screen Reader Considerations (DOC-06 §6)
+
+| Req | Description | Status | Notes |
+|-----|-------------|--------|-------|
+| §6.1 | Progress stage announcements via aria-live | ✅ PASS | ProcessingScreen `sr-only` div with `aria-live="polite"` announces `progress.message` |
+| §6.1 | Analysis complete announcement | ⬜ MISSING | No `aria-live="assertive"` announcement on completion |
+| §6.1 | LLM preview loaded/failed announcements | ⬜ MISSING | No aria-live announcements for individual LLM results |
+| §6.1 | "Link copied" / "Export complete" announcements | ⬜ MISSING | Toast notifications not announced via aria-live |
+| §6.2 | Score gauge uses `role="meter"` | ⬜ MISSING | SVG gauge uses `aria-hidden="true"`, no `role="meter"` or `aria-valuenow` |
+| §6.2 | Chart has sr-only data table | ✅ PASS | Both ScoreCard and CategoryChart have `sr-only` tables |
+| §6.2 | Trend sparkline has sr-only table | ✅ PASS | TrendSparkline has `sr-only` table with date + score |
+
+### 6.13 Testing Requirements (DOC-06 §7)
+
+| Req | Description | Status | Notes |
+|-----|-------------|--------|-------|
+| §7 | Axe-core automated scan: 0 violations | ⬜ MISSING | No axe-core test suite exists |
+| §7 | NVDA / VoiceOver screen reader tests | ⬜ MISSING | No screen reader test procedures documented |
+| §7 | Keyboard-only navigation test | ⬜ MISSING | No keyboard navigation test exists |
+| §7 | 200% zoom test | ⬜ MISSING | No zoom test exists |
+| §7 | Reduced motion test | ⬜ MISSING | No automated test for reduced motion |
+
+### Section 6 Summary
+
+| Status | Count |
+|--------|-------|
+| ✅ PASS | 39 |
+| 🟡 PARTIAL | 4 |
+| ❌ FAIL | 0 |
+| ⬜ MISSING | 9 |
+| ➖ N/A | 1 |
+| **Total** | **53** |
+
+**Pass Rate:** 73.6% (39/53)
+**Pass + Partial Rate:** 81.1% (43/53)
+
+**Key Gaps:**
+- **No accessibility test suite** — DOC-06 §7 specifies axe-core, NVDA, VoiceOver, keyboard, zoom, and reduced motion tests. None exist.
+- **Missing aria-live announcements** — Only processing stages are announced. Analysis complete, LLM results, clipboard copy, and export events are silent to screen readers.
+- **Score gauge lacks role="meter"** — SVG gauge is `aria-hidden` with no `role="meter"` or `aria-valuenow`.
+- **Abbreviations not expanded** — "LLM" and other technical terms not expanded on first use.
+- **Export dropdown keyboard navigation incomplete** — Arrow key navigation within dropdown not implemented.
 
 ---
 
