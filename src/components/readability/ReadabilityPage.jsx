@@ -45,6 +45,24 @@ export default function ReadabilityPage() {
   // Pre-filled URL from cross-tool deep linking (US-2.7.1)
   const prefillUrl = searchParams.get('url') || '';
 
+  // E-004: Keyboard shortcut system
+  const [showShortcuts, setShowShortcuts] = useState(false);
+  useEffect(() => {
+    const handler = (e) => {
+      // Don't trigger when typing in inputs
+      if (['INPUT', 'TEXTAREA', 'SELECT'].includes(e.target.tagName)) return;
+      if (e.key === '?' && !e.ctrlKey && !e.metaKey) {
+        e.preventDefault();
+        setShowShortcuts(s => !s);
+      }
+      if (e.key === 'Escape' && showShortcuts) {
+        setShowShortcuts(false);
+      }
+    };
+    window.addEventListener('keydown', handler);
+    return () => window.removeEventListener('keydown', handler);
+  }, [showShortcuts]);
+
   // Update document title based on view
   useEffect(() => {
     const titles = {
@@ -269,6 +287,34 @@ export default function ReadabilityPage() {
           </div>
         )}
       </div>
+
+      {/* E-004: Keyboard shortcuts help overlay */}
+      {showShortcuts && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50" onClick={() => setShowShortcuts(false)}>
+          <div className="bg-white dark:bg-charcoal-800 rounded-xl shadow-xl border border-charcoal-200 dark:border-charcoal-700 p-6 max-w-sm w-full mx-4" onClick={(e) => e.stopPropagation()}>
+            <h2 className="text-lg font-bold text-charcoal-900 dark:text-charcoal-100 mb-4">Keyboard Shortcuts</h2>
+            <div className="space-y-2 text-sm">
+              {[
+                ['?', 'Toggle this help'],
+                ['Esc', 'Close dialogs'],
+                ['\u2190 / \u2192', 'Switch tabs'],
+                ['Enter', 'Expand/collapse check'],
+              ].map(([key, desc]) => (
+                <div key={key} className="flex items-center justify-between">
+                  <span className="text-charcoal-600 dark:text-charcoal-400">{desc}</span>
+                  <kbd className="px-2 py-0.5 bg-charcoal-100 dark:bg-charcoal-700 text-charcoal-700 dark:text-charcoal-300 rounded text-xs font-mono">{key}</kbd>
+                </div>
+              ))}
+            </div>
+            <button
+              onClick={() => setShowShortcuts(false)}
+              className="mt-4 w-full px-3 py-2 text-sm bg-charcoal-100 dark:bg-charcoal-700 text-charcoal-700 dark:text-charcoal-300 rounded-lg hover:bg-charcoal-200 dark:hover:bg-charcoal-600 transition-colors"
+            >
+              Close
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

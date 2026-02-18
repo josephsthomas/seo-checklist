@@ -13,8 +13,10 @@ import {
   ChevronDown,
   ChevronRight,
   Copy,
+  HelpCircle,
 } from 'lucide-react';
 import toast from 'react-hot-toast';
+import { getWhyItMatters } from '../../lib/readability/utils/whyItMatters';
 
 /** Jargon glossary for technical terms */
 const JARGON = {
@@ -268,6 +270,23 @@ function ReadabilityCheckItem({ check, defaultExpanded = false }) {
                 <p className="text-sm text-teal-800 dark:text-teal-200">
                   {check.recommendation}
                 </p>
+              </div>
+            )}
+
+            {/* E-006: Why This Matters tooltip */}
+            {getWhyItMatters(check.id) && (
+              <div className="bg-blue-50 dark:bg-blue-900/10 border border-blue-100 dark:border-blue-800/30 rounded-lg p-3">
+                <div className="flex items-start gap-2">
+                  <HelpCircle className="w-4 h-4 text-blue-500 flex-shrink-0 mt-0.5" aria-hidden="true" />
+                  <div>
+                    <p className="text-xs font-medium text-blue-700 dark:text-blue-300 mb-0.5">
+                      Why this matters for AI readability:
+                    </p>
+                    <p className="text-sm text-blue-800 dark:text-blue-200">
+                      {getWhyItMatters(check.id)}
+                    </p>
+                  </div>
+                </div>
               </div>
             )}
           </div>

@@ -135,7 +135,14 @@ export async function runFullAnalysis(htmlContent, options = {}) {
 
     // Versioning
     scoringVersion: '1.0.0',
-    promptVersion: '1.0.0'
+    promptVersion: '1.0.0',
+
+    // E-020: Model version tracking for drift detection
+    modelVersions: {
+      claude: 'claude-sonnet-4-5-20250929',
+      openai: 'gpt-4o',
+      gemini: 'gemini-2.0-flash',
+    }
   };
 
   onProgress?.({ stage: 'complete', progress: 100, message: 'Analysis complete!' });

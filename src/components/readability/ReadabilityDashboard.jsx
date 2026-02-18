@@ -276,7 +276,16 @@ export default function ReadabilityDashboard({
         <ReadabilityCategoryChart
           categoryScores={analysis.categoryScores}
           onCategoryClick={(catId) => {
+            // E-002: Click category chart bar → switch to details tab and scroll to that category
             setActiveTab('details');
+            setTimeout(() => {
+              const el = document.getElementById(`category-${catId}`);
+              if (el) {
+                el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                el.classList.add('ring-2', 'ring-teal-500');
+                setTimeout(() => el.classList.remove('ring-2', 'ring-teal-500'), 2000);
+              }
+            }, 100);
           }}
         />
       </Suspense>
