@@ -1,0 +1,40 @@
+{
+  "errors": {
+    "notFound": {
+      "success": false,
+      "error": "Page not found",
+      "statusCode": 404,
+      "url": "https://example.com/nonexistent"
+    },
+    "forbidden": {
+      "success": false,
+      "error": "Access denied by the server",
+      "statusCode": 403,
+      "url": "https://example.com/protected"
+    },
+    "timeout": {
+      "success": false,
+      "error": "Request timed out after 30 seconds",
+      "code": "TIMEOUT",
+      "url": "https://slow-example.com/page"
+    },
+    "dnsFailure": {
+      "success": false,
+      "error": "Could not resolve hostname",
+      "code": "DNS_FAILURE",
+      "url": "https://nonexistent-domain-xyz.com/"
+    },
+    "serverError": {
+      "success": false,
+      "error": "Internal server error",
+      "statusCode": 500,
+      "url": "https://example.com/broken"
+    },
+    "connectionRefused": {
+      "success": false,
+      "error": "Connection refused by the server",
+      "code": "CONNECTION_REFUSED",
+      "url": "https://example.com:8443/page"
+    }
+  }
+}

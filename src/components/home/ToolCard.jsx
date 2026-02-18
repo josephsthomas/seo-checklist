@@ -57,6 +57,39 @@ export default function ToolCard({
       button: 'from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700',
       glow: 'group-hover:shadow-emerald-500/20',
       ring: 'ring-emerald-500/20'
+    },
+    teal: {
+      gradient: 'from-teal-500 to-teal-600',
+      lightGradient: 'from-teal-50 to-teal-100/50',
+      icon: 'from-teal-500 to-teal-600',
+      iconBg: 'bg-teal-50',
+      text: 'text-teal-600',
+      badge: 'bg-teal-100 text-teal-700 border-teal-200',
+      button: 'from-teal-500 to-teal-600 hover:from-teal-600 hover:to-teal-700',
+      glow: 'group-hover:shadow-teal-500/20',
+      ring: 'ring-teal-500/20'
+    },
+    amber: {
+      gradient: 'from-amber-500 to-amber-600',
+      lightGradient: 'from-amber-50 to-amber-100/50',
+      icon: 'from-amber-500 to-amber-600',
+      iconBg: 'bg-amber-50',
+      text: 'text-amber-600',
+      badge: 'bg-amber-100 text-amber-700 border-amber-200',
+      button: 'from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700',
+      glow: 'group-hover:shadow-amber-500/20',
+      ring: 'ring-amber-500/20'
+    },
+    rose: {
+      gradient: 'from-rose-500 to-rose-600',
+      lightGradient: 'from-rose-50 to-rose-100/50',
+      icon: 'from-rose-500 to-rose-600',
+      iconBg: 'bg-rose-50',
+      text: 'text-rose-600',
+      badge: 'bg-rose-100 text-rose-700 border-rose-200',
+      button: 'from-rose-500 to-rose-600 hover:from-rose-600 hover:to-rose-700',
+      glow: 'group-hover:shadow-rose-500/20',
+      ring: 'ring-rose-500/20'
     }
   };
 

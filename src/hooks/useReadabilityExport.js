@@ -1,0 +1,827 @@
+import { useState, useCallback } from 'react';
+import { format } from 'date-fns';
+import { getGrade, getScoreColor } from '../lib/readability/utils/gradeMapper';
+import toast from 'react-hot-toast';
+
+/**
+ * Teal brand color for PDF headers
+ */
+const TEAL = [20, 184, 166]; // #14b8a6
+const TEAL_DARK = [13, 148, 136]; // #0d9488
+const CHARCOAL = [40, 40, 40];
+const GRAY = [100, 100, 100];
+const LIGHT_GRAY = [200, 200, 200];
+
+/**
+ * Category display labels
+ */
+const CATEGORY_LABELS = {
+  contentStructure: 'Content Structure',
+  contentClarity: 'Content Clarity',
+  technicalAccessibility: 'Technical Accessibility',
+  metadataSchema: 'Metadata & Schema',
+  aiSpecificSignals: 'AI-Specific Signals'
+};
+
+/**
+ * Category weights for methodology page
+ */
+const CATEGORY_WEIGHTS = {
+  contentStructure: '20%',
+  contentClarity: '25%',
+  technicalAccessibility: '20%',
+  metadataSchema: '15%',
+  aiSpecificSignals: '20%'
+};
+
+/**
+ * URL to filename slug
+ */
+function urlToSlug(url) {
+  if (!url) return 'analysis';
+  try {
+    const u = new URL(url);
+    return (u.hostname + u.pathname)
+      .replace(/^www\./, '')
+      .replace(/[^a-zA-Z0-9]/g, '-')
+      .replace(/-+/g, '-')
+      .replace(/^-|-$/g, '')
+      .substring(0, 50);
+  } catch {
+    return 'analysis';
+  }
+}
+
+/**
+ * Get grade color as RGB array for PDF
+ */
+function getGradeColorRGB(score) {
+  if (score >= 90) return [16, 185, 129]; // emerald-500
+  if (score >= 80) return [20, 184, 166]; // teal-500
+  if (score >= 70) return [245, 158, 11]; // amber-500
+  if (score >= 60) return [249, 115, 22]; // orange-500
+  return [239, 68, 68]; // red-500
+}
+
+/**
+ * useReadabilityExport Hook
+ *
+ * Handles PDF and JSON export generation for readability analyses.
+ * PDF follows the 8-9 page structure defined in the BRD.
+ *
+ * BRD References: US-2.6.1, US-2.6.2, Export Requirements Section XII
+ */
+export function useReadabilityExport() {
+  const [isExporting, setIsExporting] = useState(false);
+  const [exportProgress, setExportProgress] = useState(0);
+
+  /**
+   * Generate PDF report
+   * BRD: US-2.6.1, E-UX-04 — 8-9 page PDF with customization options
+   *
+   * @param {Object} analysis - The analysis data
+   * @param {Object} options - Export customization options
+   */
+  const exportPDF = useCallback(async (analysis, options = {}) => {
+    if (!analysis) {
+      toast.error('No analysis data to export');
+      return;
+    }
+
+    setIsExporting(true);
+    setExportProgress(0);
+
+    try {
+      // Dynamic import to keep bundle small
+      const jsPDF = (await import('jspdf')).default;
+      await import('jspdf-autotable');
+
+      const {
+        reportTitle = 'AI Readability Analysis Report',
+        clientName = '',
+        clientLogo = null,
+        includeLLMSummary = true,
+        includeGEOBrief = true,
+        includeMethodology = true,
+        includeCodeSnippets = true
+      } = options;
+
+      const doc = new jsPDF();
+      const pageWidth = doc.internal.pageSize.width;
+      const pageHeight = doc.internal.pageSize.height;
+      const margin = 20;
+      const contentWidth = pageWidth - margin * 2;
+      let y = margin;
+
+      // Helper: check if new page needed
+      const checkPage = (requiredSpace = 30) => {
+        if (y + requiredSpace > pageHeight - 25) {
+          doc.addPage();
+          y = margin;
+          return true;
+        }
+        return false;
+      };
+
+      // Helper: draw section header
+      const sectionHeader = (text) => {
+        checkPage(25);
+        doc.setFillColor(...TEAL);
+        doc.rect(margin, y, contentWidth, 8, 'F');
+        doc.setFontSize(12);
+        doc.setFont('helvetica', 'bold');
+        doc.setTextColor(255, 255, 255);
+        doc.text(text, margin + 4, y + 5.5);
+        y += 14;
+        doc.setTextColor(...CHARCOAL);
+      };
+
+      // Helper: draw key-value pair
+      const keyValue = (key, value, indent = 0) => {
+        checkPage(8);
+        doc.setFontSize(9);
+        doc.setFont('helvetica', 'bold');
+        doc.setTextColor(...GRAY);
+        doc.text(key, margin + indent, y);
+        doc.setFont('helvetica', 'normal');
+        doc.setTextColor(...CHARCOAL);
+        const valueStr = String(value || 'N/A');
+        doc.text(valueStr, margin + indent + 50, y);
+        y += 6;
+      };
+
+      setExportProgress(10);
+
+      // ===== PAGE 1: COVER PAGE =====
+      if (clientLogo) {
+        try {
+          doc.addImage(clientLogo, 'PNG', margin, y, 40, 20);
+          y += 30;
+        } catch {
+          // Logo failed — non-critical
+        }
+      }
+
+      y = 60;
+      doc.setFontSize(28);
+      doc.setFont('helvetica', 'bold');
+      doc.setTextColor(...TEAL_DARK);
+      doc.text(reportTitle, pageWidth / 2, y, { align: 'center' });
+      y += 15;
+
+      if (clientName) {
+        doc.setFontSize(16);
+        doc.setFont('helvetica', 'normal');
+        doc.setTextColor(...GRAY);
+        doc.text(`Prepared for: ${clientName}`, pageWidth / 2, y, { align: 'center' });
+        y += 12;
+      }
+
+      // URL
+      if (analysis.sourceUrl) {
+        doc.setFontSize(10);
+        doc.setTextColor(...GRAY);
+        doc.text(analysis.sourceUrl, pageWidth / 2, y, { align: 'center' });
+        y += 10;
+      }
+
+      // Date
+      const dateStr = format(new Date(analysis.createdAt || analysis.analyzedAt), 'MMMM d, yyyy');
+      doc.setFontSize(10);
+      doc.text(dateStr, pageWidth / 2, y, { align: 'center' });
+      y += 20;
+
+      // Score display
+      const gradeInfo = getGrade(analysis.overallScore);
+      const scoreColor = getGradeColorRGB(analysis.overallScore);
+
+      doc.setFillColor(...scoreColor);
+      doc.roundedRect(pageWidth / 2 - 25, y, 50, 35, 5, 5, 'F');
+
+      doc.setFontSize(32);
+      doc.setFont('helvetica', 'bold');
+      doc.setTextColor(255, 255, 255);
+      doc.text(String(analysis.overallScore), pageWidth / 2, y + 18, { align: 'center' });
+
+      doc.setFontSize(14);
+      doc.text(gradeInfo.grade, pageWidth / 2, y + 28, { align: 'center' });
+      y += 45;
+
+      // Generated by
+      doc.setFontSize(8);
+      doc.setTextColor(...LIGHT_GRAY);
+      doc.text('Generated by Content Strategy Portal', pageWidth / 2, pageHeight - 20, { align: 'center' });
+
+      setExportProgress(20);
+
+      // ===== PAGE 2: EXECUTIVE SUMMARY =====
+      doc.addPage();
+      y = margin;
+
+      sectionHeader('Executive Summary');
+
+      // Summary paragraph
+      const summaryText = analysis.aiAssessment?.contentSummary ||
+        analysis.gradeSummary ||
+        `This page scored ${analysis.overallScore}/100 (Grade ${gradeInfo.grade}).`;
+
+      doc.setFontSize(10);
+      doc.setFont('helvetica', 'normal');
+      doc.setTextColor(...CHARCOAL);
+      const splitSummary = doc.splitTextToSize(summaryText, contentWidth);
+      doc.text(splitSummary, margin, y);
+      y += splitSummary.length * 5 + 8;
+
+      // Category scores table
+      const categoryRows = Object.entries(analysis.categoryScores || {}).map(([key, score]) => {
+        const catGrade = getGrade(score);
+        return [
+          CATEGORY_LABELS[key] || key,
+          CATEGORY_WEIGHTS[key] || '',
+          String(score),
+          catGrade.grade
+        ];
+      });
+
+      doc.autoTable({
+        startY: y,
+        head: [['Category', 'Weight', 'Score', 'Grade']],
+        body: categoryRows,
+        margin: { left: margin, right: margin },
+        headStyles: {
+          fillColor: TEAL,
+          textColor: [255, 255, 255],
+          fontStyle: 'bold',
+          fontSize: 9
+        },
+        bodyStyles: { fontSize: 9, textColor: CHARCOAL },
+        alternateRowStyles: { fillColor: [245, 245, 245] },
+        columnStyles: {
+          0: { cellWidth: 60 },
+          1: { cellWidth: 25, halign: 'center' },
+          2: { cellWidth: 25, halign: 'center' },
+          3: { cellWidth: 25, halign: 'center' }
+        }
+      });
+      y = doc.lastAutoTable.finalY + 10;
+
+      // Issue summary stats
+      const issues = analysis.issueSummary || {};
+      checkPage(30);
+      sectionHeader('Issue Summary');
+
+      doc.autoTable({
+        startY: y,
+        head: [['Critical', 'High', 'Medium', 'Low', 'Passed', 'Total']],
+        body: [[
+          String(issues.critical || 0),
+          String(issues.high || 0),
+          String(issues.medium || 0),
+          String(issues.low || 0),
+          String(issues.passed || 0),
+          String(issues.total || 0)
+        ]],
+        margin: { left: margin, right: margin },
+        headStyles: { fillColor: TEAL, textColor: [255, 255, 255], fontStyle: 'bold', fontSize: 9 },
+        bodyStyles: { fontSize: 9, halign: 'center' }
+      });
+      y = doc.lastAutoTable.finalY + 10;
+
+      setExportProgress(35);
+
+      // ===== PAGES 3-4: CATEGORY BREAKDOWN =====
+      doc.addPage();
+      y = margin;
+
+      const categories = Object.entries(analysis.categoryScores || {});
+      for (const [catKey, catScore] of categories) {
+        checkPage(40);
+        const catGrade = getGrade(catScore);
+        sectionHeader(`${CATEGORY_LABELS[catKey] || catKey} — ${catScore}/100 (${catGrade.grade})`);
+
+        // Score bar
+        doc.setFillColor(230, 230, 230);
+        doc.roundedRect(margin, y, contentWidth, 6, 2, 2, 'F');
+        const barColor = getGradeColorRGB(catScore);
+        doc.setFillColor(...barColor);
+        doc.roundedRect(margin, y, (contentWidth * catScore) / 100, 6, 2, 2, 'F');
+        y += 12;
+
+        // Check results for this category
+        const categoryChecks = (analysis.checkResults || []).filter(check => {
+          const prefix = {
+            contentStructure: 'CS',
+            contentClarity: 'CC',
+            technicalAccessibility: 'TA',
+            metadataSchema: 'MS',
+            aiSpecificSignals: 'AS'
+          }[catKey];
+          return check.id?.startsWith(prefix);
+        });
+
+        if (categoryChecks.length > 0) {
+          const checkRows = categoryChecks.map(check => [
+            check.id,
+            check.title || '',
+            (check.status || '').toUpperCase(),
+            check.severity || ''
+          ]);
+
+          doc.autoTable({
+            startY: y,
+            head: [['Check', 'Title', 'Status', 'Severity']],
+            body: checkRows,
+            margin: { left: margin, right: margin },
+            headStyles: { fillColor: TEAL, textColor: [255, 255, 255], fontStyle: 'bold', fontSize: 8 },
+            bodyStyles: { fontSize: 8, textColor: CHARCOAL },
+            alternateRowStyles: { fillColor: [248, 248, 248] },
+            columnStyles: {
+              0: { cellWidth: 20 },
+              1: { cellWidth: 80 },
+              2: { cellWidth: 20, halign: 'center' },
+              3: { cellWidth: 25, halign: 'center' }
+            }
+          });
+          y = doc.lastAutoTable.finalY + 10;
+        }
+      }
+
+      setExportProgress(55);
+
+      // ===== PAGE 5: LLM RENDERING SUMMARY =====
+      if (includeLLMSummary && analysis.llmExtractions) {
+        doc.addPage();
+        y = margin;
+
+        sectionHeader('How AI Models See Your Content');
+
+        // Disclaimer
+        doc.setFontSize(8);
+        doc.setFont('helvetica', 'italic');
+        doc.setTextColor(...GRAY);
+        doc.text('This preview shows how each AI model interprets your content when provided to it. It does NOT simulate actual web crawling behavior.', margin, y, { maxWidth: contentWidth });
+        y += 10;
+
+        // Coverage metrics table
+        const llmNames = { claude: 'Claude', openai: 'OpenAI GPT', gemini: 'Google Gemini' };
+        const llmRows = Object.entries(analysis.llmExtractions)
+          .filter(([, data]) => data && data.status !== 'error')
+          .map(([llmKey, data]) => [
+            llmNames[llmKey] || llmKey,
+            data.model || '',
+            data.usefulnessScore ? `${data.usefulnessScore}/10` : 'N/A',
+            data.processingTimeMs ? `${(data.processingTimeMs / 1000).toFixed(1)}s` : 'N/A',
+            data.status || 'N/A'
+          ]);
+
+        if (llmRows.length > 0) {
+          doc.autoTable({
+            startY: y,
+            head: [['LLM', 'Model', 'Usefulness', 'Time', 'Status']],
+            body: llmRows,
+            margin: { left: margin, right: margin },
+            headStyles: { fillColor: TEAL, textColor: [255, 255, 255], fontStyle: 'bold', fontSize: 9 },
+            bodyStyles: { fontSize: 9, textColor: CHARCOAL },
+            alternateRowStyles: { fillColor: [245, 245, 245] }
+          });
+          y = doc.lastAutoTable.finalY + 10;
+        }
+
+        // Key differences summary
+        const llmEntries = Object.entries(analysis.llmExtractions).filter(([, d]) => d?.extractedTitle);
+        if (llmEntries.length > 1) {
+          checkPage(20);
+          doc.setFontSize(10);
+          doc.setFont('helvetica', 'bold');
+          doc.setTextColor(...CHARCOAL);
+          doc.text('Extracted Titles Comparison', margin, y);
+          y += 6;
+
+          for (const [llmKey, data] of llmEntries) {
+            checkPage(8);
+            doc.setFontSize(8);
+            doc.setFont('helvetica', 'bold');
+            doc.text(`${llmNames[llmKey] || llmKey}:`, margin + 4, y);
+            doc.setFont('helvetica', 'normal');
+            const titleText = (data.extractedTitle || 'N/A').substring(0, 80);
+            doc.text(titleText, margin + 40, y);
+            y += 5;
+          }
+          y += 5;
+        }
+      }
+
+      setExportProgress(70);
+
+      // ===== PAGES 6-7: RECOMMENDATIONS =====
+      doc.addPage();
+      y = margin;
+
+      sectionHeader('Recommendations');
+
+      const recs = analysis.recommendations || [];
+      const groups = {
+        'quick-wins': recs.filter(r => r.group === 'quick-wins'),
+        structural: recs.filter(r => r.group === 'structural'),
+        content: recs.filter(r => r.group === 'content'),
+        technical: recs.filter(r => r.group === 'technical')
+      };
+
+      const groupLabels = {
+        'quick-wins': 'Quick Wins',
+        structural: 'Structural Improvements',
+        content: 'Content Enhancements',
+        technical: 'Technical Fixes'
+      };
+
+      for (const [groupKey, groupRecs] of Object.entries(groups)) {
+        if (groupRecs.length === 0) continue;
+
+        checkPage(20);
+        doc.setFontSize(11);
+        doc.setFont('helvetica', 'bold');
+        doc.setTextColor(...TEAL_DARK);
+        doc.text(groupLabels[groupKey] || groupKey, margin, y);
+        y += 7;
+
+        // Show top 5 per group
+        const topRecs = groupRecs.slice(0, 5);
+        for (const rec of topRecs) {
+          checkPage(20);
+
+          // Priority badge
+          doc.setFontSize(8);
+          doc.setFont('helvetica', 'bold');
+          const priorityColors = {
+            critical: [239, 68, 68],
+            high: [249, 115, 22],
+            medium: [245, 158, 11],
+            low: [59, 130, 246]
+          };
+          doc.setTextColor(...(priorityColors[rec.priority] || GRAY));
+          doc.text(`[${(rec.priority || 'medium').toUpperCase()}]`, margin, y);
+
+          // Title
+          doc.setFont('helvetica', 'bold');
+          doc.setTextColor(...CHARCOAL);
+          doc.text(rec.title || '', margin + 25, y);
+          y += 5;
+
+          // Description
+          if (rec.description) {
+            doc.setFontSize(8);
+            doc.setFont('helvetica', 'normal');
+            const descLines = doc.splitTextToSize(rec.description, contentWidth - 25);
+            doc.text(descLines.slice(0, 3), margin + 4, y);
+            y += descLines.slice(0, 3).length * 4 + 3;
+          }
+
+          // Code snippet (if enabled and available)
+          if (includeCodeSnippets && rec.codeSnippet?.after) {
+            checkPage(15);
+            doc.setFillColor(245, 245, 245);
+            const snippetText = rec.codeSnippet.after.substring(0, 200);
+            const snippetLines = doc.splitTextToSize(snippetText, contentWidth - 10);
+            const snippetHeight = snippetLines.length * 4 + 6;
+            doc.roundedRect(margin + 4, y - 2, contentWidth - 8, snippetHeight, 2, 2, 'F');
+            doc.setFontSize(7);
+            doc.setFont('courier', 'normal');
+            doc.setTextColor(80, 80, 80);
+            doc.text(snippetLines, margin + 8, y + 2);
+            y += snippetHeight + 3;
+          }
+
+          // Source badge for AI recs
+          if (rec.source === 'ai') {
+            doc.setFontSize(7);
+            doc.setFont('helvetica', 'italic');
+            doc.setTextColor(...TEAL);
+            doc.text('AI Suggested', margin + 4, y);
+            y += 4;
+          }
+
+          y += 2;
+        }
+        y += 5;
+      }
+
+      setExportProgress(80);
+
+      // ===== PAGE 8: GEO STRATEGIC BRIEF =====
+      if (includeGEOBrief) {
+        doc.addPage();
+        y = margin;
+
+        sectionHeader('GEO Strategic Brief');
+
+        // Citation Likelihood Score
+        const citationScore = analysis.aiAssessment?.citationWorthiness;
+        if (citationScore !== null && citationScore !== undefined) {
+          keyValue('Citation Likelihood Score', `${citationScore}/100`);
+          if (analysis.aiAssessment?.citationExplanation) {
+            doc.setFontSize(8);
+            doc.setFont('helvetica', 'normal');
+            const citLines = doc.splitTextToSize(analysis.aiAssessment.citationExplanation, contentWidth - 10);
+            doc.text(citLines.slice(0, 4), margin + 4, y);
+            y += citLines.slice(0, 4).length * 4 + 6;
+          }
+        }
+
+        // AI Crawler Access Matrix
+        checkPage(30);
+        doc.setFontSize(10);
+        doc.setFont('helvetica', 'bold');
+        doc.setTextColor(...CHARCOAL);
+        doc.text('AI Crawler Access Matrix', margin, y);
+        y += 7;
+
+        const crawlerChecks = (analysis.checkResults || []).filter(c =>
+          c.id === 'TA-02' || c.id === 'TA-03' || c.id === 'TA-10.5'
+        );
+
+        if (crawlerChecks.length > 0) {
+          const crawlerRows = crawlerChecks.map(c => [
+            c.id,
+            c.title || '',
+            (c.status || '').toUpperCase(),
+            (c.details || '').substring(0, 60)
+          ]);
+
+          doc.autoTable({
+            startY: y,
+            head: [['Check', 'Title', 'Status', 'Details']],
+            body: crawlerRows,
+            margin: { left: margin, right: margin },
+            headStyles: { fillColor: TEAL, textColor: [255, 255, 255], fontStyle: 'bold', fontSize: 8 },
+            bodyStyles: { fontSize: 8 }
+          });
+          y = doc.lastAutoTable.finalY + 10;
+        }
+
+        // Top AI-Specific Signals findings
+        checkPage(20);
+        doc.setFontSize(10);
+        doc.setFont('helvetica', 'bold');
+        doc.text('Top AI-Specific Signals Findings', margin, y);
+        y += 7;
+
+        const aiSignalChecks = (analysis.checkResults || [])
+          .filter(c => c.id?.startsWith('AS-') && c.status !== 'pass')
+          .slice(0, 5);
+
+        for (const check of aiSignalChecks) {
+          checkPage(10);
+          doc.setFontSize(8);
+          doc.setFont('helvetica', 'normal');
+          doc.setTextColor(...CHARCOAL);
+          const statusIcon = check.status === 'fail' ? '✗' : '!';
+          doc.text(`${statusIcon} ${check.id}: ${check.title || ''}`, margin + 4, y);
+          y += 5;
+        }
+
+        // AI visibility priorities
+        y += 5;
+        checkPage(15);
+        doc.setFontSize(10);
+        doc.setFont('helvetica', 'bold');
+        doc.text('AI Visibility Priorities', margin, y);
+        y += 7;
+
+        doc.setFontSize(8);
+        doc.setFont('helvetica', 'normal');
+        const priorities = [
+          'Ensure all AI crawlers have access to your content (check robots.txt and meta directives)',
+          'Add comprehensive structured data (JSON-LD) to improve AI understanding',
+          'Include quotable passages, clear definitions, and authoritative sources'
+        ];
+        for (const priority of priorities) {
+          checkPage(8);
+          doc.text(`• ${priority}`, margin + 4, y, { maxWidth: contentWidth - 8 });
+          y += 8;
+        }
+      }
+
+      setExportProgress(90);
+
+      // ===== PAGE 9: METHODOLOGY =====
+      if (includeMethodology) {
+        doc.addPage();
+        y = margin;
+
+        sectionHeader('Methodology');
+
+        doc.setFontSize(9);
+        doc.setFont('helvetica', 'normal');
+        doc.setTextColor(...CHARCOAL);
+
+        const methodText = `This analysis evaluates web content across 50 individual checks organized into 5 categories. Each category contributes a weighted percentage to the overall score:`;
+        const methodLines = doc.splitTextToSize(methodText, contentWidth);
+        doc.text(methodLines, margin, y);
+        y += methodLines.length * 4 + 6;
+
+        // Weights table
+        doc.autoTable({
+          startY: y,
+          head: [['Category', 'Weight', 'Checks']],
+          body: [
+            ['Content Structure', '20%', 'CS-01 to CS-10'],
+            ['Content Clarity', '25%', 'CC-01 to CC-10'],
+            ['Technical Accessibility', '20%', 'TA-01 to TA-10.5'],
+            ['Metadata & Schema', '15%', 'MS-01 to MS-10'],
+            ['AI-Specific Signals', '20%', 'AS-01 to AS-10']
+          ],
+          margin: { left: margin, right: margin },
+          headStyles: { fillColor: TEAL, textColor: [255, 255, 255], fontStyle: 'bold', fontSize: 9 },
+          bodyStyles: { fontSize: 9 }
+        });
+        y = doc.lastAutoTable.finalY + 10;
+
+        // AI disclaimer
+        checkPage(25);
+        doc.setFillColor(255, 251, 235); // amber-50
+        doc.roundedRect(margin, y, contentWidth, 20, 3, 3, 'F');
+        doc.setFontSize(8);
+        doc.setFont('helvetica', 'bold');
+        doc.setTextColor(...CHARCOAL);
+        doc.text('AI Analysis Disclaimer', margin + 4, y + 6);
+        doc.setFont('helvetica', 'normal');
+        doc.setFontSize(7);
+        const disclaimerText = 'AI-powered assessments (marked with "AI Suggested") are generated using Claude AI. These recommendations supplement rule-based analysis and should be reviewed by a human expert. LLM previews show how AI models interpret content when provided to them and do not simulate actual web crawling behavior.';
+        const disclaimerLines = doc.splitTextToSize(disclaimerText, contentWidth - 8);
+        doc.text(disclaimerLines, margin + 4, y + 11);
+        y += 25;
+
+        // Engine version
+        keyValue('Scoring Engine', `v${analysis.scoringVersion || '1.0.0'}`);
+        keyValue('Prompt Version', `v${analysis.promptVersion || '1.0.0'}`);
+        keyValue('LLM Models', 'Claude claude-sonnet-4-5-20250929, GPT gpt-4o, Gemini gemini-2.0-flash');
+      }
+
+      // ===== ADD PAGE NUMBERS & FOOTER =====
+      const pageCount = doc.internal.getNumberOfPages();
+      for (let i = 1; i <= pageCount; i++) {
+        doc.setPage(i);
+        doc.setFontSize(7);
+        doc.setTextColor(...LIGHT_GRAY);
+        doc.text(`Page ${i} of ${pageCount}`, pageWidth / 2, pageHeight - 8, { align: 'center' });
+        doc.text(
+          `Generated by Content Strategy Portal — ${format(new Date(), 'yyyy-MM-dd HH:mm')}`,
+          pageWidth / 2,
+          pageHeight - 4,
+          { align: 'center' }
+        );
+      }
+
+      setExportProgress(100);
+
+      // Generate filename and download
+      const slug = urlToSlug(analysis.sourceUrl);
+      const timestamp = format(new Date(), 'yyyy-MM-dd-HHmm');
+      const filename = `readability-${slug}-${timestamp}.pdf`;
+
+      doc.save(filename);
+      toast.success('PDF report downloaded');
+
+      return filename;
+    } catch (err) {
+      console.error('PDF export error:', err);
+      toast.error('Failed to generate PDF report');
+      throw err;
+    } finally {
+      setIsExporting(false);
+      setExportProgress(0);
+    }
+  }, []);
+
+  /**
+   * Export as JSON
+   * BRD: US-2.6.2 — complete analysis data as JSON
+   */
+  const exportJSON = useCallback((analysis) => {
+    if (!analysis) {
+      toast.error('No analysis data to export');
+      return;
+    }
+
+    try {
+      const exportData = {
+        exportVersion: '1.0.0',
+        exportedAt: new Date().toISOString(),
+        tool: 'AI Readability Checker',
+        toolVersion: analysis.scoringVersion || '1.0.0',
+
+        input: {
+          method: analysis.inputMethod,
+          url: analysis.sourceUrl || null,
+          filename: analysis.filename || null,
+          analyzedAt: analysis.analyzedAt || analysis.createdAt
+        },
+
+        pageMetadata: {
+          title: analysis.pageTitle,
+          description: analysis.pageDescription,
+          language: analysis.language,
+          wordCount: analysis.wordCount
+        },
+
+        scoring: {
+          overallScore: analysis.overallScore,
+          grade: analysis.grade,
+          categoryScores: analysis.categoryScores,
+          issueSummary: analysis.issueSummary
+        },
+
+        checkResults: analysis.checkResults,
+
+        llmExtractions: analysis.llmExtractions || {},
+
+        recommendations: analysis.recommendations || [],
+
+        aiAnalysis: analysis.aiAssessment || null,
+
+        trend: {
+          previousAnalysisId: analysis.previousAnalysisId || null,
+          scoreDelta: analysis.scoreDelta || null
+        }
+      };
+
+      const jsonString = JSON.stringify(exportData, null, 2);
+      const blob = new Blob([jsonString], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+
+      const slug = urlToSlug(analysis.sourceUrl);
+      const timestamp = format(new Date(), 'yyyy-MM-dd-HHmm');
+      const filename = `readability-${slug}-${timestamp}.json`;
+
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = filename;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+
+      toast.success('JSON export downloaded');
+      return filename;
+    } catch (err) {
+      console.error('JSON export error:', err);
+      toast.error('Failed to export JSON');
+      throw err;
+    }
+  }, []);
+
+  /**
+   * Get preview data for PDF preview modal
+   * BRD: E-UX-04 — paginated preview of layout
+   */
+  const getPreviewData = useCallback((analysis, options = {}) => {
+    if (!analysis) return null;
+
+    const {
+      includeLLMSummary = true,
+      includeGEOBrief = true,
+      includeMethodology = true,
+      includeCodeSnippets = true
+    } = options;
+
+    const pages = [
+      { number: 1, title: 'Cover Page', description: 'Report title, score, and grade' },
+      { number: 2, title: 'Executive Summary', description: 'Key findings and category scores' },
+      { number: 3, title: 'Category Breakdown (1/2)', description: 'Content Structure, Content Clarity, Technical Access' },
+      { number: 4, title: 'Category Breakdown (2/2)', description: 'Metadata & Schema, AI-Specific Signals' }
+    ];
+
+    let pageNum = 5;
+
+    if (includeLLMSummary) {
+      pages.push({ number: pageNum++, title: 'LLM Rendering Summary', description: 'How AI models see your content' });
+    }
+
+    pages.push({ number: pageNum++, title: 'Recommendations (1/2)', description: 'Quick wins and structural improvements' });
+    pages.push({ number: pageNum++, title: 'Recommendations (2/2)', description: 'Content and technical fixes' });
+
+    if (includeGEOBrief) {
+      pages.push({ number: pageNum++, title: 'GEO Strategic Brief', description: 'Citation likelihood and AI crawler access' });
+    }
+
+    if (includeMethodology) {
+      pages.push({ number: pageNum++, title: 'Methodology', description: 'Scoring weights, check descriptions, disclaimer' });
+    }
+
+    return {
+      pages,
+      totalPages: pages.length,
+      estimatedSize: `~${pages.length} pages`
+    };
+  }, []);
+
+  return {
+    exportPDF,
+    exportJSON,
+    getPreviewData,
+    isExporting,
+    exportProgress
+  };
+}
+
+export default useReadabilityExport;

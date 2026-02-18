@@ -18,7 +18,8 @@ export const ROLE_PERMISSIONS = {
     canViewAllProjects: true,
     canExport: true,
     canManageTeam: true,
-    canViewInternal: true
+    canViewInternal: true,
+    canRunReadabilityCheck: true
   },
   [USER_ROLES.PROJECT_MANAGER]: {
     canCreateProjects: true,
@@ -29,7 +30,8 @@ export const ROLE_PERMISSIONS = {
     canViewAllProjects: true,
     canExport: true,
     canManageTeam: true,
-    canViewInternal: true
+    canViewInternal: true,
+    canRunReadabilityCheck: true
   },
   [USER_ROLES.SEO_SPECIALIST]: {
     canCreateProjects: false,
@@ -40,7 +42,8 @@ export const ROLE_PERMISSIONS = {
     canViewAllProjects: false,
     canExport: true,
     canManageTeam: false,
-    canViewInternal: true
+    canViewInternal: true,
+    canRunReadabilityCheck: true
   },
   [USER_ROLES.DEVELOPER]: {
     canCreateProjects: false,
@@ -51,7 +54,8 @@ export const ROLE_PERMISSIONS = {
     canViewAllProjects: false,
     canExport: true,
     canManageTeam: false,
-    canViewInternal: true
+    canViewInternal: true,
+    canRunReadabilityCheck: true
   },
   [USER_ROLES.CONTENT_WRITER]: {
     canCreateProjects: false,
@@ -62,7 +66,8 @@ export const ROLE_PERMISSIONS = {
     canViewAllProjects: false,
     canExport: true,
     canManageTeam: false,
-    canViewInternal: true
+    canViewInternal: true,
+    canRunReadabilityCheck: true
   },
   [USER_ROLES.CLIENT]: {
     canCreateProjects: false,
@@ -73,7 +78,8 @@ export const ROLE_PERMISSIONS = {
     canViewAllProjects: false,
     canExport: false,
     canManageTeam: false,
-    canViewInternal: false
+    canViewInternal: false,
+    canRunReadabilityCheck: false
   }
 };
 

@@ -67,6 +67,10 @@ const MetaGeneratorPage = lazyWithRetry(() => import('./components/meta-generato
 // Structured Data Generator - lazy load
 const SchemaGeneratorPage = lazyWithRetry(() => import('./components/schema-generator/SchemaGeneratorPage'), 'SchemaGeneratorPage');
 
+// AI Readability Checker - lazy load
+const ReadabilityPage = lazyWithRetry(() => import('./components/readability/ReadabilityPage'), 'ReadabilityPage');
+const ReadabilityShareView = lazyWithRetry(() => import('./components/readability/ReadabilityShareView'), 'ReadabilityShareView');
+
 // User Settings - lazy load
 const UserSettingsPage = lazyWithRetry(() => import('./components/settings/UserSettingsPage'), 'UserSettingsPage');
 
@@ -339,6 +343,39 @@ function AppContent() {
                   />
 
                   {/* ============================================ */}
+                  {/* AI READABILITY CHECKER ROUTES               */}
+                  {/* ============================================ */}
+                  <Route
+                    path="/app/readability"
+                    element={
+                      <ProtectedRoute>
+                        <ToolErrorBoundary toolName="AI Readability Checker" toolColor="teal">
+                          <ReadabilityPage />
+                        </ToolErrorBoundary>
+                      </ProtectedRoute>
+                    }
+                  />
+                  <Route
+                    path="/app/readability/:analysisId"
+                    element={
+                      <ProtectedRoute>
+                        <ToolErrorBoundary toolName="AI Readability Checker" toolColor="teal">
+                          <ReadabilityPage />
+                        </ToolErrorBoundary>
+                      </ProtectedRoute>
+                    }
+                  />
+                  {/* Shared readability view - public access */}
+                  <Route
+                    path="/shared/readability/:shareToken"
+                    element={
+                      <ToolErrorBoundary toolName="Shared Readability Report" toolColor="teal">
+                        <ReadabilityShareView />
+                      </ToolErrorBoundary>
+                    }
+                  />
+
+                  {/* ============================================ */}
                   {/* SHARED APP ROUTES                           */}
                   {/* ============================================ */}
                   <Route
@@ -434,6 +471,7 @@ function AppContent() {
                   <Route path="/image-alt" element={<Navigate to="/app/image-alt" replace />} />
                   <Route path="/meta-generator" element={<Navigate to="/app/meta-generator" replace />} />
                   <Route path="/schema-generator" element={<Navigate to="/app/schema-generator" replace />} />
+                  <Route path="/readability" element={<Navigate to="/app/readability" replace />} />
 
                   {/* 404 Route */}
                   <Route path="*" element={<PublicNotFoundPage />} />

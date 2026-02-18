@@ -1,0 +1,28 @@
+{
+  "title": "Complete Guide to Content Optimization for AI Search Engines",
+  "description": "Learn how to optimize your content for AI search engines with our comprehensive guide covering structured data, readability, and technical SEO best practices.",
+  "primaryTopic": "AI content optimization and search engine readability",
+  "mainContent": "Content optimization for AI search engines is a growing field. Modern AI models extract information from web pages to answer user questions. This guide covers the key strategies you need to know.\n\nGood content structure helps AI models understand your page. Clear headings, short paragraphs, and semantic HTML all contribute to better AI readability scores.\n\nYour content structure is the foundation of AI readability. A well-organized page helps both human readers and AI models find information quickly.\n\nUse a single H1 tag for your main title. Follow it with H2 tags for major sections. Use H3 tags for subsections within each H2. Never skip heading levels.\n\nUse semantic elements like article, section, nav, and aside. These elements help AI models understand the purpose of each content block.",
+  "entities": [
+    "AI search engines",
+    "content optimization",
+    "structured data",
+    "readability",
+    "technical SEO",
+    "semantic HTML",
+    "JSON-LD",
+    "heading hierarchy"
+  ],
+  "usefulnessScore": 9,
+  "usefulnessExplanation": "The content is well-structured, informative, and covers the topic comprehensively with clear actionable advice.",
+  "unprocessableContent": [],
+  "contentCoverage": 92,
+  "headingsCoverage": 100,
+  "entitiesCoverage": 88,
+  "processingTime": 3200,
+  "coverage": {
+    "content": 92,
+    "headings": 100,
+    "entities": 88
+  }
+}

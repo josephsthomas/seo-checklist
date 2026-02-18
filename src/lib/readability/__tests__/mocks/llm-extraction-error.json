@@ -1,0 +1,5 @@
+{
+  "error": "API rate limit exceeded. Please try again in 60 seconds.",
+  "code": "RATE_LIMIT",
+  "retryAfter": 60
+}
