@@ -197,6 +197,27 @@ service cloud.firestore {
       allow write: if isAuthenticated();
     }
 
+    // Readability analyses - users can manage their own analyses
+    match /readability-analyses/{analysisId} {
+      allow read: if isAuthenticated() &&
+                    resource.data.userId == request.auth.uid;
+      allow create: if isAuthenticated() &&
+                     request.resource.data.userId == request.auth.uid;
+      allow update, delete: if isAuthenticated() &&
+                              resource.data.userId == request.auth.uid;
+    }
+
+    // Shared readability analyses - public read access for shared links
+    match /readability-analyses/{analysisId} {
+      allow read: if resource.data.isShared == true &&
+                    resource.data.shareExpiry > request.time;
+    }
+
+    // Readability settings - users can manage their own settings
+    match /readability-settings/{userId} {
+      allow read, write: if isOwner(userId);
+    }
+
     // Default deny all other access
     match /{document=**} {
       allow read, write: if false;

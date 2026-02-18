@@ -23,7 +23,8 @@ import {
   Command,
   ArrowRight,
   User,
-  X
+  X,
+  ScanEye
 } from 'lucide-react';
 import { useTheme } from '../../contexts/ThemeContext';
 import { useProjects } from '../../hooks/useProjects';
@@ -62,6 +63,7 @@ export default function CommandPalette({ isOpen, onClose }) {
       { id: 'image-alt', category: COMMAND_CATEGORIES.TOOLS, icon: Image, label: 'Image Alt Generator', keywords: ['alt text', 'images'], action: () => navigate('/app/image-alt') },
       { id: 'meta', category: COMMAND_CATEGORIES.TOOLS, icon: Tags, label: 'Meta Generator', keywords: ['title', 'description'], action: () => navigate('/app/meta-generator') },
       { id: 'schema', category: COMMAND_CATEGORIES.TOOLS, icon: Code2, label: 'Schema Generator', keywords: ['structured data', 'json-ld'], action: () => navigate('/app/schema-generator') },
+      { id: 'readability', category: COMMAND_CATEGORIES.TOOLS, icon: ScanEye, label: 'AI Readability Checker', keywords: ['readability', 'ai', 'llm', 'seo', 'geo'], action: () => navigate('/app/readability') },
 
       // Quick Actions
       { id: 'new-project', category: COMMAND_CATEGORIES.ACTIONS, icon: Plus, label: 'Create New Project', action: () => navigate('/app/planner/new') },

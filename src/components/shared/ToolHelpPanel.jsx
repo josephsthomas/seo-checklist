@@ -191,6 +191,33 @@ const TOOL_HELP = {
       { title: 'Schema.org Types', url: 'https://schema.org/docs/full.html', type: 'external' },
       { title: 'Rich Results Guide', url: '/help/resources?topic=structured-data', type: 'doc' }
     ]
+  },
+  readability: {
+    title: 'AI Readability Checker',
+    subtitle: 'AI search readability analyzer',
+    tips: [
+      {
+        title: 'Analyze by URL',
+        description: 'Enter any public URL to analyze how AI models read and interpret your content.'
+      },
+      {
+        title: 'Upload Screaming Frog HTML',
+        description: 'Upload rendered HTML exports from Screaming Frog for JavaScript-heavy pages.'
+      },
+      {
+        title: 'Export PDF Reports',
+        description: 'Generate professional PDF reports with scores, recommendations, and LLM analysis.'
+      }
+    ],
+    shortcuts: [
+      { key: 'Enter', action: 'Start analysis' },
+      { key: 'e', action: 'Export report' },
+      { key: 's', action: 'Share results' }
+    ],
+    resources: [
+      { title: 'Understanding AI Readability', url: '/help/resources?topic=ai-readability', type: 'doc' },
+      { title: 'GEO Optimization Guide', url: '/help/resources?topic=geo-guide', type: 'doc' }
+    ]
   }
 };
 
@@ -202,6 +229,7 @@ function getToolIdFromPath(pathname) {
   if (pathname.startsWith('/image-alt')) return 'image-alt';
   if (pathname.startsWith('/meta-generator')) return 'meta-generator';
   if (pathname.startsWith('/schema-generator')) return 'schema-generator';
+  if (pathname.startsWith('/readability')) return 'readability';
   return null;
 }
 

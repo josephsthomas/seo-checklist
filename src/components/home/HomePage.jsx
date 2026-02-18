@@ -25,7 +25,8 @@ import {
   Zap,
   Settings,
   Star,
-  Download
+  Download,
+  ScanEye
 } from 'lucide-react';
 import { format } from 'date-fns';
 
@@ -243,6 +244,16 @@ export default function HomePage() {
                   <Code2 className="w-5 h-5 text-white" />
                 </div>
                 <span className="text-sm font-medium text-charcoal-700 group-hover:text-rose-700 text-center">Schema</span>
+              </Link>
+
+              <Link
+                to="/app/readability"
+                className="group flex flex-col items-center p-4 rounded-xl bg-white/80 backdrop-blur border border-charcoal-100 hover:border-teal-300 hover:bg-teal-50/50 transition-all duration-200 hover:shadow-lg hover:shadow-teal-500/10"
+              >
+                <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-teal-500 to-teal-600 flex items-center justify-center mb-2 group-hover:scale-110 transition-transform shadow-md" aria-hidden="true">
+                  <ScanEye className="w-5 h-5 text-white" />
+                </div>
+                <span className="text-sm font-medium text-charcoal-700 group-hover:text-teal-700 text-center">Readability</span>
               </Link>
 
               <Link

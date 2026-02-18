@@ -13,7 +13,8 @@ import {
   Accessibility,
   Image,
   Tags,
-  Code2
+  Code2,
+  ScanEye
 } from 'lucide-react';
 
 /**
@@ -35,7 +36,8 @@ export const TOOL_COLORS = {
   PURPLE: 'purple',
   EMERALD: 'emerald',
   AMBER: 'amber',
-  ROSE: 'rose'
+  ROSE: 'rose',
+  TEAL: 'teal'
 };
 
 /**
@@ -181,6 +183,29 @@ export const tools = [
     order: 6
   },
   {
+    id: 'readability',
+    name: 'AI Readability Checker',
+    shortName: 'Readability',
+    description: 'Analyze how AI models read and interpret your content. Get actionable recommendations to improve visibility in AI-generated answers.',
+    icon: ScanEye,
+    path: '/app/readability',
+    color: TOOL_COLORS.TEAL,
+    status: TOOL_STATUS.ACTIVE,
+    badge: 'New',
+    features: [
+      'AI readability scoring',
+      'How AI sees your content',
+      'Actionable recommendations',
+      'URL and HTML analysis'
+    ],
+    statsConfig: [
+      { key: 'analysisCount', label: 'Analyzed' },
+      { key: 'avgScore', label: 'Avg Score' }
+    ],
+    permissions: ['canRunReadabilityCheck'],
+    order: 7
+  },
+  {
     id: 'analytics',
     name: 'Analytics Dashboard',
     shortName: 'Analytics',
@@ -198,7 +223,7 @@ export const tools = [
     ],
     statsConfig: [],
     permissions: ['canViewAnalytics'],
-    order: 7
+    order: 8
   },
   {
     id: 'content',
@@ -218,7 +243,7 @@ export const tools = [
     ],
     statsConfig: [],
     permissions: ['canOptimizeContent'],
-    order: 8
+    order: 9
   }
 ];
 
