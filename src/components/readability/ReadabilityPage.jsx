@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useMemo } from 'react';
+import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
 import { ScanEye, ArrowLeft, AlertCircle } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
@@ -39,6 +39,9 @@ export default function ReadabilityPage() {
   const [loadedResult, setLoadedResult] = useState(null);
   const [loadError, setLoadError] = useState(null);
 
+  // ARIA live region for screen reader announcements
+  const [liveMessage, setLiveMessage] = useState('');
+
   // Pre-filled URL from cross-tool deep linking (US-2.7.1)
   const prefillUrl = searchParams.get('url') || '';
 
@@ -74,19 +77,21 @@ export default function ReadabilityPage() {
     }
   }, [analysisId]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  // Watch analysis state changes
+  // Watch analysis state changes and announce to screen readers
   useEffect(() => {
     if (analysis.isAnalyzing) {
       setView('processing');
+      setLiveMessage('Analysis in progress. Please wait.');
     } else if (analysis.isComplete && analysis.result) {
       setView('results');
       setLoadedResult(analysis.result);
+      setLiveMessage(`Analysis complete. Score: ${analysis.result.overallScore} out of 100, Grade: ${analysis.result.grade}.`);
       // Update URL to include analysis ID
       if (analysis.result.id) {
         navigate(`/app/readability/${analysis.result.id}`, { replace: true });
       }
     } else if (analysis.isError) {
-      // Stay on current view but show error
+      setLiveMessage(`Error: ${analysis.error || 'An error occurred during analysis.'}`);
     }
   }, [analysis.state, analysis.result]); // eslint-disable-line react-hooks/exhaustive-deps
 
@@ -192,6 +197,11 @@ export default function ReadabilityPage() {
             </div>
           </div>
         </div>
+      </div>
+
+      {/* ARIA live region for screen reader announcements */}
+      <div aria-live="polite" aria-atomic="true" className="sr-only">
+        {liveMessage}
       </div>
 
       {/* Main Content */}
