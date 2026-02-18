@@ -43,7 +43,8 @@ const ORG_LEVEL_ROLES = ['admin', 'project_manager'];
  * BRD References: US-2.5.1, US-2.5.2, FR-5.1, FR-5.2
  */
 export function useReadabilityHistory() {
-  const { currentUser, userRole } = useAuth();
+  const { currentUser, userProfile } = useAuth();
+  const userRole = userProfile?.role || 'content_writer';
   const [history, setHistory] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);

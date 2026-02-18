@@ -213,7 +213,8 @@ async function findPreviousAnalysis(userId, sourceUrl) {
  * BRD References: US-2.1.1, US-2.1.2, US-2.1.3, FR-2.1, FR-2.2, FR-2.3, FR-3.1
  */
 export function useReadabilityAnalysis() {
-  const { currentUser, userRole } = useAuth();
+  const { currentUser, userProfile } = useAuth();
+  const userRole = userProfile?.role || 'content_writer';
   const [state, setState] = useState(STATES.IDLE);
   const [progress, setProgress] = useState({
     stage: null,
