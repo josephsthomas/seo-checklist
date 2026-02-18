@@ -1,0 +1,13 @@
+{
+  "error": {
+    "type": "rate_limit_error",
+    "message": "Rate limit exceeded. You have made too many requests in a short period. Please retry after the specified time.",
+    "code": "RATE_LIMIT",
+    "statusCode": 429,
+    "retryAfter": 60
+  },
+  "provider": "claude",
+  "model": "claude-sonnet-4-5-20250929",
+  "requestId": "req_mock_429_001",
+  "timestamp": "2025-01-15T10:30:00.000Z"
+}

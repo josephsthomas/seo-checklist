@@ -1,0 +1,13 @@
+{
+  "error": {
+    "type": "server_error",
+    "message": "An internal server error occurred while processing your request. The service may be temporarily unavailable.",
+    "code": "INTERNAL_ERROR",
+    "statusCode": 500,
+    "retryAfter": null
+  },
+  "provider": "openai",
+  "model": "gpt-4o",
+  "requestId": "req_mock_500_001",
+  "timestamp": "2025-01-15T10:30:00.000Z"
+}
