@@ -74,6 +74,18 @@ export default function ReadabilityDashboard({
     return `This page scored ${analysis?.overallScore || 0}/100 for AI readability.`;
   }, [analysis]);
 
+  // E-025: Plain-English executive summary for non-technical users
+  const executiveSummary = useMemo(() => {
+    const score = analysis?.overallScore || 0;
+    const issues = analysis?.issueSummary || {};
+    const criticalCount = (issues.critical || 0) + (issues.high || 0);
+    if (score >= 90) return 'This content is well-optimized for AI search engines and likely to be cited in AI-generated answers.';
+    if (score >= 80) return `Good performance with ${criticalCount} issue${criticalCount !== 1 ? 's' : ''} that could further improve AI visibility.`;
+    if (score >= 70) return `Room for improvement \u2014 addressing ${criticalCount} key issue${criticalCount !== 1 ? 's' : ''} could significantly boost AI search performance.`;
+    if (score >= 60) return 'Needs attention \u2014 AI models may struggle to cite this content effectively. Focus on the top recommendations.';
+    return 'Significant gaps for AI readability. Major improvements needed for AI search visibility.';
+  }, [analysis]);
+
   // Tab keyboard navigation
   const handleTabKeyDown = useCallback((e) => {
     const tabIds = TABS.map(t => t.id);
@@ -269,6 +281,12 @@ export default function ReadabilityDashboard({
         <p className="text-sm text-teal-800 dark:text-teal-200 leading-relaxed">
           {aiSummary}
         </p>
+        {/* E-025: Executive summary for non-technical stakeholders */}
+        {executiveSummary !== aiSummary && (
+          <p className="text-xs text-teal-700 dark:text-teal-300 mt-2 pt-2 border-t border-teal-200 dark:border-teal-800">
+            {executiveSummary}
+          </p>
+        )}
       </div>
 
       {/* Category Breakdown Chart */}
