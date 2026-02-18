@@ -5,6 +5,9 @@
 
 const PRIORITY_ORDER = { critical: 0, high: 1, medium: 2, low: 3 };
 
+/** Numeric estimated impact in score points */
+const IMPACT_POINTS = { high: 15, medium: 10, low: 5 };
+
 const CHECK_RECOMMENDATIONS = {
   'CS-01': { group: 'structural', audience: 'development', effort: 'quick', estimatedImpact: 'high', codeSnippet: { before: '<h1>First Title</h1>\n<h1>Second Title</h1>', after: '<h1>Main Page Title</h1>\n<h2>Section Title</h2>' } },
   'CS-02': { group: 'structural', audience: 'development', effort: 'quick', estimatedImpact: 'high', codeSnippet: { before: '<h1>Title</h1>\n<h3>Subsection</h3>', after: '<h1>Title</h1>\n<h2>Section</h2>\n<h3>Subsection</h3>' } },
@@ -75,6 +78,7 @@ export function generateRecommendations(scoringResults, aiAssessment = null) {
         priority: rec.priority || 'medium',
         effort: rec.effort || 'moderate',
         estimatedImpact: rec.estimatedImpact || 'medium',
+        estimatedImpactPoints: IMPACT_POINTS[rec.estimatedImpact] || IMPACT_POINTS.medium,
         group: 'content',
         audience: 'content',
         source: 'ai',
@@ -107,6 +111,7 @@ function generateRuleBasedRecommendations(allChecks) {
         priority: check.status === 'fail' ? (check.severity === 'critical' ? 'critical' : check.severity) : 'low',
         effort: meta.effort || 'moderate',
         estimatedImpact: meta.estimatedImpact || 'medium',
+        estimatedImpactPoints: IMPACT_POINTS[meta.estimatedImpact] || IMPACT_POINTS.medium,
         group: isQuickWin ? 'quick-wins' : (meta.group || 'content'),
         audience: meta.audience || 'content',
         source: 'rule',

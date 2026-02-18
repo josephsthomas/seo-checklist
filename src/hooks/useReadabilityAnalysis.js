@@ -11,7 +11,8 @@ import {
   serverTimestamp,
   limit as firestoreLimit
 } from 'firebase/firestore';
-import { db } from '../lib/firebase';
+import { ref, uploadBytes } from 'firebase/storage';
+import { db, storage } from '../lib/firebase';
 import { useAuth } from '../contexts/AuthContext';
 import { validateReadabilityUrl } from '../lib/readability/utils/urlValidation';
 import { runFullAnalysis, truncateForFirestore, estimateDocumentSize } from '../lib/readability/aggregator';
@@ -353,6 +354,18 @@ export function useReadabilityAnalysis() {
 
       // Save to Firestore
       const docRef = await addDoc(collection(db, 'readability-analyses'), firestoreDoc);
+
+      // Store HTML snapshot in Firebase Storage (Task 35)
+      try {
+        if (htmlContent && storage) {
+          const htmlBlob = new Blob([htmlContent], { type: 'text/html' });
+          const storageRef = ref(storage, `readability-snapshots/${currentUser.uid}/${docRef.id}.html`);
+          await uploadBytes(storageRef, htmlBlob);
+        }
+      } catch (storageErr) {
+        console.warn('Could not store HTML snapshot:', storageErr);
+        // Non-fatal: continue without snapshot
+      }
 
       const savedResult = {
         id: docRef.id,

@@ -704,10 +704,26 @@ export function useReadabilityExport() {
     }
 
     try {
+      // Build category scores with grade and weight per spec
+      const enrichedCategoryScores = {};
+      if (analysis.categoryScores) {
+        for (const [catId, catData] of Object.entries(analysis.categoryScores)) {
+          const catScore = typeof catData === 'number' ? catData : catData?.score ?? 0;
+          const catGrade = getGrade(catScore);
+          enrichedCategoryScores[catId] = {
+            score: catScore,
+            grade: catGrade.grade,
+            weight: CATEGORY_WEIGHTS[catId] || null,
+            label: CATEGORY_LABELS[catId] || catId,
+            ...(typeof catData === 'object' ? catData : {})
+          };
+        }
+      }
+
       const exportData = {
-        exportVersion: '1.0.0',
+        exportVersion: '1.0',
         exportedAt: new Date().toISOString(),
-        tool: 'AI Readability Checker',
+        tool: 'ai-readability-checker',
         toolVersion: analysis.scoringVersion || '1.0.0',
 
         input: {
@@ -721,13 +737,18 @@ export function useReadabilityExport() {
           title: analysis.pageTitle,
           description: analysis.pageDescription,
           language: analysis.language,
-          wordCount: analysis.wordCount
+          wordCount: analysis.wordCount,
+          canonicalUrl: analysis.canonicalUrl || null,
+          httpStatus: analysis.httpStatus || null,
+          contentLength: analysis.contentLength || null,
+          lastModified: analysis.lastModified || null,
+          robotsDirectives: analysis.robotsDirectives || null
         },
 
         scoring: {
           overallScore: analysis.overallScore,
           grade: analysis.grade,
-          categoryScores: analysis.categoryScores,
+          categoryScores: enrichedCategoryScores,
           issueSummary: analysis.issueSummary
         },
 

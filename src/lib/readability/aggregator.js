@@ -33,7 +33,7 @@ export async function runFullAnalysis(htmlContent, options = {}) {
       console.error('AI analysis failed:', err);
       return { available: false, fallback: true, fallbackReason: err.message };
     }),
-    extractWithAllLLMs(extracted, { signal, authToken }).catch(err => {
+    extractWithAllLLMs(extracted, { signal, authToken, sourceUrl }).catch(err => {
       console.error('LLM extraction failed:', err);
       return {};
     })
@@ -61,6 +61,10 @@ export async function runFullAnalysis(htmlContent, options = {}) {
     sourceUrl: sourceUrl || null,
     inputMethod,
     filename: filename || null,
+    organizationId: options.organizationId || null,
+    projectId: options.projectId || null,
+    clientName: options.clientName || null,
+    tags: options.tags || [],
     analyzedAt: now,
     createdAt: now,
 

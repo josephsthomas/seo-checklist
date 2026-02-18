@@ -16,7 +16,8 @@ function getApiConfig() {
   return null;
 }
 
-const EXTRACTION_PROMPT = `You are analyzing a web page. Extract the following information and respond in JSON format only:
+function buildExtractionPrompt(sourceUrl) {
+  return `You are analyzing a web page${sourceUrl ? ` at URL: ${sourceUrl}` : ''}. Extract the following information and respond in JSON format only:
 
 {
   "extractedTitle": "The page title as you understand it",
@@ -26,11 +27,12 @@ const EXTRACTION_PROMPT = `You are analyzing a web page. Extract the following i
   "mainContent": "The main content of the page in markdown format (max 2000 words)",
   "entities": [{"name": "entity name", "type": "person|org|product|concept"}],
   "unprocessableContent": [{"description": "what couldn't be processed", "reason": "why"}],
-  "usefulnessAssessment": {"score": 75, "explanation": "How useful this page would be for answering user questions"}
+  "usefulnessAssessment": {"score": 7, "explanation": "How useful this page would be for answering user questions (1-10 scale, 10 = most useful)"}
 }
 
 PAGE CONTENT:
 `;
+}
 
 /**
  * Extract content via all supported LLMs in parallel
@@ -40,7 +42,7 @@ PAGE CONTENT:
  */
 export async function extractWithAllLLMs(extractedContent, options = {}) {
   const truncatedContent = truncateAtSentenceBoundary(extractedContent.textContent, 50000);
-  const prompt = EXTRACTION_PROMPT + truncatedContent;
+  const prompt = buildExtractionPrompt(options.sourceUrl) + truncatedContent;
   const config = getApiConfig();
   const authToken = options.authToken || null;
 
@@ -193,6 +195,7 @@ function parseExtractionResponse(llm, model, content, startTime) {
       model,
       success: true,
       error: null,
+      rawResponse: content,
       extractedTitle: parsed.extractedTitle || '',
       extractedDescription: parsed.extractedDescription || '',
       primaryTopic: parsed.primaryTopic || '',
@@ -201,7 +204,7 @@ function parseExtractionResponse(llm, model, content, startTime) {
       entities: (parsed.entities || []).slice(0, 50),
       unprocessableContent: parsed.unprocessableContent || [],
       usefulnessAssessment: {
-        score: Math.max(0, Math.min(100, parsed.usefulnessAssessment?.score || 50)),
+        score: Math.max(1, Math.min(10, parsed.usefulnessAssessment?.score || 5)),
         explanation: parsed.usefulnessAssessment?.explanation || ''
       },
       processingTimeMs
