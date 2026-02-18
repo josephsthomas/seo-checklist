@@ -12,6 +12,7 @@ import {
   Tags,
   Code2,
   ClipboardList,
+  ScanEye,
   ArrowLeft,
   Clock,
   Trash2,
@@ -32,7 +33,8 @@ const ICONS = {
   Image,
   Tags,
   Code2,
-  ClipboardList
+  ClipboardList,
+  ScanEye
 };
 
 // Format icons
@@ -52,7 +54,8 @@ const COLOR_CLASSES = {
   purple: 'from-purple-500 to-purple-600',
   emerald: 'from-emerald-500 to-emerald-600',
   amber: 'from-amber-500 to-amber-600',
-  rose: 'from-rose-500 to-rose-600'
+  rose: 'from-rose-500 to-rose-600',
+  teal: 'from-teal-500 to-teal-600'
 };
 
 /**

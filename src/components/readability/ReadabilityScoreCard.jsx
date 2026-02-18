@@ -1,7 +1,32 @@
-import { useState, useEffect, useRef, useMemo } from 'react';
-import { Award, TrendingUp, Quote } from 'lucide-react';
+import { useState, useEffect, useRef, useMemo, useCallback } from 'react';
+import { Award, TrendingUp, Quote, Copy, Check } from 'lucide-react';
 import { getGrade, getScoreColor } from '../../lib/readability/utils/gradeMapper';
 import ReadabilityTrendSparkline from './ReadabilityTrendSparkline';
+import toast from 'react-hot-toast';
+
+/**
+ * Copy text to clipboard with fallback
+ * BRD 11 §5: Clipboard Operations
+ */
+async function copyToClipboard(text) {
+  try {
+    if (navigator.clipboard && window.isSecureContext) {
+      await navigator.clipboard.writeText(text);
+    } else {
+      const textarea = document.createElement('textarea');
+      textarea.value = text;
+      textarea.style.position = 'fixed';
+      textarea.style.opacity = '0';
+      document.body.appendChild(textarea);
+      textarea.select();
+      document.execCommand('copy');
+      document.body.removeChild(textarea);
+    }
+    return true;
+  } catch {
+    return false;
+  }
+}
 
 /**
  * Grade color classes for score display
@@ -149,6 +174,7 @@ export default function ReadabilityScoreCard({
   trendData = [],
   scoreDelta
 }) {
+  const [scoreCopied, setScoreCopied] = useState(false);
   const gradeInfo = useMemo(() => getGrade(score), [score]);
   const colors = useMemo(() => getGradeClasses(score), [score]);
 
@@ -160,6 +186,19 @@ export default function ReadabilityScoreCard({
     return { icon: '→', label: 'Stable from last analysis', color: 'text-charcoal-400 dark:text-charcoal-500' };
   }, [scoreDelta]);
 
+  // Copy score to clipboard (BRD 11 §5.1)
+  const handleCopyScore = useCallback(async () => {
+    const text = `AI Readability Score: ${score}/100 (${gradeInfo.grade})`;
+    const success = await copyToClipboard(text);
+    if (success) {
+      setScoreCopied(true);
+      toast.success('Score copied');
+      setTimeout(() => setScoreCopied(false), 2000);
+    } else {
+      toast.error('Failed to copy score');
+    }
+  }, [score, gradeInfo.grade]);
+
   return (
     <div
       className="bg-white dark:bg-charcoal-800 rounded-xl border border-charcoal-200 dark:border-charcoal-700 p-6"
@@ -167,8 +206,21 @@ export default function ReadabilityScoreCard({
     >
       <div className="flex flex-col sm:flex-row items-center sm:items-start gap-6">
         {/* Score gauge */}
-        <div className="flex-shrink-0">
+        <div className="flex-shrink-0 relative group">
           <ScoreGauge score={score} size={140} />
+          {/* Copy score button */}
+          <button
+            onClick={handleCopyScore}
+            className="absolute -top-1 -right-1 p-1.5 bg-white dark:bg-charcoal-700 border border-charcoal-200 dark:border-charcoal-600 rounded-lg opacity-0 group-hover:opacity-100 focus:opacity-100 transition-opacity shadow-sm hover:bg-charcoal-50 dark:hover:bg-charcoal-600 focus:outline-none focus:ring-2 focus:ring-teal-500"
+            aria-label={scoreCopied ? 'Score copied' : 'Copy score to clipboard'}
+            title="Copy score"
+          >
+            {scoreCopied ? (
+              <Check className="w-3.5 h-3.5 text-emerald-500" aria-hidden="true" />
+            ) : (
+              <Copy className="w-3.5 h-3.5 text-charcoal-400 dark:text-charcoal-500" aria-hidden="true" />
+            )}
+          </button>
         </div>
 
         {/* Score details */}

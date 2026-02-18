@@ -295,6 +295,8 @@ export function useReadabilityAnalysis() {
       const analysisResult = await runFullAnalysis(htmlContent, {
         sourceUrl: options.sourceUrl || null,
         inputMethod: options.inputMethod || 'url',
+        filename: options.filename || null,
+        userId: currentUser.uid,
         signal: controller.signal,
         onProgress: handleProgress
       });

@@ -13,11 +13,11 @@ import { generateRecommendations } from './recommendations.js';
 /**
  * Run full analysis pipeline
  * @param {string} htmlContent - Raw HTML
- * @param {Object} options - { sourceUrl, inputMethod, signal, onProgress }
+ * @param {Object} options - { sourceUrl, inputMethod, signal, onProgress, userId, organizationId, projectId, tags, filename }
  * @returns {Object} Complete analysis document ready for Firestore
  */
 export async function runFullAnalysis(htmlContent, options = {}) {
-  const { sourceUrl, inputMethod = 'url', signal, onProgress } = options;
+  const { sourceUrl, inputMethod = 'url', signal, onProgress, userId, organizationId, projectId, tags, filename } = options;
 
   // Stage 1: Extract content
   onProgress?.({ stage: 'extracting', progress: 15, message: 'Extracting content...' });
@@ -57,11 +57,16 @@ export async function runFullAnalysis(htmlContent, options = {}) {
   const now = new Date().toISOString();
 
   const analysisDocument = {
-    // Core identification
+    // Core identification (BRD 04 §3.1)
     sourceUrl: sourceUrl || null,
     inputMethod,
     analyzedAt: now,
     createdAt: now,
+    filename: filename || null,
+    userId: userId || null,
+    organizationId: organizationId || null,
+    projectId: projectId || null,
+    tags: tags || [],
 
     // Content metadata
     pageTitle: extracted.metadata.title || '',

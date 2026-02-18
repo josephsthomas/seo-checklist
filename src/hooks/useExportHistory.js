@@ -59,6 +59,13 @@ export const EXPORT_TYPES = {
     icon: 'ClipboardList',
     color: 'primary',
     formats: ['pdf', 'xlsx']
+  },
+  READABILITY: {
+    id: 'readability',
+    label: 'AI Readability',
+    icon: 'ScanEye',
+    color: 'teal',
+    formats: ['pdf', 'json']
   }
 };
 

@@ -760,3 +760,84 @@ html {
   clip: auto;
   white-space: normal;
 }
+
+/* ===============================================
+   PRINT STYLES — AI Readability Checker
+   BRD 11 §4: Print Optimization
+   =============================================== */
+@media print {
+  /* Hide non-essential UI elements */
+  nav,
+  footer,
+  .toast,
+  [role="tablist"],
+  button:not(.print-visible),
+  .btn,
+  .btn-ghost,
+  [data-no-print] {
+    display: none !important;
+  }
+
+  /* Show all accordion content expanded */
+  .accordion-content,
+  [role="region"][aria-labelledby] {
+    display: block !important;
+    height: auto !important;
+    overflow: visible !important;
+  }
+
+  /* Ensure charts and SVGs print */
+  canvas {
+    max-width: 100%;
+  }
+
+  svg {
+    max-width: 100%;
+    print-color-adjust: exact;
+    -webkit-print-color-adjust: exact;
+  }
+
+  /* Page break management */
+  .category-section,
+  .recommendation-card {
+    page-break-inside: avoid;
+    break-inside: avoid;
+  }
+
+  /* Print all tab panels (not just active) */
+  [role="tabpanel"] {
+    display: block !important;
+    opacity: 1 !important;
+  }
+
+  /* Preserve colors for print */
+  * {
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  /* Reset dark mode for print */
+  .dark {
+    color-scheme: light;
+    color: #1a1f2e;
+    background-color: white;
+  }
+
+  /* Simplify backgrounds */
+  body,
+  .min-h-screen {
+    background: white !important;
+  }
+
+  /* Ensure text is black for readability */
+  .dark h1, .dark h2, .dark h3, .dark h4, .dark h5, .dark h6,
+  .dark p, .dark span, .dark td, .dark th, .dark li {
+    color: #1a1f2e !important;
+  }
+
+  /* Print page margins */
+  @page {
+    margin: 20mm;
+    size: A4;
+  }
+}

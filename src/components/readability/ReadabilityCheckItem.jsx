@@ -4,7 +4,7 @@
  * BRD: US-2.2.3, check result display
  */
 
-import React, { useState } from 'react';
+import React, { useState, useCallback } from 'react';
 import {
   CheckCircle2,
   AlertTriangle,
@@ -12,7 +12,10 @@ import {
   Info,
   ChevronDown,
   ChevronRight,
+  Copy,
+  Check,
 } from 'lucide-react';
+import toast from 'react-hot-toast';
 
 const STATUS_CONFIG = {
   pass: {
@@ -51,6 +54,33 @@ const SEVERITY_BADGES = {
 
 export default function ReadabilityCheckItem({ check, defaultExpanded = false }) {
   const [expanded, setExpanded] = useState(defaultExpanded);
+  const [copied, setCopied] = useState(false);
+
+  // Copy check result to clipboard (BRD 11 §5.1)
+  const handleCopyCheck = useCallback(async (e) => {
+    e.stopPropagation();
+    const statusLabel = STATUS_CONFIG[check?.status]?.label || 'Unknown';
+    const text = `${check?.id || ''}: ${check?.title || check?.name || 'Unknown Check'} — ${statusLabel}${check?.details ? ` — ${check.details}` : ''}`;
+    try {
+      if (navigator.clipboard && window.isSecureContext) {
+        await navigator.clipboard.writeText(text);
+      } else {
+        const textarea = document.createElement('textarea');
+        textarea.value = text;
+        textarea.style.position = 'fixed';
+        textarea.style.opacity = '0';
+        document.body.appendChild(textarea);
+        textarea.select();
+        document.execCommand('copy');
+        document.body.removeChild(textarea);
+      }
+      setCopied(true);
+      toast.success('Check result copied');
+      setTimeout(() => setCopied(false), 2000);
+    } catch {
+      toast.error('Failed to copy');
+    }
+  }, [check]);
 
   if (!check) return null;
 
@@ -65,7 +95,7 @@ export default function ReadabilityCheckItem({ check, defaultExpanded = false })
 
   return (
     <div
-      className={`rounded-lg border transition-colors ${
+      className={`group/check rounded-lg border transition-colors ${
         expanded
           ? 'border-gray-200 dark:border-charcoal-600'
           : 'border-gray-100 dark:border-charcoal-700'
@@ -115,6 +145,21 @@ export default function ReadabilityCheckItem({ check, defaultExpanded = false })
             </div>
 
             <div className="flex items-center gap-2 flex-shrink-0">
+              {/* Copy check result button */}
+              <button
+                type="button"
+                onClick={handleCopyCheck}
+                className="p-1 rounded opacity-0 group-hover/check:opacity-100 focus:opacity-100 hover:bg-gray-200 dark:hover:bg-charcoal-600 transition-all focus:outline-none focus:ring-2 focus:ring-teal-500"
+                aria-label={copied ? 'Check result copied' : 'Copy check result'}
+                title="Copy check result"
+              >
+                {copied ? (
+                  <Check className="w-3.5 h-3.5 text-emerald-500" aria-hidden="true" />
+                ) : (
+                  <Copy className="w-3.5 h-3.5 text-gray-400 dark:text-gray-500" aria-hidden="true" />
+                )}
+              </button>
+
               {/* Severity badge */}
               {check.severity && (
                 <span
