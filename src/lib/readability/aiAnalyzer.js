@@ -5,6 +5,7 @@
  */
 
 import { truncateAtSentenceBoundary } from './utils/textAnalysis.js';
+import { retryFetch } from './utils/retryFetch.js';
 
 const API_TIMEOUT_MS = 45000; // 45 seconds for AI analysis
 
@@ -17,26 +18,6 @@ function getApiConfig() {
   return null;
 }
 
-/**
- * Fetch with timeout and abort support
- */
-async function fetchWithTimeout(url, options, timeoutMs = API_TIMEOUT_MS) {
-  const controller = new AbortController();
-  const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
-
-  // Merge abort signals if provided
-  const existingSignal = options.signal;
-
-  try {
-    const response = await fetch(url, {
-      ...options,
-      signal: existingSignal || controller.signal
-    });
-    return response;
-  } finally {
-    clearTimeout(timeoutId);
-  }
-}
 
 /**
  * Check if AI analysis is available
@@ -68,21 +49,30 @@ export async function analyzeWithAI(extractedContent, options = {}) {
   }
 
   try {
-    const response = await fetchWithTimeout(config.proxyUrl, {
-      method: 'POST',
-      headers,
-      body: JSON.stringify({
-        provider: 'anthropic',
-        model: 'claude-sonnet-4-5-20250929',
-        task: 'readability-analysis',
-        content: prompt,
-        parameters: {
-          temperature: 0.2,
-          max_tokens: 4096
-        }
-      }),
-      signal: options.signal
-    });
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), API_TIMEOUT_MS);
+    const signal = options.signal || controller.signal;
+
+    let response;
+    try {
+      response = await retryFetch(config.proxyUrl, {
+        method: 'POST',
+        headers,
+        body: JSON.stringify({
+          provider: 'anthropic',
+          model: 'claude-sonnet-4-5-20250929',
+          task: 'readability-analysis',
+          content: prompt,
+          parameters: {
+            temperature: 0.2,
+            max_tokens: 4096
+          }
+        }),
+        signal
+      });
+    } finally {
+      clearTimeout(timeoutId);
+    }
 
     if (!response.ok) {
       const status = response.status;

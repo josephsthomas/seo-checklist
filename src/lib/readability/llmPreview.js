@@ -6,6 +6,7 @@
  */
 
 import { truncateAtSentenceBoundary } from './utils/textAnalysis.js';
+import { retryFetch } from './utils/retryFetch.js';
 
 const EXTRACTION_TIMEOUT_MS = 60000;
 
@@ -76,7 +77,7 @@ async function extractWithClaude(prompt, config, signal, authToken) {
     const headers = { 'Content-Type': 'application/json' };
     if (authToken) headers['Authorization'] = `Bearer ${authToken}`;
 
-    const response = await fetchWithTimeout(config.proxyUrl, {
+    const response = await retryFetch(config.proxyUrl, {
       method: 'POST',
       headers,
       body: JSON.stringify({
@@ -112,7 +113,7 @@ async function extractWithOpenAI(prompt, config, signal, authToken) {
     const headers = { 'Content-Type': 'application/json' };
     if (authToken) headers['Authorization'] = `Bearer ${authToken}`;
 
-    const response = await fetchWithTimeout(config.proxyUrl, {
+    const response = await retryFetch(config.proxyUrl, {
       method: 'POST',
       headers,
       body: JSON.stringify({
@@ -147,7 +148,7 @@ async function extractWithGemini(prompt, config, signal, authToken) {
     const headers = { 'Content-Type': 'application/json' };
     if (authToken) headers['Authorization'] = `Bearer ${authToken}`;
 
-    const response = await fetchWithTimeout(config.proxyUrl, {
+    const response = await retryFetch(config.proxyUrl, {
       method: 'POST',
       headers,
       body: JSON.stringify({
@@ -226,25 +227,6 @@ function createErrorResult(llm, model, error, startTime) {
     usefulnessAssessment: { score: 0, explanation: '' },
     processingTimeMs: Date.now() - startTime
   };
-}
-
-async function fetchWithTimeout(url, options, timeoutMs = EXTRACTION_TIMEOUT_MS) {
-  const controller = new AbortController();
-  const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
-  const existingSignal = options.signal;
-
-  try {
-    if (existingSignal?.aborted) {
-      throw new DOMException('Aborted', 'AbortError');
-    }
-    const response = await fetch(url, {
-      ...options,
-      signal: existingSignal || controller.signal
-    });
-    return response;
-  } finally {
-    clearTimeout(timeoutId);
-  }
 }
 
 export default extractWithAllLLMs;
