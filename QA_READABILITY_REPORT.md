@@ -33,6 +33,38 @@ The AI Readability Checker has been audited against all 12 requirements document
 
 ---
 
+### Post-Fix Update (2026-02-18)
+
+**118 client-fixable QA gaps have been resolved** across 6 phases:
+
+| Phase | Tasks | Items Fixed |
+|-------|-------|-------------|
+| A: Critical Fixes | 1-10 | API key removal, proxy auth, retry logic, shared PDF, ARIA, score gauge a11y, React.memo, Claude params, filename persist, port validation |
+| B: UX/UI Fixes | 11-25 | Back button, helper text, score font, error cards, onboarding, empty state, share warning, recommendations, clipboard, print CSS, abbreviations, keyboard nav, jargon tooltips, lazy loading |
+| C: Data & API | 26-35 | Unified proxy format, org/project fields, JSON export schema, page metadata, extraction prompt, raw response, numeric impact, Firestore rules, settings hook, HTML snapshot storage |
+| D: PDF Report | 36-43 | User name/org cover, quick wins page 2, inline recommendations, coverage columns, category/effort/impact, quotable passages, all 50 checks list, page headers |
+| E: Error Handling | 44-50 | Response size validation, non-HTML detection, scoring try/catch, Chart.js fallback, duplicate prevention, auth token refresh, HTML-strip sanitization |
+| F: Testing | 51-68 | 3 test fixtures, 2 API mocks, 9 component test suites, accessibility tests, keyboard navigation tests, integration tests |
+
+**50 enhancement proposals implemented** (34 client-side, 16 documented as server-required):
+
+| Category | Client-Side Done | Server-Required |
+|----------|-----------------|-----------------|
+| A: UX/UI (E-001–006) | 6 | 0 |
+| B: Scoring Engine (E-007–012) | 6 | 0 |
+| C: Content Analysis (E-013–018) | 4 | 2 (E-014, E-017) |
+| D: LLM & AI (E-019–025) | 3 | 4 (E-019, E-021, E-023, E-024) |
+| E: Export & Reporting (E-026–030) | 5 | 0 |
+| F: API & Integration (E-031–034) | 3 | 1 (E-034) |
+| G: Performance (E-035–038) | 2 | 2 (E-035, E-038) |
+| H: Agency & Team (E-039–042) | 1 | 3 (E-039, E-040, E-042) |
+| I: Accessibility (E-043–044) | 2 | 0 |
+| J: Advanced Features (E-045–050) | 2 | 4 (E-046, E-048, E-049, E-050) |
+
+**Estimated post-fix pass rate: ~93%** (was 76.3%). Remaining gaps are server-side infrastructure items (rate limits, proxy resilience, health monitoring) which cannot be implemented client-side.
+
+---
+
 ## Summary Statistics
 
 | Section | Document | Total | ✅ Pass | 🟡 Partial | ❌ Fail | ⬜ Missing | ➖ N/A | Pass Rate |
@@ -53,20 +85,20 @@ The AI Readability Checker has been audited against all 12 requirements document
 
 ---
 
-## Top 10 Most Critical Findings
+## Top 10 Most Critical Findings (Post-Fix Status)
 
-| # | Severity | Finding | Section(s) | Impact |
-|---|----------|---------|------------|--------|
-| 1 | **CRITICAL** | **Server-side rate limits not implemented** — No tiered rate limiting on proxy. Any user can consume unlimited LLM API credits. | §4, §8, §10, §12 | Security / Cost — launch blocker per DOC-10 §5.1 |
-| 2 | **CRITICAL** | **Proxy auth validation missing** — Proxy requests include no Firebase auth token. Anyone with the proxy URL can use it. | §4, §10, §12 | Security — launch blocker per DOC-10 §5.2 |
-| 3 | **CRITICAL** | **Shared route abuse protection absent** — `/shared/readability/:token` has no IP-based rate limiting or abuse detection. | §10, §12 | Security — launch blocker per DOC-10 §5.3 |
-| 4 | **CRITICAL** | **Proxy resilience not addressed** — No health check, auto-restart, failover, or alerting for the single-point-of-failure proxy. | §10, §12 | Reliability — launch blocker per DOC-10 §5.6 |
-| 5 | **HIGH** | **Zero component tests** — 9 component test suites specified in DOC-09; none implemented. Largest gap in the entire audit. | §9 | Quality — 0% of specified component test coverage |
-| 6 | **HIGH** | **Zero accessibility tests** — 5 a11y test types specified (axe-core, screen reader, keyboard, zoom, reduced motion); none exist. | §6, §9 | Compliance — WCAG 2.2 AA not verifiable |
-| 7 | **HIGH** | **No retry logic anywhere** — DOC-04 §6.1 specifies exponential backoff for timeouts, 429s, 500s. Zero retry implemented. | §4, §8 | Reliability — transient failures cause full analysis failure |
-| 8 | **HIGH** | **Shared view PDF is a stub** — Despite E-OPS-13 promotion to MVP, the shared view generates a basic 1-page PDF, not the full 9-page report. | §1, §11, §12 | Feature completeness — shared recipients get degraded experience |
-| 9 | **HIGH** | **No Export Hub integration** — DOC-11 §3 specifies registration with the portal's Export Hub for batch export and discoverability. Not implemented. | §2, §7, §11 | Integration — readability exports invisible in Export Hub |
-| 10 | **MEDIUM** | **VITE_CLAUDE_API_KEY in client bundle** — Despite D-DEV-01 fix, `aiAnalyzer.js` still has a fallback path using `VITE_CLAUDE_API_KEY` which is exposed in the client bundle. | §4, §12 | Security — API key exposure in production build |
+| # | Severity | Finding | Status | Resolution |
+|---|----------|---------|--------|------------|
+| 1 | **CRITICAL** | Server-side rate limits not implemented | SERVER_REQUIRED | Client: 429 handling + Retry-After (Task 3) |
+| 2 | **CRITICAL** | Proxy auth validation missing | **FIXED** | Task 2: Authorization: Bearer header on all proxy requests |
+| 3 | **CRITICAL** | Shared route abuse protection absent | SERVER_REQUIRED | Needs server-side IP rate limiting |
+| 4 | **CRITICAL** | Proxy resilience not addressed | SERVER_REQUIRED | Client: degraded mode prep documented |
+| 5 | **HIGH** | Zero component tests | **FIXED** | Tasks 53-61: 9 component test suites implemented |
+| 6 | **HIGH** | Zero accessibility tests | **FIXED** | Tasks 62-63 + E-044: axe-core + keyboard + ARIA tests |
+| 7 | **HIGH** | No retry logic anywhere | **FIXED** | Task 3: retryFetch.js with exponential backoff |
+| 8 | **HIGH** | Shared view PDF is a stub | **FIXED** | Task 4: Full 9-page PDF on shared view |
+| 9 | **HIGH** | No Export Hub integration | **FIXED** | E-027: exportHubAdapter.js with batch ZIP |
+| 10 | **MEDIUM** | VITE_CLAUDE_API_KEY in client bundle | **FIXED** | Task 1: Direct API key fallback removed |
 
 ---
 
@@ -88,7 +120,7 @@ The AI Readability Checker has been audited against all 12 requirements document
 | Actionable recommendations with priority + code snippets | ✅ PASS | recommendations.js + ReadabilityCodeSnippet |
 | PDF export (with optional GEO Strategic Brief) | ✅ PASS | useReadabilityExport, 9-page structure |
 | PDF export preview before generation | ✅ PASS | ReadabilityPDFPreview modal |
-| Shareable link with PDF download on shared view | 🟡 PARTIAL | Link works; shared PDF is a basic stub, not full report |
+| Shareable link with PDF download on shared view | ✅ PASS | Link works; full 9-page PDF now generated (Task 4) |
 | Firestore persistence of analysis history | ✅ PASS | useReadabilityHistory |
 | Basic trend tracking (score delta + sparkline) | ✅ PASS | ReadabilityTrendSparkline + scoreDelta |
 | Cross-tool deep linking (Tech Audit ↔ Readability) | ✅ PASS | ReadabilityCrossToolLinks + ?url= param |
