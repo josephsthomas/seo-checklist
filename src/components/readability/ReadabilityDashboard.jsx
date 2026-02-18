@@ -7,9 +7,9 @@ import { useReadabilityExport } from '../../hooks/useReadabilityExport';
 import { useReadabilityShare } from '../../hooks/useReadabilityShare';
 import { useReadabilityHistory } from '../../hooks/useReadabilityHistory';
 import ReadabilityScoreCard from './ReadabilityScoreCard';
-import ReadabilityCategoryChart from './ReadabilityCategoryChart';
+const ReadabilityCategoryChart = lazy(() => import('./ReadabilityCategoryChart'));
 import ReadabilityCategoryAccordion from './ReadabilityCategoryAccordion';
-import ReadabilityLLMPreview from './ReadabilityLLMPreview';
+const ReadabilityLLMPreview = lazy(() => import('./ReadabilityLLMPreview'));
 import ReadabilityRecommendations from './ReadabilityRecommendations';
 import ReadabilityIssuesTable from './ReadabilityIssuesTable';
 import ReadabilityCrossToolLinks from './ReadabilityCrossToolLinks';
@@ -272,13 +272,14 @@ export default function ReadabilityDashboard({
       </div>
 
       {/* Category Breakdown Chart */}
-      <ReadabilityCategoryChart
-        categoryScores={analysis.categoryScores}
-        onCategoryClick={(catId) => {
-          setActiveTab('details');
-          // Scroll to accordion is handled internally
-        }}
-      />
+      <Suspense fallback={<div className="h-64 bg-charcoal-50 dark:bg-charcoal-800 rounded-xl animate-pulse" />}>
+        <ReadabilityCategoryChart
+          categoryScores={analysis.categoryScores}
+          onCategoryClick={(catId) => {
+            setActiveTab('details');
+          }}
+        />
+      </Suspense>
 
       {/* Quick Wins Preview (E-UX-02) */}
       {quickWins.length > 0 && (
@@ -394,9 +395,11 @@ export default function ReadabilityDashboard({
           aria-labelledby="results-tab-llm"
           className="motion-safe:animate-fade-in"
         >
-          <ReadabilityLLMPreview
-            llmExtractions={analysis.llmExtractions}
-          />
+          <Suspense fallback={<div className="h-64 bg-charcoal-50 dark:bg-charcoal-800 rounded-xl animate-pulse" />}>
+            <ReadabilityLLMPreview
+              llmExtractions={analysis.llmExtractions}
+            />
+          </Suspense>
         </div>
       )}
 
