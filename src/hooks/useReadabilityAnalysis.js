@@ -52,15 +52,18 @@ function getStorageLimit(role) {
  * Fetch URL content via the proxy
  * BRD: FR-1.1.3 — server-side proxy with redirects, timeout, gzip
  */
-async function fetchUrlViaProxy(url, signal) {
+async function fetchUrlViaProxy(url, signal, authToken) {
   const proxyUrl = import.meta.env.VITE_AI_PROXY_URL;
   if (!proxyUrl) {
     throw new Error('AI proxy URL not configured. Set VITE_AI_PROXY_URL in your environment.');
   }
 
+  const headers = { 'Content-Type': 'application/json' };
+  if (authToken) headers['Authorization'] = `Bearer ${authToken}`;
+
   const response = await fetch(`${proxyUrl}/api/fetch-url`, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    headers,
     body: JSON.stringify({
       url,
       options: {
@@ -276,6 +279,14 @@ export function useReadabilityAnalysis() {
       throw new Error('You must be logged in to run an analysis.');
     }
 
+    // Get fresh Firebase auth token for proxy requests
+    let authToken = null;
+    try {
+      authToken = await currentUser.getIdToken();
+    } catch (tokenErr) {
+      console.warn('Could not get auth token, proceeding without:', tokenErr);
+    }
+
     const controller = new AbortController();
     abortControllerRef.current = controller;
 
@@ -296,7 +307,8 @@ export function useReadabilityAnalysis() {
         sourceUrl: options.sourceUrl || null,
         inputMethod: options.inputMethod || 'url',
         signal: controller.signal,
-        onProgress: handleProgress
+        onProgress: handleProgress,
+        authToken
       });
 
       if (controller.signal.aborted) return;
@@ -390,8 +402,12 @@ export function useReadabilityAnalysis() {
     });
 
     try {
+      // Get auth token for proxy
+      let authToken = null;
+      try { authToken = await currentUser.getIdToken(); } catch (_) { /* proceed without */ }
+
       // Fetch via proxy
-      const fetchResult = await fetchUrlViaProxy(validatedUrl, abortControllerRef.current?.signal);
+      const fetchResult = await fetchUrlViaProxy(validatedUrl, abortControllerRef.current?.signal, authToken);
 
       if (!fetchResult.html || fetchResult.html.length < 50) {
         throw new Error('The fetched page contains very little content. Try uploading the HTML directly.');

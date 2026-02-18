@@ -17,7 +17,7 @@ import { generateRecommendations } from './recommendations.js';
  * @returns {Object} Complete analysis document ready for Firestore
  */
 export async function runFullAnalysis(htmlContent, options = {}) {
-  const { sourceUrl, inputMethod = 'url', signal, onProgress } = options;
+  const { sourceUrl, inputMethod = 'url', signal, onProgress, authToken } = options;
 
   // Stage 1: Extract content
   onProgress?.({ stage: 'extracting', progress: 15, message: 'Extracting content...' });
@@ -29,11 +29,11 @@ export async function runFullAnalysis(htmlContent, options = {}) {
   onProgress?.({ stage: 'analyzing', progress: 25, message: 'Running AI analysis...' });
 
   const [aiAssessment, llmExtractions] = await Promise.all([
-    analyzeWithAI(extracted, { signal }).catch(err => {
+    analyzeWithAI(extracted, { signal, authToken }).catch(err => {
       console.error('AI analysis failed:', err);
       return { available: false, fallback: true, fallbackReason: err.message };
     }),
-    extractWithAllLLMs(extracted, { signal }).catch(err => {
+    extractWithAllLLMs(extracted, { signal, authToken }).catch(err => {
       console.error('LLM extraction failed:', err);
       return {};
     })

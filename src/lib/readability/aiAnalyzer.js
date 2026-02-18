@@ -62,10 +62,15 @@ export async function analyzeWithAI(extractedContent, options = {}) {
 
   const prompt = buildAnalysisPrompt(extractedContent, truncatedContent);
 
+  const headers = { 'Content-Type': 'application/json' };
+  if (options.authToken) {
+    headers['Authorization'] = `Bearer ${options.authToken}`;
+  }
+
   try {
     const response = await fetchWithTimeout(config.proxyUrl, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers,
       body: JSON.stringify({
         provider: 'anthropic',
         model: 'claude-sonnet-4-5-20250929',
