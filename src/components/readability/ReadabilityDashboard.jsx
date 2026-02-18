@@ -1,7 +1,7 @@
 import { useState, useCallback, useMemo, useEffect, lazy, Suspense } from 'react';
 import {
   ExternalLink, Share2, Download, FileJson, FileText, ChevronDown,
-  Zap, ArrowRight, ListChecks, Eye, MessageSquare, AlertTriangle
+  Zap, ArrowRight, ArrowLeft, ListChecks, Eye, MessageSquare, AlertTriangle
 } from 'lucide-react';
 import { useReadabilityExport } from '../../hooks/useReadabilityExport';
 import { useReadabilityShare } from '../../hooks/useReadabilityShare';
@@ -108,11 +108,31 @@ export default function ReadabilityDashboard({
   if (!analysis) return null;
 
   return (
-    <div className="space-y-6 motion-safe:animate-fade-in">
+    <div className="space-y-6 motion-safe:animate-fade-in print:space-y-4">
+      {/* Print-optimized styles */}
+      <style>{`
+        @media print {
+          nav, header, footer, [role="tablist"], .no-print { display: none !important; }
+          button:not(.print-visible) { display: none !important; }
+          details[open] > summary ~ * { display: block !important; }
+          details { break-inside: avoid; }
+          .print\\:space-y-4 > * + * { margin-top: 1rem; }
+        }
+      `}</style>
       {/* Top Action Bar */}
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
-        {/* URL / Source */}
+        {/* Back button + URL / Source */}
         <div className="flex items-center gap-2 min-w-0">
+          {onBack && (
+            <button
+              onClick={onBack}
+              className="inline-flex items-center gap-1.5 px-3 py-2 text-sm font-medium text-charcoal-700 dark:text-charcoal-300 bg-white dark:bg-charcoal-800 border border-charcoal-300 dark:border-charcoal-600 rounded-lg hover:bg-charcoal-50 dark:hover:bg-charcoal-700 transition-colors focus:outline-none focus:ring-2 focus:ring-teal-500"
+              aria-label="Back to input"
+            >
+              <ArrowLeft className="w-4 h-4" aria-hidden="true" />
+              <span className="hidden sm:inline">Back</span>
+            </button>
+          )}
           {analysis.sourceUrl && (
             <a
               href={analysis.sourceUrl}
@@ -195,17 +215,35 @@ export default function ReadabilityDashboard({
             </button>
 
             {showExportMenu && (
-              <div className="absolute right-0 top-full mt-2 w-52 bg-white dark:bg-charcoal-800 border border-charcoal-200 dark:border-charcoal-700 rounded-lg shadow-lg z-20 py-1">
+              <div
+                className="absolute right-0 top-full mt-2 w-52 bg-white dark:bg-charcoal-800 border border-charcoal-200 dark:border-charcoal-700 rounded-lg shadow-lg z-20 py-1"
+                role="menu"
+                onKeyDown={(e) => {
+                  const items = e.currentTarget.querySelectorAll('[role="menuitem"]');
+                  const current = Array.from(items).indexOf(document.activeElement);
+                  if (e.key === 'ArrowDown') {
+                    e.preventDefault();
+                    items[(current + 1) % items.length]?.focus();
+                  } else if (e.key === 'ArrowUp') {
+                    e.preventDefault();
+                    items[(current - 1 + items.length) % items.length]?.focus();
+                  } else if (e.key === 'Escape') {
+                    setShowExportMenu(false);
+                  }
+                }}
+              >
                 <button
+                  role="menuitem"
                   onClick={handleExportPDF}
-                  className="w-full flex items-center gap-2 px-4 py-2.5 text-sm text-charcoal-700 dark:text-charcoal-300 hover:bg-charcoal-50 dark:hover:bg-charcoal-700 transition-colors text-left"
+                  className="w-full flex items-center gap-2 px-4 py-2.5 text-sm text-charcoal-700 dark:text-charcoal-300 hover:bg-charcoal-50 dark:hover:bg-charcoal-700 transition-colors text-left focus:outline-none focus:bg-charcoal-50 dark:focus:bg-charcoal-700"
                 >
                   <FileText className="w-4 h-4 text-red-500" aria-hidden="true" />
                   Export as PDF
                 </button>
                 <button
+                  role="menuitem"
                   onClick={handleExportJSON}
-                  className="w-full flex items-center gap-2 px-4 py-2.5 text-sm text-charcoal-700 dark:text-charcoal-300 hover:bg-charcoal-50 dark:hover:bg-charcoal-700 transition-colors text-left"
+                  className="w-full flex items-center gap-2 px-4 py-2.5 text-sm text-charcoal-700 dark:text-charcoal-300 hover:bg-charcoal-50 dark:hover:bg-charcoal-700 transition-colors text-left focus:outline-none focus:bg-charcoal-50 dark:focus:bg-charcoal-700"
                 >
                   <FileJson className="w-4 h-4 text-blue-500" aria-hidden="true" />
                   Export as JSON
