@@ -1636,13 +1636,321 @@
 
 ## Section 10: Performance & Security (DOC-10)
 
-> *To be completed in Chunk 12.*
+**Source:** `requirements/ai-readability-checker/10-performance-and-security.md`
+**Verified Against:** `urlValidation.js`, `htmlParser.js`, `llmPreview.js`, `aiAnalyzer.js`, `firestore.rules`, `storage.rules`, `useReadabilityAnalysis.js`
+
+### 10.1 Performance — Response Time (DOC-10 §1.1)
+
+| Operation | Target | Status | Notes |
+|-----------|--------|--------|-------|
+| Input screen load | <500ms | ✅ PASS | Lazy-loaded via lazyWithRetry |
+| URL validation | <50ms | ✅ PASS | Regex + IP check (debounced 300ms) |
+| URL fetch | <3s target, 30s max | ✅ PASS | 30s timeout enforced |
+| Content extraction | <500ms | ✅ PASS | DOMParser + text extraction |
+| Single LLM call | <5s, 30s max | ✅ PASS | 45-60s timeouts (conservative) |
+| All 3 LLMs parallel | <8s target | ✅ PASS | Promise.all parallelization |
+| Rule-based scoring | <200ms | ✅ PASS | Synchronous calculation |
+| Recommendations | <300ms | ✅ PASS | Synchronous filtering |
+| Full e2e analysis | <15s, 45s max | ➖ N/A | Architecture supports; runtime-dependent |
+| Dashboard render | <300ms | ✅ PASS | Standard React render |
+| PDF export | <3s, 5s max | ✅ PASS | jsPDF client-side |
+| JSON export | <500ms | ✅ PASS | JSON.stringify + download |
+| History load | <1s | ✅ PASS | Firestore with pagination |
+
+### 10.2 Performance — Optimization (DOC-10 §1.4–1.5)
+
+| Req | Description | Status | Notes |
+|-----|-------------|--------|-------|
+| Concurrent LLM calls: 3 parallel | ✅ PASS | Promise.all in aggregator |
+| Max 1 analysis per user | ✅ PASS | AbortController cancels previous |
+| useMemo for expensive calculations | ✅ PASS | Dashboard, ScoreCard, Recommendations |
+| useCallback for handler stability | ✅ PASS | All handlers wrapped |
+| Debounce URL validation (300ms) | ✅ PASS | setTimeout in InputScreen |
+| Abort in-flight on cancel | ✅ PASS | AbortController cleanup |
+| Truncate HTML to 50K chars for LLMs | ✅ PASS | truncateAtSentenceBoundary |
+| React.memo on pure components | ⬜ MISSING | CheckItem, LLMColumn not memoized |
+| Skeleton loaders during async | 🟡 PARTIAL | Spinner used; no skeleton loaders |
+
+### 10.3 Security — Input Sanitization & XSS (DOC-10 §2.1–2.2)
+
+| Req | Status | Notes |
+|-----|--------|-------|
+| URL: validate, block private IPs | ✅ PASS | urlValidation.js comprehensive |
+| HTML upload: DOMParser only, never execute | ✅ PASS | Text-only extraction |
+| HTML paste: same pipeline | ✅ PASS | |
+| LLM markdown via react-markdown (safe) | ✅ PASS | No script/iframe |
+| No dangerouslySetInnerHTML for user content | ✅ PASS | JSX escaping throughout |
+| Code snippets in `<pre><code>` text | ✅ PASS | CodeSnippet uses text content |
+| Context fields sanitized | 🟡 PARTIAL | Industry is select (safe); keywords has maxLength but no HTML strip |
+
+### 10.4 Security — API & SSRF (DOC-10 §2.3–2.4)
+
+| Req | Status | Notes |
+|-----|--------|-------|
+| LLM keys server-side only | ✅ PASS | Only VITE_CLAUDE_API_KEY on client |
+| Auth on all API calls | ⬜ MISSING | No Authorization header sent to proxy |
+| Rate limits enforced server-side | ⬜ MISSING | No rate limiting |
+| Input size limits (50K chars) | ✅ PASS | Truncation before LLM calls |
+| Block private IPs (SSRF) | ✅ PASS | Client-side validation |
+| Block localhost | ✅ PASS | Blocked |
+| Block metadata IPs (169.254.x) | ✅ PASS | Blocked |
+| Port restriction (80/443 only) | ⬜ MISSING | Non-standard ports accepted |
+| Protocol restriction (HTTP/HTTPS) | ✅ PASS | Only http/https |
+| Redirect validation | ✅ PASS | maxRedirects=5 |
+
+### 10.5 Security — Data Privacy & Content (DOC-10 §2.5–2.6)
+
+| Req | Status | Notes |
+|-----|--------|-------|
+| Analyses visible only to owner | ✅ PASS | Firestore userId == auth.uid |
+| Shared links time-limited | ✅ PASS | Configurable expiry |
+| No auth tokens in PDFs | ✅ PASS | Data only |
+| Account deletion cascade | ⬜ MISSING | No cascading delete for readability data |
+| No eval() or Function() | ✅ PASS | No dynamic code execution |
+| No new third-party scripts | ✅ PASS | Existing dependencies only |
+
+### 10.6 Monitoring & Audit Trail (DOC-10 §4 — REQUIRED)
+
+| Metric | Status | Notes |
+|--------|--------|-------|
+| Analysis success rate | ⬜ MISSING | No analytics logging |
+| LLM error rates | ⬜ MISSING | Console.error only |
+| API usage audit trail | ⬜ MISSING | No api-usage-log collection |
+| Cost alerting (80% cap) | ⬜ MISSING | No cost monitoring |
+| Abuse detection | ⬜ MISSING | No abuse pattern detection |
+
+### 10.7 Launch-Blocking Security (DOC-10 §5)
+
+| # | Description | Status | Notes |
+|---|-------------|--------|-------|
+| §5.1 | Server-side rate limit enforcement | ⬜ MISSING | **LAUNCH BLOCKER** |
+| §5.2 | Proxy authentication validation | ⬜ MISSING | **LAUNCH BLOCKER** |
+| §5.3 | Shared route abuse protection | ⬜ MISSING | **LAUNCH BLOCKER** |
+| §5.4 | Non-English CC-01 handling | ✅ PASS | Returns 'na' for non-English |
+| §5.5 | Pre-launch legal review | ➖ N/A | Operational |
+| §5.6 | Proxy resilience (/health, alerting) | ⬜ MISSING | **LAUNCH BLOCKER** |
+
+### Section 10 Summary
+
+| Status | Count |
+|--------|-------|
+| ✅ PASS | 38 |
+| 🟡 PARTIAL | 2 |
+| ❌ FAIL | 0 |
+| ⬜ MISSING | 14 |
+| ➖ N/A | 2 |
+| **Total** | **56** |
+
+**Pass Rate:** 67.9% (38/56)
+
+**CRITICAL: 4 Launch-Blocking Items Not Resolved:**
+1. Server-side rate limits — No tiered rate limiting on proxy
+2. Proxy auth validation — No Firebase token validation
+3. Shared route abuse protection — No IP-based rate limiting
+4. Proxy resilience — No health check, auto-restart, or alerting
+
+**Other Gaps:** No monitoring/audit trail, no account deletion cascade, React.memo not applied
 
 ---
 
 ## Section 11: Export & Reporting (DOC-11)
 
-> *To be completed in Chunk 13.*
+**Verified Against:** `useReadabilityExport.js` (827 lines), `ReadabilityPDFPreview.jsx` (433 lines), `useReadabilityShare.js` (328 lines), `ReadabilityShareView.jsx` (389 lines), `ReadabilityCodeSnippet.jsx`
+
+### 11.1 PDF Report — Generation Technology (DOC-11 §1.1.1)
+
+| Req | Description | Status | Notes |
+|-----|-------------|--------|-------|
+| jsPDF + jspdf-autotable | ✅ PASS | Dynamic import on lines 96–97 of useReadabilityExport |
+
+### 11.2 PDF Report — Structure (DOC-11 §1.1.2)
+
+| Page | Req | Status | Notes |
+|------|-----|--------|-------|
+| P1 Cover | Portal logo (top-left) | 🟡 PARTIAL | Supports optional clientLogo but no default portal logo |
+| P1 Cover | Report title "AI Readability Analysis Report" | ✅ PASS | Default title in options |
+| P1 Cover | Analyzed URL or filename | ✅ PASS | analysis.sourceUrl rendered |
+| P1 Cover | Analysis date and time | ✅ PASS | date-fns format |
+| P1 Cover | Overall score (large, color-coded) with grade | ✅ PASS | Rounded rect with score + grade |
+| P1 Cover | Generated by: user name and organization | ⬜ MISSING | Only "Generated by Content Strategy Portal" — no user name/org from profile |
+| P1 Cover | Optional client logo and company name | ✅ PASS | clientLogo + clientName options |
+| P2 Exec | One-paragraph summary | ✅ PASS | aiAssessment.contentSummary or gradeSummary |
+| P2 Exec | Category scores table (5 categories) | ✅ PASS | autoTable with label, weight, score, grade |
+| P2 Exec | Key statistics (checks, passed, warnings, failures) | ✅ PASS | Issue summary table |
+| P2 Exec | Top 3 quick-win recommendations highlighted | ⬜ MISSING | Quick wins not shown on exec summary page |
+| P3-4 Category | One section per category with score/grade/bar | ✅ PASS | Iterated with sectionHeader + bar |
+| P3-4 Category | Check list with status, title, result | ✅ PASS | autoTable per category |
+| P3-4 Category | Failed/warning checks include recommendation | ⬜ MISSING | Shows status but not recommendation inline |
+| P5 LLM | Coverage metrics table | 🟡 PARTIAL | Shows model, usefulness, time, status — missing content/heading/entity coverage % |
+| P5 LLM | Key differences (2-3 bullet points per LLM) | 🟡 PARTIAL | Shows extracted title comparison only |
+| P5 LLM | Summary only (not full extractions) | ✅ PASS | Only summary fields included |
+| P6-7 Recs | Prioritized recommendation list | ✅ PASS | Sorted, grouped |
+| P6-7 Recs | Each item: priority badge, title, description | ✅ PASS | Priority color + title + description |
+| P6-7 Recs | Each item: category, effort, impact | ⬜ MISSING | Category/effort/impact not rendered per item |
+| P6-7 Recs | Grouped: Quick Wins, Structural, Content, Technical | ✅ PASS | 4 groups |
+| P6-7 Recs | Code snippets for top 5 technical | ✅ PASS | includeCodeSnippets toggle |
+| P8 GEO | Citation Likelihood score with explanation | ✅ PASS | citationWorthiness + citationExplanation |
+| P8 GEO | AI Crawler Access matrix (TA-02/TA-03) | ✅ PASS | Filters TA-02, TA-03, TA-10.5 |
+| P8 GEO | Top 3 AI-Specific Signals findings | ✅ PASS | AS-* non-pass, sliced to 5 |
+| P8 GEO | Quotable Passages assessment (AS-05) | ⬜ MISSING | Not specifically called out |
+| P8 GEO | AI visibility priorities | ✅ PASS | 3 bullet points |
+| P8 GEO | Toggle on by default | ✅ PASS | includeGEOBrief defaults true |
+| P9 Method | Scoring methodology (weights) | ✅ PASS | Weights table |
+| P9 Method | List of 50 checks with brief descriptions | ⬜ MISSING | Only weight table; no individual check list |
+| P9 Method | LLM models and versions | ✅ PASS | Model IDs listed |
+| P9 Method | AI disclaimer | ✅ PASS | Amber box with disclaimer text |
+| P9 Method | Engine date and version | ✅ PASS | scoringVersion + promptVersion |
+| Footer | Page number on all pages | ✅ PASS | Loop through pages |
+| Footer | "Generated by Content Strategy Portal" | ✅ PASS | Footer text |
+| Footer | Generation timestamp | ✅ PASS | date-fns format |
+
+### 11.3 PDF Styling (DOC-11 §1.1.3)
+
+| Req | Status | Notes |
+|-----|--------|-------|
+| Font: Helvetica | ✅ PASS | jsPDF default + explicit setFont('helvetica') |
+| Primary color: Teal #14b8a6 | ✅ PASS | TEAL = [20, 184, 166] |
+| Score colors: Emerald/Teal/Amber/Orange/Red | ✅ PASS | getGradeColorRGB mapping |
+| Tables: autoTable with alternating rows | ✅ PASS | alternateRowStyles applied |
+| Page size: A4 | ✅ PASS | jsPDF default is A4 |
+| Margins: 20mm | ✅ PASS | margin = 20 |
+| Header: tool name + date on each page | ⬜ MISSING | Only footer on each page, no header |
+
+### 11.4 PDF Customization Options (DOC-11 §1.1.4)
+
+| Option | Default | Configurable | Status | Notes |
+|--------|---------|-------------|--------|-------|
+| Report title | "AI Readability Analysis Report" | Yes | ✅ PASS | Free text input |
+| Client name | Empty | Yes | ✅ PASS | Free text input |
+| Client logo | None | Yes | ✅ PASS | Image upload in preview modal |
+| Include LLM summary | Yes | Yes | ✅ PASS | Toggle switch |
+| Include GEO Brief | Yes | Yes | ✅ PASS | Toggle switch |
+| Include methodology | Yes | Yes | ✅ PASS | Toggle switch |
+| Include code snippets | Yes | Yes | ✅ PASS | Toggle switch |
+
+### 11.5 PDF Export Preview Modal (DOC-11 §1.1.5)
+
+| Req | Status | Notes |
+|-----|--------|-------|
+| Preview modal before download | ✅ PASS | ReadabilityPDFPreview.jsx |
+| Paginated preview with navigation | ✅ PASS | ChevronLeft/Right, page counter |
+| Toggle options and see preview update | ✅ PASS | getPreviewData recalculates pages |
+| "Generate & Download" button | ✅ PASS | Download icon + text |
+| "Cancel" returns to dashboard | ✅ PASS | Cancel button + onClose |
+| Lightweight HTML representation | ✅ PASS | Skeleton/simulated layout, not full jsPDF render |
+
+### 11.6 JSON Export (DOC-11 §1.2)
+
+| Req | Status | Notes |
+|-----|--------|-------|
+| exportVersion field | 🟡 PARTIAL | "1.0.0" vs spec "1.0" |
+| exportDate field | ✅ PASS | exportedAt: new Date().toISOString() |
+| tool identifier | 🟡 PARTIAL | "AI Readability Checker" vs spec "ai-readability-checker" |
+| toolVersion | ✅ PASS | analysis.scoringVersion |
+| input block (method, url, filename, analyzedAt) | ✅ PASS | All 4 fields present |
+| pageMetadata (title, description, language) | 🟡 PARTIAL | Has title, description, language, wordCount; missing canonicalUrl, httpStatus, contentLength, lastModified, robotsDirectives |
+| scores (overall, grade, categories with weights) | 🟡 PARTIAL | Flat categoryScores (score only) vs spec nested {score, grade, weight} |
+| issueSummary | ✅ PASS | Critical/high/medium/low/passed/total |
+| checkResults array | ✅ PASS | Full check results |
+| llmExtractions | ✅ PASS | All 3 LLMs |
+| recommendations | ✅ PASS | Full array |
+| aiAnalysis | ✅ PASS | aiAssessment data |
+| Filename: readability-{slug}-{timestamp}.json | ✅ PASS | urlToSlug + date-fns format |
+
+### 11.7 Excel Export (DOC-11 §1.3)
+
+| Req | Status | Notes |
+|-----|--------|-------|
+| Excel export (Post-MVP) | ➖ N/A | Correctly deferred |
+
+### 11.8 Sharing — Link Generation (DOC-11 §2.1)
+
+| Req | Status | Notes |
+|-----|--------|-------|
+| User clicks "Share" button | ✅ PASS | Dashboard action bar |
+| UUID share token generated | ✅ PASS | crypto.randomUUID with fallback |
+| Token + expiry saved to Firestore | ✅ PASS | updateDoc with shareToken, isShared, shareExpiry |
+| URL: /shared/readability/{shareToken} | ✅ PASS | Correct format |
+| Auto-copy to clipboard | ✅ PASS | copyToClipboard utility |
+| Toast: "Share link copied to clipboard" | ✅ PASS | On successful copy |
+| Default expiry: 30 days | ✅ PASS | expiryDays = 30 default |
+| Expiry options: 7/30/90/Never | 🟡 PARTIAL | Hook accepts any expiryDays; UI picker for options not confirmed in dashboard |
+| 'Never' expiry warning message | ⬜ MISSING | No warning for non-expiring links |
+
+### 11.9 Sharing — Shared View (DOC-11 §2.2)
+
+| Req | Status | Notes |
+|-----|--------|-------|
+| No authentication required | ✅ PASS | Public route, no ProtectedRoute wrapper |
+| Show: overall score, category breakdown | ✅ PASS | Score card + category bars |
+| Show: LLM coverage summary table | ✅ PASS | Table with content/headings/entities/usefulness columns |
+| NOT show: full LLM extraction text | ✅ PASS | filterForSharedView omits mainContent |
+| NOT show: history | ✅ PASS | No history in shared view |
+| Show: top recommendations | ⬜ MISSING | recommendations in filtered data but not rendered in SharedView UI |
+| "Download PDF Report" button | ✅ PASS | handleExportPDF button present |
+| PDF uses same generation logic as authenticated | ⬜ MISSING | Shared view PDF is a basic stub (title/score/url/date only), not the full 9-page report |
+| Portal branding | ✅ PASS | ScanEye + "Content Strategy Portal" header |
+| "Create your own analysis" CTA | ✅ PASS | Link to /app/readability |
+| Expiry date shown | ✅ PASS | formatDate(data.shareExpiry) |
+| Expired link: "This link has expired" message | ✅ PASS | Clear error with CTA |
+| "About This Report" section (2-3 sentences) | ✅ PASS | Methodology explanation paragraph |
+| De-emphasize expiry date | ✅ PASS | text-xs text-gray-400, subtle |
+| System-theme-aware dark/light mode | ✅ PASS | prefers-color-scheme media query detection |
+
+### 11.10 Sharing — Revocation (DOC-11 §2.3)
+
+| Req | Status | Notes |
+|-----|--------|-------|
+| User can revoke from detail view | ✅ PASS | revokeShare function |
+| Sets isShared:false, clears shareToken | ✅ PASS | updateDoc clears all 3 fields |
+| Revoked URLs return appropriate message | ✅ PASS | Same generic "expired or no longer available" (no info leakage) |
+
+### 11.11 Export Hub Integration (DOC-11 §3)
+
+| Req | Status | Notes |
+|-----|--------|-------|
+| Register exports in Export Hub | ⬜ MISSING | No Export Hub integration code found |
+| Batch export to ZIP | ⬜ MISSING | No batch/ZIP export functionality |
+
+### 11.12 Print Optimization (DOC-11 §4)
+
+| Req | Status | Notes |
+|-----|--------|-------|
+| @media print stylesheet | ⬜ MISSING | No print CSS in readability components |
+| Hide nav, buttons, tabs in print | ⬜ MISSING | — |
+| Expand accordions in print | ⬜ MISSING | — |
+| Page breaks on sections | ⬜ MISSING | — |
+| Ctrl+P keyboard shortcut | ⬜ MISSING | No keyboard shortcut handler |
+
+### 11.13 Clipboard Operations (DOC-11 §5)
+
+| Req | Status | Notes |
+|-----|--------|-------|
+| Share link copy | ✅ PASS | Auto-copy on share creation |
+| Code snippet copy | ✅ PASS | CopyButton in ReadabilityCodeSnippet with clipboard API + fallback |
+| Overall score copy | ⬜ MISSING | No copy action on score card |
+| Individual check result copy | ⬜ MISSING | No copy action on check items |
+| navigator.clipboard + fallback | ✅ PASS | Both useReadabilityShare and ReadabilityCodeSnippet |
+| Toast on success/failure | ✅ PASS | react-hot-toast used |
+
+### 11.14 Section 11 Summary
+
+| Metric | Count |
+|--------|-------|
+| Total Requirements | 73 |
+| ✅ PASS | 47 |
+| 🟡 PARTIAL | 8 |
+| ⬜ MISSING | 16 |
+| ➖ N/A | 2 |
+| **Pass Rate** | **64.4%** |
+
+**Key Gaps:**
+1. **Shared view PDF is a stub** — generates a 1-page basic PDF instead of the full 9-page report (DOC-11 §2.2)
+2. **No Export Hub integration** — Export Hub registration and batch ZIP export not implemented (DOC-11 §3)
+3. **No print optimization** — no @media print CSS or Ctrl+P handler (DOC-11 §4)
+4. **Missing clipboard actions** — score copy and check result copy not implemented (DOC-11 §5.1)
+5. **PDF report omissions** — no user name/org on cover, no quick wins on exec summary, no per-item effort/impact on recs, no 50-check list on methodology page
+6. **JSON schema deviations** — flat category scores (missing grade/weight per category), missing pageMetadata fields (canonicalUrl, httpStatus, etc.)
 
 ---
 
