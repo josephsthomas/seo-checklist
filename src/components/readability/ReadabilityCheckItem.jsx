@@ -49,7 +49,7 @@ const SEVERITY_BADGES = {
   info: 'bg-gray-100 text-gray-700 dark:bg-charcoal-700 dark:text-gray-300',
 };
 
-export default function ReadabilityCheckItem({ check, defaultExpanded = false }) {
+function ReadabilityCheckItem({ check, defaultExpanded = false }) {
   const [expanded, setExpanded] = useState(defaultExpanded);
 
   if (!check) return null;
@@ -225,3 +225,5 @@ export default function ReadabilityCheckItem({ check, defaultExpanded = false })
     </div>
   );
 }
+
+export default React.memo(ReadabilityCheckItem);

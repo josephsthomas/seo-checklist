@@ -89,7 +89,14 @@ function ScoreGauge({ score, size = 120 }) {
   const dashOffset = circumference - (circumference * animatedScore) / 100;
 
   return (
-    <div className="relative inline-flex items-center justify-center">
+    <div
+      className="relative inline-flex items-center justify-center"
+      role="meter"
+      aria-valuenow={score}
+      aria-valuemin={0}
+      aria-valuemax={100}
+      aria-label={`AI Readability Score: ${score} out of 100, Grade ${gradeInfo.grade}`}
+    >
       <svg
         width={size}
         height={size}
@@ -123,7 +130,7 @@ function ScoreGauge({ score, size = 120 }) {
       {/* Center text */}
       <div className="absolute inset-0 flex flex-col items-center justify-center">
         <span
-          className={`text-4xl font-bold ${colors.text}`}
+          className={`text-5xl font-bold ${colors.text}`}
           aria-hidden="true"
         >
           {animatedScore}

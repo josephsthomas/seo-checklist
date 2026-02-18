@@ -17,7 +17,7 @@ import { generateRecommendations } from './recommendations.js';
  * @returns {Object} Complete analysis document ready for Firestore
  */
 export async function runFullAnalysis(htmlContent, options = {}) {
-  const { sourceUrl, inputMethod = 'url', signal, onProgress, authToken } = options;
+  const { sourceUrl, inputMethod = 'url', filename, signal, onProgress, authToken } = options;
 
   // Stage 1: Extract content
   onProgress?.({ stage: 'extracting', progress: 15, message: 'Extracting content...' });
@@ -60,6 +60,7 @@ export async function runFullAnalysis(htmlContent, options = {}) {
     // Core identification
     sourceUrl: sourceUrl || null,
     inputMethod,
+    filename: filename || null,
     analyzedAt: now,
     createdAt: now,
 
