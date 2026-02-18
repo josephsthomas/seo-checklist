@@ -169,12 +169,22 @@ export function useReadabilityExport() {
       doc.text(reportTitle, pageWidth / 2, y, { align: 'center' });
       y += 15;
 
-      if (clientName) {
+      // User name/org on cover page (Task 36)
+      const displayName = clientName || options.userName || analysis.userName || '';
+      const displayOrg = options.organizationName || analysis.organizationId || '';
+      if (displayName) {
         doc.setFontSize(16);
         doc.setFont('helvetica', 'normal');
         doc.setTextColor(...GRAY);
-        doc.text(`Prepared for: ${clientName}`, pageWidth / 2, y, { align: 'center' });
-        y += 12;
+        doc.text(`Prepared for: ${displayName}`, pageWidth / 2, y, { align: 'center' });
+        y += 10;
+      }
+      if (displayOrg) {
+        doc.setFontSize(12);
+        doc.setFont('helvetica', 'normal');
+        doc.setTextColor(...GRAY);
+        doc.text(displayOrg, pageWidth / 2, y, { align: 'center' });
+        y += 10;
       }
 
       // URL
@@ -287,6 +297,31 @@ export function useReadabilityExport() {
       });
       y = doc.lastAutoTable.finalY + 10;
 
+      // Quick wins on exec summary (Task 37)
+      const quickWinRecs = (analysis.recommendations || [])
+        .filter(r => r.group === 'quick-wins' || (r.priority === 'high' && r.effort === 'quick'))
+        .slice(0, 3);
+      if (quickWinRecs.length > 0) {
+        checkPage(20);
+        sectionHeader('Quick Wins');
+        for (const qw of quickWinRecs) {
+          checkPage(10);
+          doc.setFontSize(9);
+          doc.setFont('helvetica', 'bold');
+          doc.setTextColor(...CHARCOAL);
+          doc.text(`• ${qw.title || ''}`, margin + 4, y);
+          y += 5;
+          if (qw.description) {
+            doc.setFont('helvetica', 'normal');
+            doc.setFontSize(8);
+            const descLines = doc.splitTextToSize(qw.description, contentWidth - 10);
+            doc.text(descLines.slice(0, 2), margin + 8, y);
+            y += descLines.slice(0, 2).length * 4 + 3;
+          }
+        }
+        y += 5;
+      }
+
       setExportProgress(35);
 
       // ===== PAGES 3-4: CATEGORY BREAKDOWN =====
@@ -324,22 +359,24 @@ export function useReadabilityExport() {
             check.id,
             check.title || '',
             (check.status || '').toUpperCase(),
-            check.severity || ''
+            check.severity || '',
+            (check.status === 'fail' || check.status === 'warn') ? (check.recommendation || '').substring(0, 60) : ''
           ]);
 
           doc.autoTable({
             startY: y,
-            head: [['Check', 'Title', 'Status', 'Severity']],
+            head: [['Check', 'Title', 'Status', 'Severity', 'Recommendation']],
             body: checkRows,
             margin: { left: margin, right: margin },
             headStyles: { fillColor: TEAL, textColor: [255, 255, 255], fontStyle: 'bold', fontSize: 8 },
-            bodyStyles: { fontSize: 8, textColor: CHARCOAL },
+            bodyStyles: { fontSize: 7, textColor: CHARCOAL },
             alternateRowStyles: { fillColor: [248, 248, 248] },
             columnStyles: {
-              0: { cellWidth: 20 },
-              1: { cellWidth: 80 },
-              2: { cellWidth: 20, halign: 'center' },
-              3: { cellWidth: 25, halign: 'center' }
+              0: { cellWidth: 15 },
+              1: { cellWidth: 50 },
+              2: { cellWidth: 15, halign: 'center' },
+              3: { cellWidth: 18, halign: 'center' },
+              4: { cellWidth: 70, fontStyle: 'italic' }
             }
           });
           y = doc.lastAutoTable.finalY + 10;
@@ -369,15 +406,17 @@ export function useReadabilityExport() {
           .map(([llmKey, data]) => [
             llmNames[llmKey] || llmKey,
             data.model || '',
-            data.usefulnessScore ? `${data.usefulnessScore}/10` : 'N/A',
-            data.processingTimeMs ? `${(data.processingTimeMs / 1000).toFixed(1)}s` : 'N/A',
-            data.status || 'N/A'
+            data.usefulnessScore || data.usefulnessAssessment?.score ? `${data.usefulnessScore || data.usefulnessAssessment?.score}/10` : 'N/A',
+            data.contentCoverage != null ? `${data.contentCoverage}%` : 'N/A',
+            data.headingsCoverage != null ? `${data.headingsCoverage}%` : 'N/A',
+            data.entitiesCoverage != null ? `${data.entitiesCoverage}%` : 'N/A',
+            data.processingTimeMs ? `${(data.processingTimeMs / 1000).toFixed(1)}s` : 'N/A'
           ]);
 
         if (llmRows.length > 0) {
           doc.autoTable({
             startY: y,
-            head: [['LLM', 'Model', 'Usefulness', 'Time', 'Status']],
+            head: [['LLM', 'Model', 'Useful', 'Content%', 'Headings%', 'Entities%', 'Time']],
             body: llmRows,
             margin: { left: margin, right: margin },
             headStyles: { fillColor: TEAL, textColor: [255, 255, 255], fontStyle: 'bold', fontSize: 9 },
@@ -461,10 +500,23 @@ export function useReadabilityExport() {
           doc.setTextColor(...(priorityColors[rec.priority] || GRAY));
           doc.text(`[${(rec.priority || 'medium').toUpperCase()}]`, margin, y);
 
-          // Title
+          // Title + meta
           doc.setFont('helvetica', 'bold');
           doc.setTextColor(...CHARCOAL);
           doc.text(rec.title || '', margin + 25, y);
+          // Category, effort, impact inline
+          const metaText = [
+            rec.category ? `Cat: ${rec.category}` : '',
+            rec.effort ? `Effort: ${rec.effort}` : '',
+            rec.estimatedImpactPoints ? `Impact: ~${rec.estimatedImpactPoints}pts` : ''
+          ].filter(Boolean).join(' | ');
+          if (metaText) {
+            doc.setFontSize(7);
+            doc.setFont('helvetica', 'italic');
+            doc.setTextColor(...GRAY);
+            doc.text(metaText, margin + 25, y + 4);
+            y += 4;
+          }
           y += 5;
 
           // Description
@@ -579,6 +631,27 @@ export function useReadabilityExport() {
           y += 5;
         }
 
+        // AS-05 Quotable passages (Task 41)
+        const quotableCheck = (analysis.checkResults || []).find(c => c.id === 'AS-05');
+        if (quotableCheck) {
+          checkPage(15);
+          doc.setFontSize(10);
+          doc.setFont('helvetica', 'bold');
+          doc.setTextColor(...CHARCOAL);
+          doc.text('Quotable Passages Assessment (AS-05)', margin, y);
+          y += 7;
+          doc.setFontSize(8);
+          doc.setFont('helvetica', 'normal');
+          const quotableStatus = quotableCheck.status === 'pass' ? 'PASS' : quotableCheck.status === 'warn' ? 'WARNING' : 'FAIL';
+          doc.text(`Status: ${quotableStatus}`, margin + 4, y);
+          y += 5;
+          if (quotableCheck.details) {
+            const quotableLines = doc.splitTextToSize(quotableCheck.details, contentWidth - 10);
+            doc.text(quotableLines.slice(0, 3), margin + 4, y);
+            y += quotableLines.slice(0, 3).length * 4 + 5;
+          }
+        }
+
         // AI visibility priorities
         y += 5;
         checkPage(15);
@@ -636,6 +709,39 @@ export function useReadabilityExport() {
         });
         y = doc.lastAutoTable.finalY + 10;
 
+        // All 50 checks list (Task 42)
+        const allChecks = analysis.checkResults || [];
+        if (allChecks.length > 0) {
+          checkPage(20);
+          doc.setFontSize(10);
+          doc.setFont('helvetica', 'bold');
+          doc.setTextColor(...CHARCOAL);
+          doc.text('Complete Check List', margin, y);
+          y += 7;
+
+          const checkListRows = allChecks.map(c => [
+            c.id || '',
+            (c.title || '').substring(0, 50),
+            (c.status || '').toUpperCase()
+          ]);
+
+          doc.autoTable({
+            startY: y,
+            head: [['ID', 'Check', 'Status']],
+            body: checkListRows,
+            margin: { left: margin, right: margin },
+            headStyles: { fillColor: TEAL, textColor: [255, 255, 255], fontStyle: 'bold', fontSize: 7 },
+            bodyStyles: { fontSize: 6, textColor: CHARCOAL },
+            alternateRowStyles: { fillColor: [248, 248, 248] },
+            columnStyles: {
+              0: { cellWidth: 18 },
+              1: { cellWidth: 120 },
+              2: { cellWidth: 18, halign: 'center' }
+            }
+          });
+          y = doc.lastAutoTable.finalY + 10;
+        }
+
         // AI disclaimer
         checkPage(25);
         doc.setFillColor(255, 251, 235); // amber-50
@@ -657,15 +763,26 @@ export function useReadabilityExport() {
         keyValue('LLM Models', 'Claude claude-sonnet-4-5-20250929, GPT gpt-4o, Gemini gemini-2.0-flash');
       }
 
-      // ===== ADD PAGE NUMBERS & FOOTER =====
+      // ===== ADD HEADERS, PAGE NUMBERS & FOOTER (Task 43) =====
       const pageCount = doc.internal.getNumberOfPages();
+      const reportDate = format(new Date(), 'yyyy-MM-dd HH:mm');
       for (let i = 1; i <= pageCount; i++) {
         doc.setPage(i);
+        // Header (skip cover page)
+        if (i > 1) {
+          doc.setFontSize(7);
+          doc.setTextColor(...LIGHT_GRAY);
+          doc.text('AI Readability Checker', margin, 8);
+          doc.text(reportDate, pageWidth - margin, 8, { align: 'right' });
+          doc.setDrawColor(...LIGHT_GRAY);
+          doc.line(margin, 10, pageWidth - margin, 10);
+        }
+        // Footer
         doc.setFontSize(7);
         doc.setTextColor(...LIGHT_GRAY);
         doc.text(`Page ${i} of ${pageCount}`, pageWidth / 2, pageHeight - 8, { align: 'center' });
         doc.text(
-          `Generated by Content Strategy Portal — ${format(new Date(), 'yyyy-MM-dd HH:mm')}`,
+          `Generated by Content Strategy Portal — ${reportDate}`,
           pageWidth / 2,
           pageHeight - 4,
           { align: 'center' }
