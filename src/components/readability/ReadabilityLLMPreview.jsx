@@ -11,9 +11,11 @@ import {
   LayoutList,
   AlertTriangle,
   Info,
+  Diff,
 } from 'lucide-react';
 import ReadabilityLLMColumn from './ReadabilityLLMColumn';
 import ReadabilityCoverageTable from './ReadabilityCoverageTable';
+import ReadabilityLLMDiff from './ReadabilityLLMDiff';
 
 const LLM_OPTIONS = [
   { key: 'claude', name: 'Claude', model: 'Claude 3.5 Sonnet' },
@@ -25,7 +27,7 @@ export default function ReadabilityLLMPreview({ llmExtractions, aiAssessment }) 
   const [selectedLLMs, setSelectedLLMs] = useState(
     new Set(LLM_OPTIONS.map((l) => l.key))
   );
-  const [viewMode, setViewMode] = useState('side-by-side'); // 'side-by-side' | 'stacked'
+  const [viewMode, setViewMode] = useState('side-by-side'); // 'side-by-side' | 'stacked' | 'diff'
 
   const toggleLLM = useCallback((key) => {
     setSelectedLLMs((prev) => {
@@ -164,34 +166,56 @@ export default function ReadabilityLLMPreview({ llmExtractions, aiAssessment }) 
             <LayoutList className="w-4 h-4" aria-hidden="true" />
             <span className="hidden sm:inline">Stacked</span>
           </button>
+          <button
+            type="button"
+            onClick={() => setViewMode('diff')}
+            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-sm font-medium transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-teal-500 ${
+              viewMode === 'diff'
+                ? 'bg-white dark:bg-charcoal-600 text-gray-900 dark:text-white shadow-sm'
+                : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300'
+            }`}
+            aria-pressed={viewMode === 'diff'}
+          >
+            <Diff className="w-4 h-4" aria-hidden="true" />
+            <span className="hidden sm:inline">Diff</span>
+          </button>
         </div>
       </div>
 
-      {/* LLM columns */}
-      <div
-        className={
-          viewMode === 'side-by-side'
-            ? `grid gap-4 ${
-                activeLLMs.length === 1
-                  ? 'grid-cols-1'
-                  : activeLLMs.length === 2
-                  ? 'grid-cols-1 md:grid-cols-2'
-                  : 'grid-cols-1 md:grid-cols-2 xl:grid-cols-3'
-              }`
-            : 'space-y-4'
-        }
-      >
-        {activeLLMs.map((llm, idx) => (
-          <ReadabilityLLMColumn
-            key={llm.key}
-            llmKey={llm.key}
-            llmName={llm.name}
-            llmModel={llm.model}
-            extraction={llmExtractions[llm.key]}
-            animationDelay={idx * 100}
-          />
-        ))}
-      </div>
+      {/* LLM columns / diff view */}
+      {viewMode === 'diff' ? (
+        <ReadabilityLLMDiff
+          llmA={activeLLMs.length >= 1 ? llmExtractions[activeLLMs[0]?.key] : null}
+          llmB={activeLLMs.length >= 2 ? llmExtractions[activeLLMs[1]?.key] : null}
+          nameA={activeLLMs[0]?.name || 'LLM A'}
+          nameB={activeLLMs[1]?.name || 'LLM B'}
+        />
+      ) : (
+        <div
+          className={
+            viewMode === 'side-by-side'
+              ? `grid gap-4 ${
+                  activeLLMs.length === 1
+                    ? 'grid-cols-1'
+                    : activeLLMs.length === 2
+                    ? 'grid-cols-1 md:grid-cols-2'
+                    : 'grid-cols-1 md:grid-cols-2 xl:grid-cols-3'
+                }`
+              : 'space-y-4'
+          }
+        >
+          {activeLLMs.map((llm, idx) => (
+            <ReadabilityLLMColumn
+              key={llm.key}
+              llmKey={llm.key}
+              llmName={llm.name}
+              llmModel={llm.model}
+              extraction={llmExtractions[llm.key]}
+              animationDelay={idx * 100}
+            />
+          ))}
+        </div>
+      )}
 
       {/* Coverage comparison table */}
       {coverageData.length > 0 && (

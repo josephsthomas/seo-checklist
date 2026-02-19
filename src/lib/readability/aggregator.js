@@ -9,6 +9,13 @@ import { scoreContent } from './scorer.js';
 import { analyzeWithAI } from './aiAnalyzer.js';
 import { extractWithAllLLMs } from './llmPreview.js';
 import { generateRecommendations } from './recommendations.js';
+import { calculateScoreConfidence } from './utils/scoreConfidence.js';
+import { computeLLMConsensus } from './utils/llmConsensus.js';
+import { assessContentFreshness } from './utils/contentFreshness.js';
+import { detectPageType } from './utils/pageTypeDetector.js';
+import { getReadabilityScore } from './utils/readabilityFormulas.js';
+import { scoreAllSchemas } from './utils/schemaValidator.js';
+import { getIndustryProfile } from './profiles/industryProfiles.js';
 
 /**
  * Run full analysis pipeline
@@ -72,7 +79,24 @@ export async function runFullAnalysis(htmlContent, options = {}) {
 
   if (signal?.aborted) throw new DOMException('Aborted', 'AbortError');
 
-  // Stage 5: Assemble final document
+  // Stage 5: Compute enhancement metrics (E-009, E-010, E-011, E-016, E-018, E-022)
+  onProgress?.({ stage: 'finalizing', progress: 93, message: 'Computing enhancement metrics...' });
+
+  const llmConsensus = computeLLMConsensus(llmExtractions);
+  const scoreConfidence = calculateScoreConfidence(scoring, llmConsensus);
+  const contentFreshness = assessContentFreshness(extracted);
+  const pageType = detectPageType(htmlContent);
+  const readabilityScore = getReadabilityScore(extracted.language, {
+    totalWords: extracted.wordCount || 0,
+    totalSentences: extracted.sentenceCount || 0,
+    totalSyllables: extracted.syllableCount || 0,
+    longWords: extracted.longWordCount || 0,
+    totalChars: extracted.charCount || 0,
+  });
+  const schemaValidation = scoreAllSchemas(extracted.structuredData || []);
+  const industryProfile = options.industry ? getIndustryProfile(options.industry) : null;
+
+  // Stage 6: Assemble final document
   onProgress?.({ stage: 'finalizing', progress: 95, message: 'Finalizing...' });
 
   const now = new Date().toISOString();
@@ -123,6 +147,15 @@ export async function runFullAnalysis(htmlContent, options = {}) {
 
     // Recommendations
     recommendations,
+
+    // Enhancement metrics (E-009, E-010, E-011, E-016, E-018, E-022)
+    scoreConfidence,
+    llmConsensus,
+    contentFreshness,
+    pageType,
+    readabilityScore,
+    schemaValidation,
+    industryProfile: industryProfile ? { key: options.industry, label: industryProfile.label } : null,
 
     // Sharing (populated later)
     isShared: false,

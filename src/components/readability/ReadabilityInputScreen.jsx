@@ -9,6 +9,8 @@ import { useDropzone } from 'react-dropzone';
 import { validateReadabilityUrl } from '../../lib/readability/utils/urlValidation';
 import { getGrade } from '../../lib/readability/utils/gradeMapper';
 import { format } from 'date-fns';
+import ReadabilityProjectTagger from './ReadabilityProjectTagger';
+import ReadabilityBenchmarkWidget from './ReadabilityBenchmarkWidget';
 
 /**
  * Input method tabs
@@ -89,6 +91,9 @@ export default function ReadabilityInputScreen({
 
   // Advanced options
   const [showAdvanced, setShowAdvanced] = useState(false);
+
+  // Project tagging (E-041)
+  const [projectTags, setProjectTags] = useState({});
 
   // Prefill URL on mount or change
   useEffect(() => {
@@ -412,6 +417,12 @@ export default function ReadabilityInputScreen({
                       }}
                     />
                   </div>
+
+                  {/* Project/Client Tagging (E-041) */}
+                  <ReadabilityProjectTagger
+                    value={projectTags}
+                    onChange={setProjectTags}
+                  />
                 </div>
               )}
             </div>
@@ -661,6 +672,13 @@ export default function ReadabilityInputScreen({
           <p className="text-xs text-charcoal-500 dark:text-charcoal-500 mt-1">
             Run your first analysis to see results here
           </p>
+        </div>
+      )}
+
+      {/* Historical Benchmark Widget (E-012) — shown after 5+ analyses */}
+      {recentAnalyses.length >= 5 && (
+        <div className="mt-6">
+          <ReadabilityBenchmarkWidget history={recentAnalyses} />
         </div>
       )}
 

@@ -1,6 +1,7 @@
 import { useState, useCallback } from 'react';
 import { format } from 'date-fns';
 import { getGrade, getScoreColor } from '../lib/readability/utils/gradeMapper';
+import { registerWithExportHub, createBatchZip, downloadBlob } from '../lib/readability/exportHubAdapter';
 import toast from 'react-hot-toast';
 
 /**
@@ -1148,7 +1149,11 @@ export function useReadabilityExport() {
     exportExcel,
     getPreviewData,
     isExporting,
-    exportProgress
+    exportProgress,
+    // E-027: Export Hub integration
+    registerWithExportHub,
+    createBatchZip,
+    downloadBlob
   };
 }
 
