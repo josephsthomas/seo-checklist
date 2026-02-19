@@ -44,6 +44,7 @@ export default function ReadabilityDashboard({
   const [showPDFPreview, setShowPDFPreview] = useState(false);
   const [showWeightConfig, setShowWeightConfig] = useState(false);
   const [shareExpiry, setShareExpiry] = useState(30);
+  const [generatedShareUrl, setGeneratedShareUrl] = useState(null);
   const [trendData, setTrendData] = useState([]);
 
   const exportHook = useReadabilityExport();
@@ -117,8 +118,10 @@ export default function ReadabilityDashboard({
   // Share handler
   const handleShare = useCallback(async () => {
     if (!analysis?.id) return;
-    await shareHook.createShareLink(analysis.id, { expiryDays: shareExpiry });
-    setShowShareDialog(false);
+    const result = await shareHook.createShareLink(analysis.id, { expiryDays: shareExpiry });
+    if (result?.shareUrl) {
+      setGeneratedShareUrl(result.shareUrl);
+    }
   }, [analysis?.id, shareExpiry, shareHook]);
 
   if (!analysis) return null;
@@ -214,6 +217,20 @@ export default function ReadabilityDashboard({
                 >
                   {shareHook.isSharing ? 'Creating...' : 'Create & Copy Link'}
                 </button>
+                {generatedShareUrl && (
+                  <div className="mt-3 p-2 bg-charcoal-50 dark:bg-charcoal-700 rounded-lg">
+                    <p className="text-xs text-charcoal-500 dark:text-charcoal-400 mb-1">Share link:</p>
+                    <div className="flex items-center gap-1">
+                      <input
+                        type="text"
+                        readOnly
+                        value={generatedShareUrl}
+                        className="flex-1 text-xs px-2 py-1 bg-white dark:bg-charcoal-800 border border-charcoal-300 dark:border-charcoal-600 rounded text-charcoal-700 dark:text-charcoal-200"
+                        onFocus={(e) => e.target.select()}
+                      />
+                    </div>
+                  </div>
+                )}
               </div>
             )}
           </div>

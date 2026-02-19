@@ -91,6 +91,8 @@ export default function ReadabilityInputScreen({
 
   // Advanced options
   const [showAdvanced, setShowAdvanced] = useState(false);
+  const [industry, setIndustry] = useState('');
+  const [keywords, setKeywords] = useState('');
 
   // Project tagging (E-041)
   const [projectTags, setProjectTags] = useState({});
@@ -132,9 +134,14 @@ export default function ReadabilityInputScreen({
   const handleUrlSubmit = useCallback((e) => {
     e.preventDefault();
     if (urlValidation?.valid && !isAnalyzing) {
-      onAnalyzeUrl(url);
+      // DEF-017: Pass advanced options (industry, keywords, project tags) to analysis
+      onAnalyzeUrl(url, {
+        industry: industry || undefined,
+        keywords: keywords || undefined,
+        ...projectTags,
+      });
     }
-  }, [url, urlValidation, isAnalyzing, onAnalyzeUrl]);
+  }, [url, urlValidation, isAnalyzing, onAnalyzeUrl, industry, keywords, projectTags]);
 
   const handleUrlPaste = useCallback((e) => {
     // Paste-and-go: validate immediately on paste
@@ -384,6 +391,8 @@ export default function ReadabilityInputScreen({
                     </label>
                     <select
                       id="industry-select"
+                      value={industry}
+                      onChange={(e) => setIndustry(e.target.value)}
                       className="w-full px-3 py-2 rounded-lg border border-charcoal-300 dark:border-charcoal-600 dark:bg-charcoal-800 dark:text-charcoal-100 text-sm focus:outline-none focus:ring-2 focus:ring-teal-500"
                     >
                       <option value="">Select industry...</option>
@@ -403,6 +412,8 @@ export default function ReadabilityInputScreen({
                     <input
                       id="keywords-input"
                       type="text"
+                      value={keywords}
+                      onChange={(e) => setKeywords(e.target.value)}
                       placeholder="e.g., AI readability, content optimization"
                       className="w-full px-3 py-2 rounded-lg border border-charcoal-300 dark:border-charcoal-600 dark:bg-charcoal-800 dark:text-charcoal-100 text-sm focus:outline-none focus:ring-2 focus:ring-teal-500"
                       maxLength={200}

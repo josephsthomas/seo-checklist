@@ -211,9 +211,10 @@ service cloud.firestore {
     }
 
     // Shared readability analyses - public read access for shared links
+    // shareExpiry == null means permanent (never expires)
     match /readability-analyses/{analysisId} {
       allow read: if resource.data.isShared == true &&
-                    resource.data.shareExpiry > request.time;
+                    (resource.data.shareExpiry == null || resource.data.shareExpiry > request.time);
     }
 
     // Readability settings - users can manage their own settings

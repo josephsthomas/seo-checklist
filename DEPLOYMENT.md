@@ -355,7 +355,7 @@ After getting your Vercel URL, go back to Railway and update the CORS configurat
 
 ### AI features not working
 - Check Railway logs for errors
-- Verify `VITE_AI_PROXY_URL` includes the full path (`/api/claude`)
+- Verify `VITE_AI_PROXY_URL` is the base URL of the proxy server (e.g., `https://your-railway-app.railway.app`) — do NOT append a path suffix
 - Ensure CORS is configured with your Vercel domain
 
 ### Build fails on Vercel

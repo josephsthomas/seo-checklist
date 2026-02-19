@@ -76,21 +76,20 @@ async function handleMultiProvider(provider, content, model, parameters) {
  * Handle direct messages format (from old snippet: { messages, model, max_tokens, system })
  */
 async function handleDirectMessages(messages, model, maxTokens, system) {
-  const Anthropic = require('@anthropic-ai/sdk');
-  const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
+  // Reuse shared callAnthropic provider instead of creating duplicate SDK instance
+  const promptParts = messages.map(m => {
+    const role = m.role === 'user' ? 'Human' : 'Assistant';
+    return `${role}: ${typeof m.content === 'string' ? m.content : JSON.stringify(m.content)}`;
+  });
+  const prompt = promptParts.join('\n\n');
+  const fullPrompt = system ? `${system}\n\n${prompt}` : prompt;
 
-  const response = await withTimeout(
-    anthropic.messages.create({
-      model: model || 'claude-sonnet-4-5-20250929',
-      max_tokens: maxTokens || 4096,
-      system: system || undefined,
-      messages
-    }),
+  const result = await withTimeout(
+    callAnthropic(fullPrompt, { max_tokens: maxTokens || 4096, model }),
     REQUEST_TIMEOUT_MS
   );
 
-  // Return the full Anthropic response for backward compatibility
-  return response;
+  return { content: result.content, model: result.model };
 }
 
 /**
