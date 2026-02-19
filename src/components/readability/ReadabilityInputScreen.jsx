@@ -269,6 +269,39 @@ export default function ReadabilityInputScreen({
         })}
       </div>
 
+      {/* Tab helper text (Task 12) */}
+      <p className="text-xs text-charcoal-500 dark:text-charcoal-400 mb-4 -mt-4">
+        {activeTab === 'url' && 'Enter a public URL to analyze. We\u2019ll fetch the page and evaluate its AI readability.'}
+        {activeTab === 'upload' && 'Upload an .html or .htm file (max 10MB). Works great with Screaming Frog rendered exports.'}
+        {activeTab === 'paste' && 'Paste raw HTML content (min 100 characters, max 2MB) for direct analysis.'}
+      </p>
+
+      {/* First-use onboarding callout (Task 15) */}
+      {!localStorage.getItem('readability-onboarded') && (
+        <div className="mb-4 p-4 bg-teal-50 dark:bg-teal-900/20 border border-teal-200 dark:border-teal-800 rounded-lg flex items-start gap-3">
+          <Info className="w-5 h-5 text-teal-500 flex-shrink-0 mt-0.5" aria-hidden="true" />
+          <div className="flex-1">
+            <p className="text-sm font-medium text-teal-800 dark:text-teal-200">
+              Welcome to the AI Readability Checker
+            </p>
+            <p className="text-sm text-teal-700 dark:text-teal-300 mt-1">
+              Analyze any web page across 50+ checks to see how AI models read your content.
+              Get a score, grade, and actionable recommendations to improve AI visibility.
+            </p>
+          </div>
+          <button
+            onClick={() => {
+              localStorage.setItem('readability-onboarded', 'true');
+              // Force re-render by toggling a state
+              setActiveTab(activeTab);
+            }}
+            className="text-xs text-teal-600 dark:text-teal-400 hover:underline whitespace-nowrap"
+          >
+            Dismiss
+          </button>
+        </div>
+      )}
+
       {/* URL Tab Panel */}
       {activeTab === 'url' && (
         <div
@@ -368,6 +401,15 @@ export default function ReadabilityInputScreen({
                       placeholder="e.g., AI readability, content optimization"
                       className="w-full px-3 py-2 rounded-lg border border-charcoal-300 dark:border-charcoal-600 dark:bg-charcoal-800 dark:text-charcoal-100 text-sm focus:outline-none focus:ring-2 focus:ring-teal-500"
                       maxLength={200}
+                      onPaste={(e) => {
+                        // Strip HTML tags from pasted content (Task 50)
+                        const text = e.clipboardData?.getData('text/plain') || '';
+                        const stripped = text.replace(/<[^>]*>/g, '');
+                        if (stripped !== text) {
+                          e.preventDefault();
+                          e.target.value = stripped;
+                        }
+                      }}
                     />
                   </div>
                 </div>
@@ -606,6 +648,19 @@ export default function ReadabilityInputScreen({
               )}
             </button>
           </div>
+        </div>
+      )}
+
+      {/* Empty history state (Task 16) */}
+      {recentAnalyses.length === 0 && (
+        <div className="mt-8 pt-6 border-t border-charcoal-200 dark:border-charcoal-700 text-center py-8">
+          <ScanEye className="w-10 h-10 text-charcoal-300 dark:text-charcoal-600 mx-auto mb-3" aria-hidden="true" />
+          <p className="text-sm font-medium text-charcoal-600 dark:text-charcoal-400">
+            No analyses yet
+          </p>
+          <p className="text-xs text-charcoal-500 dark:text-charcoal-500 mt-1">
+            Run your first analysis to see results here
+          </p>
         </div>
       )}
 

@@ -1,7 +1,8 @@
-import { useState, useEffect, useRef, useMemo } from 'react';
-import { Award, TrendingUp, Quote } from 'lucide-react';
+import { useState, useEffect, useRef, useMemo, useCallback } from 'react';
+import { Award, TrendingUp, Quote, Copy } from 'lucide-react';
 import { getGrade, getScoreColor } from '../../lib/readability/utils/gradeMapper';
 import ReadabilityTrendSparkline from './ReadabilityTrendSparkline';
+import toast from 'react-hot-toast';
 
 /**
  * Grade color classes for score display
@@ -89,7 +90,14 @@ function ScoreGauge({ score, size = 120 }) {
   const dashOffset = circumference - (circumference * animatedScore) / 100;
 
   return (
-    <div className="relative inline-flex items-center justify-center">
+    <div
+      className="relative inline-flex items-center justify-center"
+      role="meter"
+      aria-valuenow={score}
+      aria-valuemin={0}
+      aria-valuemax={100}
+      aria-label={`AI Readability Score: ${score} out of 100, Grade ${gradeInfo.grade}`}
+    >
       <svg
         width={size}
         height={size}
@@ -123,7 +131,7 @@ function ScoreGauge({ score, size = 120 }) {
       {/* Center text */}
       <div className="absolute inset-0 flex flex-col items-center justify-center">
         <span
-          className={`text-4xl font-bold ${colors.text}`}
+          className={`text-5xl font-bold ${colors.text}`}
           aria-hidden="true"
         >
           {animatedScore}
@@ -152,6 +160,17 @@ export default function ReadabilityScoreCard({
   const gradeInfo = useMemo(() => getGrade(score), [score]);
   const colors = useMemo(() => getGradeClasses(score), [score]);
 
+  // Copy score to clipboard (Task 19)
+  const handleCopyScore = useCallback(async () => {
+    const text = `AI Readability Score: ${score}/100 (Grade ${gradeInfo.grade})`;
+    try {
+      await navigator.clipboard.writeText(text);
+      toast.success('Score copied to clipboard');
+    } catch {
+      toast.error('Could not copy to clipboard');
+    }
+  }, [score, gradeInfo.grade]);
+
   // Trend arrow
   const trendArrow = useMemo(() => {
     if (scoreDelta === null || scoreDelta === undefined) return null;
@@ -173,10 +192,20 @@ export default function ReadabilityScoreCard({
 
         {/* Score details */}
         <div className="flex-1 text-center sm:text-left">
-          {/* Summary */}
-          <p className="text-lg font-medium text-charcoal-900 dark:text-charcoal-100 mb-2">
-            {gradeSummary || gradeInfo.summary}
-          </p>
+          {/* Summary + copy button */}
+          <div className="flex items-start gap-2 mb-2">
+            <p className="text-lg font-medium text-charcoal-900 dark:text-charcoal-100 flex-1">
+              {gradeSummary || gradeInfo.summary}
+            </p>
+            <button
+              onClick={handleCopyScore}
+              className="p-1.5 rounded hover:bg-charcoal-100 dark:hover:bg-charcoal-700 transition-colors flex-shrink-0 focus:outline-none focus:ring-2 focus:ring-teal-500"
+              title="Copy score to clipboard"
+              aria-label="Copy score to clipboard"
+            >
+              <Copy className="w-4 h-4 text-charcoal-400 dark:text-charcoal-500" aria-hidden="true" />
+            </button>
+          </div>
 
           {/* Trend arrow */}
           {trendArrow && (

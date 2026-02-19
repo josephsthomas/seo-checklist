@@ -4,7 +4,7 @@
  * BRD: US-2.2.3, check result display
  */
 
-import React, { useState } from 'react';
+import React, { useState, useCallback } from 'react';
 import {
   CheckCircle2,
   AlertTriangle,
@@ -12,7 +12,35 @@ import {
   Info,
   ChevronDown,
   ChevronRight,
+  Copy,
+  HelpCircle,
 } from 'lucide-react';
+import toast from 'react-hot-toast';
+import { getWhyItMatters } from '../../lib/readability/utils/whyItMatters';
+
+/** Jargon glossary for technical terms */
+const JARGON = {
+  'JSON-LD': 'JavaScript Object Notation for Linked Data — a structured data format',
+  'Schema.org': 'A shared vocabulary for structured data markup on web pages',
+  'Flesch Reading Ease': 'A formula measuring text readability (0-100, higher = easier)',
+  'robots.txt': 'A file that tells search engine crawlers which pages to access',
+  'meta description': 'An HTML tag summarizing a page for search engine results',
+  'canonical URL': 'The preferred URL for a page when duplicates exist',
+  'Open Graph': 'A protocol for enriching link previews on social media',
+  'hreflang': 'An HTML attribute indicating the language of a linked page',
+};
+
+/** Wrap known jargon terms in title-bearing abbr tags */
+function annotateJargon(text) {
+  if (!text) return text;
+  let result = text;
+  for (const [term, definition] of Object.entries(JARGON)) {
+    if (result.includes(term)) {
+      result = result.replace(term, `<abbr title="${definition}" class="underline decoration-dotted cursor-help">${term}</abbr>`);
+    }
+  }
+  return result === text ? null : result;
+}
 
 const STATUS_CONFIG = {
   pass: {
@@ -49,8 +77,17 @@ const SEVERITY_BADGES = {
   info: 'bg-gray-100 text-gray-700 dark:bg-charcoal-700 dark:text-gray-300',
 };
 
-export default function ReadabilityCheckItem({ check, defaultExpanded = false }) {
+function ReadabilityCheckItem({ check, defaultExpanded = false }) {
   const [expanded, setExpanded] = useState(defaultExpanded);
+
+  const handleCopy = useCallback(async (e) => {
+    e.stopPropagation();
+    const text = `${check.id}: ${check.title || check.name} — ${(check.status || '').toUpperCase()}${check.details ? '\n' + check.details : ''}`;
+    try {
+      await navigator.clipboard.writeText(text);
+      toast.success('Check result copied');
+    } catch { /* noop */ }
+  }, [check]);
 
   if (!check) return null;
 
@@ -108,13 +145,29 @@ export default function ReadabilityCheckItem({ check, defaultExpanded = false })
                   {check.id}
                 </span>
               )}
-              {/* Title */}
-              <span className="text-sm font-medium text-gray-800 dark:text-gray-200">
-                {check.title || check.name || 'Unknown Check'}
-              </span>
+              {/* Title (with jargon tooltips) */}
+              {annotateJargon(check.title || check.name || 'Unknown Check') ? (
+                <span
+                  className="text-sm font-medium text-gray-800 dark:text-gray-200"
+                  dangerouslySetInnerHTML={{ __html: annotateJargon(check.title || check.name || 'Unknown Check') }}
+                />
+              ) : (
+                <span className="text-sm font-medium text-gray-800 dark:text-gray-200">
+                  {check.title || check.name || 'Unknown Check'}
+                </span>
+              )}
             </div>
 
             <div className="flex items-center gap-2 flex-shrink-0">
+              {/* Copy button */}
+              <button
+                onClick={handleCopy}
+                className="p-1 rounded hover:bg-gray-200 dark:hover:bg-charcoal-600 transition-colors focus:outline-none focus:ring-1 focus:ring-teal-500"
+                title="Copy check result"
+                aria-label={`Copy ${check.id} result`}
+              >
+                <Copy className="w-3.5 h-3.5 text-gray-400 dark:text-gray-500" aria-hidden="true" />
+              </button>
               {/* Severity badge */}
               {check.severity && (
                 <span
@@ -219,9 +272,28 @@ export default function ReadabilityCheckItem({ check, defaultExpanded = false })
                 </p>
               </div>
             )}
+
+            {/* E-006: Why This Matters tooltip */}
+            {getWhyItMatters(check.id) && (
+              <div className="bg-blue-50 dark:bg-blue-900/10 border border-blue-100 dark:border-blue-800/30 rounded-lg p-3">
+                <div className="flex items-start gap-2">
+                  <HelpCircle className="w-4 h-4 text-blue-500 flex-shrink-0 mt-0.5" aria-hidden="true" />
+                  <div>
+                    <p className="text-xs font-medium text-blue-700 dark:text-blue-300 mb-0.5">
+                      Why this matters for AI readability:
+                    </p>
+                    <p className="text-sm text-blue-800 dark:text-blue-200">
+                      {getWhyItMatters(check.id)}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
         </div>
       )}
     </div>
   );
 }
+
+export default React.memo(ReadabilityCheckItem);

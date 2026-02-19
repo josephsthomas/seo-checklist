@@ -1,0 +1,8 @@
+{
+  "success": false,
+  "error": {
+    "type": "internal_server_error",
+    "message": "An internal error occurred while processing your request.",
+    "status": 500
+  }
+}

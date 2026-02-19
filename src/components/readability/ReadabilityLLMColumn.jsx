@@ -66,7 +66,7 @@ function SkeletonLoader() {
   );
 }
 
-export default function ReadabilityLLMColumn({
+function ReadabilityLLMColumn({
   llmKey,
   llmName,
   llmModel,
@@ -274,3 +274,5 @@ export default function ReadabilityLLMColumn({
     </div>
   );
 }
+
+export default React.memo(ReadabilityLLMColumn);

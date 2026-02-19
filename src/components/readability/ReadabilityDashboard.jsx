@@ -1,15 +1,15 @@
 import { useState, useCallback, useMemo, useEffect, lazy, Suspense } from 'react';
 import {
   ExternalLink, Share2, Download, FileJson, FileText, ChevronDown,
-  Zap, ArrowRight, ListChecks, Eye, MessageSquare, AlertTriangle
+  Zap, ArrowRight, ArrowLeft, ListChecks, Eye, MessageSquare, AlertTriangle
 } from 'lucide-react';
 import { useReadabilityExport } from '../../hooks/useReadabilityExport';
 import { useReadabilityShare } from '../../hooks/useReadabilityShare';
 import { useReadabilityHistory } from '../../hooks/useReadabilityHistory';
 import ReadabilityScoreCard from './ReadabilityScoreCard';
-import ReadabilityCategoryChart from './ReadabilityCategoryChart';
+const ReadabilityCategoryChart = lazy(() => import('./ReadabilityCategoryChart'));
 import ReadabilityCategoryAccordion from './ReadabilityCategoryAccordion';
-import ReadabilityLLMPreview from './ReadabilityLLMPreview';
+const ReadabilityLLMPreview = lazy(() => import('./ReadabilityLLMPreview'));
 import ReadabilityRecommendations from './ReadabilityRecommendations';
 import ReadabilityIssuesTable from './ReadabilityIssuesTable';
 import ReadabilityCrossToolLinks from './ReadabilityCrossToolLinks';
@@ -74,6 +74,18 @@ export default function ReadabilityDashboard({
     return `This page scored ${analysis?.overallScore || 0}/100 for AI readability.`;
   }, [analysis]);
 
+  // E-025: Plain-English executive summary for non-technical users
+  const executiveSummary = useMemo(() => {
+    const score = analysis?.overallScore || 0;
+    const issues = analysis?.issueSummary || {};
+    const criticalCount = (issues.critical || 0) + (issues.high || 0);
+    if (score >= 90) return 'This content is well-optimized for AI search engines and likely to be cited in AI-generated answers.';
+    if (score >= 80) return `Good performance with ${criticalCount} issue${criticalCount !== 1 ? 's' : ''} that could further improve AI visibility.`;
+    if (score >= 70) return `Room for improvement \u2014 addressing ${criticalCount} key issue${criticalCount !== 1 ? 's' : ''} could significantly boost AI search performance.`;
+    if (score >= 60) return 'Needs attention \u2014 AI models may struggle to cite this content effectively. Focus on the top recommendations.';
+    return 'Significant gaps for AI readability. Major improvements needed for AI search visibility.';
+  }, [analysis]);
+
   // Tab keyboard navigation
   const handleTabKeyDown = useCallback((e) => {
     const tabIds = TABS.map(t => t.id);
@@ -108,11 +120,31 @@ export default function ReadabilityDashboard({
   if (!analysis) return null;
 
   return (
-    <div className="space-y-6 motion-safe:animate-fade-in">
+    <div className="space-y-6 motion-safe:animate-fade-in print:space-y-4">
+      {/* Print-optimized styles */}
+      <style>{`
+        @media print {
+          nav, header, footer, [role="tablist"], .no-print { display: none !important; }
+          button:not(.print-visible) { display: none !important; }
+          details[open] > summary ~ * { display: block !important; }
+          details { break-inside: avoid; }
+          .print\\:space-y-4 > * + * { margin-top: 1rem; }
+        }
+      `}</style>
       {/* Top Action Bar */}
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
-        {/* URL / Source */}
+        {/* Back button + URL / Source */}
         <div className="flex items-center gap-2 min-w-0">
+          {onBack && (
+            <button
+              onClick={onBack}
+              className="inline-flex items-center gap-1.5 px-3 py-2 text-sm font-medium text-charcoal-700 dark:text-charcoal-300 bg-white dark:bg-charcoal-800 border border-charcoal-300 dark:border-charcoal-600 rounded-lg hover:bg-charcoal-50 dark:hover:bg-charcoal-700 transition-colors focus:outline-none focus:ring-2 focus:ring-teal-500"
+              aria-label="Back to input"
+            >
+              <ArrowLeft className="w-4 h-4" aria-hidden="true" />
+              <span className="hidden sm:inline">Back</span>
+            </button>
+          )}
           {analysis.sourceUrl && (
             <a
               href={analysis.sourceUrl}
@@ -195,17 +227,35 @@ export default function ReadabilityDashboard({
             </button>
 
             {showExportMenu && (
-              <div className="absolute right-0 top-full mt-2 w-52 bg-white dark:bg-charcoal-800 border border-charcoal-200 dark:border-charcoal-700 rounded-lg shadow-lg z-20 py-1">
+              <div
+                className="absolute right-0 top-full mt-2 w-52 bg-white dark:bg-charcoal-800 border border-charcoal-200 dark:border-charcoal-700 rounded-lg shadow-lg z-20 py-1"
+                role="menu"
+                onKeyDown={(e) => {
+                  const items = e.currentTarget.querySelectorAll('[role="menuitem"]');
+                  const current = Array.from(items).indexOf(document.activeElement);
+                  if (e.key === 'ArrowDown') {
+                    e.preventDefault();
+                    items[(current + 1) % items.length]?.focus();
+                  } else if (e.key === 'ArrowUp') {
+                    e.preventDefault();
+                    items[(current - 1 + items.length) % items.length]?.focus();
+                  } else if (e.key === 'Escape') {
+                    setShowExportMenu(false);
+                  }
+                }}
+              >
                 <button
+                  role="menuitem"
                   onClick={handleExportPDF}
-                  className="w-full flex items-center gap-2 px-4 py-2.5 text-sm text-charcoal-700 dark:text-charcoal-300 hover:bg-charcoal-50 dark:hover:bg-charcoal-700 transition-colors text-left"
+                  className="w-full flex items-center gap-2 px-4 py-2.5 text-sm text-charcoal-700 dark:text-charcoal-300 hover:bg-charcoal-50 dark:hover:bg-charcoal-700 transition-colors text-left focus:outline-none focus:bg-charcoal-50 dark:focus:bg-charcoal-700"
                 >
                   <FileText className="w-4 h-4 text-red-500" aria-hidden="true" />
                   Export as PDF
                 </button>
                 <button
+                  role="menuitem"
                   onClick={handleExportJSON}
-                  className="w-full flex items-center gap-2 px-4 py-2.5 text-sm text-charcoal-700 dark:text-charcoal-300 hover:bg-charcoal-50 dark:hover:bg-charcoal-700 transition-colors text-left"
+                  className="w-full flex items-center gap-2 px-4 py-2.5 text-sm text-charcoal-700 dark:text-charcoal-300 hover:bg-charcoal-50 dark:hover:bg-charcoal-700 transition-colors text-left focus:outline-none focus:bg-charcoal-50 dark:focus:bg-charcoal-700"
                 >
                   <FileJson className="w-4 h-4 text-blue-500" aria-hidden="true" />
                   Export as JSON
@@ -231,16 +281,32 @@ export default function ReadabilityDashboard({
         <p className="text-sm text-teal-800 dark:text-teal-200 leading-relaxed">
           {aiSummary}
         </p>
+        {/* E-025: Executive summary for non-technical stakeholders */}
+        {executiveSummary !== aiSummary && (
+          <p className="text-xs text-teal-700 dark:text-teal-300 mt-2 pt-2 border-t border-teal-200 dark:border-teal-800">
+            {executiveSummary}
+          </p>
+        )}
       </div>
 
       {/* Category Breakdown Chart */}
-      <ReadabilityCategoryChart
-        categoryScores={analysis.categoryScores}
-        onCategoryClick={(catId) => {
-          setActiveTab('details');
-          // Scroll to accordion is handled internally
-        }}
-      />
+      <Suspense fallback={<div className="h-64 bg-charcoal-50 dark:bg-charcoal-800 rounded-xl animate-pulse" />}>
+        <ReadabilityCategoryChart
+          categoryScores={analysis.categoryScores}
+          onCategoryClick={(catId) => {
+            // E-002: Click category chart bar → switch to details tab and scroll to that category
+            setActiveTab('details');
+            setTimeout(() => {
+              const el = document.getElementById(`category-${catId}`);
+              if (el) {
+                el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                el.classList.add('ring-2', 'ring-teal-500');
+                setTimeout(() => el.classList.remove('ring-2', 'ring-teal-500'), 2000);
+              }
+            }, 100);
+          }}
+        />
+      </Suspense>
 
       {/* Quick Wins Preview (E-UX-02) */}
       {quickWins.length > 0 && (
@@ -356,9 +422,11 @@ export default function ReadabilityDashboard({
           aria-labelledby="results-tab-llm"
           className="motion-safe:animate-fade-in"
         >
-          <ReadabilityLLMPreview
-            llmExtractions={analysis.llmExtractions}
-          />
+          <Suspense fallback={<div className="h-64 bg-charcoal-50 dark:bg-charcoal-800 rounded-xl animate-pulse" />}>
+            <ReadabilityLLMPreview
+              llmExtractions={analysis.llmExtractions}
+            />
+          </Suspense>
         </div>
       )}
 

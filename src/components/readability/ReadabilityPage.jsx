@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useMemo } from 'react';
+import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
 import { ScanEye, ArrowLeft, AlertCircle } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
@@ -39,8 +39,29 @@ export default function ReadabilityPage() {
   const [loadedResult, setLoadedResult] = useState(null);
   const [loadError, setLoadError] = useState(null);
 
+  // ARIA live region for screen reader announcements
+  const [liveMessage, setLiveMessage] = useState('');
+
   // Pre-filled URL from cross-tool deep linking (US-2.7.1)
   const prefillUrl = searchParams.get('url') || '';
+
+  // E-004: Keyboard shortcut system
+  const [showShortcuts, setShowShortcuts] = useState(false);
+  useEffect(() => {
+    const handler = (e) => {
+      // Don't trigger when typing in inputs
+      if (['INPUT', 'TEXTAREA', 'SELECT'].includes(e.target.tagName)) return;
+      if (e.key === '?' && !e.ctrlKey && !e.metaKey) {
+        e.preventDefault();
+        setShowShortcuts(s => !s);
+      }
+      if (e.key === 'Escape' && showShortcuts) {
+        setShowShortcuts(false);
+      }
+    };
+    window.addEventListener('keydown', handler);
+    return () => window.removeEventListener('keydown', handler);
+  }, [showShortcuts]);
 
   // Update document title based on view
   useEffect(() => {
@@ -74,19 +95,21 @@ export default function ReadabilityPage() {
     }
   }, [analysisId]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  // Watch analysis state changes
+  // Watch analysis state changes and announce to screen readers
   useEffect(() => {
     if (analysis.isAnalyzing) {
       setView('processing');
+      setLiveMessage('Analysis in progress. Please wait.');
     } else if (analysis.isComplete && analysis.result) {
       setView('results');
       setLoadedResult(analysis.result);
+      setLiveMessage(`Analysis complete. Score: ${analysis.result.overallScore} out of 100, Grade: ${analysis.result.grade}.`);
       // Update URL to include analysis ID
       if (analysis.result.id) {
         navigate(`/app/readability/${analysis.result.id}`, { replace: true });
       }
     } else if (analysis.isError) {
-      // Stay on current view but show error
+      setLiveMessage(`Error: ${analysis.error || 'An error occurred during analysis.'}`);
     }
   }, [analysis.state, analysis.result]); // eslint-disable-line react-hooks/exhaustive-deps
 
@@ -194,12 +217,17 @@ export default function ReadabilityPage() {
         </div>
       </div>
 
+      {/* ARIA live region for screen reader announcements */}
+      <div aria-live="polite" aria-atomic="true" className="sr-only">
+        {liveMessage}
+      </div>
+
       {/* Main Content */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
         {/* Error Banner */}
         {(analysis.error || loadError) && (
           <div
-            className="mb-6 p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg flex items-start gap-3"
+            className="mb-6 p-4 bg-red-50 dark:bg-red-900/20 border-l-4 border-red-500 rounded-r-lg flex items-start gap-3"
             role="alert"
           >
             <AlertCircle className="w-5 h-5 text-red-500 flex-shrink-0 mt-0.5" aria-hidden="true" />
@@ -259,6 +287,34 @@ export default function ReadabilityPage() {
           </div>
         )}
       </div>
+
+      {/* E-004: Keyboard shortcuts help overlay */}
+      {showShortcuts && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50" onClick={() => setShowShortcuts(false)}>
+          <div className="bg-white dark:bg-charcoal-800 rounded-xl shadow-xl border border-charcoal-200 dark:border-charcoal-700 p-6 max-w-sm w-full mx-4" onClick={(e) => e.stopPropagation()}>
+            <h2 className="text-lg font-bold text-charcoal-900 dark:text-charcoal-100 mb-4">Keyboard Shortcuts</h2>
+            <div className="space-y-2 text-sm">
+              {[
+                ['?', 'Toggle this help'],
+                ['Esc', 'Close dialogs'],
+                ['\u2190 / \u2192', 'Switch tabs'],
+                ['Enter', 'Expand/collapse check'],
+              ].map(([key, desc]) => (
+                <div key={key} className="flex items-center justify-between">
+                  <span className="text-charcoal-600 dark:text-charcoal-400">{desc}</span>
+                  <kbd className="px-2 py-0.5 bg-charcoal-100 dark:bg-charcoal-700 text-charcoal-700 dark:text-charcoal-300 rounded text-xs font-mono">{key}</kbd>
+                </div>
+              ))}
+            </div>
+            <button
+              onClick={() => setShowShortcuts(false)}
+              className="mt-4 w-full px-3 py-2 text-sm bg-charcoal-100 dark:bg-charcoal-700 text-charcoal-700 dark:text-charcoal-300 rounded-lg hover:bg-charcoal-200 dark:hover:bg-charcoal-600 transition-colors"
+            >
+              Close
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

@@ -11,7 +11,8 @@ import {
   serverTimestamp,
   limit as firestoreLimit
 } from 'firebase/firestore';
-import { db } from '../lib/firebase';
+import { ref, uploadBytes } from 'firebase/storage';
+import { db, storage } from '../lib/firebase';
 import { useAuth } from '../contexts/AuthContext';
 import { validateReadabilityUrl } from '../lib/readability/utils/urlValidation';
 import { runFullAnalysis, truncateForFirestore, estimateDocumentSize } from '../lib/readability/aggregator';
@@ -52,15 +53,18 @@ function getStorageLimit(role) {
  * Fetch URL content via the proxy
  * BRD: FR-1.1.3 — server-side proxy with redirects, timeout, gzip
  */
-async function fetchUrlViaProxy(url, signal) {
+async function fetchUrlViaProxy(url, signal, authToken) {
   const proxyUrl = import.meta.env.VITE_AI_PROXY_URL;
   if (!proxyUrl) {
     throw new Error('AI proxy URL not configured. Set VITE_AI_PROXY_URL in your environment.');
   }
 
+  const headers = { 'Content-Type': 'application/json' };
+  if (authToken) headers['Authorization'] = `Bearer ${authToken}`;
+
   const response = await fetch(`${proxyUrl}/api/fetch-url`, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    headers,
     body: JSON.stringify({
       url,
       options: {
@@ -80,15 +84,26 @@ async function fetchUrlViaProxy(url, signal) {
     if (status === 404) throw new Error(`Page not found (404) at "${url}".`);
     if (status === 403) throw new Error(`Access denied by "${new URL(url).hostname}".`);
     if (status === 429) throw new Error('Rate limit reached. Please try again in a few minutes.');
-    if (status === 401) throw new Error('Session expired. Please log in again.');
+    if (status === 401) throw new Error('Session expired. Please refresh the page and log in again.');
     if (status >= 500) throw new Error('The server returned an error. Try again later.');
     throw new Error(errorData.message || `Failed to fetch URL (status ${status})`);
+  }
+
+  // Task 44: Validate response size (>10MB guard)
+  const contentLength = response.headers.get('content-length');
+  if (contentLength && parseInt(contentLength, 10) > 10 * 1024 * 1024) {
+    throw new Error('The response exceeds 10MB. Try uploading a saved copy of the page instead.');
   }
 
   const data = await response.json();
 
   if (!data.success) {
     throw new Error(data.error || 'Failed to fetch URL content');
+  }
+
+  // Also check actual HTML size after parsing
+  if (data.data?.html && new Blob([data.data.html]).size > 10 * 1024 * 1024) {
+    throw new Error('The page content exceeds 10MB. Try uploading a trimmed copy instead.');
   }
 
   return data.data;
@@ -230,6 +245,7 @@ export function useReadabilityAnalysis() {
   const [error, setError] = useState(null);
   const [partialResults, setPartialResults] = useState(null);
   const abortControllerRef = useRef(null);
+  const lastSubmissionRef = useRef({ url: null, time: 0 });
 
   // Cleanup AbortController on unmount
   useEffect(() => {
@@ -276,6 +292,19 @@ export function useReadabilityAnalysis() {
       throw new Error('You must be logged in to run an analysis.');
     }
 
+    // Task 49: Get fresh Firebase auth token (force refresh if needed)
+    let authToken = null;
+    try {
+      authToken = await currentUser.getIdToken(/* forceRefresh */ false);
+    } catch (tokenErr) {
+      // Token may be expired; force refresh
+      try {
+        authToken = await currentUser.getIdToken(/* forceRefresh */ true);
+      } catch (refreshErr) {
+        console.warn('Could not refresh auth token, proceeding without:', refreshErr);
+      }
+    }
+
     const controller = new AbortController();
     abortControllerRef.current = controller;
 
@@ -295,8 +324,10 @@ export function useReadabilityAnalysis() {
       const analysisResult = await runFullAnalysis(htmlContent, {
         sourceUrl: options.sourceUrl || null,
         inputMethod: options.inputMethod || 'url',
+        filename: options.filename || null,
         signal: controller.signal,
-        onProgress: handleProgress
+        onProgress: handleProgress,
+        authToken
       });
 
       if (controller.signal.aborted) return;
@@ -341,6 +372,18 @@ export function useReadabilityAnalysis() {
       // Save to Firestore
       const docRef = await addDoc(collection(db, 'readability-analyses'), firestoreDoc);
 
+      // Store HTML snapshot in Firebase Storage (Task 35)
+      try {
+        if (htmlContent && storage) {
+          const htmlBlob = new Blob([htmlContent], { type: 'text/html' });
+          const storageRef = ref(storage, `readability-snapshots/${currentUser.uid}/${docRef.id}.html`);
+          await uploadBytes(storageRef, htmlBlob);
+        }
+      } catch (storageErr) {
+        console.warn('Could not store HTML snapshot:', storageErr);
+        // Non-fatal: continue without snapshot
+      }
+
       const savedResult = {
         id: docRef.id,
         ...analysisResult,
@@ -381,6 +424,18 @@ export function useReadabilityAnalysis() {
 
     const validatedUrl = validation.url;
 
+    // Task 48: Prevent duplicate submission of same URL within 5 seconds
+    const now = Date.now();
+    if (
+      lastSubmissionRef.current.url === validatedUrl &&
+      now - lastSubmissionRef.current.time < 5000
+    ) {
+      const msg = 'This URL was just submitted. Please wait a few seconds before re-analyzing.';
+      toast(msg, { icon: '\u23F3' });
+      return;
+    }
+    lastSubmissionRef.current = { url: validatedUrl, time: now };
+
     setState(STATES.FETCHING);
     setProgress({
       stage: 'fetching',
@@ -390,8 +445,12 @@ export function useReadabilityAnalysis() {
     });
 
     try {
+      // Get auth token for proxy
+      let authToken = null;
+      try { authToken = await currentUser.getIdToken(); } catch (_) { /* proceed without */ }
+
       // Fetch via proxy
-      const fetchResult = await fetchUrlViaProxy(validatedUrl, abortControllerRef.current?.signal);
+      const fetchResult = await fetchUrlViaProxy(validatedUrl, abortControllerRef.current?.signal, authToken);
 
       if (!fetchResult.html || fetchResult.html.length < 50) {
         throw new Error('The fetched page contains very little content. Try uploading the HTML directly.');

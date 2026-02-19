@@ -158,122 +158,76 @@ Save these values - you'll need them for Vercel environment variables.
 
 ## Step 2: Railway Setup (AI Proxy)
 
-Railway hosts the backend proxy that securely forwards requests to Claude API.
+Railway hosts the backend proxy server that securely routes requests to Claude, OpenAI, and Gemini APIs. The proxy server code is in the `server/` directory of this repository.
 
-### 2.1 Create AI Proxy Service
+### What the Proxy Server Does
 
-Create a new file `api-proxy/index.js` in a separate repository or directory:
+- **Multi-LLM Routing**: Routes requests to Anthropic Claude, OpenAI GPT-4o, and Google Gemini
+- **URL Fetching**: Fetches web page content server-side for the AI Readability Checker
+- **Firebase Auth Verification**: Validates user authentication tokens on every request
+- **Tiered Rate Limiting**: Free (10/hr), Pro (30/hr), Enterprise (200/hr) — prevents unlimited API cost
+- **SSRF Protection**: Validates URLs before fetching to prevent server-side request forgery
+- **Health Monitoring**: Structured `/health` endpoint for uptime monitoring
 
-```javascript
-const express = require('express');
-const cors = require('cors');
-const Anthropic = require('@anthropic-ai/sdk');
+### 2.1 Local Development
 
-const app = express();
-const port = process.env.PORT || 3001;
-
-// CORS configuration - update with your Vercel domain
-const allowedOrigins = [
-  'https://your-app.vercel.app',
-  'http://localhost:5173' // for local development
-];
-
-app.use(cors({
-  origin: (origin, callback) => {
-    if (!origin || allowedOrigins.includes(origin)) {
-      callback(null, true);
-    } else {
-      callback(new Error('Not allowed by CORS'));
-    }
-  }
-}));
-
-app.use(express.json({ limit: '10mb' }));
-
-// Initialize Anthropic client
-const anthropic = new Anthropic({
-  apiKey: process.env.ANTHROPIC_API_KEY,
-});
-
-// Health check
-app.get('/health', (req, res) => {
-  res.json({ status: 'ok' });
-});
-
-// Claude API proxy endpoint
-app.post('/api/claude', async (req, res) => {
-  try {
-    const { model, max_tokens, messages, system } = req.body;
-
-    const response = await anthropic.messages.create({
-      model: model || 'claude-sonnet-4-20250514',
-      max_tokens: max_tokens || 4096,
-      system: system,
-      messages: messages,
-    });
-
-    res.json(response);
-  } catch (error) {
-    console.error('Claude API error:', error);
-    res.status(error.status || 500).json({
-      error: error.message || 'Failed to process request'
-    });
-  }
-});
-
-app.listen(port, () => {
-  console.log(`AI Proxy running on port ${port}`);
-});
-```
-
-Create `api-proxy/package.json`:
-
-```json
-{
-  "name": "content-strategy-ai-proxy",
-  "version": "1.0.0",
-  "main": "index.js",
-  "scripts": {
-    "start": "node index.js"
-  },
-  "dependencies": {
-    "@anthropic-ai/sdk": "^0.24.0",
-    "cors": "^2.8.5",
-    "express": "^4.18.2"
-  }
-}
+```bash
+cd server
+npm install
+cp .env.example .env
+# Edit .env with your API keys (see below)
+npm start
+# Server runs on http://localhost:3001
 ```
 
 ### 2.2 Deploy to Railway
 
 1. Go to [Railway](https://railway.app) and sign in
 2. Click **New Project**
-3. Select **Deploy from GitHub repo** or **Empty Project**
-4. If using GitHub:
-   - Connect your GitHub account
-   - Select the api-proxy repository
-5. If empty project:
-   - Click **Add Service → Empty Service**
-   - Go to **Settings → Deploy**
-   - Connect to Git or use Railway CLI
+3. Select **Deploy from GitHub repo**
+4. Connect your GitHub account and select this repository
+5. In **Settings → Build**, set the **Root Directory** to `server`
+6. Railway will auto-detect Node.js and run `npm start`
+
+Alternatively, deploy the `server/` directory as a standalone repository.
 
 ### 2.3 Configure Railway Environment Variables
 
-1. In your Railway service, go to **Variables** tab
-2. Add the following:
+In your Railway service, go to **Variables** tab and add:
 
-| Variable | Value |
-|----------|-------|
-| `ANTHROPIC_API_KEY` | Your Claude API key from [Anthropic Console](https://console.anthropic.com) |
-| `PORT` | `3001` (Railway will override this automatically) |
+| Variable | Value | Required |
+|----------|-------|----------|
+| `ANTHROPIC_API_KEY` | Claude API key from [Anthropic Console](https://console.anthropic.com) | Yes |
+| `OPENAI_API_KEY` | OpenAI API key from [OpenAI Platform](https://platform.openai.com/api-keys) | Yes |
+| `GEMINI_API_KEY` | Gemini API key from [Google AI Studio](https://aistudio.google.com/apikey) | Yes |
+| `FIREBASE_SERVICE_ACCOUNT_KEY` | Firebase service account JSON (single-line) — see below | Yes |
+| `ALLOWED_ORIGINS` | Your Vercel URL, e.g. `https://your-app.vercel.app` | Yes |
+| `PORT` | Railway sets this automatically | No |
+| `NODE_ENV` | `production` | Recommended |
+
+**Getting the Firebase Service Account Key:**
+1. Go to Firebase Console → Project Settings → Service Accounts
+2. Click **Generate new private key**
+3. Open the downloaded JSON file
+4. Copy the entire contents and paste as a single-line string in the `FIREBASE_SERVICE_ACCOUNT_KEY` variable
 
 ### 2.4 Get Railway URL
 
 1. Go to **Settings → Networking**
 2. Click **Generate Domain** or add a custom domain
 3. Copy the URL (e.g., `https://your-proxy.up.railway.app`)
+4. Verify health: `curl https://your-proxy.up.railway.app/health`
 
-Save this URL - you'll need it for Vercel.
+Save this URL — you'll need it for the Vercel `VITE_AI_PROXY_URL` variable.
+
+### 2.5 Proxy API Endpoints
+
+| Endpoint | Method | Auth | Description |
+|----------|--------|------|-------------|
+| `/health` | GET | No | Health check — returns service status and configured providers |
+| `/` | POST | Yes | AI request — legacy format (`{ prompt, maxTokens }`) or multi-provider (`{ provider, model, content }`) |
+| `/api/ai` | POST | Yes | AI request — same as above |
+| `/api/fetch-url` | POST | Yes | Fetch URL content server-side for readability analysis |
 
 ---
 
@@ -311,7 +265,7 @@ In the **Environment Variables** section, add:
 | `VITE_FIREBASE_STORAGE_BUCKET` | `your-project.appspot.com` | All |
 | `VITE_FIREBASE_MESSAGING_SENDER_ID` | From Firebase config | All |
 | `VITE_FIREBASE_APP_ID` | From Firebase config | All |
-| `VITE_AI_PROXY_URL` | Your Railway URL (e.g., `https://your-proxy.up.railway.app/api/claude`) | All |
+| `VITE_AI_PROXY_URL` | Your Railway URL — base URL only (e.g., `https://your-proxy.up.railway.app`) | All |
 
 ### 3.4 Deploy
 

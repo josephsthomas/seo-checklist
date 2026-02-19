@@ -6,18 +6,18 @@
  */
 
 import { truncateAtSentenceBoundary } from './utils/textAnalysis.js';
+import { retryFetch } from './utils/retryFetch.js';
 
 const EXTRACTION_TIMEOUT_MS = 60000;
 
 function getApiConfig() {
   const proxyUrl = import.meta.env.VITE_AI_PROXY_URL;
-  const apiKey = import.meta.env.VITE_CLAUDE_API_KEY;
-  if (proxyUrl) return { useProxy: true, proxyUrl };
-  if (apiKey) return { useProxy: false, apiKey };
+  if (proxyUrl) return { proxyUrl };
   return null;
 }
 
-const EXTRACTION_PROMPT = `You are analyzing a web page. Extract the following information and respond in JSON format only:
+function buildExtractionPrompt(sourceUrl) {
+  return `You are analyzing a web page${sourceUrl ? ` at URL: ${sourceUrl}` : ''}. Extract the following information and respond in JSON format only:
 
 {
   "extractedTitle": "The page title as you understand it",
@@ -27,11 +27,12 @@ const EXTRACTION_PROMPT = `You are analyzing a web page. Extract the following i
   "mainContent": "The main content of the page in markdown format (max 2000 words)",
   "entities": [{"name": "entity name", "type": "person|org|product|concept"}],
   "unprocessableContent": [{"description": "what couldn't be processed", "reason": "why"}],
-  "usefulnessAssessment": {"score": 75, "explanation": "How useful this page would be for answering user questions"}
+  "usefulnessAssessment": {"score": 7, "explanation": "How useful this page would be for answering user questions (1-10 scale, 10 = most useful)"}
 }
 
 PAGE CONTENT:
 `;
+}
 
 /**
  * Extract content via all supported LLMs in parallel
@@ -41,20 +42,21 @@ PAGE CONTENT:
  */
 export async function extractWithAllLLMs(extractedContent, options = {}) {
   const truncatedContent = truncateAtSentenceBoundary(extractedContent.textContent, 50000);
-  const prompt = EXTRACTION_PROMPT + truncatedContent;
+  const prompt = buildExtractionPrompt(options.sourceUrl) + truncatedContent;
   const config = getApiConfig();
+  const authToken = options.authToken || null;
 
   const enabledLLMs = options.enabledLLMs || ['claude', 'openai', 'gemini'];
 
   const tasks = [];
   if (enabledLLMs.includes('claude')) {
-    tasks.push(extractWithClaude(prompt, config, options.signal).then(r => ['claude', r]));
+    tasks.push(extractWithClaude(prompt, config, options.signal, authToken).then(r => ['claude', r]));
   }
   if (enabledLLMs.includes('openai')) {
-    tasks.push(extractWithOpenAI(prompt, config, options.signal).then(r => ['openai', r]));
+    tasks.push(extractWithOpenAI(prompt, config, options.signal, authToken).then(r => ['openai', r]));
   }
   if (enabledLLMs.includes('gemini')) {
-    tasks.push(extractWithGemini(prompt, config, options.signal).then(r => ['gemini', r]));
+    tasks.push(extractWithGemini(prompt, config, options.signal, authToken).then(r => ['gemini', r]));
   }
 
   const results = await Promise.all(tasks);
@@ -67,50 +69,35 @@ export async function extractWithAllLLMs(extractedContent, options = {}) {
   return output;
 }
 
-async function extractWithClaude(prompt, config, signal) {
+async function extractWithClaude(prompt, config, signal, authToken) {
   const start = Date.now();
   try {
     if (!config) {
       return createErrorResult('claude', 'claude-sonnet-4-5-20250929', 'No API configuration', start);
     }
 
-    let response;
-    if (config.useProxy) {
-      response = await fetchWithTimeout(config.proxyUrl, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          prompt, maxTokens: 4096,
-          tool: 'readability-llm-preview', llm: 'claude'
-        }),
-        signal
-      });
-    } else {
-      response = await fetchWithTimeout('https://api.anthropic.com/v1/messages', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'x-api-key': config.apiKey,
-          'anthropic-version': '2023-06-01',
-          'anthropic-dangerous-direct-browser-access': 'true'
-        },
-        body: JSON.stringify({
-          model: 'claude-sonnet-4-5-20250929',
-          max_tokens: 4096,
-          messages: [{ role: 'user', content: prompt }]
-        }),
-        signal
-      });
-    }
+    const headers = { 'Content-Type': 'application/json' };
+    if (authToken) headers['Authorization'] = `Bearer ${authToken}`;
+
+    const response = await retryFetch(config.proxyUrl, {
+      method: 'POST',
+      headers,
+      body: JSON.stringify({
+        provider: 'anthropic',
+        model: 'claude-sonnet-4-5-20250929',
+        task: 'readability-llm-preview',
+        content: prompt,
+        parameters: { temperature: 0.2, max_tokens: 4096 }
+      }),
+      signal
+    });
 
     if (!response.ok) {
       return createErrorResult('claude', 'claude-sonnet-4-5-20250929', `API error: ${response.status}`, start);
     }
 
     const data = await response.json();
-    const content = config.useProxy
-      ? data.content || data.text || data.response
-      : data.content?.[0]?.text;
+    const content = data.content || data.text || data.response;
 
     return parseExtractionResponse('claude', 'claude-sonnet-4-5-20250929', content, start);
   } catch (error) {
@@ -118,19 +105,25 @@ async function extractWithClaude(prompt, config, signal) {
   }
 }
 
-async function extractWithOpenAI(prompt, config, signal) {
+async function extractWithOpenAI(prompt, config, signal, authToken) {
   const start = Date.now();
   try {
-    if (!config?.useProxy) {
+    if (!config) {
       return createErrorResult('openai', 'gpt-4o', 'OpenAI requires proxy configuration', start);
     }
 
-    const response = await fetchWithTimeout(config.proxyUrl, {
+    const headers = { 'Content-Type': 'application/json' };
+    if (authToken) headers['Authorization'] = `Bearer ${authToken}`;
+
+    const response = await retryFetch(config.proxyUrl, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers,
       body: JSON.stringify({
-        prompt, maxTokens: 4096,
-        tool: 'readability-llm-preview', llm: 'openai'
+        provider: 'openai',
+        model: 'gpt-4o',
+        task: 'readability-llm-preview',
+        content: prompt,
+        parameters: { temperature: 0.2, max_tokens: 4096 }
       }),
       signal
     });
@@ -147,19 +140,25 @@ async function extractWithOpenAI(prompt, config, signal) {
   }
 }
 
-async function extractWithGemini(prompt, config, signal) {
+async function extractWithGemini(prompt, config, signal, authToken) {
   const start = Date.now();
   try {
-    if (!config?.useProxy) {
+    if (!config) {
       return createErrorResult('gemini', 'gemini-2.0-flash', 'Gemini requires proxy configuration', start);
     }
 
-    const response = await fetchWithTimeout(config.proxyUrl, {
+    const headers = { 'Content-Type': 'application/json' };
+    if (authToken) headers['Authorization'] = `Bearer ${authToken}`;
+
+    const response = await retryFetch(config.proxyUrl, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers,
       body: JSON.stringify({
-        prompt, maxTokens: 4096,
-        tool: 'readability-llm-preview', llm: 'gemini'
+        provider: 'google',
+        model: 'gemini-2.0-flash',
+        task: 'readability-llm-preview',
+        content: prompt,
+        parameters: { temperature: 0.2, max_tokens: 4096 }
       }),
       signal
     });
@@ -196,6 +195,7 @@ function parseExtractionResponse(llm, model, content, startTime) {
       model,
       success: true,
       error: null,
+      rawResponse: content,
       extractedTitle: parsed.extractedTitle || '',
       extractedDescription: parsed.extractedDescription || '',
       primaryTopic: parsed.primaryTopic || '',
@@ -204,7 +204,7 @@ function parseExtractionResponse(llm, model, content, startTime) {
       entities: (parsed.entities || []).slice(0, 50),
       unprocessableContent: parsed.unprocessableContent || [],
       usefulnessAssessment: {
-        score: Math.max(0, Math.min(100, parsed.usefulnessAssessment?.score || 50)),
+        score: Math.max(1, Math.min(10, parsed.usefulnessAssessment?.score || 5)),
         explanation: parsed.usefulnessAssessment?.explanation || ''
       },
       processingTimeMs
@@ -230,25 +230,6 @@ function createErrorResult(llm, model, error, startTime) {
     usefulnessAssessment: { score: 0, explanation: '' },
     processingTimeMs: Date.now() - startTime
   };
-}
-
-async function fetchWithTimeout(url, options, timeoutMs = EXTRACTION_TIMEOUT_MS) {
-  const controller = new AbortController();
-  const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
-  const existingSignal = options.signal;
-
-  try {
-    if (existingSignal?.aborted) {
-      throw new DOMException('Aborted', 'AbortError');
-    }
-    const response = await fetch(url, {
-      ...options,
-      signal: existingSignal || controller.signal
-    });
-    return response;
-  } finally {
-    clearTimeout(timeoutId);
-  }
 }
 
 export default extractWithAllLLMs;

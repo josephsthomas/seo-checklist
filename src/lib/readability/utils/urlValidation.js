@@ -85,6 +85,11 @@ export function validateReadabilityUrl(input) {
     return { valid: false, url: null, reason: 'Invalid top-level domain' };
   }
 
+  // Block non-standard ports (only allow 80, 443, or default no port)
+  if (parsed.port && parsed.port !== '80' && parsed.port !== '443') {
+    return { valid: false, url: null, reason: 'Non-standard ports are not allowed. Only ports 80 and 443 are supported.' };
+  }
+
   return { valid: true, url: parsed.href, reason: null };
 }
 

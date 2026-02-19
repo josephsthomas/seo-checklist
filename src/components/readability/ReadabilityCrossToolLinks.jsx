@@ -12,6 +12,8 @@ import {
   ArrowLeft,
   ExternalLink,
   Wrench,
+  FileEdit,
+  Key,
 } from 'lucide-react';
 
 const CROSS_TOOL_LINKS = [
@@ -31,7 +33,6 @@ const CROSS_TOOL_LINKS = [
     path: '/app/schema',
     paramKey: 'url',
     extraParams: (analysis) => {
-      // Detect schema type from analysis
       const types = analysis?.checkResults;
       if (types) {
         for (const check of Object.values(types)) {
@@ -43,6 +44,23 @@ const CROSS_TOOL_LINKS = [
       }
       return {};
     },
+  },
+  // E-033: Extended deep links
+  {
+    key: 'content-planner',
+    label: 'Plan Content Updates',
+    description: 'Create a content plan based on readability recommendations.',
+    icon: FileEdit,
+    path: '/app/content-planner',
+    paramKey: 'url',
+  },
+  {
+    key: 'keyword-research',
+    label: 'Research Keywords',
+    description: 'Find keyword opportunities based on detected topics.',
+    icon: Key,
+    path: '/app/keyword-research',
+    paramKey: 'url',
   },
 ];
 
@@ -57,6 +75,8 @@ export default function ReadabilityCrossToolLinks({ analysis }) {
     audit: 'Technical Audit',
     schema: 'Schema Generator',
     meta: 'Meta Generator',
+    'content-planner': 'Content Planner',
+    'keyword-research': 'Keyword Research',
   };
 
   if (!currentUrl && !fromTool) return null;

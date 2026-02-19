@@ -17,7 +17,7 @@ import { generateRecommendations } from './recommendations.js';
  * @returns {Object} Complete analysis document ready for Firestore
  */
 export async function runFullAnalysis(htmlContent, options = {}) {
-  const { sourceUrl, inputMethod = 'url', signal, onProgress } = options;
+  const { sourceUrl, inputMethod = 'url', filename, signal, onProgress, authToken } = options;
 
   // Stage 1: Extract content
   onProgress?.({ stage: 'extracting', progress: 15, message: 'Extracting content...' });
@@ -29,11 +29,11 @@ export async function runFullAnalysis(htmlContent, options = {}) {
   onProgress?.({ stage: 'analyzing', progress: 25, message: 'Running AI analysis...' });
 
   const [aiAssessment, llmExtractions] = await Promise.all([
-    analyzeWithAI(extracted, { signal }).catch(err => {
+    analyzeWithAI(extracted, { signal, authToken }).catch(err => {
       console.error('AI analysis failed:', err);
       return { available: false, fallback: true, fallbackReason: err.message };
     }),
-    extractWithAllLLMs(extracted, { signal }).catch(err => {
+    extractWithAllLLMs(extracted, { signal, authToken, sourceUrl }).catch(err => {
       console.error('LLM extraction failed:', err);
       return {};
     })
@@ -41,13 +41,34 @@ export async function runFullAnalysis(htmlContent, options = {}) {
 
   if (signal?.aborted) throw new DOMException('Aborted', 'AbortError');
 
-  // Stage 3: Score content
+  // Stage 3: Score content (Task 46: wrapped in try/catch to prevent pipeline crash)
   onProgress?.({ stage: 'scoring', progress: 85, message: 'Calculating scores...' });
-  const scoring = scoreContent(extracted, aiAssessment?.available ? aiAssessment : null);
+  let scoring;
+  try {
+    scoring = scoreContent(extracted, aiAssessment?.available ? aiAssessment : null);
+  } catch (scoringErr) {
+    console.error('Scoring pipeline failed, using fallback:', scoringErr);
+    scoring = {
+      overallScore: 0,
+      grade: 'F',
+      gradeColor: 'red',
+      gradeLabel: 'Scoring Error',
+      gradeSummary: 'Scoring could not be completed. Please try again.',
+      categoryScores: {},
+      issueSummary: { critical: 0, high: 0, medium: 0, low: 0 },
+      checkResults: []
+    };
+  }
 
-  // Stage 4: Generate recommendations
+  // Stage 4: Generate recommendations (Task 46: wrapped in try/catch)
   onProgress?.({ stage: 'recommendations', progress: 90, message: 'Generating recommendations...' });
-  const recommendations = generateRecommendations(scoring, aiAssessment?.available ? aiAssessment : null);
+  let recommendations;
+  try {
+    recommendations = generateRecommendations(scoring, aiAssessment?.available ? aiAssessment : null);
+  } catch (recErr) {
+    console.error('Recommendations generation failed:', recErr);
+    recommendations = [];
+  }
 
   if (signal?.aborted) throw new DOMException('Aborted', 'AbortError');
 
@@ -60,6 +81,11 @@ export async function runFullAnalysis(htmlContent, options = {}) {
     // Core identification
     sourceUrl: sourceUrl || null,
     inputMethod,
+    filename: filename || null,
+    organizationId: options.organizationId || null,
+    projectId: options.projectId || null,
+    clientName: options.clientName || null,
+    tags: options.tags || [],
     analyzedAt: now,
     createdAt: now,
 
@@ -109,7 +135,14 @@ export async function runFullAnalysis(htmlContent, options = {}) {
 
     // Versioning
     scoringVersion: '1.0.0',
-    promptVersion: '1.0.0'
+    promptVersion: '1.0.0',
+
+    // E-020: Model version tracking for drift detection
+    modelVersions: {
+      claude: 'claude-sonnet-4-5-20250929',
+      openai: 'gpt-4o',
+      gemini: 'gemini-2.0-flash',
+    }
   };
 
   onProgress?.({ stage: 'complete', progress: 100, message: 'Analysis complete!' });

@@ -5,41 +5,19 @@
  */
 
 import { truncateAtSentenceBoundary } from './utils/textAnalysis.js';
+import { retryFetch } from './utils/retryFetch.js';
 
 const API_TIMEOUT_MS = 45000; // 45 seconds for AI analysis
 
 /**
- * Get API configuration (follows existing pattern)
+ * Get API configuration — proxy-only (no direct API key fallback)
  */
 function getApiConfig() {
   const proxyUrl = import.meta.env.VITE_AI_PROXY_URL;
-  const apiKey = import.meta.env.VITE_CLAUDE_API_KEY;
-
-  if (proxyUrl) return { useProxy: true, proxyUrl };
-  if (apiKey) return { useProxy: false, apiKey };
+  if (proxyUrl) return { proxyUrl };
   return null;
 }
 
-/**
- * Fetch with timeout and abort support
- */
-async function fetchWithTimeout(url, options, timeoutMs = API_TIMEOUT_MS) {
-  const controller = new AbortController();
-  const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
-
-  // Merge abort signals if provided
-  const existingSignal = options.signal;
-
-  try {
-    const response = await fetch(url, {
-      ...options,
-      signal: existingSignal || controller.signal
-    });
-    return response;
-  } finally {
-    clearTimeout(timeoutId);
-  }
-}
 
 /**
  * Check if AI analysis is available
@@ -65,36 +43,35 @@ export async function analyzeWithAI(extractedContent, options = {}) {
 
   const prompt = buildAnalysisPrompt(extractedContent, truncatedContent);
 
-  try {
-    let response;
+  const headers = { 'Content-Type': 'application/json' };
+  if (options.authToken) {
+    headers['Authorization'] = `Bearer ${options.authToken}`;
+  }
 
-    if (config.useProxy) {
-      response = await fetchWithTimeout(config.proxyUrl, {
+  try {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), API_TIMEOUT_MS);
+    const signal = options.signal || controller.signal;
+
+    let response;
+    try {
+      response = await retryFetch(config.proxyUrl, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers,
         body: JSON.stringify({
-          prompt,
-          maxTokens: 2048,
-          tool: 'readability-analyzer'
-        }),
-        signal: options.signal
-      });
-    } else {
-      response = await fetchWithTimeout('https://api.anthropic.com/v1/messages', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'x-api-key': config.apiKey,
-          'anthropic-version': '2023-06-01',
-          'anthropic-dangerous-direct-browser-access': 'true'
-        },
-        body: JSON.stringify({
+          provider: 'anthropic',
           model: 'claude-sonnet-4-5-20250929',
-          max_tokens: 2048,
-          messages: [{ role: 'user', content: prompt }]
+          task: 'readability-analysis',
+          content: prompt,
+          parameters: {
+            temperature: 0.2,
+            max_tokens: 4096
+          }
         }),
-        signal: options.signal
+        signal
       });
+    } finally {
+      clearTimeout(timeoutId);
     }
 
     if (!response.ok) {
@@ -106,9 +83,7 @@ export async function analyzeWithAI(extractedContent, options = {}) {
     }
 
     const data = await response.json();
-    const content = config.useProxy
-      ? data.content || data.text || data.response
-      : data.content?.[0]?.text;
+    const content = data.content || data.text || data.response;
 
     return parseAIResponse(content);
   } catch (error) {
