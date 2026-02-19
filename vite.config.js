@@ -16,7 +16,8 @@ export default defineConfig({
           'vendor-exceljs': ['exceljs'],
           'vendor-jspdf': ['jspdf', 'jspdf-autotable'],
           'vendor-firebase': ['firebase/app', 'firebase/auth', 'firebase/firestore', 'firebase/storage'],
-          'vendor-react': ['react', 'react-dom', 'react-router-dom']
+          'vendor-react': ['react', 'react-dom', 'react-router-dom'],
+          'vendor-readability': ['htmlparser2', 'franc', 'jszip']
         }
       }
     },
