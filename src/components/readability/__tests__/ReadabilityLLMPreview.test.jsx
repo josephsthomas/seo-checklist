@@ -50,9 +50,10 @@ describe('ReadabilityLLMPreview', () => {
 
   it('shows LLM toggle buttons', () => {
     render(<ReadabilityLLMPreview llmExtractions={mockExtractions} />);
-    expect(screen.getByText(/claude/i)).toBeInTheDocument();
-    expect(screen.getByText(/openai/i)).toBeInTheDocument();
-    expect(screen.getByText(/gemini/i)).toBeInTheDocument();
+    // Each LLM name appears in both the label and model text spans
+    expect(screen.getAllByText(/claude/i).length).toBeGreaterThanOrEqual(1);
+    expect(screen.getAllByText(/openai/i).length).toBeGreaterThanOrEqual(1);
+    expect(screen.getAllByText(/gemini/i).length).toBeGreaterThanOrEqual(1);
   });
 
   it('can toggle LLMs on/off', async () => {
@@ -74,7 +75,7 @@ describe('ReadabilityLLMPreview', () => {
 
   it('shows empty state when no extractions', () => {
     render(<ReadabilityLLMPreview llmExtractions={{}} />);
-    expect(screen.getByText(/no llm extraction data|no data/i)).toBeInTheDocument();
+    expect(screen.getByText(/LLM Preview Not Available/i)).toBeInTheDocument();
   });
 
   it('expands LLM abbreviation on first use', () => {

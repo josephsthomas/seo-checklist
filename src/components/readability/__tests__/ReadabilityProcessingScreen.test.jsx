@@ -1,4 +1,4 @@
-import { describe, it, expect, vi } from 'vitest';
+import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import ReadabilityProcessingScreen from '../ReadabilityProcessingScreen';
@@ -9,6 +9,8 @@ describe('ReadabilityProcessingScreen', () => {
     partialResults: null,
     onCancel: vi.fn(),
   };
+
+  beforeEach(() => vi.clearAllMocks());
 
   it('renders the progress bar', () => {
     render(<ReadabilityProcessingScreen {...defaultProps} />);
@@ -24,7 +26,8 @@ describe('ReadabilityProcessingScreen', () => {
   it('renders stage checklist', () => {
     render(<ReadabilityProcessingScreen {...defaultProps} />);
     expect(screen.getByText(/fetching page content/i)).toBeInTheDocument();
-    expect(screen.getByText(/extracting content/i)).toBeInTheDocument();
+    // "Extracting content" appears in both the stage label and the sr-only aria-live region
+    expect(screen.getAllByText(/extracting content/i).length).toBeGreaterThanOrEqual(1);
     expect(screen.getByText(/analyzing with ai/i)).toBeInTheDocument();
     expect(screen.getByText(/calculating scores/i)).toBeInTheDocument();
     expect(screen.getByText(/finalizing results/i)).toBeInTheDocument();

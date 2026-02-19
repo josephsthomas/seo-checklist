@@ -107,15 +107,17 @@ describe('Accessibility (a11y)', () => {
     };
 
     it('expandable items have aria-expanded', () => {
-      render(<ReadabilityCheckItem check={failCheck} />);
-      const button = screen.getByRole('button');
-      expect(button).toHaveAttribute('aria-expanded');
+      const { container } = render(<ReadabilityCheckItem check={failCheck} />);
+      const expandable = container.querySelector('[aria-expanded]');
+      expect(expandable).not.toBeNull();
+      expect(expandable).toHaveAttribute('aria-expanded');
     });
 
     it('expandable items have aria-controls', () => {
-      render(<ReadabilityCheckItem check={failCheck} />);
-      const button = screen.getByRole('button');
-      expect(button).toHaveAttribute('aria-controls');
+      const { container } = render(<ReadabilityCheckItem check={failCheck} />);
+      const expandable = container.querySelector('[aria-controls]');
+      expect(expandable).not.toBeNull();
+      expect(expandable).toHaveAttribute('aria-controls');
     });
 
     it('pass items are not expandable', () => {

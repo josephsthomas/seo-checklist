@@ -8,7 +8,9 @@ import userEvent from '@testing-library/user-event';
 vi.mock('../../../hooks/useReadabilityExport', () => ({
   useReadabilityExport: () => ({
     exportPDF: vi.fn().mockResolvedValue(undefined),
+    getPreviewData: vi.fn(() => ({ totalPages: 8, pages: [] })),
     isExporting: false,
+    exportProgress: null,
   }),
 }));
 
@@ -33,8 +35,8 @@ describe('ReadabilityPDFPreview', () => {
 
   it('renders when open', () => {
     render(<ReadabilityPDFPreview {...defaultProps} />);
-    // Should show the modal/dialog
-    expect(screen.getByText(/pdf|report|preview/i)).toBeInTheDocument();
+    // Should show the modal dialog title
+    expect(screen.getByText('PDF Report Preview')).toBeInTheDocument();
   });
 
   it('renders close button', () => {
