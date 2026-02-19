@@ -25,6 +25,7 @@ const { rateLimitMiddleware } = require('./middleware/rateLimit');
 const { requestLogger } = require('./middleware/requestLogger');
 const healthRouter = require('./routes/health');
 const aiRouter = require('./routes/ai');
+const aiBatchRouter = require('./routes/aiBatch');
 const fetchRouter = require('./routes/fetch');
 
 const app = express();
@@ -85,6 +86,9 @@ app.use('/health', healthRouter);
 // Protected API routes — auth + rate limiting
 app.post('/api/fetch-url', authMiddleware, rateLimitMiddleware, fetchRouter);
 app.post('/api/ai', authMiddleware, rateLimitMiddleware, aiRouter);
+
+// Batch AI endpoint — auth only (rate limiting handled internally per-token)
+app.post('/api/ai/batch', authMiddleware, aiBatchRouter);
 
 // Legacy route: POST / (used by suggestionService, imageAltService, etc.)
 // Also used by readability llmPreview.js and aiAnalyzer.js (they POST to VITE_AI_PROXY_URL directly)
@@ -155,6 +159,7 @@ Endpoints:
   GET  /health          Health check
   POST /                AI request (legacy format)
   POST /api/ai          AI request (multi-provider)
+  POST /api/ai/batch    AI batch request (multiple providers)
   POST /api/fetch-url   Fetch URL content
 `);
 });

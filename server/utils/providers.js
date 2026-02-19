@@ -3,6 +3,34 @@
  * Each provider returns a unified { content, model, usage? } response
  */
 
+const RETRYABLE_STATUSES = [429, 500, 502, 503, 529];
+
+/**
+ * Retry wrapper with exponential backoff for transient LLM errors
+ * @param {Function} fn - Async function to retry
+ * @param {Object} options - { maxRetries, baseDelayMs }
+ * @returns {Promise<any>}
+ */
+async function retryWithBackoff(fn, { maxRetries = 1, baseDelayMs = 2000 } = {}) {
+  let lastError;
+  for (let attempt = 0; attempt <= maxRetries; attempt++) {
+    try {
+      return await fn();
+    } catch (err) {
+      lastError = err;
+      const status = err.status || err.statusCode;
+      if (attempt < maxRetries && RETRYABLE_STATUSES.includes(status)) {
+        const delay = baseDelayMs * Math.pow(2, attempt);
+        console.warn(`[RETRY] Provider error (status ${status}), retrying in ${delay}ms (attempt ${attempt + 1}/${maxRetries})`);
+        await new Promise(resolve => setTimeout(resolve, delay));
+        continue;
+      }
+      throw err;
+    }
+  }
+  throw lastError;
+}
+
 // Lazy-initialized SDK clients
 let anthropicClient = null;
 let openaiClient = null;
@@ -43,19 +71,21 @@ async function callAnthropic(content, options = {}) {
     throw Object.assign(new Error('Anthropic API key not configured'), { status: 503 });
   }
 
-  const client = getAnthropicClient();
-  const response = await client.messages.create({
-    model: options.model || 'claude-sonnet-4-5-20250929',
-    max_tokens: options.max_tokens || 4096,
-    temperature: options.temperature ?? 0.2,
-    messages: [{ role: 'user', content }]
-  });
+  return retryWithBackoff(async () => {
+    const client = getAnthropicClient();
+    const response = await client.messages.create({
+      model: options.model || 'claude-sonnet-4-5-20250929',
+      max_tokens: options.max_tokens || 4096,
+      temperature: options.temperature ?? 0.2,
+      messages: [{ role: 'user', content }]
+    });
 
-  return {
-    content: response.content[0].text,
-    model: response.model,
-    usage: response.usage
-  };
+    return {
+      content: response.content[0].text,
+      model: response.model,
+      usage: response.usage
+    };
+  });
 }
 
 /**
@@ -110,20 +140,22 @@ async function callOpenAI(content, options = {}) {
     throw Object.assign(new Error('OpenAI API key not configured'), { status: 503 });
   }
 
-  const client = getOpenAIClient();
-  const response = await client.chat.completions.create({
-    model: options.model || 'gpt-4o',
-    max_tokens: options.max_tokens || 4096,
-    temperature: options.temperature ?? 0.2,
-    messages: [{ role: 'user', content }],
-    response_format: { type: 'json_object' }
-  });
+  return retryWithBackoff(async () => {
+    const client = getOpenAIClient();
+    const response = await client.chat.completions.create({
+      model: options.model || 'gpt-4o',
+      max_tokens: options.max_tokens || 4096,
+      temperature: options.temperature ?? 0.2,
+      messages: [{ role: 'user', content }],
+      response_format: { type: 'json_object' }
+    });
 
-  return {
-    content: response.choices[0].message.content,
-    model: response.model,
-    usage: response.usage
-  };
+    return {
+      content: response.choices[0].message.content,
+      model: response.model,
+      usage: response.usage
+    };
+  });
 }
 
 /**
@@ -137,23 +169,25 @@ async function callGemini(content, options = {}) {
     throw Object.assign(new Error('Gemini API key not configured'), { status: 503 });
   }
 
-  const genAI = getGeminiClient();
-  const model = genAI.getGenerativeModel({
-    model: options.model || 'gemini-2.0-flash',
-    generationConfig: {
-      maxOutputTokens: options.max_tokens || 4096,
-      temperature: options.temperature ?? 0.2,
-      responseMimeType: 'application/json'
-    }
+  return retryWithBackoff(async () => {
+    const genAI = getGeminiClient();
+    const model = genAI.getGenerativeModel({
+      model: options.model || 'gemini-2.0-flash',
+      generationConfig: {
+        maxOutputTokens: options.max_tokens || 4096,
+        temperature: options.temperature ?? 0.2,
+        responseMimeType: 'application/json'
+      }
+    });
+
+    const result = await model.generateContent(content);
+    const response = result.response;
+
+    return {
+      content: response.text(),
+      model: options.model || 'gemini-2.0-flash'
+    };
   });
-
-  const result = await model.generateContent(content);
-  const response = result.response;
-
-  return {
-    content: response.text(),
-    model: options.model || 'gemini-2.0-flash'
-  };
 }
 
 /**
