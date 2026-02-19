@@ -19,9 +19,9 @@ const STAGES = [
  * LLM substages for parallel analysis
  */
 const LLM_SUBSTAGES = [
-  { id: 'claude', label: 'Claude', model: 'claude-sonnet-4-5-20250929' },
-  { id: 'openai', label: 'OpenAI GPT', model: 'gpt-4o' },
-  { id: 'gemini', label: 'Google Gemini', model: 'gemini-2.0-flash' }
+  { id: 'claude', label: 'Claude', model: 'Claude Sonnet 4.5' },
+  { id: 'openai', label: 'OpenAI GPT', model: 'GPT-4o' },
+  { id: 'gemini', label: 'Google Gemini', model: 'Gemini 2.0 Flash' }
 ];
 
 /**

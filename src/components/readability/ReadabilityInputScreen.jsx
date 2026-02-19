@@ -9,6 +9,8 @@ import { useDropzone } from 'react-dropzone';
 import { validateReadabilityUrl } from '../../lib/readability/utils/urlValidation';
 import { getGrade } from '../../lib/readability/utils/gradeMapper';
 import { format } from 'date-fns';
+import ReadabilityProjectTagger from './ReadabilityProjectTagger';
+import ReadabilityBenchmarkWidget from './ReadabilityBenchmarkWidget';
 
 /**
  * Input method tabs
@@ -89,6 +91,11 @@ export default function ReadabilityInputScreen({
 
   // Advanced options
   const [showAdvanced, setShowAdvanced] = useState(false);
+  const [industry, setIndustry] = useState('');
+  const [keywords, setKeywords] = useState('');
+
+  // Project tagging (E-041)
+  const [projectTags, setProjectTags] = useState({});
 
   // Prefill URL on mount or change
   useEffect(() => {
@@ -127,9 +134,14 @@ export default function ReadabilityInputScreen({
   const handleUrlSubmit = useCallback((e) => {
     e.preventDefault();
     if (urlValidation?.valid && !isAnalyzing) {
-      onAnalyzeUrl(url);
+      // DEF-017: Pass advanced options (industry, keywords, project tags) to analysis
+      onAnalyzeUrl(url, {
+        industry: industry || undefined,
+        keywords: keywords || undefined,
+        ...projectTags,
+      });
     }
-  }, [url, urlValidation, isAnalyzing, onAnalyzeUrl]);
+  }, [url, urlValidation, isAnalyzing, onAnalyzeUrl, industry, keywords, projectTags]);
 
   const handleUrlPaste = useCallback((e) => {
     // Paste-and-go: validate immediately on paste
@@ -379,6 +391,8 @@ export default function ReadabilityInputScreen({
                     </label>
                     <select
                       id="industry-select"
+                      value={industry}
+                      onChange={(e) => setIndustry(e.target.value)}
                       className="w-full px-3 py-2 rounded-lg border border-charcoal-300 dark:border-charcoal-600 dark:bg-charcoal-800 dark:text-charcoal-100 text-sm focus:outline-none focus:ring-2 focus:ring-teal-500"
                     >
                       <option value="">Select industry...</option>
@@ -398,6 +412,8 @@ export default function ReadabilityInputScreen({
                     <input
                       id="keywords-input"
                       type="text"
+                      value={keywords}
+                      onChange={(e) => setKeywords(e.target.value)}
                       placeholder="e.g., AI readability, content optimization"
                       className="w-full px-3 py-2 rounded-lg border border-charcoal-300 dark:border-charcoal-600 dark:bg-charcoal-800 dark:text-charcoal-100 text-sm focus:outline-none focus:ring-2 focus:ring-teal-500"
                       maxLength={200}
@@ -412,6 +428,12 @@ export default function ReadabilityInputScreen({
                       }}
                     />
                   </div>
+
+                  {/* Project/Client Tagging (E-041) */}
+                  <ReadabilityProjectTagger
+                    value={projectTags}
+                    onChange={setProjectTags}
+                  />
                 </div>
               )}
             </div>
@@ -661,6 +683,13 @@ export default function ReadabilityInputScreen({
           <p className="text-xs text-charcoal-500 dark:text-charcoal-500 mt-1">
             Run your first analysis to see results here
           </p>
+        </div>
+      )}
+
+      {/* Historical Benchmark Widget (E-012) — shown after 5+ analyses */}
+      {recentAnalyses.length >= 5 && (
+        <div className="mt-6">
+          <ReadabilityBenchmarkWidget history={recentAnalyses} />
         </div>
       )}
 

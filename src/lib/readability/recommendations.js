@@ -58,7 +58,15 @@ const CHECK_RECOMMENDATIONS = {
   'AS-07': { group: 'content', audience: 'content', effort: 'moderate', estimatedImpact: 'low' },
   'AS-08': { group: 'content', audience: 'content', effort: 'moderate', estimatedImpact: 'medium' },
   'AS-09': { group: 'content', audience: 'content', effort: 'moderate', estimatedImpact: 'low' },
-  'AS-10': { group: 'content', audience: 'development', effort: 'moderate', estimatedImpact: 'medium' }
+  'AS-10': { group: 'content', audience: 'development', effort: 'moderate', estimatedImpact: 'medium' },
+  // E-015: Fact Density Score
+  'CC-11': { group: 'content', audience: 'content', effort: 'significant', estimatedImpact: 'high' },
+  // E-045: Google AI Overview Checks
+  'AIO-01': { group: 'content', audience: 'content', effort: 'moderate', estimatedImpact: 'high' },
+  'AIO-02': { group: 'technical', audience: 'development', effort: 'moderate', estimatedImpact: 'medium' },
+  'AIO-03': { group: 'content', audience: 'content', effort: 'moderate', estimatedImpact: 'medium' },
+  'AIO-04': { group: 'content', audience: 'content', effort: 'moderate', estimatedImpact: 'high' },
+  'AIO-05': { group: 'technical', audience: 'development', effort: 'moderate', estimatedImpact: 'low' }
 };
 
 /**

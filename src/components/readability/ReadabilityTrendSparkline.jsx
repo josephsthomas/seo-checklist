@@ -89,14 +89,28 @@ export default function ReadabilityTrendSparkline({
             cx={point.x}
             cy={point.y}
             r={hoveredPoint === i ? 4 : 2.5}
-            className={`transition-all duration-150
+            className={`transition-all duration-150 outline-none
               ${hoveredPoint === i
                 ? 'fill-teal-600 dark:fill-teal-300 stroke-white dark:stroke-charcoal-800'
                 : 'fill-teal-500 dark:fill-teal-400 stroke-white dark:stroke-charcoal-800'
               }`}
             strokeWidth="1.5"
+            tabIndex={0}
+            role="button"
+            aria-label={`Score ${point.score}${point.date ? ` on ${point.date}` : ''}`}
             onMouseEnter={() => setHoveredPoint(i)}
             onMouseLeave={() => setHoveredPoint(null)}
+            onFocus={() => setHoveredPoint(i)}
+            onBlur={() => setHoveredPoint(null)}
+            onKeyDown={(e) => {
+              if (e.key === 'ArrowRight' && i < points.length - 1) {
+                e.preventDefault();
+                e.target.nextElementSibling?.focus();
+              } else if (e.key === 'ArrowLeft' && i > 0) {
+                e.preventDefault();
+                e.target.previousElementSibling?.focus();
+              }
+            }}
             style={{ cursor: 'pointer' }}
           />
         ))}

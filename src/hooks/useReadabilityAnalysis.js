@@ -16,6 +16,7 @@ import { db, storage } from '../lib/firebase';
 import { useAuth } from '../contexts/AuthContext';
 import { validateReadabilityUrl } from '../lib/readability/utils/urlValidation';
 import { runFullAnalysis, truncateForFirestore, estimateDocumentSize } from '../lib/readability/aggregator';
+import { getCachedAnalysis, setCachedAnalysis } from '../lib/readability/utils/analysisCache';
 import toast from 'react-hot-toast';
 
 /**
@@ -462,11 +463,28 @@ export function useReadabilityAnalysis() {
         throw new Error(`This URL returned ${contentType.split(';')[0]} content, not HTML.`);
       }
 
+      // E-036: Check cache before running full analysis
+      const cached = getCachedAnalysis(validatedUrl, fetchResult.html);
+      if (cached) {
+        setResult(cached);
+        setState(STATES.COMPLETE);
+        setProgress({ stage: 'complete', progress: 100, message: 'Loaded from cache', substages: { claude: 'complete', openai: 'complete', gemini: 'complete' } });
+        toast.success('Loaded cached results (content unchanged)');
+        return cached;
+      }
+
       // Run analysis
-      return await runAnalysis(fetchResult.html, {
+      const analysisResult = await runAnalysis(fetchResult.html, {
         sourceUrl: fetchResult.finalUrl || validatedUrl,
         inputMethod: 'url'
       });
+
+      // E-036: Cache the result for future lookups
+      if (analysisResult) {
+        setCachedAnalysis(validatedUrl, fetchResult.html, analysisResult);
+      }
+
+      return analysisResult;
     } catch (err) {
       if (err.name === 'AbortError') {
         setState(STATES.IDLE);

@@ -8,6 +8,8 @@ import { runContentClarityChecks } from './checks/contentClarity.js';
 import { runTechnicalAccessChecks } from './checks/technicalAccess.js';
 import { runMetadataSchemaChecks } from './checks/metadataSchema.js';
 import { runAISignalsChecks } from './checks/aiSignals.js';
+import { checkFactDensity } from './checks/factDensity.js';
+import { runGoogleAIOChecks } from './checks/googleAIO.js';
 import { calculateCategoryScore, calculateOverallScore, integrateAIScores } from './utils/scoreCalculator.js';
 import { getGrade, getGradeSummary } from './utils/gradeMapper.js';
 
@@ -24,6 +26,14 @@ export function scoreContent(extractedContent, aiAssessment = null) {
   const technicalAccessResults = runTechnicalAccessChecks(extractedContent);
   const metadataSchemaResults = runMetadataSchemaChecks(extractedContent);
   const aiSignalsResults = runAISignalsChecks(extractedContent);
+
+  // Run enhancement checks (E-015, E-045)
+  const factDensityResult = checkFactDensity(extractedContent);
+  const googleAIOResults = runGoogleAIOChecks(extractedContent);
+
+  // Append enhancement checks to their parent categories
+  contentClarityResults.push(factDensityResult);
+  aiSignalsResults.push(...googleAIOResults);
 
   // Calculate category scores
   const rawCategoryScores = {

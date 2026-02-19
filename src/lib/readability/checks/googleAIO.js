@@ -8,7 +8,7 @@
  */
 function checkFeaturedSnippetStructure(extracted) {
   const headings = extracted?.headings || [];
-  const bodyText = extracted?.bodyText || '';
+  const bodyText = extracted?.textContent || '';
 
   // Look for question-answer patterns
   const questionHeadings = headings.filter(h =>
@@ -17,7 +17,8 @@ function checkFeaturedSnippetStructure(extracted) {
 
   // Look for concise answer paragraphs (40-60 words after a heading)
   const hasConseAnswers = bodyText.includes('. ') && extracted?.paragraphs?.some(p => {
-    const wordCount = p.split(/\s+/).length;
+    const text = typeof p === 'string' ? p : p?.text || '';
+    const wordCount = text.split(/\s+/).length;
     return wordCount >= 30 && wordCount <= 80;
   });
 
@@ -62,7 +63,7 @@ function checkFAQSchema(extracted) {
  */
 function checkPAAAlignment(extracted) {
   const headings = extracted?.headings || [];
-  const bodyText = extracted?.bodyText || '';
+  const bodyText = extracted?.textContent || '';
 
   // Check for interrogative sentences in content
   const questionSentences = (bodyText.match(/[^.!?]*\?/g) || []).length;
@@ -88,7 +89,8 @@ function checkPAAAlignment(extracted) {
 function checkConciseAnswers(extracted) {
   const paragraphs = extracted?.paragraphs || [];
   const conciseParagraphs = paragraphs.filter(p => {
-    const wordCount = p.split(/\s+/).length;
+    const text = typeof p === 'string' ? p : p?.text || '';
+    const wordCount = text.split(/\s+/).length;
     return wordCount >= 20 && wordCount <= 60;
   });
 

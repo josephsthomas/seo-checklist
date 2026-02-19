@@ -7,11 +7,12 @@
 
 import React, { useRef, useEffect, useState } from 'react';
 import { BarChart3, AlertTriangle } from 'lucide-react';
+import EmptyState from '../shared/EmptyState';
 
 const CATEGORY_META = {
   contentStructure: { label: 'Content Structure', short: 'CS', order: 0 },
   contentClarity: { label: 'Content Clarity', short: 'CC', order: 1 },
-  technicalAccessibility: { label: 'Technical Accessibility', short: 'TA', order: 2 },
+  technicalAccess: { label: 'Technical Accessibility', short: 'TA', order: 2 },
   metadataSchema: { label: 'Metadata & Schema', short: 'MS', order: 3 },
   aiSignals: { label: 'AI-Specific Signals', short: 'AS', order: 4 },
 };
@@ -124,13 +125,12 @@ function ReadabilityCategoryChart({ categoryScores, onCategoryClick }) {
 
   if (!categoryScores || Object.keys(categoryScores).length === 0) {
     return (
-      <div className="bg-white dark:bg-charcoal-800 rounded-xl border border-gray-200 dark:border-charcoal-700 p-6">
-        <div className="flex items-center gap-2 mb-4">
-          <BarChart3 className="w-5 h-5 text-teal-500" />
-          <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Category Breakdown</h3>
-        </div>
-        <p className="text-sm text-gray-500 dark:text-gray-400">No category data available.</p>
-      </div>
+      <EmptyState
+        icon={BarChart3}
+        title="No category data available."
+        compact
+        className="bg-white dark:bg-charcoal-800"
+      />
     );
   }
 

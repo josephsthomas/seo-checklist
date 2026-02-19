@@ -35,12 +35,9 @@ function pruneTimestamps(timestamps) {
  * Requires req.user.uid (from auth middleware) and req.user.plan
  */
 function rateLimitMiddleware(req, res, next) {
-  const userId = req.user?.uid;
-  if (!userId) {
-    return next(); // No user context — skip rate limiting
-  }
-
-  const tier = req.user.plan || 'free';
+  // Use user UID if authenticated, otherwise fall back to IP-based limiting
+  const userId = req.user?.uid || `ip:${req.ip || req.connection?.remoteAddress || 'unknown'}`;
+  const tier = req.user?.plan || 'free';
   const limit = getLimit(tier);
   const now = Date.now();
 

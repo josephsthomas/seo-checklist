@@ -156,6 +156,11 @@ export function useReadabilityShare() {
       const { expiryDays = 30 } = options;
       const shareToken = generateShareToken();
 
+      // DEF-011: Validate expiryDays is positive to prevent past-date expiry
+      if (expiryDays !== null && (typeof expiryDays !== 'number' || expiryDays <= 0)) {
+        throw new Error('Expiry must be a positive number of days or null for permanent links.');
+      }
+
       // Calculate expiry
       let shareExpiresAt = null;
       if (expiryDays !== null) {

@@ -1,7 +1,7 @@
 import { useState, useCallback, useMemo, useEffect, lazy, Suspense } from 'react';
 import {
   ExternalLink, Share2, Download, FileJson, FileText, ChevronDown,
-  Zap, ArrowRight, ArrowLeft, ListChecks, Eye, MessageSquare, AlertTriangle
+  Zap, ArrowRight, ArrowLeft, ListChecks, Eye, MessageSquare, AlertTriangle, Sliders
 } from 'lucide-react';
 import { useReadabilityExport } from '../../hooks/useReadabilityExport';
 import { useReadabilityShare } from '../../hooks/useReadabilityShare';
@@ -14,6 +14,9 @@ import ReadabilityRecommendations from './ReadabilityRecommendations';
 import ReadabilityIssuesTable from './ReadabilityIssuesTable';
 import ReadabilityCrossToolLinks from './ReadabilityCrossToolLinks';
 import ReadabilityPDFPreview from './ReadabilityPDFPreview';
+import ReadabilityQuotableHighlighter from './ReadabilityQuotableHighlighter';
+import ReadabilityWeightConfig from './ReadabilityWeightConfig';
+import { ScoreCardSkeleton, CategoryChartSkeleton, LLMPreviewSkeleton } from './ReadabilitySkeletonLoader';
 
 /**
  * Dashboard tabs
@@ -39,7 +42,9 @@ export default function ReadabilityDashboard({
   const [showExportMenu, setShowExportMenu] = useState(false);
   const [showShareDialog, setShowShareDialog] = useState(false);
   const [showPDFPreview, setShowPDFPreview] = useState(false);
+  const [showWeightConfig, setShowWeightConfig] = useState(false);
   const [shareExpiry, setShareExpiry] = useState(30);
+  const [generatedShareUrl, setGeneratedShareUrl] = useState(null);
   const [trendData, setTrendData] = useState([]);
 
   const exportHook = useReadabilityExport();
@@ -113,8 +118,10 @@ export default function ReadabilityDashboard({
   // Share handler
   const handleShare = useCallback(async () => {
     if (!analysis?.id) return;
-    await shareHook.createShareLink(analysis.id, { expiryDays: shareExpiry });
-    setShowShareDialog(false);
+    const result = await shareHook.createShareLink(analysis.id, { expiryDays: shareExpiry });
+    if (result?.shareUrl) {
+      setGeneratedShareUrl(result.shareUrl);
+    }
   }, [analysis?.id, shareExpiry, shareHook]);
 
   if (!analysis) return null;
@@ -210,6 +217,20 @@ export default function ReadabilityDashboard({
                 >
                   {shareHook.isSharing ? 'Creating...' : 'Create & Copy Link'}
                 </button>
+                {generatedShareUrl && (
+                  <div className="mt-3 p-2 bg-charcoal-50 dark:bg-charcoal-700 rounded-lg">
+                    <p className="text-xs text-charcoal-500 dark:text-charcoal-400 mb-1">Share link:</p>
+                    <div className="flex items-center gap-1">
+                      <input
+                        type="text"
+                        readOnly
+                        value={generatedShareUrl}
+                        className="flex-1 text-xs px-2 py-1 bg-white dark:bg-charcoal-800 border border-charcoal-300 dark:border-charcoal-600 rounded text-charcoal-700 dark:text-charcoal-200"
+                        onFocus={(e) => e.target.select()}
+                      />
+                    </div>
+                  </div>
+                )}
               </div>
             )}
           </div>
@@ -290,7 +311,7 @@ export default function ReadabilityDashboard({
       </div>
 
       {/* Category Breakdown Chart */}
-      <Suspense fallback={<div className="h-64 bg-charcoal-50 dark:bg-charcoal-800 rounded-xl animate-pulse" />}>
+      <Suspense fallback={<CategoryChartSkeleton />}>
         <ReadabilityCategoryChart
           categoryScores={analysis.categoryScores}
           onCategoryClick={(catId) => {
@@ -406,12 +427,42 @@ export default function ReadabilityDashboard({
           role="tabpanel"
           id="results-panel-details"
           aria-labelledby="results-tab-details"
-          className="motion-safe:animate-fade-in"
+          className="motion-safe:animate-fade-in space-y-6"
         >
+          {/* Weight Config toggle (E-007) */}
+          <div className="flex justify-end">
+            <button
+              onClick={() => setShowWeightConfig(!showWeightConfig)}
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-charcoal-600 dark:text-charcoal-400 bg-charcoal-50 dark:bg-charcoal-800 border border-charcoal-200 dark:border-charcoal-700 rounded-lg hover:bg-charcoal-100 dark:hover:bg-charcoal-700 transition-colors focus:outline-none focus:ring-2 focus:ring-teal-500"
+              aria-expanded={showWeightConfig}
+            >
+              <Sliders className="w-3.5 h-3.5" aria-hidden="true" />
+              {showWeightConfig ? 'Hide' : 'Adjust'} Weights
+            </button>
+          </div>
+          {showWeightConfig && (
+            <div className="bg-white dark:bg-charcoal-800 rounded-xl border border-charcoal-200 dark:border-charcoal-700 p-5 motion-safe:animate-fade-in">
+              <ReadabilityWeightConfig
+                weights={null}
+                onChange={(weights) => {
+                  console.log('Custom weights applied:', weights);
+                }}
+              />
+            </div>
+          )}
+
           <ReadabilityCategoryAccordion
             categoryScores={analysis.categoryScores}
             checkResults={analysis.checkResults}
           />
+
+          {/* Quotable Passages (E-013) */}
+          <div className="bg-white dark:bg-charcoal-800 rounded-xl border border-charcoal-200 dark:border-charcoal-700 p-5">
+            <ReadabilityQuotableHighlighter
+              bodyText={analysis.aiAssessment?.contentSummary || ''}
+              aiQuotables={analysis.aiAssessment?.quotablePassages}
+            />
+          </div>
         </div>
       )}
 
@@ -422,7 +473,7 @@ export default function ReadabilityDashboard({
           aria-labelledby="results-tab-llm"
           className="motion-safe:animate-fade-in"
         >
-          <Suspense fallback={<div className="h-64 bg-charcoal-50 dark:bg-charcoal-800 rounded-xl animate-pulse" />}>
+          <Suspense fallback={<LLMPreviewSkeleton />}>
             <ReadabilityLLMPreview
               llmExtractions={analysis.llmExtractions}
             />
