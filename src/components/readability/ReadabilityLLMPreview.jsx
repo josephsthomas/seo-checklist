@@ -16,6 +16,7 @@ import {
 import ReadabilityLLMColumn from './ReadabilityLLMColumn';
 import ReadabilityCoverageTable from './ReadabilityCoverageTable';
 import ReadabilityLLMDiff from './ReadabilityLLMDiff';
+import EmptyState from '../shared/EmptyState';
 
 const LLM_OPTIONS = [
   { key: 'claude', name: 'Claude', model: 'Claude 3.5 Sonnet' },
@@ -68,16 +69,13 @@ export default function ReadabilityLLMPreview({ llmExtractions, aiAssessment }) 
 
   if (!hasData) {
     return (
-      <div className="bg-white dark:bg-charcoal-800 rounded-xl border border-gray-200 dark:border-charcoal-700 p-8 text-center">
-        <Eye className="w-10 h-10 text-gray-300 dark:text-gray-600 mx-auto mb-3" />
-        <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
-          LLM Preview Not Available
-        </h3>
-        <p className="text-sm text-gray-500 dark:text-gray-400 max-w-md mx-auto">
-          AI model extractions were not available for this analysis. This may be due to
-          API unavailability or the content being too short to analyze.
-        </p>
-      </div>
+      <EmptyState
+        icon={Eye}
+        large
+        title="LLM Preview Not Available"
+        description="AI model extractions were not available for this analysis. This may be due to API unavailability or the content being too short to analyze."
+        className="bg-white dark:bg-charcoal-800 p-8"
+      />
     );
   }
 

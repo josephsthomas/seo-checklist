@@ -5,6 +5,7 @@
  */
 
 import React, { useState, useMemo, useCallback } from 'react';
+import EmptyState from '../shared/EmptyState';
 import {
   CheckCircle2,
   AlertTriangle,
@@ -184,10 +185,7 @@ export default function ReadabilityIssuesTable({ checkResults }) {
 
   if (!checkResults || checks.length === 0) {
     return (
-      <div className="text-center py-12 bg-gray-50 dark:bg-charcoal-800 rounded-xl border border-gray-200 dark:border-charcoal-700">
-        <Info className="w-10 h-10 text-gray-300 dark:text-gray-600 mx-auto mb-3" />
-        <p className="text-sm text-gray-500 dark:text-gray-400">No check results available.</p>
-      </div>
+      <EmptyState icon={Info} title="No check results available." />
     );
   }
 

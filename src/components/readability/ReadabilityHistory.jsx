@@ -6,6 +6,7 @@
 
 import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
+import EmptyState from '../shared/EmptyState';
 import {
   History,
   Search,
@@ -172,25 +173,14 @@ export default function ReadabilityHistory({ onAnalyze, storageLimit }) {
   // Empty state
   if (!loading && (!history || history.length === 0) && !searchInput && !filters?.searchUrl) {
     return (
-      <div className="text-center py-16 bg-white dark:bg-charcoal-800 rounded-xl border border-gray-200 dark:border-charcoal-700">
-        <History className="w-12 h-12 text-gray-300 dark:text-gray-600 mx-auto mb-4" />
-        <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
-          No analyses yet
-        </h3>
-        <p className="text-sm text-gray-500 dark:text-gray-400 mb-6 max-w-md mx-auto">
-          Start by analyzing a URL, uploading an HTML file, or pasting HTML content above.
-        </p>
-        {onAnalyze && (
-          <button
-            type="button"
-            onClick={onAnalyze}
-            className="inline-flex items-center gap-2 px-4 py-2 bg-teal-500 hover:bg-teal-600 text-white rounded-lg font-medium text-sm transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-teal-500 focus-visible:ring-offset-2 dark:focus-visible:ring-offset-charcoal-800"
-          >
-            <ScanEye className="w-4 h-4" />
-            Analyze Content
-          </button>
-        )}
-      </div>
+      <EmptyState
+        icon={History}
+        large
+        title="No analyses yet"
+        description="Start by analyzing a URL, uploading an HTML file, or pasting HTML content above."
+        action={onAnalyze ? { label: 'Analyze Content', onClick: onAnalyze } : undefined}
+        className="bg-white dark:bg-charcoal-800 py-16"
+      />
     );
   }
 

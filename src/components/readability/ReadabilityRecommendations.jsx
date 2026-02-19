@@ -5,6 +5,7 @@
  */
 
 import React, { useState, useMemo, useCallback } from 'react';
+import EmptyState from '../shared/EmptyState';
 import {
   Lightbulb,
   Sparkles,
@@ -171,17 +172,13 @@ export default function ReadabilityRecommendations({ recommendations, aiAssessme
 
       {/* Recommendation cards */}
       {filteredRecs.length === 0 ? (
-        <div className="text-center py-12 bg-gray-50 dark:bg-charcoal-800 rounded-xl border border-gray-200 dark:border-charcoal-700">
-          <Lightbulb className="w-10 h-10 text-gray-300 dark:text-gray-600 mx-auto mb-3" />
-          <p className="text-sm font-medium text-gray-500 dark:text-gray-400">
-            No recommendations in this category.
-          </p>
-          <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">
-            {activeFilter !== 'all'
-              ? 'Try selecting a different filter.'
-              : 'Great job — your content looks solid!'}
-          </p>
-        </div>
+        <EmptyState
+          icon={Lightbulb}
+          title="No recommendations in this category."
+          description={activeFilter !== 'all'
+            ? 'Try selecting a different filter.'
+            : 'Great job — your content looks solid!'}
+        />
       ) : (
         <div className="space-y-3">
           {filteredRecs.map((rec, idx) => (

@@ -69,7 +69,16 @@ export default function ReadabilityPDFPreview({ analysis, onClose }) {
 
   // Preview data
   const previewData = getPreviewData(analysis, options);
-  const totalPages = previewData?.pageCount || 8;
+  const totalPages = previewData?.totalPages || 8;
+
+  // Category data for pages 2-4
+  const categories = analysis?.categoryScores ? Object.entries(analysis.categoryScores) : [];
+  const topCategories = categories.slice(0, 3);
+  const bottomCategories = categories.slice(3);
+  const llmNames = { claude: 'Claude', openai: 'OpenAI GPT', gemini: 'Google Gemini' };
+
+  // Determine which page index maps to LLM Summary (first optional page after page 4)
+  const llmPageIndex = 5; // Pages 3-4 are category breakdown, page 5 is LLM if enabled
 
   // Focus trap + escape handler
   useEffect(() => {
@@ -216,24 +225,141 @@ export default function ReadabilityPDFPreview({ analysis, onClose }) {
                 )}
                 {previewPage === 2 && (
                   <div className="flex-1">
-                    <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-3">
+                    <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-2">
                       Executive Summary
                     </h3>
-                    <div className="space-y-2">
-                      <div className="h-3 bg-gray-200 dark:bg-charcoal-700 rounded w-full" />
-                      <div className="h-3 bg-gray-200 dark:bg-charcoal-700 rounded w-5/6" />
-                      <div className="h-3 bg-gray-200 dark:bg-charcoal-700 rounded w-4/6" />
+                    {analysis?.gradeSummary && (
+                      <p className="text-[10px] text-gray-500 dark:text-gray-400 mb-3 line-clamp-2">
+                        {analysis.gradeSummary}
+                      </p>
+                    )}
+                    <div className="space-y-1.5 mt-2">
+                      {categories.map(([key, cat]) => {
+                        const score = typeof cat === 'number' ? cat : cat?.score ?? 0;
+                        const label = typeof cat === 'object' ? cat?.label : key;
+                        return (
+                          <div key={key} className="flex items-center gap-2">
+                            <span className="text-[9px] text-gray-500 dark:text-gray-400 w-20 truncate">{label}</span>
+                            <div className="flex-1 h-4 bg-gray-100 dark:bg-charcoal-700 rounded-full overflow-hidden">
+                              <div
+                                className="h-full bg-teal-500 dark:bg-teal-400 rounded-full"
+                                style={{ width: `${Math.max(score, 3)}%` }}
+                              />
+                            </div>
+                            <span className="text-[9px] font-semibold text-gray-700 dark:text-gray-300 w-7 text-right">{Math.round(score)}</span>
+                          </div>
+                        );
+                      })}
                     </div>
-                    <div className="mt-6 space-y-2">
-                      <div className="h-8 bg-teal-50 dark:bg-teal-900/20 rounded" />
-                      <div className="h-8 bg-teal-50 dark:bg-teal-900/20 rounded" />
-                      <div className="h-8 bg-teal-50 dark:bg-teal-900/20 rounded" />
-                      <div className="h-8 bg-teal-50 dark:bg-teal-900/20 rounded" />
-                      <div className="h-8 bg-teal-50 dark:bg-teal-900/20 rounded" />
+                    {analysis?.issueSummary && (
+                      <div className="mt-3 flex gap-2 text-[8px]">
+                        {analysis.issueSummary.critical > 0 && <span className="px-1.5 py-0.5 bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-300 rounded">{analysis.issueSummary.critical} critical</span>}
+                        {analysis.issueSummary.high > 0 && <span className="px-1.5 py-0.5 bg-orange-100 dark:bg-orange-900/30 text-orange-700 dark:text-orange-300 rounded">{analysis.issueSummary.high} high</span>}
+                        <span className="px-1.5 py-0.5 bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300 rounded">{analysis.issueSummary.passed} passed</span>
+                      </div>
+                    )}
+                  </div>
+                )}
+                {/* Page 3: Category Breakdown 1/2 */}
+                {previewPage === 3 && (
+                  <div className="flex-1">
+                    <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-3">
+                      Category Breakdown (1/2)
+                    </h3>
+                    <div className="space-y-3">
+                      {topCategories.map(([key, cat]) => {
+                        const score = typeof cat === 'number' ? cat : cat?.score ?? 0;
+                        const label = typeof cat === 'object' ? cat?.label : key;
+                        const weight = typeof cat === 'object' ? cat?.weight : '';
+                        const checks = analysis?.checkResults?.[key] || [];
+                        const passed = Array.isArray(checks) ? checks.filter(c => c.status === 'pass').length : 0;
+                        const total = Array.isArray(checks) ? checks.length : 0;
+                        return (
+                          <div key={key} className="p-2 bg-gray-50 dark:bg-charcoal-700/50 rounded-lg">
+                            <div className="flex items-center justify-between mb-1">
+                              <span className="text-[10px] font-semibold text-gray-700 dark:text-gray-200">{label}</span>
+                              <span className="text-[9px] text-gray-400">{weight}</span>
+                            </div>
+                            <div className="h-2 bg-gray-200 dark:bg-charcoal-600 rounded-full overflow-hidden mb-1">
+                              <div className="h-full bg-teal-500 rounded-full" style={{ width: `${Math.max(score, 3)}%` }} />
+                            </div>
+                            <div className="flex justify-between text-[8px] text-gray-400">
+                              <span>Score: {Math.round(score)}/100</span>
+                              <span>{passed}/{total} checks passed</span>
+                            </div>
+                          </div>
+                        );
+                      })}
                     </div>
                   </div>
                 )}
-                {previewPage >= 3 && (
+
+                {/* Page 4: Category Breakdown 2/2 */}
+                {previewPage === 4 && (
+                  <div className="flex-1">
+                    <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-3">
+                      Category Breakdown (2/2)
+                    </h3>
+                    <div className="space-y-3">
+                      {bottomCategories.map(([key, cat]) => {
+                        const score = typeof cat === 'number' ? cat : cat?.score ?? 0;
+                        const label = typeof cat === 'object' ? cat?.label : key;
+                        const weight = typeof cat === 'object' ? cat?.weight : '';
+                        const checks = analysis?.checkResults?.[key] || [];
+                        const passed = Array.isArray(checks) ? checks.filter(c => c.status === 'pass').length : 0;
+                        const total = Array.isArray(checks) ? checks.length : 0;
+                        return (
+                          <div key={key} className="p-2 bg-gray-50 dark:bg-charcoal-700/50 rounded-lg">
+                            <div className="flex items-center justify-between mb-1">
+                              <span className="text-[10px] font-semibold text-gray-700 dark:text-gray-200">{label}</span>
+                              <span className="text-[9px] text-gray-400">{weight}</span>
+                            </div>
+                            <div className="h-2 bg-gray-200 dark:bg-charcoal-600 rounded-full overflow-hidden mb-1">
+                              <div className="h-full bg-teal-500 rounded-full" style={{ width: `${Math.max(score, 3)}%` }} />
+                            </div>
+                            <div className="flex justify-between text-[8px] text-gray-400">
+                              <span>Score: {Math.round(score)}/100</span>
+                              <span>{passed}/{total} checks passed</span>
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+                )}
+
+                {/* Page 5: LLM Summary (if enabled) */}
+                {previewPage === llmPageIndex && options.includeLLMSummary && analysis?.llmExtractions && (
+                  <div className="flex-1">
+                    <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-3">
+                      How AI Models See Your Content
+                    </h3>
+                    <div className="space-y-2">
+                      {Object.entries(analysis.llmExtractions)
+                        .filter(([, data]) => data && data.status !== 'error')
+                        .map(([llmKey, data]) => (
+                          <div key={llmKey} className="p-2 bg-gray-50 dark:bg-charcoal-700/50 rounded-lg flex items-center justify-between">
+                            <div>
+                              <span className="text-[10px] font-semibold text-gray-700 dark:text-gray-200">{llmNames[llmKey] || llmKey}</span>
+                              <span className="text-[8px] text-gray-400 ml-1">({data.model || ''})</span>
+                            </div>
+                            <div className="text-right">
+                              <span className="text-[10px] font-bold text-teal-600 dark:text-teal-400">
+                                {data.usefulnessScore || data.usefulnessAssessment?.score || '—'}/10
+                              </span>
+                              <p className="text-[7px] text-gray-400">usefulness</p>
+                            </div>
+                          </div>
+                        ))}
+                    </div>
+                    <p className="text-[7px] text-gray-400 dark:text-gray-500 mt-3 italic">
+                      LLM previews show how AI models interpret content when provided to them.
+                    </p>
+                  </div>
+                )}
+
+                {/* Pages 6+: Title + description + skeleton (text-heavy content) */}
+                {previewPage >= 6 && (
                   <div className="flex-1">
                     <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-3">
                       {previewData?.pages?.[previewPage - 1]?.title || `Page ${previewPage}`}
@@ -243,11 +369,24 @@ export default function ReadabilityPDFPreview({ analysis, onClose }) {
                     </p>
                     <div className="space-y-2">
                       {Array.from({ length: 8 }, (_, i) => (
-                        <div
-                          key={i}
-                          className="h-3 bg-gray-200 dark:bg-charcoal-700 rounded"
-                          style={{ width: `${60 + Math.random() * 40}%` }}
-                        />
+                        <div key={i} className="h-3 bg-gray-200 dark:bg-charcoal-700 rounded" style={{ width: `${65 + (i * 5) % 35}%` }} />
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Page 5 fallback when LLM not enabled */}
+                {previewPage === llmPageIndex && (!options.includeLLMSummary || !analysis?.llmExtractions) && (
+                  <div className="flex-1">
+                    <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-3">
+                      {previewData?.pages?.[previewPage - 1]?.title || `Page ${previewPage}`}
+                    </h3>
+                    <p className="text-xs text-gray-400 dark:text-gray-500 mb-4">
+                      {previewData?.pages?.[previewPage - 1]?.description || 'Detailed analysis content'}
+                    </p>
+                    <div className="space-y-2">
+                      {Array.from({ length: 8 }, (_, i) => (
+                        <div key={i} className="h-3 bg-gray-200 dark:bg-charcoal-700 rounded" style={{ width: `${65 + (i * 5) % 35}%` }} />
                       ))}
                     </div>
                   </div>
