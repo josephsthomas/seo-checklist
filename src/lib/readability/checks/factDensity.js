@@ -38,7 +38,7 @@ function countFactualIndicators(text) {
  * @returns {Object} Check result
  */
 export function checkFactDensity(extracted) {
-  const bodyText = extracted?.bodyText || '';
+  const bodyText = extracted?.textContent || '';
   const wordCount = extracted?.wordCount || bodyText.split(/\s+/).length;
 
   if (wordCount < 100) {

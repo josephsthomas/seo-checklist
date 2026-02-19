@@ -18,9 +18,9 @@ const LIGHT_GRAY = [200, 200, 200];
 const CATEGORY_LABELS = {
   contentStructure: 'Content Structure',
   contentClarity: 'Content Clarity',
-  technicalAccessibility: 'Technical Accessibility',
+  technicalAccess: 'Technical Accessibility',
   metadataSchema: 'Metadata & Schema',
-  aiSpecificSignals: 'AI-Specific Signals'
+  aiSignals: 'AI-Specific Signals'
 };
 
 /**
@@ -29,9 +29,9 @@ const CATEGORY_LABELS = {
 const CATEGORY_WEIGHTS = {
   contentStructure: '20%',
   contentClarity: '25%',
-  technicalAccessibility: '20%',
+  technicalAccess: '20%',
   metadataSchema: '15%',
-  aiSpecificSignals: '20%'
+  aiSignals: '20%'
 };
 
 /**
@@ -359,9 +359,9 @@ export function useReadabilityExport() {
           const prefix = {
             contentStructure: 'CS',
             contentClarity: 'CC',
-            technicalAccessibility: 'TA',
+            technicalAccess: 'TA',
             metadataSchema: 'MS',
-            aiSpecificSignals: 'AS'
+            aiSignals: 'AS'
           }[catKey];
           return check.id?.startsWith(prefix);
         });
