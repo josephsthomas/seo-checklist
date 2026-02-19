@@ -5,14 +5,14 @@ The following enhancements require server-side implementation. Client-side stubs
 ## P0 Pre-Launch (Server Required)
 
 ### E-035: Server-Side Rate Limiting
-- **Status:** TODO: SERVER_REQUIRED
-- **What's needed:** Rate limit middleware on proxy: Free 10/hr, Pro 30/hr, Enterprise 200/hr
+- **Status:** IMPLEMENTED — `server/middleware/rateLimit.js`
+- **Implementation:** In-memory sliding window rate limiter: Free 10/hr, Pro 30/hr, Enterprise 200/hr
 - **Client prep:** 429 error handling with Retry-After support already implemented (Task 3)
 
 ### E-038: Proxy Health Monitoring & Failover
-- **Status:** TODO: SERVER_REQUIRED
-- **What's needed:** GET /health endpoint, auto-restart, alerting webhook
-- **Client prep:** Could add health check ping on app load to show degraded mode banner
+- **Status:** IMPLEMENTED — `server/routes/health.js`
+- **Implementation:** GET /health returns structured status with uptime, memory, configured services
+- **Remaining:** Auto-restart (use Railway/PM2), alerting webhook (configure monitoring service)
 
 ## P2-P3 (Server Required)
 
