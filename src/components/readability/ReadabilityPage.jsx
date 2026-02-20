@@ -8,6 +8,7 @@ import { useReadabilityHistory } from '../../hooks/useReadabilityHistory';
 import ReadabilityInputScreen from './ReadabilityInputScreen';
 import ReadabilityProcessingScreen from './ReadabilityProcessingScreen';
 import ReadabilityDashboard from './ReadabilityDashboard';
+import toast from 'react-hot-toast';
 
 /**
  * ReadabilityPage — Main page container
@@ -78,10 +79,12 @@ export default function ReadabilityPage() {
 
   // Load existing analysis from URL param
   useEffect(() => {
+    let cancelled = false;
     if (analysisId && analysisId !== 'undefined') {
       setView('results');
       history.getAnalysisById(analysisId)
         .then(data => {
+          if (cancelled) return;
           if (data) {
             setLoadedResult(data);
             setLoadError(null);
@@ -90,9 +93,11 @@ export default function ReadabilityPage() {
           }
         })
         .catch(err => {
+          if (cancelled) return;
           setLoadError(err.message || 'Failed to load analysis');
         });
     }
+    return () => { cancelled = true; };
   }, [analysisId]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Watch analysis state changes and announce to screen readers
@@ -117,24 +122,24 @@ export default function ReadabilityPage() {
   const handleAnalyzeUrl = useCallback(async (url) => {
     try {
       await analysis.analyzeUrl(url);
-    } catch {
-      // Error is handled in hook
+    } catch (err) {
+      toast.error(err.message || 'Analysis failed. Please try again.');
     }
   }, [analysis]);
 
   const handleAnalyzeHtml = useCallback(async (file) => {
     try {
       await analysis.analyzeHtml(file);
-    } catch {
-      // Error is handled in hook
+    } catch (err) {
+      toast.error(err.message || 'Failed to analyze the uploaded file.');
     }
   }, [analysis]);
 
   const handleAnalyzePaste = useCallback(async (html) => {
     try {
       await analysis.analyzePaste(html);
-    } catch {
-      // Error is handled in hook
+    } catch (err) {
+      toast.error(err.message || 'Failed to analyze the pasted content.');
     }
   }, [analysis]);
 

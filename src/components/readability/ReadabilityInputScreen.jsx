@@ -94,6 +94,11 @@ export default function ReadabilityInputScreen({
   const [industry, setIndustry] = useState('');
   const [keywords, setKeywords] = useState('');
 
+  // First-use onboarding (SSR-safe localStorage access)
+  const [dismissed, setDismissed] = useState(() => {
+    try { return localStorage.getItem('readability-onboarded') === 'true'; } catch { return false; }
+  });
+
   // Project tagging (E-041)
   const [projectTags, setProjectTags] = useState({});
 
@@ -289,7 +294,7 @@ export default function ReadabilityInputScreen({
       </p>
 
       {/* First-use onboarding callout (Task 15) */}
-      {!localStorage.getItem('readability-onboarded') && (
+      {!dismissed && (
         <div className="mb-4 p-4 bg-teal-50 dark:bg-teal-900/20 border border-teal-200 dark:border-teal-800 rounded-lg flex items-start gap-3">
           <Info className="w-5 h-5 text-teal-500 flex-shrink-0 mt-0.5" aria-hidden="true" />
           <div className="flex-1">
@@ -303,9 +308,8 @@ export default function ReadabilityInputScreen({
           </div>
           <button
             onClick={() => {
-              localStorage.setItem('readability-onboarded', 'true');
-              // Force re-render by toggling a state
-              setActiveTab(activeTab);
+              try { localStorage.setItem('readability-onboarded', 'true'); } catch {}
+              setDismissed(true);
             }}
             className="text-xs text-teal-600 dark:text-teal-400 hover:underline whitespace-nowrap"
           >

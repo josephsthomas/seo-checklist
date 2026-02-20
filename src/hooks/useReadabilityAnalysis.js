@@ -654,5 +654,5 @@ export function useReadabilityAnalysis() {
   };
 }
 
-export { STATES as ANALYSIS_STATES };
+export { STATES as ANALYSIS_STATES, STORAGE_LIMITS };
 export default useReadabilityAnalysis;
