@@ -44,6 +44,8 @@ const REPORT_TYPES = [
     description: 'Full technical SEO analysis report',
     icon: Globe,
     color: 'cyan',
+    bgClass: 'bg-cyan-100 dark:bg-cyan-900/30',
+    textClass: 'text-cyan-600 dark:text-cyan-400',
     fields: ['url', 'depth', 'includeScreenshots']
   },
   {
@@ -52,6 +54,8 @@ const REPORT_TYPES = [
     description: 'WCAG compliance analysis report',
     icon: Shield,
     color: 'purple',
+    bgClass: 'bg-purple-100 dark:bg-purple-900/30',
+    textClass: 'text-purple-600 dark:text-purple-400',
     fields: ['url', 'wcagLevel', 'includeFixSuggestions']
   },
   {
@@ -60,6 +64,8 @@ const REPORT_TYPES = [
     description: 'Project checklist completion status',
     icon: CheckCircle,
     color: 'primary',
+    bgClass: 'bg-primary-100 dark:bg-primary-900/30',
+    textClass: 'text-primary-600 dark:text-primary-400',
     fields: ['projectId', 'includeAssignments']
   },
   {
@@ -68,6 +74,8 @@ const REPORT_TYPES = [
     description: 'Meta tags performance report',
     icon: FileText,
     color: 'amber',
+    bgClass: 'bg-amber-100 dark:bg-amber-900/30',
+    textClass: 'text-amber-600 dark:text-amber-400',
     fields: ['urls', 'includeCompetitors']
   },
   {
@@ -76,7 +84,10 @@ const REPORT_TYPES = [
     description: 'Image accessibility compliance report',
     icon: Image,
     color: 'emerald',
-    fields: ['url', 'includeAIsuggestions']
+    bgClass: 'bg-emerald-100 dark:bg-emerald-900/30',
+    textClass: 'text-emerald-600 dark:text-emerald-400',
+    fields: ['url', 'includeAIsuggestions'],
+    aiDisclaimer: 'AI-generated alt text suggestions may contain inaccuracies. Review before publishing.'
   },
   {
     id: 'schema-validation',
@@ -84,6 +95,8 @@ const REPORT_TYPES = [
     description: 'Schema markup validation report',
     icon: Code,
     color: 'rose',
+    bgClass: 'bg-rose-100 dark:bg-rose-900/30',
+    textClass: 'text-rose-600 dark:text-rose-400',
     fields: ['url', 'includeRecommendations']
   },
   {
@@ -92,6 +105,8 @@ const REPORT_TYPES = [
     description: 'Team activity and usage statistics',
     icon: BarChart3,
     color: 'indigo',
+    bgClass: 'bg-indigo-100 dark:bg-indigo-900/30',
+    textClass: 'text-indigo-600 dark:text-indigo-400',
     fields: ['dateRange', 'includeUserBreakdown']
   }
 ];
@@ -163,11 +178,12 @@ export default function ScheduledReportsPanel() {
 
   // Toggle schedule active status
   const toggleSchedule = (id) => {
+    const schedule = schedules.find(s => s.id === id);
+    const wasActive = schedule?.isActive;
     setSchedules(prev => prev.map(s =>
       s.id === id ? { ...s, isActive: !s.isActive, lastStatus: !s.isActive ? 'active' : 'paused' } : s
     ));
-    const schedule = schedules.find(s => s.id === id);
-    toast.success(schedule?.isActive ? 'Schedule paused' : 'Schedule activated');
+    toast.success(wasActive ? 'Schedule paused' : 'Schedule activated');
   };
 
   // State for delete confirmation
@@ -399,8 +415,8 @@ export default function ScheduledReportsPanel() {
                 {/* Main row */}
                 <div className="p-4 flex items-center gap-4">
                   {/* Icon */}
-                  <div className={`p-3 rounded-xl bg-${reportType?.color || 'primary'}-100 dark:bg-${reportType?.color || 'primary'}-900/30`}>
-                    <Icon className={`w-6 h-6 text-${reportType?.color || 'primary'}-600 dark:text-${reportType?.color || 'primary'}-400`} />
+                  <div className={`p-3 rounded-xl ${reportType?.bgClass || 'bg-primary-100 dark:bg-primary-900/30'}`}>
+                    <Icon className={`w-6 h-6 ${reportType?.textClass || 'text-primary-600 dark:text-primary-400'}`} />
                   </div>
 
                   {/* Info */}
@@ -654,11 +670,19 @@ function ScheduleFormModal({ schedule, onSave, onClose }) {
       return;
     }
 
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    const recipientList = formData.recipients.split(',').map(e => e.trim()).filter(Boolean);
+    const invalidEmails = recipientList.filter(e => !emailRegex.test(e));
+    if (invalidEmails.length > 0) {
+      toast.error(`Invalid email address${invalidEmails.length > 1 ? 'es' : ''}: ${invalidEmails.join(', ')}`);
+      return;
+    }
+
     const nextRun = calculateNextRun(formData);
 
     onSave({
       ...formData,
-      recipients: formData.recipients.split(',').map(e => e.trim()).filter(Boolean),
+      recipients: recipientList,
       nextRun,
       lastStatus: formData.isActive ? 'active' : 'paused'
     });
@@ -1002,7 +1026,13 @@ function ScheduleFormModal({ schedule, onSave, onClose }) {
           {step < 3 ? (
             <button
               type="button"
-              onClick={() => setStep(step + 1)}
+              onClick={() => {
+                if (step === 1 && !formData.name.trim()) {
+                  toast.error('Please enter a schedule name');
+                  return;
+                }
+                setStep(step + 1);
+              }}
               className="btn btn-primary"
             >
               Continue

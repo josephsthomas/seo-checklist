@@ -15,8 +15,7 @@ import {
 import { format } from 'date-fns';
 import toast from 'react-hot-toast';
 import InfoTooltip from '../common/InfoTooltip';
-import jsPDF from 'jspdf';
-import 'jspdf-autotable';
+// jsPDF and jspdf-autotable are dynamically imported at point of use for bundle size
 
 // VPAT Conformance Levels
 const CONFORMANCE_LEVELS = {
@@ -96,9 +95,8 @@ const WCAG_CRITERIA = [
 ];
 
 export default function VPATReportGenerator({ productInfo, onClose }) {
-  // eslint-disable-next-line no-unused-vars
-  const [_showPreview, _setShowPreview] = useState(true);
-  const [expandedPrinciples, setExpandedPrinciples] = useState(['Perceivable', 'Operable', 'Understandable', 'Robust']);
+  const [showPreview, setShowPreview] = useState(false);
+  const [expandedPrinciples, setExpandedPrinciples] = useState(['Perceivable']);
   const [evaluationData, setEvaluationData] = useState(() => {
     // Map audit results to VPAT criteria
     const initial = {};
@@ -167,7 +165,9 @@ export default function VPATReportGenerator({ productInfo, onClose }) {
     }));
   };
 
-  const handleExport = () => {
+  const handleExport = async () => {
+    const { default: jsPDF } = await import('jspdf');
+    await import('jspdf-autotable');
     const doc = new jsPDF();
     const pageWidth = doc.internal.pageSize.getWidth();
 
@@ -285,7 +285,7 @@ export default function VPATReportGenerator({ productInfo, onClose }) {
               <InfoTooltip tipKey="vpat.version" />
             </h2>
             <p className="text-sm text-charcoal-500 dark:text-charcoal-400">
-              Voluntary Product Accessibility Template (WCAG 2.1)
+              Voluntary Product Accessibility Template (WCAG 2.2)
             </p>
           </div>
         </div>
@@ -301,9 +301,10 @@ export default function VPATReportGenerator({ productInfo, onClose }) {
           {onClose && (
             <button
               onClick={onClose}
+              aria-label="Close VPAT Report Generator"
               className="p-2 text-charcoal-400 hover:text-charcoal-600 dark:hover:text-charcoal-300 rounded-lg"
             >
-              <X className="w-5 h-5" />
+              <X className="w-5 h-5" aria-hidden="true" />
             </button>
           )}
         </div>
@@ -311,7 +312,7 @@ export default function VPATReportGenerator({ productInfo, onClose }) {
 
       {/* Summary Stats */}
       <div className="px-6 py-4 border-b border-charcoal-100 dark:border-charcoal-700 bg-charcoal-50 dark:bg-charcoal-900/50">
-        <div className="grid grid-cols-5 gap-4">
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-4">
           <div className="text-center">
             <p className="text-2xl font-bold text-emerald-600 dark:text-emerald-400">{summary.supports}</p>
             <p className="text-xs text-charcoal-500 dark:text-charcoal-400">Supports</p>
@@ -322,7 +323,7 @@ export default function VPATReportGenerator({ productInfo, onClose }) {
           </div>
           <div className="text-center">
             <p className="text-2xl font-bold text-red-600 dark:text-red-400">{summary.doesNotSupport}</p>
-            <p className="text-xs text-charcoal-500 dark:text-charcoal-400">Does Not</p>
+            <p className="text-xs text-charcoal-500 dark:text-charcoal-400">Fails</p>
           </div>
           <div className="text-center">
             <p className="text-2xl font-bold text-charcoal-500 dark:text-charcoal-400">{summary.notApplicable}</p>
@@ -387,6 +388,7 @@ export default function VPATReportGenerator({ productInfo, onClose }) {
                             <select
                               value={data.conformance}
                               onChange={(e) => updateConformance(criterion.id, e.target.value)}
+                              aria-label={`Conformance level for ${criterion.id} ${criterion.title}`}
                               className={`select text-sm py-1.5 ${
                                 conformanceConfig.color === 'emerald' ? 'border-emerald-300' :
                                 conformanceConfig.color === 'amber' ? 'border-amber-300' :
@@ -404,6 +406,7 @@ export default function VPATReportGenerator({ productInfo, onClose }) {
                             value={data.remarks}
                             onChange={(e) => updateRemarks(criterion.id, e.target.value)}
                             placeholder="Add remarks or explanations..."
+                            aria-label={`Remarks for ${criterion.id} ${criterion.title}`}
                             className="input text-sm py-2 min-h-[60px] resize-none"
                           />
                         </div>
@@ -424,9 +427,9 @@ export default function VPATReportGenerator({ productInfo, onClose }) {
           Report Date: {format(new Date(), 'MMMM d, yyyy')}
         </div>
         <div className="flex items-center gap-2">
-          <button className="btn btn-secondary flex items-center gap-2">
+          <button onClick={() => setShowPreview(!showPreview)} className="btn btn-secondary flex items-center gap-2">
             <Eye className="w-4 h-4" />
-            Preview
+            {showPreview ? 'Edit' : 'Preview'}
           </button>
           <button
             onClick={handleExport}
