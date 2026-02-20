@@ -14,11 +14,13 @@ import {
 } from 'firebase/firestore';
 import { db } from '../lib/firebase';
 import { useAuth } from '../contexts/AuthContext';
+import { hasPermission } from '../utils/roles';
 import toast from 'react-hot-toast';
 
 export function useProjects() {
   const [projects, setProjects] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   const { currentUser } = useAuth();
 
   useEffect(() => {
@@ -35,11 +37,16 @@ export function useProjects() {
     );
 
     const unsubscribe = onSnapshot(q, (snapshot) => {
-      const projectsData = snapshot.docs.map(doc => ({
-        id: doc.id,
-        ...doc.data()
+      const projectsData = snapshot.docs.map(d => ({
+        id: d.id,
+        ...d.data()
       }));
       setProjects(projectsData);
+      setLoading(false);
+      setError(null);
+    }, (err) => {
+      console.error('Projects listener error:', err);
+      setError('Failed to load projects');
       setLoading(false);
     });
 
@@ -78,27 +85,39 @@ export function useProjects() {
   };
 
   const deleteProject = async (projectId) => {
+    const userRole = currentUser?.role || 'viewer';
+    if (!hasPermission(userRole, 'canDeleteProjects')) {
+      toast.error('You do not have permission to delete projects');
+      return;
+    }
     try {
       await deleteDoc(doc(db, 'projects', projectId));
       toast.success('Project deleted successfully!');
-    } catch (error) {
+    } catch (err) {
       toast.error('Failed to delete project');
-      throw error;
+      throw err;
     }
   };
 
   const getProject = async (projectId) => {
-    const docRef = doc(db, 'projects', projectId);
-    const docSnap = await getDoc(docRef);
-    if (docSnap.exists()) {
-      return { id: docSnap.id, ...docSnap.data() };
+    try {
+      const docRef = doc(db, 'projects', projectId);
+      const docSnap = await getDoc(docRef);
+      if (docSnap.exists()) {
+        return { id: docSnap.id, ...docSnap.data() };
+      }
+      return null;
+    } catch (err) {
+      console.error('Failed to get project:', err);
+      toast.error('Failed to load project');
+      return null;
     }
-    return null;
   };
 
   return {
     projects,
     loading,
+    error,
     createProject,
     updateProject,
     deleteProject,

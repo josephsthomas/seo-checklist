@@ -1,12 +1,14 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import {
   collection,
   query,
   where,
   orderBy,
+  limit,
   onSnapshot,
   addDoc,
   updateDoc,
+  deleteDoc,
   doc,
   serverTimestamp,
   writeBatch
@@ -18,8 +20,11 @@ import toast from 'react-hot-toast';
 export function useNotifications() {
   const [notifications, setNotifications] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   const [unreadCount, setUnreadCount] = useState(0);
+  const [liveAnnouncement, setLiveAnnouncement] = useState('');
   const { currentUser } = useAuth();
+  const prevUnreadRef = useRef(0);
 
   useEffect(() => {
     if (!currentUser) {
@@ -30,16 +35,27 @@ export function useNotifications() {
     const q = query(
       collection(db, 'notifications'),
       where('userId', '==', currentUser.uid),
-      orderBy('createdAt', 'desc')
+      orderBy('createdAt', 'desc'),
+      limit(200)
     );
 
     const unsubscribe = onSnapshot(q, (snapshot) => {
-      const notificationsData = snapshot.docs.map(doc => ({
-        id: doc.id,
-        ...doc.data()
+      const notificationsData = snapshot.docs.map(d => ({
+        id: d.id,
+        ...d.data()
       }));
       setNotifications(notificationsData);
-      setUnreadCount(notificationsData.filter(n => !n.read).length);
+      const newUnread = notificationsData.filter(n => !n.read).length;
+      if (newUnread > prevUnreadRef.current) {
+        setLiveAnnouncement(`You have ${newUnread} unread notification${newUnread !== 1 ? 's' : ''}`);
+      }
+      prevUnreadRef.current = newUnread;
+      setUnreadCount(newUnread);
+      setLoading(false);
+      setError(null);
+    }, (err) => {
+      console.error('Notification listener error:', err);
+      setError('Failed to load notifications');
       setLoading(false);
     });
 
@@ -52,25 +68,38 @@ export function useNotifications() {
       await updateDoc(notificationRef, {
         read: true
       });
-    } catch {
-      // Silently fail - non-critical operation
+    } catch (err) {
+      console.error('Failed to mark notification as read:', err);
     }
   };
 
   const markAllAsRead = async () => {
     try {
-      const batch = writeBatch(db);
       const unreadNotifications = notifications.filter(n => !n.read);
+      const BATCH_LIMIT = 500;
 
-      unreadNotifications.forEach(notification => {
-        const notificationRef = doc(db, 'notifications', notification.id);
-        batch.update(notificationRef, { read: true });
-      });
+      for (let i = 0; i < unreadNotifications.length; i += BATCH_LIMIT) {
+        const chunk = unreadNotifications.slice(i, i + BATCH_LIMIT);
+        const batch = writeBatch(db);
+        chunk.forEach(notification => {
+          const notificationRef = doc(db, 'notifications', notification.id);
+          batch.update(notificationRef, { read: true });
+        });
+        await batch.commit();
+      }
 
-      await batch.commit();
       toast.success('All notifications marked as read');
     } catch {
-      toast.error('Failed to mark all as read');
+      toast.error('Could not mark notifications as read. Please try again.');
+    }
+  };
+
+  const deleteNotification = async (notificationId) => {
+    try {
+      await deleteDoc(doc(db, 'notifications', notificationId));
+    } catch (err) {
+      console.error('Failed to delete notification:', err);
+      toast.error('Could not delete notification');
     }
   };
 
@@ -78,8 +107,11 @@ export function useNotifications() {
     notifications,
     unreadCount,
     loading,
+    error,
+    liveAnnouncement,
     markAsRead,
-    markAllAsRead
+    markAllAsRead,
+    deleteNotification
   };
 }
 
@@ -95,7 +127,7 @@ export async function createNotification(userId, type, title, message, link, dat
       createdAt: serverTimestamp(),
       data
     });
-  } catch {
-    // Silently fail - notification creation is non-critical
+  } catch (err) {
+    console.error('Failed to create notification:', err);
   }
 }
