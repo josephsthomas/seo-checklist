@@ -45,25 +45,34 @@ def write_role_report(role_number, role_name, defects, output_path):
         "LOW": Font(color="000000"),
     }
 
+    # Helper to convert lists/non-strings to strings for Excel
+    def to_str(val):
+        if isinstance(val, list):
+            return "\n".join(str(v) for v in val)
+        if val is None:
+            return ""
+        return str(val)
+
     # Data rows
     for i, defect in enumerate(defects, 2):
-        ws.cell(row=i, column=1, value=defect["bug_id"]).border = thin_border
+        ws.cell(row=i, column=1, value=to_str(defect.get("bug_id", ""))).border = thin_border
         ws.cell(row=i, column=2, value=role_name).border = thin_border
 
-        sev_cell = ws.cell(row=i, column=3, value=defect["severity"])
-        sev_cell.fill = severity_fills.get(defect["severity"], PatternFill())
-        sev_cell.font = severity_fonts.get(defect["severity"], Font())
+        sev = to_str(defect.get("severity", "MEDIUM"))
+        sev_cell = ws.cell(row=i, column=3, value=sev)
+        sev_cell.fill = severity_fills.get(sev, PatternFill())
+        sev_cell.font = severity_fonts.get(sev, Font())
         sev_cell.border = thin_border
         sev_cell.alignment = Alignment(horizontal='center')
 
-        ws.cell(row=i, column=4, value=defect["category"]).border = thin_border
-        ws.cell(row=i, column=5, value=defect["component"]).border = thin_border
-        ws.cell(row=i, column=6, value=defect["file_line"]).border = thin_border
-        ws.cell(row=i, column=7, value=defect["description"]).border = thin_border
-        ws.cell(row=i, column=8, value=defect["steps"]).border = thin_border
-        ws.cell(row=i, column=9, value=defect["expected"]).border = thin_border
-        ws.cell(row=i, column=10, value=defect["actual"]).border = thin_border
-        ws.cell(row=i, column=11, value=defect["impact"]).border = thin_border
+        ws.cell(row=i, column=4, value=to_str(defect.get("category", ""))).border = thin_border
+        ws.cell(row=i, column=5, value=to_str(defect.get("component", ""))).border = thin_border
+        ws.cell(row=i, column=6, value=to_str(defect.get("file_line", ""))).border = thin_border
+        ws.cell(row=i, column=7, value=to_str(defect.get("description", ""))).border = thin_border
+        ws.cell(row=i, column=8, value=to_str(defect.get("steps", ""))).border = thin_border
+        ws.cell(row=i, column=9, value=to_str(defect.get("expected", ""))).border = thin_border
+        ws.cell(row=i, column=10, value=to_str(defect.get("actual", ""))).border = thin_border
+        ws.cell(row=i, column=11, value=to_str(defect.get("impact", ""))).border = thin_border
         ws.cell(row=i, column=12, value="OPEN").border = thin_border
 
         # Wrap text for long fields
