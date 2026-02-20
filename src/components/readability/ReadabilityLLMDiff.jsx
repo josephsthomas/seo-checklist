@@ -41,7 +41,7 @@ export default function ReadabilityLLMDiff({ llmA, llmB, nameA, nameB }) {
   if (!llmA || !llmB) {
     return (
       <div className="text-center py-8 text-gray-500 dark:text-gray-400">
-        <p className="text-sm">Select two LLMs to compare their extractions.</p>
+        <p className="text-sm">Select two AI models to compare their content analysis.</p>
       </div>
     );
   }
@@ -57,7 +57,7 @@ export default function ReadabilityLLMDiff({ llmA, llmB, nameA, nameB }) {
       <div className="flex items-center gap-2 mb-3">
         <Diff className="w-5 h-5 text-teal-500" aria-hidden="true" />
         <h3 className="text-sm font-semibold text-gray-900 dark:text-white">
-          Extraction Diff: {nameA} vs {nameB}
+          Content Comparison: {nameA} vs {nameB}
         </h3>
         <span className="text-xs text-gray-500 dark:text-gray-400 ml-auto">
           {overlapPct}% overlap

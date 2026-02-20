@@ -56,7 +56,7 @@ const EFFORT_CONFIG = {
 const IMPACT_CONFIG = {
   high: { label: 'High Impact', class: 'bg-emerald-100 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-300' },
   medium: { label: 'Medium Impact', class: 'bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-300' },
-  low: { label: 'Low Impact', class: 'bg-gray-100 text-gray-600 dark:bg-charcoal-700 dark:text-gray-400' },
+  low: { label: 'Low Impact', class: 'bg-charcoal-100 text-charcoal-600 dark:bg-charcoal-700 dark:text-charcoal-400' },
 };
 
 export default function ReadabilityRecommendationCard({ recommendation: rec }) {
@@ -73,7 +73,7 @@ export default function ReadabilityRecommendationCard({ recommendation: rec }) {
 
   return (
     <div
-      className={`bg-white dark:bg-charcoal-800 rounded-xl border border-gray-200 dark:border-charcoal-700 border-l-4 ${priority.border} overflow-hidden`}
+      className={`bg-white dark:bg-charcoal-800 rounded-xl border border-charcoal-200 dark:border-charcoal-700 border-l-4 ${priority.border} overflow-hidden`}
     >
       <div className="p-4">
         {/* Header row */}
@@ -86,7 +86,7 @@ export default function ReadabilityRecommendationCard({ recommendation: rec }) {
           <div className="flex-1 min-w-0">
             {/* Title row */}
             <div className="flex items-start justify-between gap-2">
-              <h4 className="text-sm font-semibold text-gray-900 dark:text-white">
+              <h4 className="text-sm font-semibold text-charcoal-900 dark:text-white">
                 {rec.title}
               </h4>
               {rec.source === 'ai' && (
@@ -99,7 +99,7 @@ export default function ReadabilityRecommendationCard({ recommendation: rec }) {
 
             {/* Description */}
             {rec.description && (
-              <p className="text-sm text-gray-600 dark:text-gray-300 mt-1 line-clamp-3">
+              <p className="text-sm text-charcoal-600 dark:text-charcoal-300 mt-1 line-clamp-3">
                 {rec.description}
               </p>
             )}
@@ -131,7 +131,7 @@ export default function ReadabilityRecommendationCard({ recommendation: rec }) {
 
               {/* Check ID reference */}
               {rec.checkId && (
-                <span className="text-xs font-mono text-gray-400 dark:text-gray-500">
+                <span className="text-xs font-mono text-charcoal-400 dark:text-charcoal-500">
                   {rec.checkId}
                 </span>
               )}
@@ -142,17 +142,17 @@ export default function ReadabilityRecommendationCard({ recommendation: rec }) {
 
       {/* Code fix expandable section */}
       {hasCodeSnippet && (
-        <div className="border-t border-gray-100 dark:border-charcoal-700">
+        <div className="border-t border-charcoal-100 dark:border-charcoal-700">
           <button
             type="button"
             onClick={() => setCodeExpanded(!codeExpanded)}
             aria-expanded={codeExpanded}
-            className="w-full flex items-center gap-2 px-4 py-2.5 text-left hover:bg-gray-50 dark:hover:bg-charcoal-750 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-teal-500"
+            className="w-full flex items-center gap-2 px-4 py-2.5 text-left hover:bg-charcoal-50 dark:hover:bg-charcoal-700 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-teal-500"
           >
             {codeExpanded ? (
-              <ChevronDown className="w-4 h-4 text-gray-400" aria-hidden="true" />
+              <ChevronDown className="w-4 h-4 text-charcoal-400" aria-hidden="true" />
             ) : (
-              <ChevronRight className="w-4 h-4 text-gray-400" aria-hidden="true" />
+              <ChevronRight className="w-4 h-4 text-charcoal-400" aria-hidden="true" />
             )}
             <span className="text-xs font-medium text-teal-600 dark:text-teal-400">
               View Code Fix

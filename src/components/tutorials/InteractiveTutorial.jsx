@@ -191,10 +191,10 @@ function TutorialStep({ step, isActive, isComplete, onClick }) {
       onClick={onClick}
       className={`flex items-start gap-3 p-3 rounded-lg transition-all text-left w-full ${
         isActive
-          ? 'bg-primary-50 border-2 border-primary-500'
+          ? 'bg-primary-50 border-2 border-primary-500 dark:bg-primary-900/20 dark:border-primary-400'
           : isComplete
-            ? 'bg-emerald-50 border border-emerald-200'
-            : 'bg-charcoal-50 border border-charcoal-100 hover:bg-charcoal-100'
+            ? 'bg-emerald-50 border border-emerald-200 dark:bg-emerald-900/20 dark:border-emerald-800'
+            : 'bg-charcoal-50 border border-charcoal-100 hover:bg-charcoal-100 dark:bg-charcoal-700 dark:border-charcoal-600 dark:hover:bg-charcoal-600'
       }`}
     >
       <div className={`w-6 h-6 rounded-full flex items-center justify-center flex-shrink-0 ${
@@ -212,12 +212,12 @@ function TutorialStep({ step, isActive, isComplete, onClick }) {
       </div>
       <div className="flex-1 min-w-0">
         <p className={`font-medium text-sm ${
-          isActive ? 'text-primary-700' : isComplete ? 'text-emerald-700' : 'text-charcoal-700'
+          isActive ? 'text-primary-700 dark:text-primary-300' : isComplete ? 'text-emerald-700 dark:text-emerald-300' : 'text-charcoal-700 dark:text-charcoal-200'
         }`}>
           {step.title}
         </p>
         {isActive && (
-          <p className="text-xs text-charcoal-500 mt-1">{step.description}</p>
+          <p className="text-xs text-charcoal-500 dark:text-charcoal-400 mt-1">{step.description}</p>
         )}
       </div>
     </button>
@@ -229,20 +229,20 @@ function TutorialStep({ step, isActive, isComplete, onClick }) {
  */
 export function TutorialCard({ tutorial, onStart }) {
   return (
-    <div className="bg-white rounded-xl border border-charcoal-100 p-5 hover:shadow-lg transition-all">
+    <div className="bg-white dark:bg-charcoal-800 rounded-xl border border-charcoal-100 dark:border-charcoal-700 p-5 hover:shadow-lg transition-all">
       <div className="flex items-start gap-4">
         <div className="w-12 h-12 bg-gradient-to-br from-primary-500 to-cyan-500 rounded-xl flex items-center justify-center flex-shrink-0">
           <Play className="w-6 h-6 text-white" />
         </div>
         <div className="flex-1">
-          <h3 className="font-semibold text-charcoal-900">{tutorial.name}</h3>
-          <p className="text-sm text-charcoal-500 mt-1">{tutorial.description}</p>
+          <h3 className="font-semibold text-charcoal-900 dark:text-white">{tutorial.name}</h3>
+          <p className="text-sm text-charcoal-500 dark:text-charcoal-400 mt-1">{tutorial.description}</p>
           <div className="flex items-center gap-2 mt-3">
-            <span className="text-xs text-charcoal-400">
+            <span className="text-xs text-charcoal-400 dark:text-charcoal-500">
               {tutorial.steps.length} steps
             </span>
-            <span className="text-charcoal-300">•</span>
-            <span className="text-xs text-charcoal-400">
+            <span className="text-charcoal-300 dark:text-charcoal-600">•</span>
+            <span className="text-xs text-charcoal-400 dark:text-charcoal-500">
               ~{tutorial.steps.length * 2} min
             </span>
           </div>
@@ -313,7 +313,7 @@ export default function InteractiveTutorial({
   const progress = ((completedSteps.size + (currentStep === tutorial.steps.length - 1 ? 1 : 0)) / tutorial.steps.length) * 100;
 
   return (
-    <div className={`bg-white rounded-2xl border border-charcoal-100 shadow-xl overflow-hidden ${className}`}>
+    <div className={`bg-white dark:bg-charcoal-800 rounded-2xl border border-charcoal-100 dark:border-charcoal-700 shadow-xl overflow-hidden ${className}`}>
       {/* Header */}
       <div className="bg-gradient-to-r from-primary-500 to-cyan-500 p-4 text-white">
         <div className="flex items-center justify-between mb-3">
@@ -342,20 +342,20 @@ export default function InteractiveTutorial({
 
       {/* Current Step Content */}
       <div className="p-5">
-        <h3 className="text-lg font-semibold text-charcoal-900 mb-2">{step.title}</h3>
-        <p className="text-charcoal-600 mb-4">{step.description}</p>
+        <h3 className="text-lg font-semibold text-charcoal-900 dark:text-white mb-2">{step.title}</h3>
+        <p className="text-charcoal-600 dark:text-charcoal-300 mb-4">{step.description}</p>
 
         {/* Tip */}
         {step.tip && (
-          <div className="flex items-start gap-3 p-4 bg-amber-50 rounded-xl mb-4">
-            <Lightbulb className="w-5 h-5 text-amber-600 flex-shrink-0" />
-            <p className="text-sm text-amber-800">{step.tip}</p>
+          <div className="flex items-start gap-3 p-4 bg-amber-50 dark:bg-amber-900/20 rounded-xl mb-4">
+            <Lightbulb className="w-5 h-5 text-amber-600 dark:text-amber-400 flex-shrink-0" />
+            <p className="text-sm text-amber-800 dark:text-amber-300">{step.tip}</p>
           </div>
         )}
 
         {/* Action */}
         {step.action && (
-          <div className="flex items-center gap-2 p-3 bg-primary-50 rounded-lg text-sm text-primary-700 font-medium">
+          <div className="flex items-center gap-2 p-3 bg-primary-50 dark:bg-primary-900/20 rounded-lg text-sm text-primary-700 dark:text-primary-300 font-medium">
             <ArrowRight className="w-4 h-4" />
             {step.action}
           </div>
@@ -364,7 +364,7 @@ export default function InteractiveTutorial({
 
       {/* Step List */}
       <div className="px-5 pb-3">
-        <p className="text-xs font-medium text-charcoal-500 uppercase tracking-wide mb-2">All Steps</p>
+        <p className="text-xs font-medium text-charcoal-500 dark:text-charcoal-400 uppercase tracking-wide mb-2">All Steps</p>
         <div className="space-y-2 max-h-40 overflow-y-auto">
           {tutorial.steps.map((s, idx) => (
             <TutorialStep
@@ -379,7 +379,7 @@ export default function InteractiveTutorial({
       </div>
 
       {/* Navigation */}
-      <div className="p-4 border-t border-charcoal-100 flex items-center gap-3">
+      <div className="p-4 border-t border-charcoal-100 dark:border-charcoal-700 flex items-center gap-3">
         <button
           onClick={handlePrevious}
           disabled={currentStep === 0}

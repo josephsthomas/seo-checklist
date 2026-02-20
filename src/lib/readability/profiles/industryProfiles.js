@@ -10,7 +10,7 @@ const INDUSTRY_PROFILES = {
     weightOverrides: {
       contentStructure: 25, // +5 (code structure matters)
       contentClarity: 20,  // -5 (technical jargon acceptable)
-      technicalAccessibility: 25, // +5 (tech audience expects it)
+      technicalAccess: 25, // +5 (tech audience expects it)
       metadataSchema: 15,
       aiSignals: 15, // -5
     },
@@ -31,7 +31,7 @@ const INDUSTRY_PROFILES = {
     weightOverrides: {
       contentStructure: 20,
       contentClarity: 30,  // +5 (plain language critical)
-      technicalAccessibility: 15, // -5
+      technicalAccess: 15, // -5
       metadataSchema: 15,
       aiSignals: 20,
     },
@@ -53,7 +53,7 @@ const INDUSTRY_PROFILES = {
     weightOverrides: {
       contentStructure: 15, // -5
       contentClarity: 20,  // -5
-      technicalAccessibility: 20,
+      technicalAccess: 20,
       metadataSchema: 30,  // +15 (product schema critical)
       aiSignals: 15,
     },
@@ -75,7 +75,7 @@ const INDUSTRY_PROFILES = {
     weightOverrides: {
       contentStructure: 20,
       contentClarity: 25,
-      technicalAccessibility: 15,
+      technicalAccess: 15,
       metadataSchema: 20,  // +5
       aiSignals: 20,
     },
@@ -97,7 +97,7 @@ const INDUSTRY_PROFILES = {
     weightOverrides: {
       contentStructure: 20,
       contentClarity: 25,  // +5
-      technicalAccessibility: 20,
+      technicalAccess: 20,
       metadataSchema: 15,
       aiSignals: 20,
     },

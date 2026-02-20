@@ -72,7 +72,7 @@ export default function ReadabilityLLMPreview({ llmExtractions, aiAssessment }) 
       <EmptyState
         icon={Eye}
         large
-        title="LLM Preview Not Available"
+        title="AI Preview Not Available"
         description="AI model extractions were not available for this analysis. This may be due to API unavailability or the content being too short to analyze."
         className="bg-white dark:bg-charcoal-800 p-8"
       />
@@ -225,10 +225,10 @@ export default function ReadabilityLLMPreview({ llmExtractions, aiAssessment }) 
         <Info className="w-5 h-5 text-blue-500 dark:text-blue-400 flex-shrink-0 mt-0.5" aria-hidden="true" />
         <div>
           <p className="text-sm font-medium text-blue-800 dark:text-blue-300 mb-1">
-            About <abbr title="Large Language Model">LLM</abbr> Previews
+            About AI Previews
           </p>
           <p className="text-sm text-blue-700 dark:text-blue-400">
-            This preview shows how each <abbr title="Large Language Model">LLM</abbr> (Large Language Model) interprets your content when provided to it.
+            This preview shows how each AI model interprets your content when provided to it.
             It does <strong>NOT</strong> simulate actual web crawling behavior. Real-world
             extraction may vary based on model updates, crawling policies, and content
             accessibility at the time of crawling.

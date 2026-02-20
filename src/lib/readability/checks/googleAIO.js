@@ -16,22 +16,22 @@ function checkFeaturedSnippetStructure(extracted) {
   );
 
   // Look for concise answer paragraphs (40-60 words after a heading)
-  const hasConseAnswers = bodyText.includes('. ') && extracted?.paragraphs?.some(p => {
+  const hasConciseAnswers = bodyText.includes('. ') && extracted?.paragraphs?.some(p => {
     const text = typeof p === 'string' ? p : p?.text || '';
     const wordCount = text.split(/\s+/).length;
     return wordCount >= 30 && wordCount <= 80;
   });
 
-  const pass = questionHeadings.length >= 1 && hasConseAnswers;
+  const pass = questionHeadings.length >= 1 && hasConciseAnswers;
 
   return {
     id: 'AIO-01',
     title: 'Featured Snippet Structure',
-    category: 'aiSignals',
+    category: 'AI-Specific Signals',
     status: pass ? 'pass' : 'warn',
     severity: 'high',
     description: 'Content should include question-format headings with concise answer paragraphs (40-60 words).',
-    details: `Found ${questionHeadings.length} question headings. ${hasConseAnswers ? 'Concise answer paragraphs detected.' : 'No concise answer paragraphs found.'}`,
+    details: `Found ${questionHeadings.length} question headings. ${hasConciseAnswers ? 'Concise answer paragraphs detected.' : 'No concise answer paragraphs found.'}`,
     recommendation: 'Add H2/H3 headings phrased as questions with a direct 1-2 sentence answer immediately after.',
   };
 }
@@ -49,7 +49,7 @@ function checkFAQSchema(extracted) {
   return {
     id: 'AIO-02',
     title: 'FAQ Schema for AI Overviews',
-    category: 'aiSignals',
+    category: 'AI-Specific Signals',
     status: hasFAQ ? 'pass' : 'warn',
     severity: 'medium',
     description: 'FAQPage schema helps Google surface your Q&A content in AI Overviews.',
@@ -74,7 +74,7 @@ function checkPAAAlignment(extracted) {
   return {
     id: 'AIO-03',
     title: 'People Also Ask Alignment',
-    category: 'aiSignals',
+    category: 'AI-Specific Signals',
     status: hasGoodAlignment ? 'pass' : 'warn',
     severity: 'medium',
     description: 'Content addressing common questions improves chances of AI Overview inclusion.',
@@ -100,7 +100,7 @@ function checkConciseAnswers(extracted) {
   return {
     id: 'AIO-04',
     title: 'Concise Answer Paragraphs',
-    category: 'aiSignals',
+    category: 'AI-Specific Signals',
     status: pass ? 'pass' : 'warn',
     severity: 'medium',
     description: 'Google AI Overviews prefer concise, self-contained answer paragraphs (20-60 words).',
@@ -128,7 +128,7 @@ function checkKnowledgePanelReadiness(extracted) {
   return {
     id: 'AIO-05',
     title: 'Knowledge Panel Readiness',
-    category: 'aiSignals',
+    category: 'AI-Specific Signals',
     status: pass ? 'pass' : hasOrg ? 'warn' : 'fail',
     severity: 'low',
     description: 'Organization/Person schema with sameAs links improves knowledge panel eligibility.',
