@@ -1,0 +1,7 @@
+{
+  "last_completed_batch": 1,
+  "total_fixed": 26,
+  "total_skipped": 8,
+  "skipped_ids": ["R04-107", "R02-201", "R02-209", "R05-203", "R05-204", "R05-205", "R05-207", "R05-213"],
+  "timestamp": "2026-02-20T10:01:00"
+}

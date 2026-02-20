@@ -28,6 +28,7 @@ import {
   Accessibility
 } from 'lucide-react';
 import { WCAG_PRINCIPLES, WCAG_CRITERIA, getCriteriaByLevel } from '../../../data/wcagCriteria';
+import { AIDisclaimerInline } from '../../shared/AIDisclaimer';
 import { COMPLIANCE_STATUS } from '../../../lib/accessibility/accessibilityEngine';
 import {
   exportAccessibilityPDF,
@@ -125,7 +126,7 @@ export default function AccessibilityDashboard({ auditResults, domainInfo, onNew
   const getScoreLabel = (score) => {
     if (score >= 90) return 'Excellent';
     if (score >= 70) return 'Good';
-    if (score >= 50) return 'Needs Work';
+    if (score >= 50) return 'Needs Improvement';
     return 'Poor';
   };
 
@@ -196,9 +197,9 @@ export default function AccessibilityDashboard({ auditResults, domainInfo, onNew
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-charcoal-50 to-white">
+    <div className="min-h-screen bg-gradient-to-b from-charcoal-50 to-white dark:from-charcoal-900 dark:to-charcoal-800">
       {/* Header */}
-      <div className="bg-white/80 backdrop-blur-xl border-b border-charcoal-100/50 sticky top-16 z-10">
+      <div className="bg-white/80 dark:bg-charcoal-800/80 backdrop-blur-xl border-b border-charcoal-100/50 dark:border-charcoal-700/50 sticky top-16 z-10">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div className="flex items-center gap-4">
@@ -259,9 +260,11 @@ export default function AccessibilityDashboard({ auditResults, domainInfo, onNew
           </div>
 
           {/* Tab Navigation */}
-          <div className="flex gap-1 mt-4 -mb-px overflow-x-auto">
+          <div className="flex gap-1 mt-4 -mb-px overflow-x-auto" role="tablist" aria-label="Audit results">
             <button
               onClick={() => setActiveTab(TABS.OVERVIEW)}
+              role="tab"
+              aria-selected={activeTab === TABS.OVERVIEW}
               className={`tab ${activeTab === TABS.OVERVIEW ? 'tab-active' : ''}`}
             >
               <LayoutDashboard className="w-4 h-4" />
@@ -269,6 +272,8 @@ export default function AccessibilityDashboard({ auditResults, domainInfo, onNew
             </button>
             <button
               onClick={() => setActiveTab(TABS.ISSUES)}
+              role="tab"
+              aria-selected={activeTab === TABS.ISSUES}
               className={`tab ${activeTab === TABS.ISSUES ? 'tab-active' : ''}`}
             >
               <ListChecks className="w-4 h-4" />
@@ -276,6 +281,8 @@ export default function AccessibilityDashboard({ auditResults, domainInfo, onNew
             </button>
             <button
               onClick={() => setActiveTab(TABS.PAGES)}
+              role="tab"
+              aria-selected={activeTab === TABS.PAGES}
               className={`tab ${activeTab === TABS.PAGES ? 'tab-active' : ''}`}
             >
               <Table className="w-4 h-4" />
@@ -283,6 +290,8 @@ export default function AccessibilityDashboard({ auditResults, domainInfo, onNew
             </button>
             <button
               onClick={() => setActiveTab(TABS.WCAG)}
+              role="tab"
+              aria-selected={activeTab === TABS.WCAG}
               className={`tab ${activeTab === TABS.WCAG ? 'tab-active' : ''}`}
             >
               <Shield className="w-4 h-4" />
@@ -388,10 +397,10 @@ export default function AccessibilityDashboard({ auditResults, domainInfo, onNew
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
             {/* POUR Principles */}
             <div className="card p-6">
-              <h3 className="font-bold text-charcoal-900 mb-4 flex items-center gap-2">
+              <h2 className="font-bold text-charcoal-900 dark:text-white mb-4 flex items-center gap-2">
                 <Shield className="w-5 h-5 text-purple-500" />
                 POUR Principles
-              </h3>
+              </h2>
               <div className="space-y-4">
                 {Object.entries(WCAG_PRINCIPLES).map(([key, name]) => {
                   const Icon = PRINCIPLE_ICONS[key];
@@ -430,10 +439,10 @@ export default function AccessibilityDashboard({ auditResults, domainInfo, onNew
 
             {/* Impact Breakdown */}
             <div className="card p-6">
-              <h3 className="font-bold text-charcoal-900 mb-4 flex items-center gap-2">
+              <h2 className="font-bold text-charcoal-900 dark:text-white mb-4 flex items-center gap-2">
                 <AlertTriangle className="w-5 h-5 text-amber-500" />
                 Violations by Impact
-              </h3>
+              </h2>
               <div className="space-y-4">
                 {[
                   { key: 'critical', label: 'Critical', desc: 'Users cannot access content' },
@@ -471,10 +480,10 @@ export default function AccessibilityDashboard({ auditResults, domainInfo, onNew
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             {/* Top Issues */}
             <div className="card p-6">
-              <h3 className="font-bold text-charcoal-900 mb-4 flex items-center gap-2">
+              <h2 className="font-bold text-charcoal-900 dark:text-white mb-4 flex items-center gap-2">
                 <ListChecks className="w-5 h-5 text-red-500" />
                 Top Issues to Fix
-              </h3>
+              </h2>
               <div className="space-y-3">
                 {topIssues.slice(0, 5).map((issue, idx) => (
                   <div
@@ -518,10 +527,10 @@ export default function AccessibilityDashboard({ auditResults, domainInfo, onNew
 
             {/* Worst Pages */}
             <div className="card p-6">
-              <h3 className="font-bold text-charcoal-900 mb-4 flex items-center gap-2">
+              <h2 className="font-bold text-charcoal-900 dark:text-white mb-4 flex items-center gap-2">
                 <Table className="w-5 h-5 text-amber-500" />
                 Pages with Most Violations
-              </h3>
+              </h2>
               <div className="space-y-3">
                 {worstPages.slice(0, 5).map((page, idx) => (
                   <div
@@ -533,7 +542,7 @@ export default function AccessibilityDashboard({ auditResults, domainInfo, onNew
                     </div>
                     <div className="flex-1 min-w-0">
                       <p className="font-medium text-charcoal-900 text-sm truncate" title={page.address}>
-                        {new URL(page.address).pathname || '/'}
+                        {(() => { try { return new URL(page.address).pathname || '/'; } catch { return page.address; } })()}
                       </p>
                       <div className="flex items-center gap-2 mt-1 text-xs text-charcoal-500">
                         <span className="font-semibold text-red-600">{page.totalViolations} total</span>
@@ -575,6 +584,7 @@ export default function AccessibilityDashboard({ auditResults, domainInfo, onNew
                 <input
                   type="text"
                   placeholder="Search violations..."
+                  aria-label="Search violations"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   className="input pl-12 w-full"
@@ -691,6 +701,7 @@ export default function AccessibilityDashboard({ auditResults, domainInfo, onNew
                           <div>
                             <h4 className="text-sm font-semibold text-charcoal-700 mb-2">How to Fix</h4>
                             <p className="text-charcoal-600">{issue.fixSuggestion}</p>
+                            {issue.aiFixable && <AIDisclaimerInline className="mt-2" />}
                           </div>
                         )}
                         {issue.urls && issue.urls.length > 0 && (

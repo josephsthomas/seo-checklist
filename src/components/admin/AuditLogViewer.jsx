@@ -23,23 +23,23 @@ import toast from 'react-hot-toast';
 import InfoTooltip from '../common/InfoTooltip';
 
 const ACTION_TYPES = {
-  CREATE: { label: 'Create', color: 'emerald', icon: Plus },
-  READ: { label: 'Read', color: 'blue', icon: Eye },
-  UPDATE: { label: 'Update', color: 'amber', icon: Edit3 },
-  DELETE: { label: 'Delete', color: 'red', icon: Trash2 },
-  EXPORT: { label: 'Export', color: 'purple', icon: Download },
-  LOGIN: { label: 'Login', color: 'cyan', icon: User },
-  LOGOUT: { label: 'Logout', color: 'charcoal', icon: User },
-  SETTINGS: { label: 'Settings', color: 'charcoal', icon: Settings },
+  CREATE: { label: 'Create', badgeClass: 'bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400', icon: Plus },
+  READ: { label: 'Read', badgeClass: 'bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400', icon: Eye },
+  UPDATE: { label: 'Update', badgeClass: 'bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400', icon: Edit3 },
+  DELETE: { label: 'Delete', badgeClass: 'bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400', icon: Trash2 },
+  EXPORT: { label: 'Export', badgeClass: 'bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-400', icon: Download },
+  LOGIN: { label: 'Login', badgeClass: 'bg-cyan-100 dark:bg-cyan-900/30 text-cyan-700 dark:text-cyan-400', icon: User },
+  LOGOUT: { label: 'Logout', badgeClass: 'bg-charcoal-100 dark:bg-charcoal-700 text-charcoal-700 dark:text-charcoal-300', icon: User },
+  SETTINGS: { label: 'Settings', badgeClass: 'bg-charcoal-100 dark:bg-charcoal-700 text-charcoal-700 dark:text-charcoal-300', icon: Settings },
 };
 
 const RESOURCE_TYPES = [
   'Project',
   'Audit',
-  'Accessibility Report',
-  'Alt Text',
-  'Meta Tags',
-  'Schema',
+  'Accessibility Analyzer',
+  'Image Alt Generator',
+  'Meta Data Generator',
+  'Structured Data Generator',
   'User',
   'Team',
   'Export',
@@ -58,6 +58,7 @@ const RETENTION_OPTIONS = [
 export default function AuditLogViewer() {
   const [logs, setLogs] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [refreshKey, setRefreshKey] = useState(0);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedAction, setSelectedAction] = useState('all');
   const [selectedResource, setSelectedResource] = useState('all');
@@ -65,6 +66,7 @@ export default function AuditLogViewer() {
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [selectedLog, setSelectedLog] = useState(null);
+  const [showExportMenu, setShowExportMenu] = useState(false);
 
   // Retention settings
   const [showRetentionSettings, setShowRetentionSettings] = useState(false);
@@ -108,7 +110,7 @@ export default function AuditLogViewer() {
     };
 
     fetchLogs();
-  }, [dateRange]);
+  }, [dateRange, refreshKey]);
 
   // Filter logs
   const filteredLogs = useMemo(() => {
@@ -225,7 +227,7 @@ export default function AuditLogViewer() {
   };
 
   const getActionConfig = (action) => {
-    return ACTION_TYPES[action] || { label: action, color: 'charcoal', icon: Activity };
+    return ACTION_TYPES[action] || { label: action, badgeClass: 'bg-charcoal-100 dark:bg-charcoal-700 text-charcoal-700 dark:text-charcoal-300', icon: Activity };
   };
 
   return (
@@ -258,32 +260,42 @@ export default function AuditLogViewer() {
               Retention
             </button>
             <button
-              onClick={() => setLoading(true)}
+              onClick={() => setRefreshKey(k => k + 1)}
               className="btn btn-secondary flex items-center gap-2"
             >
               <RefreshCcw className="w-4 h-4" />
               Refresh
             </button>
-            <div className="relative group">
-              <button className="btn btn-primary flex items-center gap-2" title="Export logs for compliance reporting or offline analysis">
+            <div className="relative">
+              <button
+                onClick={() => setShowExportMenu(prev => !prev)}
+                aria-haspopup="menu"
+                aria-expanded={showExportMenu}
+                className="btn btn-primary flex items-center gap-2"
+                title="Export logs for compliance reporting or offline analysis"
+              >
                 <Download className="w-4 h-4" />
                 Export Logs
                 <ChevronDown className="w-4 h-4" />
               </button>
-              <div className="absolute right-0 top-full mt-1 w-40 bg-white dark:bg-charcoal-800 border border-charcoal-200 dark:border-charcoal-700 rounded-lg shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-10">
+              {showExportMenu && (
+              <div className="absolute right-0 top-full mt-1 w-40 bg-white dark:bg-charcoal-800 border border-charcoal-200 dark:border-charcoal-700 rounded-lg shadow-lg z-20" role="menu">
                 <button
-                  onClick={() => handleExport('csv')}
+                  onClick={() => { handleExport('csv'); setShowExportMenu(false); }}
                   className="w-full px-4 py-2 text-sm text-left text-charcoal-700 dark:text-charcoal-300 hover:bg-charcoal-100 dark:hover:bg-charcoal-700 rounded-t-lg"
+                  role="menuitem"
                 >
                   Export as CSV
                 </button>
                 <button
-                  onClick={() => handleExport('json')}
+                  onClick={() => { handleExport('json'); setShowExportMenu(false); }}
                   className="w-full px-4 py-2 text-sm text-left text-charcoal-700 dark:text-charcoal-300 hover:bg-charcoal-100 dark:hover:bg-charcoal-700 rounded-b-lg"
+                  role="menuitem"
                 >
                   Export as JSON
                 </button>
               </div>
+              )}
             </div>
           </div>
         </div>
@@ -345,7 +357,7 @@ export default function AuditLogViewer() {
         </div>
 
         {/* Stats */}
-        <div className="grid grid-cols-4 gap-4">
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
           <div className="card p-4">
             <p className="text-sm text-charcoal-500 dark:text-charcoal-400">Total Entries</p>
             <p className="text-2xl font-bold text-charcoal-900 dark:text-white">{filteredLogs.length}</p>
@@ -387,6 +399,20 @@ export default function AuditLogViewer() {
                 Audit logging tracks user actions across the platform. Logs will appear here as users interact with the system.
               </p>
             </div>
+          ) : filteredLogs.length === 0 ? (
+            <div className="p-12 text-center">
+              <Search className="w-12 h-12 text-charcoal-300 dark:text-charcoal-600 mx-auto mb-4" />
+              <h3 className="text-lg font-medium text-charcoal-900 dark:text-white mb-2">No Matching Logs</h3>
+              <p className="text-charcoal-500 dark:text-charcoal-400 max-w-md mx-auto mb-4">
+                No logs match your current filters. Try adjusting your search or filter criteria.
+              </p>
+              <button
+                onClick={() => { setSearchQuery(''); setSelectedAction('all'); setSelectedResource('all'); }}
+                className="btn btn-secondary"
+              >
+                Clear Filters
+              </button>
+            </div>
           ) : (
             <>
               <div className="overflow-x-auto">
@@ -425,7 +451,7 @@ export default function AuditLogViewer() {
                             </div>
                           </td>
                           <td>
-                            <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-${actionConfig.color}-100 dark:bg-${actionConfig.color}-900/30 text-${actionConfig.color}-700 dark:text-${actionConfig.color}-400`}>
+                            <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium ${actionConfig.badgeClass}`}>
                               <ActionIcon className="w-3.5 h-3.5" />
                               {actionConfig.label}
                             </span>
@@ -496,7 +522,13 @@ export default function AuditLogViewer() {
 
         {/* Log Detail Modal */}
         {selectedLog && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-charcoal-900/60 dark:bg-charcoal-950/80 backdrop-blur-sm">
+          <div
+            className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-charcoal-900/60 dark:bg-charcoal-950/80 backdrop-blur-sm"
+            role="dialog"
+            aria-modal="true"
+            aria-label="Log Details"
+            onKeyDown={(e) => { if (e.key === 'Escape') setSelectedLog(null); }}
+          >
             <div className="bg-white dark:bg-charcoal-800 rounded-2xl shadow-2xl w-full max-w-lg animate-scale-in">
               <div className="px-6 py-4 border-b border-charcoal-100 dark:border-charcoal-700 flex items-center justify-between">
                 <h3 className="font-bold text-charcoal-900 dark:text-white">Log Details</h3>
