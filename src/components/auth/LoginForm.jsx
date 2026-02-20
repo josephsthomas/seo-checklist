@@ -38,19 +38,19 @@ export default function LoginForm() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-primary-50 to-primary-100 px-4">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-primary-50 to-primary-100 dark:from-charcoal-900 dark:to-charcoal-800 px-4">
       <div className="max-w-md w-full">
         <div className="text-center mb-8">
-          <h1 className="text-4xl font-bold text-primary-600 mb-2">Content Strategy Portal</h1>
-          <p className="text-charcoal-600">All-in-one content and SEO suite for organic health & visibility</p>
+          <h1 className="text-4xl font-bold text-primary-600 dark:text-primary-400 mb-2">Content Strategy Portal</h1>
+          <p className="text-charcoal-600 dark:text-charcoal-400">All-in-one content and SEO suite for organic health & visibility</p>
         </div>
 
-        <div className="card p-8">
-          <h2 className="text-2xl font-semibold text-charcoal-900 mb-6">Welcome back</h2>
+        <div className="card dark:bg-charcoal-800 dark:border-charcoal-700 p-8">
+          <h2 className="text-2xl font-semibold text-charcoal-900 dark:text-white mb-6">Welcome back</h2>
 
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="form-group">
-              <label htmlFor="email" className="block text-sm font-medium text-charcoal-700 mb-2">
+              <label htmlFor="email" className="block text-sm font-medium text-charcoal-700 dark:text-charcoal-300 mb-2">
                 Email Address
               </label>
               <div className="relative">
@@ -71,7 +71,7 @@ export default function LoginForm() {
 
             <div className="form-group">
               <div className="flex items-center justify-between mb-2">
-                <label htmlFor="password" className="block text-sm font-medium text-charcoal-700">
+                <label htmlFor="password" className="block text-sm font-medium text-charcoal-700 dark:text-charcoal-300">
                   Password
                 </label>
                 <Link
@@ -123,10 +123,10 @@ export default function LoginForm() {
           <div className="mt-6">
             <div className="relative">
               <div className="absolute inset-0 flex items-center">
-                <div className="w-full border-t border-charcoal-200" />
+                <div className="w-full border-t border-charcoal-200 dark:border-charcoal-600" />
               </div>
               <div className="relative flex justify-center text-sm">
-                <span className="px-2 bg-white text-charcoal-500">Or continue with</span>
+                <span className="px-2 bg-white dark:bg-charcoal-800 text-charcoal-500 dark:text-charcoal-400">Or continue with</span>
               </div>
             </div>
 
@@ -142,7 +142,7 @@ export default function LoginForm() {
             </button>
           </div>
 
-          <p className="mt-6 text-center text-sm text-charcoal-600">
+          <p className="mt-6 text-center text-sm text-charcoal-600 dark:text-charcoal-400">
             Don&apos;t have an account?{' '}
             <Link to="/register" className="text-primary-600 hover:text-primary-700 font-medium">
               Sign up

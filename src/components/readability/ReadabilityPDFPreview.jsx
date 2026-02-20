@@ -150,7 +150,7 @@ export default function ReadabilityPDFPreview({ analysis, onClose }) {
     <>
       {/* Backdrop */}
       <div
-        className="fixed inset-0 bg-black/50 z-50"
+        className="fixed inset-0 bg-black/50 z-[60]"
         onClick={onClose}
         aria-hidden="true"
       />
@@ -162,7 +162,7 @@ export default function ReadabilityPDFPreview({ analysis, onClose }) {
         aria-modal="true"
         aria-labelledby="pdf-preview-title"
         tabIndex={-1}
-        className="fixed inset-4 sm:inset-8 lg:inset-16 bg-white dark:bg-charcoal-800 rounded-2xl shadow-2xl z-50 flex flex-col overflow-hidden focus:outline-none"
+        className="fixed inset-4 sm:inset-8 lg:inset-16 bg-white dark:bg-charcoal-800 rounded-2xl shadow-2xl z-[70] flex flex-col overflow-hidden focus:outline-none"
       >
         {/* Header */}
         <div className="flex items-center justify-between px-6 py-4 border-b border-gray-200 dark:border-charcoal-700">
@@ -353,7 +353,7 @@ export default function ReadabilityPDFPreview({ analysis, onClose }) {
                         ))}
                     </div>
                     <p className="text-[7px] text-gray-400 dark:text-gray-500 mt-3 italic">
-                      LLM previews show how AI models interpret content when provided to them.
+                      AI-generated analysis: These LLM previews are approximations of how AI models may interpret this content and do not guarantee actual search engine rankings or visibility. Scores and assessments are estimates only and may vary. Always verify findings with manual review and professional judgment before making content decisions.
                     </p>
                   </div>
                 )}
@@ -516,7 +516,7 @@ export default function ReadabilityPDFPreview({ analysis, onClose }) {
                 />
                 <ToggleSwitch
                   id="toggle-geo"
-                  label="GEO Strategic Brief"
+                  label="GEO Strategic Brief (Generative Engine Optimization)"
                   checked={options.includeGEOBrief}
                   onChange={(v) => updateOption('includeGEOBrief', v)}
                 />

@@ -83,7 +83,7 @@ export default function ReadabilityBenchmarkWidget({ history = [] }) {
   const trendColor = stats.trend > 0 ? 'text-emerald-600' : stats.trend < 0 ? 'text-red-500' : 'text-gray-400';
 
   return (
-    <div className="bg-white dark:bg-charcoal-800 border border-gray-200 dark:border-charcoal-700 rounded-lg p-3 text-sm">
+    <div role="region" aria-label="Score benchmarks" className="bg-white dark:bg-charcoal-800 border border-gray-200 dark:border-charcoal-700 rounded-lg p-3 text-sm">
       <div className="flex items-center gap-2 mb-2">
         <BarChart3 className="w-4 h-4 text-teal-500" aria-hidden="true" />
         <span className="font-medium text-gray-900 dark:text-white">Your Benchmarks</span>
@@ -94,14 +94,17 @@ export default function ReadabilityBenchmarkWidget({ history = [] }) {
         {/* Average Score */}
         <div className="text-center">
           <div className="text-lg font-bold text-gray-900 dark:text-white">{stats.avg}</div>
-          <div className="text-xs text-gray-500 dark:text-gray-400">Avg Score</div>
+          <div className="text-xs text-gray-500 dark:text-gray-400">Average Score</div>
         </div>
 
         {/* Trend */}
         <div className="text-center">
           <div className={`flex items-center justify-center gap-1 ${trendColor}`}>
             <TrendIcon className="w-4 h-4" aria-hidden="true" />
-            <span className="text-lg font-bold">
+            <span
+              className="text-lg font-bold"
+              aria-label={`Trend: ${stats.trend > 0 ? 'up' : stats.trend < 0 ? 'down' : 'stable'} ${stats.trend > 0 ? '+' : ''}${stats.trend} points`}
+            >
               {stats.trend > 0 ? '+' : ''}{stats.trend}
             </span>
           </div>

@@ -292,7 +292,7 @@ export default function UserSettingsPage() {
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-charcoal-50 to-white py-8 px-4">
+    <div className="min-h-screen bg-gradient-to-b from-charcoal-50 to-white dark:from-charcoal-900 dark:to-charcoal-800 py-8 px-4">
       <div className="max-w-5xl mx-auto">
         {/* Header */}
         <div className="mb-8">
@@ -301,8 +301,8 @@ export default function UserSettingsPage() {
               <Settings className="w-7 h-7 text-white" />
             </div>
             <div>
-              <h1 className="text-2xl font-bold text-charcoal-900">Settings</h1>
-              <p className="text-charcoal-500">Manage your account and preferences</p>
+              <h1 className="text-2xl font-bold text-charcoal-900 dark:text-white">Settings</h1>
+              <p className="text-charcoal-500 dark:text-charcoal-400">Manage your account and preferences</p>
             </div>
           </div>
         </div>
@@ -310,7 +310,7 @@ export default function UserSettingsPage() {
         <div className="flex flex-col md:flex-row gap-6">
           {/* Sidebar */}
           <div className="md:w-64 flex-shrink-0">
-            <div className="bg-white rounded-2xl border border-charcoal-100 overflow-hidden">
+            <div className="bg-white dark:bg-charcoal-800 rounded-2xl border border-charcoal-100 dark:border-charcoal-700 overflow-hidden">
               {sections.map((section) => (
                 <button
                   key={section.id}
@@ -318,9 +318,9 @@ export default function UserSettingsPage() {
                   className={`w-full flex items-center gap-3 p-4 text-left transition-colors ${
                     activeSection === section.id
                       ? section.danger
-                        ? 'bg-red-50 border-l-4 border-red-500'
-                        : 'bg-primary-50 border-l-4 border-primary-500'
-                      : 'hover:bg-charcoal-50 border-l-4 border-transparent'
+                        ? 'bg-red-50 dark:bg-red-900/20 border-l-4 border-red-500'
+                        : 'bg-primary-50 dark:bg-primary-900/20 border-l-4 border-primary-500'
+                      : 'hover:bg-charcoal-50 dark:hover:bg-charcoal-700 border-l-4 border-transparent'
                   }`}
                 >
                   <section.icon className={`w-5 h-5 ${
@@ -330,21 +330,21 @@ export default function UserSettingsPage() {
                         : 'text-primary-600'
                       : section.danger
                         ? 'text-red-400'
-                        : 'text-charcoal-400'
+                        : 'text-charcoal-400 dark:text-charcoal-500'
                   }`} />
                   <div className="flex-1">
                     <p className={`font-medium ${
                       activeSection === section.id
                         ? section.danger
-                          ? 'text-red-700'
-                          : 'text-primary-700'
+                          ? 'text-red-700 dark:text-red-400'
+                          : 'text-primary-700 dark:text-primary-400'
                         : section.danger
-                          ? 'text-red-600'
-                          : 'text-charcoal-700'
+                          ? 'text-red-600 dark:text-red-400'
+                          : 'text-charcoal-700 dark:text-charcoal-200'
                     }`}>
                       {section.label}
                     </p>
-                    <p className={`text-xs ${section.danger ? 'text-red-400' : 'text-charcoal-500'}`}>
+                    <p className={`text-xs ${section.danger ? 'text-red-400' : 'text-charcoal-500 dark:text-charcoal-400'}`}>
                       {section.description}
                     </p>
                   </div>
@@ -355,12 +355,12 @@ export default function UserSettingsPage() {
 
           {/* Content */}
           <div className="flex-1">
-            <div className="bg-white rounded-2xl border border-charcoal-100 p-6">
+            <div className="bg-white dark:bg-charcoal-800 rounded-2xl border border-charcoal-100 dark:border-charcoal-700 p-6">
               {/* Profile Section */}
               {activeSection === SECTIONS.PROFILE && (
                 <form onSubmit={handleSaveProfile} className="space-y-6">
                   <div>
-                    <h2 className="text-lg font-semibold text-charcoal-900 mb-4">Profile Information</h2>
+                    <h2 className="text-lg font-semibold text-charcoal-900 dark:text-white mb-4">Profile Information</h2>
 
                     {/* Avatar */}
                     <div className="flex items-center gap-6 mb-6">
@@ -433,6 +433,8 @@ export default function UserSettingsPage() {
                             onChange={(e) => setProfileForm(prev => ({ ...prev, name: e.target.value }))}
                             className="input pl-10"
                             placeholder="Your name"
+                            required
+                            minLength={2}
                           />
                         </div>
                       </div>
@@ -508,7 +510,7 @@ export default function UserSettingsPage() {
               {/* Notifications Section */}
               {activeSection === SECTIONS.NOTIFICATIONS && (
                 <div>
-                  <h2 className="text-lg font-semibold text-charcoal-900 mb-4">Notification Settings</h2>
+                  <h2 className="text-lg font-semibold text-charcoal-900 dark:text-white mb-4">Notification Settings</h2>
                   <p className="text-charcoal-500 mb-6">
                     Choose how and when you want to be notified about updates.
                   </p>
@@ -532,7 +534,7 @@ export default function UserSettingsPage() {
               {/* Appearance Section */}
               {activeSection === SECTIONS.APPEARANCE && (
                 <div>
-                  <h2 className="text-lg font-semibold text-charcoal-900 mb-4">Appearance</h2>
+                  <h2 className="text-lg font-semibold text-charcoal-900 dark:text-white mb-4">Appearance</h2>
 
                   <div className="space-y-4">
                     {/* Theme Selection */}
@@ -620,7 +622,7 @@ export default function UserSettingsPage() {
               {activeSection === SECTIONS.SECURITY && (
                 <form onSubmit={handleChangePassword} className="space-y-6">
                   <div>
-                    <h2 className="text-lg font-semibold text-charcoal-900 mb-4">Change Password</h2>
+                    <h2 className="text-lg font-semibold text-charcoal-900 dark:text-white mb-4">Change Password</h2>
                     <p className="text-charcoal-500 mb-6">
                       Update your password to keep your account secure.
                     </p>

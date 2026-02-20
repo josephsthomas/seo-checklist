@@ -22,8 +22,8 @@ export default function SEOHead({
   const seo = pageKey ? pageSEO[pageKey] : {};
   const pageTitle = title || seo.title || `${defaultMeta.siteName}`;
   const pageDescription = description || seo.description || '';
-  const pageCanonical = canonical || seo.canonical || '/';
-  const fullCanonicalUrl = `${defaultMeta.siteUrl}${pageCanonical}`;
+  const pageCanonical = canonical || seo.canonical || null;
+  const fullCanonicalUrl = pageCanonical ? `${defaultMeta.siteUrl}${pageCanonical}` : null;
 
   // Generate breadcrumb schema if breadcrumbs provided
   const breadcrumbSchema = breadcrumbs ? generateBreadcrumbSchema(breadcrumbs) : null;
@@ -33,15 +33,14 @@ export default function SEOHead({
       {/* Primary Meta Tags */}
       <title>{pageTitle}</title>
       <meta name="description" content={pageDescription} />
-      {seo.keywords && <meta name="keywords" content={seo.keywords} />}
-      <link rel="canonical" href={fullCanonicalUrl} />
+      {fullCanonicalUrl && <link rel="canonical" href={fullCanonicalUrl} />}
 
       {/* Robots */}
       {(noindex || seo.noindex) && <meta name="robots" content="noindex, nofollow" />}
 
       {/* Open Graph / Facebook */}
       <meta property="og:type" content={defaultMeta.ogType} />
-      <meta property="og:url" content={fullCanonicalUrl} />
+      {fullCanonicalUrl && <meta property="og:url" content={fullCanonicalUrl} />}
       <meta property="og:title" content={pageTitle} />
       <meta property="og:description" content={pageDescription} />
       <meta property="og:image" content={defaultMeta.ogImage} />

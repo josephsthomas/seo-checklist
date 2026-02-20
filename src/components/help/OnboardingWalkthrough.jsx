@@ -37,7 +37,7 @@ const onboardingSteps = [
   {
     id: 3,
     title: "Technical Audit",
-    description: "Upload Screaming Frog exports to run comprehensive technical SEO audits. Get AI-powered recommendations for fixing issues.",
+    description: "Upload site crawl exports (e.g., from Screaming Frog) to run comprehensive technical SEO audits. Get AI-powered recommendations for fixing issues.",
     icon: Search,
     color: 'from-cyan-500 to-cyan-600',
     target: "#audit-tool"
