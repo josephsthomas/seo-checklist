@@ -61,6 +61,20 @@ const NOTIFICATION_TYPES = [
     description: 'When someone replies to your comments',
     icon: Reply,
     category: 'Collaboration'
+  },
+  {
+    id: 'audit_completed',
+    label: 'Audit Completed',
+    description: 'When a scheduled audit finishes running',
+    icon: ClipboardList,
+    category: 'Content'
+  },
+  {
+    id: 'content_review_due',
+    label: 'Content Review Due',
+    description: 'When content reaches its scheduled review date',
+    icon: Clock,
+    category: 'Content'
   }
 ];
 
@@ -74,7 +88,9 @@ const DEFAULT_PREFERENCES = {
     task_overdue: true,
     blocker_alert: true,
     project_milestone: true,
-    comment_reply: true
+    comment_reply: true,
+    audit_completed: true,
+    content_review_due: true
   },
   email: {
     enabled: false,

@@ -45,7 +45,7 @@ export function checkFactDensity(extracted) {
     return {
       id: 'CC-11',
       title: 'Fact Density Score',
-      category: 'contentClarity',
+      category: 'Content Clarity',
       status: 'na',
       severity: 'medium',
       description: 'Measures the density of factual claims, statistics, and citations per 1000 words.',
@@ -70,7 +70,7 @@ export function checkFactDensity(extracted) {
   return {
     id: 'CC-11',
     title: 'Fact Density Score',
-    category: 'contentClarity',
+    category: 'Content Clarity',
     status,
     severity: 'medium',
     description: 'Measures the density of factual claims, statistics, and citations per 1000 words. Higher fact density correlates with AI citation likelihood.',
