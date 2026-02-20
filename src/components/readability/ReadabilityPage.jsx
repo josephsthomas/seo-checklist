@@ -9,6 +9,7 @@ import ReadabilityInputScreen from './ReadabilityInputScreen';
 import ReadabilityProcessingScreen from './ReadabilityProcessingScreen';
 import ReadabilityDashboard from './ReadabilityDashboard';
 import toast from 'react-hot-toast';
+import SEOHead from '../shared/SEOHead';
 
 /**
  * ReadabilityPage — Main page container
@@ -192,6 +193,7 @@ export default function ReadabilityPage() {
     <div
       className="min-h-screen bg-charcoal-50 dark:bg-charcoal-900 transition-colors motion-safe:animate-fade-in"
     >
+      <SEOHead pageKey="features/readability" />
       {/* Page Header */}
       <div className="bg-white dark:bg-charcoal-800 border-b border-charcoal-200 dark:border-charcoal-700">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">

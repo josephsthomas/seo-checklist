@@ -723,7 +723,7 @@ export default function ScheduledAuditsPanel() {
                   Delete Audit Schedule
                 </h3>
                 <p className="text-sm text-charcoal-500 dark:text-charcoal-400">
-                  This action can be undone
+                  You&apos;ll have 5 seconds to undo
                 </p>
               </div>
             </div>

@@ -165,7 +165,7 @@ export function FavoriteItems({ limit, type }) {
         return (
           <div
             key={`${item.type}-${item.id}`}
-            className="flex items-center gap-3 p-3 bg-white border border-charcoal-100 rounded-xl hover:border-charcoal-200 hover:shadow-sm transition-all group"
+            className="flex items-center gap-3 p-3 bg-white dark:bg-charcoal-800 border border-charcoal-100 dark:border-charcoal-700 rounded-xl hover:border-charcoal-200 dark:hover:border-charcoal-600 hover:shadow-sm transition-all group"
           >
             <Link to={item.path} className="flex items-center gap-3 flex-1 min-w-0">
               <div className={`w-10 h-10 rounded-lg bg-gradient-to-br ${colorClass} flex items-center justify-center`}>

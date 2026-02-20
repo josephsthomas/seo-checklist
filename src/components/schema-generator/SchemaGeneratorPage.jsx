@@ -5,6 +5,7 @@ import SchemaUploadScreen from './upload/SchemaUploadScreen';
 import SchemaProcessingScreen from './upload/SchemaProcessingScreen';
 import SchemaDashboard from './dashboard/SchemaDashboard';
 import { extractHtmlContent, generateSchema } from '../../lib/schema-generator/schemaGeneratorService';
+import SEOHead from '../shared/SEOHead';
 
 // View states
 const VIEWS = {
@@ -146,9 +147,12 @@ export default function SchemaGeneratorPage() {
     case VIEWS.INPUT:
     default:
       return (
-        <SchemaUploadScreen
-          onSubmit={handleSubmit}
-        />
+        <>
+          <SEOHead pageKey="schema-generator" />
+          <SchemaUploadScreen
+            onSubmit={handleSubmit}
+          />
+        </>
       );
   }
 }

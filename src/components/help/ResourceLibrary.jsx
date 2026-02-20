@@ -2,6 +2,7 @@ import { useState, useMemo, useDeferredValue, useEffect } from 'react';
 import { Search, Book, Video, FileText } from 'lucide-react';
 import { resources, resourceCategories, resourceTypes, difficultyLevels } from '../../data/resources';
 import ReactMarkdown from 'react-markdown';
+import SEOHead from '../shared/SEOHead';
 
 export default function ResourceLibrary() {
   useEffect(() => {
@@ -107,6 +108,7 @@ export default function ResourceLibrary() {
 
   return (
     <div className="min-h-screen bg-charcoal-50">
+      <SEOHead pageKey="help/resources" />
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Header */}
         <div className="mb-8">

@@ -377,7 +377,7 @@ export default function UserSettingsPage() {
                           )}
                         </div>
                         {uploadingAvatar && (
-                          <div className="absolute inset-0 bg-white/80 rounded-2xl flex items-center justify-center">
+                          <div className="absolute inset-0 bg-white/80 dark:bg-charcoal-900/80 rounded-2xl flex items-center justify-center">
                             <Loader2 className="w-6 h-6 animate-spin text-primary-600" />
                           </div>
                         )}

@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 import { Mail, Lock, LogIn, Chrome, Eye, EyeOff } from 'lucide-react';
+import SEOHead from '../shared/SEOHead';
 
 export default function LoginForm() {
   const [email, setEmail] = useState('');
@@ -39,6 +40,7 @@ export default function LoginForm() {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-primary-50 to-primary-100 dark:from-charcoal-900 dark:to-charcoal-800 px-4">
+      <SEOHead pageKey="login" />
       <div className="max-w-md w-full">
         <div className="text-center mb-8">
           <h1 className="text-4xl font-bold text-primary-600 dark:text-primary-400 mb-2">Content Strategy Portal</h1>

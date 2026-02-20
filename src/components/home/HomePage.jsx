@@ -30,15 +30,10 @@ import {
   ScanEye
 } from 'lucide-react';
 import { format } from 'date-fns';
+import SEOHead from '../shared/SEOHead';
 
 export default function HomePage() {
   const { userProfile } = useAuth();
-
-  // SEO meta tags for authenticated dashboard
-  useEffect(() => {
-    document.title = 'Dashboard | Content Strategy Portal';
-    return () => { document.title = 'Content Strategy Portal'; };
-  }, []);
   const { projects, loading: projectsLoading } = useProjects();
   const { audits, loading: auditsLoading, stats: auditStats } = useAudits();
   const { recents } = useFavoritesAndRecents();
@@ -92,6 +87,7 @@ export default function HomePage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-charcoal-50 to-white">
+      <SEOHead pageKey="home" />
       {/* Hero Section with Gradient */}
       <div className="relative overflow-hidden">
         {/* Background Decorations */}
