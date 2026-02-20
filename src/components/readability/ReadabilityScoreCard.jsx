@@ -229,10 +229,10 @@ export default function ReadabilityScoreCard({
               <div>
                 <div className="flex items-center gap-2">
                   <span className="text-sm font-semibold text-charcoal-900 dark:text-charcoal-100">
-                    {citationWorthiness}/100
+                    ~{Math.round(citationWorthiness / 5) * 5}/100
                   </span>
                   <span className="text-xs text-charcoal-500 dark:text-charcoal-400">
-                    Citation Likelihood
+                    Est. Citation Likelihood
                   </span>
                 </div>
                 <p className="text-xs text-charcoal-500 dark:text-charcoal-400">
@@ -251,7 +251,7 @@ export default function ReadabilityScoreCard({
           <tr><th scope="row">Overall Score</th><td>{score}/100</td></tr>
           <tr><th scope="row">Grade</th><td>{gradeInfo.grade}</td></tr>
           {citationWorthiness !== null && citationWorthiness !== undefined && (
-            <tr><th scope="row">Citation Likelihood</th><td>{citationWorthiness}/100</td></tr>
+            <tr><th scope="row">Est. Citation Likelihood</th><td>~{Math.round(citationWorthiness / 5) * 5}/100</td></tr>
           )}
           {scoreDelta !== null && scoreDelta !== undefined && (
             <tr><th scope="row">Score Change</th><td>{scoreDelta > 0 ? '+' : ''}{scoreDelta}</td></tr>

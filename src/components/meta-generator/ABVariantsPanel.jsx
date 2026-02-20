@@ -272,7 +272,7 @@ export default function ABVariantsPanel({
           <div className="flex items-start gap-2 p-3 bg-amber-50 rounded-lg">
             <AlertCircle className="w-4 h-4 text-amber-600 flex-shrink-0 mt-0.5" />
             <p className="text-xs text-amber-800">
-              Generate multiple variations and A/B test them to find the best performing titles and descriptions for your content.
+              Variants are generated using template-based transformations. Review and customize each variant before using it in production. A/B test them to find the best performing titles and descriptions.
             </p>
           </div>
         </div>

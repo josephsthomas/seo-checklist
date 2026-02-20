@@ -29,13 +29,13 @@ const LLM_SUBSTAGES = [
  */
 const FACTOIDS = [
   'AI models like Claude and GPT extract content differently — comparing their views helps identify gaps.',
-  'Structured data (JSON-LD) can improve how AI models understand and cite your content by up to 40%.',
-  'Pages with clear heading hierarchies are 3x more likely to be cited in AI-generated answers.',
+  'Structured data (JSON-LD) may improve how AI models understand and cite your content.',
+  'Pages with clear heading hierarchies are generally more likely to be cited in AI-generated answers.',
   'The Flesch Reading Ease score measures how easy your content is to understand — aim for 60+.',
-  'Adding author expertise signals can improve citation likelihood in AI search results.',
+  'Adding author expertise signals may improve citation likelihood in AI search results.',
   'AI crawlers like GPTBot and Google-Extended can be individually allowed or blocked via robots.txt.',
-  'Content freshness (published within 12 months) is a key signal for AI answer selection.',
-  'Quotable passages — clear, concise statements — increase the chance of AI citation.'
+  'Content freshness (e.g., published within 12 months) is considered a signal for AI answer selection.',
+  'Quotable passages — clear, concise statements — may increase the chance of AI citation.'
 ];
 
 /**

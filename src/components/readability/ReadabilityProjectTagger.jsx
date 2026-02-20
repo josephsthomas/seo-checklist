@@ -17,9 +17,27 @@ export default function ReadabilityProjectTagger({ value = {}, onChange, recentT
     onChange?.({ ...value, [field]: fieldValue });
   }, [value, onChange]);
 
+  const MAX_TAGS = 10;
+  const MAX_TAG_LENGTH = 30;
+
   const handleAddTag = useCallback(() => {
-    const trimmed = newTag.trim();
-    if (trimmed && !tags.includes(trimmed)) {
+    const trimmed = newTag.trim().toLowerCase().replace(/[^a-z0-9\s-]/g, '');
+    if (!trimmed) {
+      setNewTag('');
+      setShowTagInput(false);
+      return;
+    }
+    if (trimmed.length > MAX_TAG_LENGTH) {
+      setNewTag('');
+      setShowTagInput(false);
+      return;
+    }
+    if (tags.length >= MAX_TAGS) {
+      setNewTag('');
+      setShowTagInput(false);
+      return;
+    }
+    if (!tags.includes(trimmed)) {
       handleFieldChange('tags', [...tags, trimmed]);
     }
     setNewTag('');

@@ -70,11 +70,35 @@ export default function MetaGeneratorPage() {
       toast.success('Metadata generated successfully!');
 
     } catch (err) {
-      setError(err.message);
+      const userMessage = getUserFriendlyError(err);
+      setError(userMessage);
       setView(VIEWS.ERROR);
-      toast.error(err.message);
+      toast.error(userMessage);
     }
   }, []);
+
+  /**
+   * Map errors to user-friendly messages
+   */
+  const getUserFriendlyError = (err) => {
+    const message = err.message || '';
+    if (message.includes('validate') || message.includes('valid')) return message;
+    if (message.includes('network') || message.includes('fetch') || message.includes('Failed to fetch'))
+      return 'Network error: Please check your internet connection and try again.';
+    if (message.includes('timeout') || message.includes('abort'))
+      return 'The request timed out. Please try again with a smaller file.';
+    if (message.includes('413') || message.includes('too large'))
+      return 'The file is too large to process. Please try a smaller file.';
+    if (message.includes('429') || message.includes('rate'))
+      return 'Too many requests. Please wait a moment and try again.';
+    if (message.includes('401') || message.includes('403'))
+      return 'Authentication error. Please sign in again and retry.';
+    if (message.includes('500') || message.includes('server'))
+      return 'A server error occurred. Please try again later.';
+    if (message.includes('parse') || message.includes('JSON') || message.includes('extract'))
+      return 'Could not process the file content. Please ensure it contains readable text.';
+    return message || 'An unexpected error occurred. Please try again.';
+  };
 
   /**
    * Handle new processing

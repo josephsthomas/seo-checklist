@@ -34,7 +34,9 @@ function buildExtractionPrompt(sourceUrl) {
   "usefulnessAssessment": {"score": 7, "explanation": "How useful this page would be for answering user questions (1-10 scale, 10 = most useful)"}
 }
 
-PAGE CONTENT:
+Respond with JSON only. Do not include any text outside the JSON object.
+
+<page_content>
 `;
 }
 
@@ -46,7 +48,7 @@ PAGE CONTENT:
  */
 export async function extractWithAllLLMs(extractedContent, options = {}) {
   const truncatedContent = truncateAtSentenceBoundary(extractedContent.textContent, 50000);
-  const prompt = buildExtractionPrompt(options.sourceUrl) + truncatedContent;
+  const prompt = buildExtractionPrompt(options.sourceUrl) + truncatedContent + '\n</page_content>';
   const config = getApiConfig();
   const authToken = options.authToken || null;
   const enabledLLMs = options.enabledLLMs || ['claude', 'openai', 'gemini'];

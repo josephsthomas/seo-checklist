@@ -87,6 +87,14 @@ export default function ImageAltGeneratorPage() {
       }
 
       setFileCount(imageFiles.length);
+
+      if (imageFiles.length > 50) {
+        toast('Processing a large batch (50+ images) may take several minutes and use significant API tokens.', {
+          icon: '\u26A0\uFE0F',
+          duration: 5000
+        });
+      }
+
       setStage(`Processing ${imageFiles.length} image${imageFiles.length > 1 ? 's' : ''}...`);
       setProgress(20);
 

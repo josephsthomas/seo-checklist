@@ -221,12 +221,16 @@ function parseAltTextResponse(content, originalFilename) {
       const parts = originalFilename.split('.');
       const ext = parts.length > 1 ? parts.pop().toLowerCase() : 'jpg';
 
+      // Clamp confidence to valid [0, 1] range
+      const rawConfidence = parsed.confidence ?? 0.8;
+      const clampedConfidence = Math.max(0, Math.min(1, rawConfidence));
+
       return {
         alt_text: parsed.alt_text || '',
         filename: `${parsed.filename || 'image'}.${ext}`,
         is_decorative: parsed.is_decorative || false,
         detected_elements: parsed.detected_elements || [],
-        confidence: parsed.confidence || 0.8
+        confidence: clampedConfidence
       };
     }
   } catch (e) {

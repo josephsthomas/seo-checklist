@@ -45,9 +45,22 @@ export default function ImageAltUploadScreen({ onFileSelect }) {
     maxSize: 500 * 1024 * 1024 // 500MB for ZIP
   });
 
+  const sanitizeContext = (ctx) => {
+    const maxLen = 200;
+    const sanitize = (str) => str ? str.slice(0, maxLen).replace(/[<>{}]/g, '') : '';
+    return {
+      brandName: sanitize(ctx.brandName),
+      industry: sanitize(ctx.industry),
+      keywords: sanitize(ctx.keywords),
+      guidelines: sanitize(ctx.guidelines).slice(0, 500),
+      tone: ctx.tone,
+      charLimit: ctx.charLimit
+    };
+  };
+
   const handleProcess = () => {
     if (files.length === 0) return;
-    onFileSelect(files, context);
+    onFileSelect(files, sanitizeContext(context));
   };
 
   const removeFile = (index) => {
