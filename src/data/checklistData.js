@@ -56,7 +56,7 @@ export const checklistData = [
   { id: 55, phase: "Build", priority: "HIGH", item: "Set up monitoring for 404 errors using Google Search Console and fix or redirect broken links monthly", owner: "SEO + Development", category: "Technical SEO", projectTypes: ["Net New Site", "Site Refresh", "Microsite"], effortLevel: "Medium (2-8h)", riskLevel: "MEDIUM", deliverableType: "Configuration" },
   { id: 56, phase: "Build", priority: "HIGH", item: "Defer or async load non-critical JavaScript to prevent blocking page rendering and improve LCP scores", owner: "Development", category: "Performance", projectTypes: ["Net New Site", "Site Refresh", "Campaign Landing Page", "Microsite"], effortLevel: "Medium (2-8h)", riskLevel: "HIGH RISK", deliverableType: "Code" },
   { id: 57, phase: "Build", priority: "HIGH", item: "Optimize CSS delivery by inlining critical CSS and deferring non-critical styles", owner: "Development", category: "Performance", projectTypes: ["Net New Site", "Site Refresh", "Campaign Landing Page", "Microsite"], effortLevel: "High (8-40h)", riskLevel: "HIGH RISK", deliverableType: "Code" },
-  { id: 58, phase: "Build", priority: "HIGH", item: "Reduce server response time (TTFB - Time to First Byte) to under 600ms through server optimization or better hosting", owner: "Development", category: "Performance", projectTypes: ["Net New Site", "Site Refresh", "Campaign Landing Page", "Microsite"], effortLevel: "High (8-40h)", riskLevel: "HIGH RISK", deliverableType: "Configuration" },
+  { id: 58, phase: "Build", priority: "HIGH", item: "Reduce server response time (TTFB - Time to First Byte) to under 800ms through server optimization or better hosting", owner: "Development", category: "Performance", projectTypes: ["Net New Site", "Site Refresh", "Campaign Landing Page", "Microsite"], effortLevel: "High (8-40h)", riskLevel: "HIGH RISK", deliverableType: "Configuration" },
   { id: 59, phase: "Build", priority: "HIGH", item: "Implement resource hints (preconnect, dns-prefetch, prefetch, preload) for critical resources to reduce latency", owner: "Development", category: "Performance", projectTypes: ["Net New Site", "Site Refresh", "Campaign Landing Page", "Microsite"], effortLevel: "Medium (2-8h)", riskLevel: "MEDIUM", deliverableType: "Code" },
   { id: 60, phase: "Build", priority: "HIGH", item: "Optimize web fonts - use font-display: swap, subset fonts to include only needed characters, preload critical fonts", owner: "Development", category: "Performance", projectTypes: ["Net New Site", "Site Refresh", "Campaign Landing Page", "Microsite"], effortLevel: "Medium (2-8h)", riskLevel: "MEDIUM", deliverableType: "Code" },
   { id: 61, phase: "Build", priority: "HIGH", item: "Implement CDN (Content Delivery Network) for faster global content delivery and improved Core Web Vitals scores", owner: "Development", category: "Performance", projectTypes: ["Net New Site", "Site Refresh", "Campaign Landing Page", "Microsite"], effortLevel: "Medium (2-8h)", riskLevel: "MEDIUM", deliverableType: "Configuration" },
@@ -371,3 +371,36 @@ export const checklistData = [
   { id: 352, phase: "Pre-Launch", priority: "HIGH", item: "Validate XML sitemap compliance and error-free submission - use XML sitemap validators, test all URLs return 200, no 404s in sitemap", owner: "Development", category: "Technical SEO", projectTypes: ["Net New Site", "Site Refresh"], effortLevel: "Low (<2h)", riskLevel: "MEDIUM", deliverableType: "Review/Approval" },
   { id: 353, phase: "Pre-Launch", priority: "HIGH", item: "Conduct structured data validation across all templates - use Google Rich Results Test and Schema Validator on all page templates", owner: "Development", category: "Schema Markup", projectTypes: ["Net New Site", "Site Refresh"], effortLevel: "Medium (2-8h)", riskLevel: "MEDIUM", deliverableType: "Review/Approval" },
 ];
+
+/**
+ * Canonical list of checklist categories (controlled vocabulary)
+ */
+export const CHECKLIST_CATEGORIES = [
+  'Accessibility',
+  'AI & Generative Search',
+  'Campaign Landing Pages',
+  'Content Strategy',
+  'E-Commerce SEO',
+  'Foundation & Setup',
+  'Image Optimization',
+  'International SEO',
+  'Keyword Research',
+  'Knowledge Graph',
+  'Link Architecture',
+  'Link Building',
+  'Local SEO',
+  'Machine Readability',
+  'Mobile Optimization',
+  'Monitoring',
+  'On-Page Optimization',
+  'Ongoing Maintenance',
+  'Performance',
+  'Privacy & Compliance',
+  'Schema Markup',
+  'Security',
+  'Site Refresh/Migration',
+  'Technical SEO',
+  'Testing & QA'
+];
+
+export const CHECKLIST_ITEM_COUNT = checklistData.length;

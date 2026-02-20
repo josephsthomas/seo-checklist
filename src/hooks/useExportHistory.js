@@ -13,6 +13,7 @@ import {
 } from 'firebase/firestore';
 import { db } from '../lib/firebase';
 import { useAuth } from '../contexts/AuthContext';
+import toast from 'react-hot-toast';
 
 /**
  * Export types configuration
@@ -41,7 +42,7 @@ export const EXPORT_TYPES = {
   },
   META_DATA: {
     id: 'meta_data',
-    label: 'Meta Data',
+    label: 'Metadata',
     icon: 'Tags',
     color: 'amber',
     formats: ['xlsx', 'json', 'html']
@@ -50,7 +51,7 @@ export const EXPORT_TYPES = {
     id: 'schema',
     label: 'Structured Data',
     icon: 'Code2',
-    color: 'rose',
+    color: 'danger',
     formats: ['json', 'html']
   },
   CHECKLIST: {
@@ -68,6 +69,7 @@ export const EXPORT_TYPES = {
 export function useExportHistory(limit = 20) {
   const [exports, setExports] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   const { currentUser } = useAuth();
 
   useEffect(() => {
@@ -91,6 +93,11 @@ export function useExportHistory(limit = 20) {
       }));
       setExports(exportsData);
       setLoading(false);
+      setError(null);
+    }, (err) => {
+      console.error('Error listening to export history:', err);
+      setLoading(false);
+      setError(err.message || 'Failed to load export history');
     });
 
     return unsubscribe;
@@ -109,6 +116,7 @@ export function useExportHistory(limit = 20) {
       return docRef.id;
     } catch (error) {
       console.error('Error logging export:', error);
+      toast.error('Failed to log export');
       return null;
     }
   }, [currentUser]);
@@ -119,10 +127,11 @@ export function useExportHistory(limit = 20) {
       await deleteDoc(doc(db, 'export_history', exportId));
     } catch (error) {
       console.error('Error deleting export record:', error);
+      toast.error('Failed to delete export record');
     }
   }, []);
 
-  return { exports, loading, logExport, deleteExport };
+  return { exports, loading, error, logExport, deleteExport };
 }
 
 /**

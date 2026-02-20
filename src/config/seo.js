@@ -6,7 +6,7 @@
  */
 
 const SITE_NAME = 'Content Strategy Portal';
-const SITE_URL = 'https://contentstrategyportal.com'; // Update with actual domain
+const SITE_URL = import.meta.env.VITE_SITE_URL || 'https://contentstrategyportal.com';
 const SITE_DESCRIPTION = 'AI-powered SEO management platform with project planning, technical audits, accessibility compliance, and content optimization tools for agencies and enterprise teams.';
 
 /**
@@ -27,7 +27,7 @@ export const defaultMeta = {
 export const pageSEO = {
   home: {
     title: 'SEO Project Management & Technical Audits for Agencies | Content Strategy Portal',
-    description: 'Manage SEO projects with 321-item checklists, run technical audits in minutes, ensure WCAG accessibility compliance. Free tier available for agencies managing multiple client sites.',
+    description: 'Manage SEO projects with 353-item checklists, run technical audits in minutes, ensure WCAG accessibility compliance. Free tier available for agencies managing multiple client sites.',
     canonical: '/',
     keywords: 'SEO project management, technical SEO audit, content checklist, SEO agency tools, WCAG compliance'
   },
@@ -41,14 +41,14 @@ export const pageSEO = {
 
   features: {
     title: '6 SEO Tools: Content Planner, Audits, Accessibility & More | Content Strategy Portal',
-    description: 'Explore our integrated SEO suite: Content Planner (321-item checklist), Technical Audit (31 categories), Accessibility Analyzer (WCAG 2.2), Meta Generator, Schema Generator, and Image Alt Generator.',
+    description: 'Explore our integrated SEO suite: Content Planner (353-item checklist), Technical Audit (31 categories), Accessibility Analyzer (WCAG 2.2), Meta Generator, Schema Generator, and Image Alt Generator.',
     canonical: '/features',
     keywords: 'SEO tools, content planner, technical audit tool, accessibility checker, meta generator, schema markup'
   },
 
   'features/planner': {
-    title: 'Content Planner - 321-Item SEO Checklist & Project Management | CSP',
-    description: 'Manage SEO projects with our comprehensive 321-item checklist. Track progress across 8 phases, collaborate with teams, and export branded PDF/Excel reports. Free tier available.',
+    title: 'Content Planner - 353-Item SEO Checklist & Project Management | CSP',
+    description: 'Manage SEO projects with our comprehensive 353-item checklist. Track progress across 8 phases, collaborate with teams, and export branded PDF/Excel reports. Free tier available.',
     canonical: '/features/planner',
     keywords: 'SEO checklist, content planner, SEO project management, website launch checklist'
   },
@@ -88,6 +88,13 @@ export const pageSEO = {
     keywords: 'alt text generator, image accessibility, AI image description, bulk alt text'
   },
 
+  'features/readability': {
+    title: 'Readability Analyzer - Content Scoring & Optimization | CSP',
+    description: 'Analyze content readability with Flesch-Kincaid, Gunning Fog, and other scoring algorithms. Get AI-powered suggestions to improve clarity and engagement.',
+    canonical: '/features/readability',
+    keywords: 'readability analyzer, content scoring, Flesch-Kincaid, readability checker, content optimization'
+  },
+
   help: {
     title: 'Help Center - Guides, FAQ & Resources | Content Strategy Portal',
     description: 'Get help with Content Strategy Portal. Browse getting started guides, tool tutorials, FAQ, SEO glossary, and 200+ curated resources.',
@@ -110,8 +117,8 @@ export const pageSEO = {
   },
 
   'help/glossary': {
-    title: 'SEO Glossary - 100+ Terms Explained Simply | Content Strategy Portal',
-    description: 'Comprehensive SEO glossary with 100+ terms explained in plain language. From anchor text to XML sitemaps, understand the terminology that matters.',
+    title: 'SEO Glossary - 30+ Terms Explained Simply | Content Strategy Portal',
+    description: 'Comprehensive SEO glossary with 30+ terms explained in plain language. From anchor text to XML sitemaps, understand the terminology that matters.',
     canonical: '/help/glossary',
     keywords: 'SEO glossary, SEO terms, SEO definitions, SEO terminology'
   },
@@ -141,7 +148,7 @@ export const organizationSchema = {
   url: SITE_URL,
   logo: `${SITE_URL}/logo.png`,
   description: SITE_DESCRIPTION,
-  foundingDate: '2024'
+  foundingDate: '2024-01-01'
 };
 
 /**
@@ -152,7 +159,7 @@ export const softwareSchemas = {
     '@context': 'https://schema.org',
     '@type': 'SoftwareApplication',
     name: 'Content Planner',
-    description: 'Comprehensive 321-item SEO checklist and project management tool for website launches and refreshes.',
+    description: 'Comprehensive 353-item SEO checklist and project management tool for website launches and refreshes.',
     applicationCategory: 'BusinessApplication',
     operatingSystem: 'Web',
     offers: {
@@ -162,7 +169,7 @@ export const softwareSchemas = {
       description: 'Free tier available'
     },
     featureList: [
-      '321 content checklist items',
+      '353 content checklist items',
       'Multi-project dashboard',
       'Team collaboration',
       'PDF & Excel export',
@@ -190,7 +197,8 @@ export const softwareSchemas = {
       'Health score calculation',
       'Client-ready reports',
       'Issue prioritization'
-    ]
+    ],
+    screenshot: `${SITE_URL}/screenshots/audit.png`
   },
 
   accessibility: {
@@ -211,7 +219,8 @@ export const softwareSchemas = {
       'AI fix suggestions',
       'VPAT generation',
       'Multi-page scanning'
-    ]
+    ],
+    screenshot: `${SITE_URL}/screenshots/accessibility.png`
   },
 
   'meta-generator': {
