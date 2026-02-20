@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom';
 import { ArrowLeft, Shield, Database, Clock, Trash2, Lock, Globe, FileText } from 'lucide-react';
+import SEOHead from '../shared/SEOHead';
 
 export default function PrivacyPolicy() {
   const currentDate = new Date().toLocaleDateString('en-US', {
@@ -10,6 +11,12 @@ export default function PrivacyPolicy() {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-charcoal-50 to-white py-12 px-4">
+      <SEOHead
+        title="Privacy & Data Policy | Content Strategy Portal"
+        description="Privacy and data policy for Content Strategy Portal. Learn how we collect, use, and protect your data."
+        canonical="/privacy"
+        noindex={true}
+      />
       <div className="max-w-4xl mx-auto">
         {/* Back Button */}
         <Link

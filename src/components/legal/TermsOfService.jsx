@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom';
 import { ArrowLeft, Scale, Shield, AlertTriangle, FileText, Building } from 'lucide-react';
+import SEOHead from '../shared/SEOHead';
 
 export default function TermsOfService() {
   const currentDate = new Date().toLocaleDateString('en-US', {
@@ -10,6 +11,12 @@ export default function TermsOfService() {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-charcoal-50 to-white py-12 px-4">
+      <SEOHead
+        title="Terms of Service | Content Strategy Portal"
+        description="Terms of Service for Content Strategy Portal. Read our terms and conditions for using the platform."
+        canonical="/terms"
+        noindex={true}
+      />
       <div className="max-w-4xl mx-auto">
         {/* Back Button */}
         <Link

@@ -4,6 +4,7 @@ import { useAuth } from '../../contexts/AuthContext';
 import { Mail, Lock, User, Chrome, CheckCircle, Circle, Eye, EyeOff, FileText, Shield, Bot } from 'lucide-react';
 import PolicyAgreementModal from './PolicyAgreementModal';
 import PasswordStrengthMeter, { isPasswordValid } from './PasswordStrengthMeter';
+import SEOHead from '../shared/SEOHead';
 
 export default function RegisterForm() {
   const [formData, setFormData] = useState({
@@ -120,6 +121,11 @@ export default function RegisterForm() {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-primary-50 to-primary-100 px-4 py-8">
+      <SEOHead
+        title="Sign Up | Content Strategy Portal"
+        description="Create your Content Strategy Portal account. Access SEO tools, content planning, accessibility auditing, and AI-powered features."
+        canonical="/register"
+      />
       <div className="max-w-md w-full">
         <div className="text-center mb-8">
           <h1 className="text-4xl font-bold text-primary-600 mb-2">Content Strategy Portal</h1>

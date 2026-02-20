@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom';
 import { ArrowLeft, Bot, AlertTriangle, CheckCircle, XCircle, Info, Shield, FileText } from 'lucide-react';
+import SEOHead from '../shared/SEOHead';
 
 export default function AIPolicy() {
   const currentDate = new Date().toLocaleDateString('en-US', {
@@ -10,6 +11,12 @@ export default function AIPolicy() {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-charcoal-50 to-white py-12 px-4">
+      <SEOHead
+        title="AI Usage Policy | Content Strategy Portal"
+        description="AI usage policy for Content Strategy Portal. Understand how AI features work and your responsibilities."
+        canonical="/ai-policy"
+        noindex={true}
+      />
       <div className="max-w-4xl mx-auto">
         {/* Back Button */}
         <Link

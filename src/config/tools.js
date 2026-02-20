@@ -54,6 +54,7 @@ export const tools = [
     color: TOOL_COLORS.PRIMARY,
     status: TOOL_STATUS.ACTIVE,
     badge: null, // Dynamic - set based on project count
+    tagline: 'Project management & SEO checklists',
     features: [
       '353 content checklist items',
       'Project tracking',
@@ -77,6 +78,7 @@ export const tools = [
     color: TOOL_COLORS.CYAN,
     status: TOOL_STATUS.ACTIVE,
     badge: null,
+    tagline: 'Analyze Screaming Frog exports',
     features: [
       '31 audit categories',
       'AI recommendations',
@@ -100,6 +102,7 @@ export const tools = [
     color: TOOL_COLORS.PURPLE,
     status: TOOL_STATUS.ACTIVE,
     badge: 'New',
+    tagline: 'WCAG 2.2 compliance auditing',
     features: [
       'WCAG 2.2 compliance',
       '93 Axe-core rules',
@@ -123,6 +126,7 @@ export const tools = [
     color: TOOL_COLORS.EMERALD,
     status: TOOL_STATUS.ACTIVE,
     badge: 'New',
+    tagline: 'Bulk alt text generation',
     features: [
       'Claude Vision AI analysis',
       'Batch processing (100 images)',
@@ -146,6 +150,7 @@ export const tools = [
     color: TOOL_COLORS.AMBER,
     status: TOOL_STATUS.ACTIVE,
     badge: 'New',
+    tagline: 'AI-powered meta optimization',
     features: [
       'Multi-format support',
       'SERP preview',
@@ -169,6 +174,7 @@ export const tools = [
     color: TOOL_COLORS.ROSE,
     status: TOOL_STATUS.ACTIVE,
     badge: 'New',
+    tagline: 'JSON-LD structured data',
     features: [
       '40+ schema types',
       'Rich snippet preview',
@@ -192,6 +198,7 @@ export const tools = [
     color: TOOL_COLORS.TEAL,
     status: TOOL_STATUS.ACTIVE,
     badge: 'New',
+    tagline: 'AI readability scoring',
     features: [
       'AI readability scoring',
       'How AI sees your content',
@@ -215,6 +222,7 @@ export const tools = [
     color: TOOL_COLORS.CYAN,
     status: TOOL_STATUS.COMING_SOON,
     badge: null,
+    tagline: 'Multi-source analytics integration',
     features: [
       'Multi-source integration',
       'Custom dashboards',
@@ -235,6 +243,7 @@ export const tools = [
     color: TOOL_COLORS.PURPLE,
     status: TOOL_STATUS.COMING_SOON,
     badge: null,
+    tagline: 'AI-powered content optimization',
     features: [
       'AI content scoring',
       'Keyword optimization',
@@ -300,7 +309,7 @@ export function getToolsNavigation() {
     name: tool.name,
     path: tool.path,
     icon: tool.icon,
-    description: tool.features[0],
+    description: tool.tagline,
     badge: tool.badge,
     color: tool.color
   }));

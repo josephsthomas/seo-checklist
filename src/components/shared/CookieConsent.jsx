@@ -76,30 +76,30 @@ export default function CookieConsent() {
 
   return (
     <div className="fixed bottom-0 left-0 right-0 z-50 p-4 md:p-6">
-      <div className="max-w-4xl mx-auto bg-white rounded-xl shadow-2xl border border-charcoal-200 overflow-hidden">
+      <div className="max-w-4xl mx-auto bg-white dark:bg-charcoal-800 rounded-xl shadow-2xl border border-charcoal-200 dark:border-charcoal-700 overflow-hidden">
         {/* Main Banner */}
         <div className="p-4 md:p-6">
           <div className="flex items-start gap-4">
-            <div className="w-10 h-10 bg-primary-100 rounded-lg flex items-center justify-center flex-shrink-0">
-              <Cookie className="w-5 h-5 text-primary-600" />
+            <div className="w-10 h-10 bg-primary-100 dark:bg-primary-900/30 rounded-lg flex items-center justify-center flex-shrink-0">
+              <Cookie className="w-5 h-5 text-primary-600 dark:text-primary-400" />
             </div>
             <div className="flex-1 min-w-0">
-              <h2 className="text-lg font-semibold text-charcoal-900 mb-2">
+              <h2 className="text-lg font-semibold text-charcoal-900 dark:text-white mb-2">
                 Cookie & Privacy Settings
               </h2>
-              <p className="text-charcoal-600 text-sm mb-4">
+              <p className="text-charcoal-600 dark:text-charcoal-300 text-sm mb-4">
                 We use cookies and similar technologies to provide essential functionality, analyze usage,
                 and improve your experience. You can customize your preferences below.
               </p>
 
               {/* Cookie Settings Panel */}
               {showSettings && (
-                <div className="mb-4 space-y-3 p-4 bg-charcoal-50 rounded-lg">
+                <div className="mb-4 space-y-3 p-4 bg-charcoal-50 dark:bg-charcoal-700 rounded-lg">
                   {/* Essential Cookies */}
                   <div className="flex items-center justify-between">
                     <div>
-                      <p className="font-medium text-charcoal-900 text-sm">Essential Cookies</p>
-                      <p className="text-charcoal-500 text-xs">Required for the site to function (login, security)</p>
+                      <p className="font-medium text-charcoal-900 dark:text-white text-sm">Essential Cookies</p>
+                      <p className="text-charcoal-500 dark:text-charcoal-400 text-xs">Required for the site to function (login, security)</p>
                     </div>
                     <div className="flex items-center gap-2">
                       <span className="text-xs text-charcoal-500">Always on</span>
@@ -112,8 +112,8 @@ export default function CookieConsent() {
                   {/* Functional Cookies */}
                   <div className="flex items-center justify-between">
                     <div>
-                      <p className="font-medium text-charcoal-900 text-sm">Functional Cookies</p>
-                      <p className="text-charcoal-500 text-xs">Remembers your preferences and settings</p>
+                      <p className="font-medium text-charcoal-900 dark:text-white text-sm">Functional Cookies</p>
+                      <p className="text-charcoal-500 dark:text-charcoal-400 text-xs">Remembers your preferences and settings</p>
                     </div>
                     <button
                       onClick={() => setPreferences(p => ({ ...p, functional: !p.functional }))}
@@ -130,8 +130,8 @@ export default function CookieConsent() {
                   {/* Analytics Cookies */}
                   <div className="flex items-center justify-between">
                     <div>
-                      <p className="font-medium text-charcoal-900 text-sm">Analytics Cookies</p>
-                      <p className="text-charcoal-500 text-xs">Helps us understand how you use the site</p>
+                      <p className="font-medium text-charcoal-900 dark:text-white text-sm">Analytics Cookies</p>
+                      <p className="text-charcoal-500 dark:text-charcoal-400 text-xs">Helps us understand how you use the site</p>
                     </div>
                     <button
                       onClick={() => setPreferences(p => ({ ...p, analytics: !p.analytics }))}
@@ -160,14 +160,14 @@ export default function CookieConsent() {
                 {showSettings ? (
                   <button
                     onClick={handleAcceptSelected}
-                    className="flex items-center gap-2 px-4 py-2 bg-charcoal-100 text-charcoal-700 rounded-lg hover:bg-charcoal-200 transition-colors text-sm font-medium"
+                    className="flex items-center gap-2 px-4 py-2 bg-charcoal-100 dark:bg-charcoal-700 text-charcoal-700 dark:text-charcoal-200 rounded-lg hover:bg-charcoal-200 dark:hover:bg-charcoal-600 transition-colors text-sm font-medium"
                   >
                     Save Preferences
                   </button>
                 ) : (
                   <button
                     onClick={() => setShowSettings(true)}
-                    className="flex items-center gap-2 px-4 py-2 bg-charcoal-100 text-charcoal-700 rounded-lg hover:bg-charcoal-200 transition-colors text-sm font-medium"
+                    className="flex items-center gap-2 px-4 py-2 bg-charcoal-100 dark:bg-charcoal-700 text-charcoal-700 dark:text-charcoal-200 rounded-lg hover:bg-charcoal-200 dark:hover:bg-charcoal-600 transition-colors text-sm font-medium"
                   >
                     <Settings className="w-4 h-4" />
                     Customize
@@ -176,14 +176,14 @@ export default function CookieConsent() {
 
                 <button
                   onClick={handleRejectNonEssential}
-                  className="px-4 py-2 text-charcoal-600 hover:text-charcoal-900 text-sm"
+                  className="px-4 py-2 text-charcoal-600 dark:text-charcoal-400 hover:text-charcoal-900 dark:hover:text-white text-sm"
                 >
                   Essential Only
                 </button>
               </div>
 
               {/* Privacy Link */}
-              <p className="text-xs text-charcoal-500 mt-3">
+              <p className="text-xs text-charcoal-500 dark:text-charcoal-400 mt-3">
                 Learn more in our{' '}
                 <Link to="/privacy" className="text-primary-600 hover:underline">
                   Privacy Policy

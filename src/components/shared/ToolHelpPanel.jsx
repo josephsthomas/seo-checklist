@@ -259,20 +259,20 @@ export default function ToolHelpPanel({ toolId, isOpen, onClose }) {
 
       {/* Slide-in Panel */}
       <div
-        className="fixed right-0 top-0 h-full w-full max-w-md bg-white shadow-2xl z-50 flex flex-col animate-slide-in-right"
+        className="fixed right-0 top-0 h-full w-full max-w-md bg-white dark:bg-charcoal-800 shadow-2xl z-50 flex flex-col animate-slide-in-right"
         role="dialog"
         aria-modal="true"
         aria-labelledby="help-panel-title"
       >
         {/* Header */}
-        <div className="flex items-center justify-between p-6 border-b border-charcoal-100 bg-gradient-to-r from-primary-50 to-cyan-50">
+        <div className="flex items-center justify-between p-6 border-b border-charcoal-100 dark:border-charcoal-700 bg-gradient-to-r from-primary-50 to-cyan-50 dark:from-primary-900/20 dark:to-cyan-900/20">
           <div className="flex items-center gap-3">
             <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-primary-500 to-cyan-500 flex items-center justify-center shadow-lg">
               <Lightbulb className="w-6 h-6 text-white" />
             </div>
             <div>
-              <h2 id="help-panel-title" className="text-lg font-bold text-charcoal-900">{help.title} Help</h2>
-              <p className="text-sm text-charcoal-500">{help.subtitle}</p>
+              <h2 id="help-panel-title" className="text-lg font-bold text-charcoal-900 dark:text-white">{help.title} Help</h2>
+              <p className="text-sm text-charcoal-500 dark:text-charcoal-400">{help.subtitle}</p>
             </div>
           </div>
           <button
@@ -296,10 +296,10 @@ export default function ToolHelpPanel({ toolId, isOpen, onClose }) {
               {help.tips.map((tip, idx) => (
                 <div
                   key={idx}
-                  className="p-4 bg-charcoal-50 rounded-xl border border-charcoal-100 hover:bg-charcoal-100 transition-colors"
+                  className="p-4 bg-charcoal-50 dark:bg-charcoal-700 rounded-xl border border-charcoal-100 dark:border-charcoal-600 hover:bg-charcoal-100 dark:hover:bg-charcoal-600 transition-colors"
                 >
-                  <h4 className="font-medium text-charcoal-900 mb-1">{tip.title}</h4>
-                  <p className="text-sm text-charcoal-600">{tip.description}</p>
+                  <h4 className="font-medium text-charcoal-900 dark:text-white mb-1">{tip.title}</h4>
+                  <p className="text-sm text-charcoal-600 dark:text-charcoal-300">{tip.description}</p>
                 </div>
               ))}
             </div>
@@ -312,12 +312,12 @@ export default function ToolHelpPanel({ toolId, isOpen, onClose }) {
                 <Keyboard className="w-4 h-4" />
                 Keyboard Shortcuts
               </h3>
-              <div className="bg-charcoal-50 rounded-xl p-4 border border-charcoal-100">
+              <div className="bg-charcoal-50 dark:bg-charcoal-700 rounded-xl p-4 border border-charcoal-100 dark:border-charcoal-600">
                 <div className="space-y-2">
                   {help.shortcuts.map((shortcut, idx) => (
                     <div key={idx} className="flex items-center justify-between">
-                      <span className="text-sm text-charcoal-600">{shortcut.action}</span>
-                      <kbd className="px-2 py-1 bg-white border border-charcoal-200 rounded text-xs font-mono text-charcoal-700 shadow-sm">
+                      <span className="text-sm text-charcoal-600 dark:text-charcoal-300">{shortcut.action}</span>
+                      <kbd className="px-2 py-1 bg-white dark:bg-charcoal-600 border border-charcoal-200 dark:border-charcoal-500 rounded text-xs font-mono text-charcoal-700 dark:text-charcoal-200 shadow-sm">
                         {shortcut.key}
                       </kbd>
                     </div>
@@ -341,7 +341,7 @@ export default function ToolHelpPanel({ toolId, isOpen, onClose }) {
                     href={resource.url}
                     target={resource.type === 'external' ? '_blank' : undefined}
                     rel={resource.type === 'external' ? 'noopener noreferrer' : undefined}
-                    className="flex items-center gap-3 p-3 bg-white border border-charcoal-200 rounded-xl hover:border-primary-300 hover:bg-primary-50 transition-colors group"
+                    className="flex items-center gap-3 p-3 bg-white dark:bg-charcoal-700 border border-charcoal-200 dark:border-charcoal-600 rounded-xl hover:border-primary-300 dark:hover:border-primary-600 hover:bg-primary-50 dark:hover:bg-primary-900/20 transition-colors group"
                   >
                     <div className="w-10 h-10 rounded-lg bg-charcoal-100 group-hover:bg-primary-100 flex items-center justify-center transition-colors">
                       {resource.type === 'video' ? (
@@ -364,7 +364,7 @@ export default function ToolHelpPanel({ toolId, isOpen, onClose }) {
         </div>
 
         {/* Footer */}
-        <div className="p-4 border-t border-charcoal-100 bg-charcoal-50">
+        <div className="p-4 border-t border-charcoal-100 dark:border-charcoal-700 bg-charcoal-50 dark:bg-charcoal-900">
           <button
             onClick={onClose}
             className="w-full btn btn-primary"

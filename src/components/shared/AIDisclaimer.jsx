@@ -39,9 +39,9 @@ export default function AIDisclaimer({
 
   if (compact) {
     return (
-      <div className="flex items-center gap-2 px-3 py-2 bg-amber-50 border border-amber-200 rounded-lg text-sm">
-        <Bot className="w-4 h-4 text-amber-600 flex-shrink-0" />
-        <span className="text-amber-700">
+      <div className="flex items-center gap-2 px-3 py-2 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-lg text-sm">
+        <Bot className="w-4 h-4 text-amber-600 dark:text-amber-400 flex-shrink-0" />
+        <span className="text-amber-700 dark:text-amber-300">
           AI-generated content requires review.{' '}
           <Link to="/ai-policy" className="underline hover:text-amber-800">
             Learn more
@@ -52,19 +52,19 @@ export default function AIDisclaimer({
   }
 
   return (
-    <div className="bg-amber-50 border border-amber-200 rounded-xl overflow-hidden">
+    <div className="bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-xl overflow-hidden">
       {/* Header */}
       <div className="flex items-start gap-3 p-4">
-        <div className="w-10 h-10 bg-amber-100 rounded-lg flex items-center justify-center flex-shrink-0">
-          <AlertTriangle className="w-5 h-5 text-amber-600" />
+        <div className="w-10 h-10 bg-amber-100 dark:bg-amber-900/30 rounded-lg flex items-center justify-center flex-shrink-0">
+          <AlertTriangle className="w-5 h-5 text-amber-600 dark:text-amber-400" />
         </div>
         <div className="flex-1 min-w-0">
           <div className="flex items-start justify-between gap-2">
             <div>
-              <h3 className="font-semibold text-amber-800">
+              <h3 className="font-semibold text-amber-800 dark:text-amber-200">
                 {toolName} - AI-Powered Feature
               </h3>
-              <p className="text-amber-700 text-sm mt-1">
+              <p className="text-amber-700 dark:text-amber-300 text-sm mt-1">
                 AI can make mistakes. Always review and verify generated content before use.
               </p>
             </div>
@@ -82,10 +82,10 @@ export default function AIDisclaimer({
       </div>
 
       {/* Expandable Details */}
-      <div className="border-t border-amber-200">
+      <div className="border-t border-amber-200 dark:border-amber-800">
         <button
           onClick={() => setExpanded(!expanded)}
-          className="w-full flex items-center justify-between px-4 py-2 text-sm text-amber-700 hover:bg-amber-100/50 transition-colors"
+          className="w-full flex items-center justify-between px-4 py-2 text-sm text-amber-700 dark:text-amber-300 hover:bg-amber-100/50 dark:hover:bg-amber-800/30 transition-colors"
           aria-expanded={expanded}
         >
           <span>{expanded ? 'Hide details' : 'Important information about AI limitations'}</span>

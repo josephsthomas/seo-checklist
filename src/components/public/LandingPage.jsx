@@ -41,7 +41,7 @@ const FEATURES = [
     color: 'emerald'
   },
   {
-    name: 'Meta Data Generator',
+    name: 'Metadata Generator',
     href: '/features/meta-generator',
     icon: FileText,
     description: 'AI-powered title and description optimization for better search visibility.',

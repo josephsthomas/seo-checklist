@@ -12,7 +12,8 @@ import {
   Image,
   BookOpen,
   HelpCircle,
-  Sparkles
+  Sparkles,
+  ScanEye
 } from 'lucide-react';
 
 const FEATURES = [
@@ -22,6 +23,7 @@ const FEATURES = [
   { name: 'Meta Data Generator', href: '/features/meta-generator', icon: FileText, description: 'AI-powered meta optimization' },
   { name: 'Schema Generator', href: '/features/schema-generator', icon: Code, description: 'JSON-LD structured data' },
   { name: 'Image Alt Generator', href: '/features/image-alt', icon: Image, description: 'Bulk alt text generation' },
+  { name: 'AI Readability Checker', href: '/features/readability', icon: ScanEye, description: 'AI readability scoring' },
 ];
 
 const HELP_LINKS = [

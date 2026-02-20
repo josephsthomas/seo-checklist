@@ -145,7 +145,7 @@ function CategorySection({ category, score, checks, isExpanded, onToggle, sectio
               ({config.weight})
             </span>
           </div>
-          <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5 hidden sm:block">
+          <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
             {config.description}
           </p>
         </div>

@@ -78,13 +78,13 @@ export default function AIExportConfirmation({
 
       {/* Modal */}
       <div
-        className="relative bg-white rounded-2xl shadow-2xl max-w-lg w-full overflow-hidden"
+        className="relative bg-white dark:bg-charcoal-800 rounded-2xl shadow-2xl max-w-lg w-full overflow-hidden"
         role="dialog"
         aria-modal="true"
         aria-labelledby="ai-export-title"
       >
         {/* Header */}
-        <div className="bg-amber-50 border-b border-amber-200 p-4">
+        <div className="bg-amber-50 dark:bg-amber-900/20 border-b border-amber-200 dark:border-amber-800 p-4">
           <div className="flex items-start gap-3">
             <div className="w-10 h-10 bg-amber-100 rounded-lg flex items-center justify-center flex-shrink-0">
               <AlertTriangle className="w-5 h-5 text-amber-600" />
@@ -110,7 +110,7 @@ export default function AIExportConfirmation({
         {/* Content */}
         <div className="p-6">
           {/* Warning */}
-          <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-6">
+          <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-4 mb-6">
             <p className="text-red-700 text-sm">
               <strong>Important:</strong> AI-generated content may contain errors, inaccuracies,
               or inappropriate suggestions. You must review and verify all content before publishing
@@ -120,55 +120,55 @@ export default function AIExportConfirmation({
 
           {/* Acknowledgments */}
           <div className="space-y-3">
-            <p className="text-sm font-medium text-charcoal-700 mb-3">
+            <p className="text-sm font-medium text-charcoal-700 dark:text-charcoal-300 mb-3">
               Please confirm the following:
             </p>
 
             <button
               onClick={() => handleToggle('reviewed')}
-              className="w-full flex items-start gap-3 p-3 rounded-lg border border-charcoal-200 hover:border-primary-300 hover:bg-charcoal-50 transition-colors text-left"
+              className="w-full flex items-start gap-3 p-3 rounded-lg border border-charcoal-200 dark:border-charcoal-600 hover:border-primary-300 dark:hover:border-primary-600 hover:bg-charcoal-50 dark:hover:bg-charcoal-700 transition-colors text-left"
             >
               {acknowledgments.reviewed ? (
                 <CheckSquare className="w-5 h-5 text-primary-600 flex-shrink-0 mt-0.5" />
               ) : (
                 <Square className="w-5 h-5 text-charcoal-400 flex-shrink-0 mt-0.5" />
               )}
-              <span className="text-sm text-charcoal-700">
+              <span className="text-sm text-charcoal-700 dark:text-charcoal-300">
                 I have reviewed the AI-generated {contentType} and understand it may require editing
               </span>
             </button>
 
             <button
               onClick={() => handleToggle('understand')}
-              className="w-full flex items-start gap-3 p-3 rounded-lg border border-charcoal-200 hover:border-primary-300 hover:bg-charcoal-50 transition-colors text-left"
+              className="w-full flex items-start gap-3 p-3 rounded-lg border border-charcoal-200 dark:border-charcoal-600 hover:border-primary-300 dark:hover:border-primary-600 hover:bg-charcoal-50 dark:hover:bg-charcoal-700 transition-colors text-left"
             >
               {acknowledgments.understand ? (
                 <CheckSquare className="w-5 h-5 text-primary-600 flex-shrink-0 mt-0.5" />
               ) : (
                 <Square className="w-5 h-5 text-charcoal-400 flex-shrink-0 mt-0.5" />
               )}
-              <span className="text-sm text-charcoal-700">
+              <span className="text-sm text-charcoal-700 dark:text-charcoal-300">
                 I understand that AI can make mistakes and the content may contain errors or inaccuracies
               </span>
             </button>
 
             <button
               onClick={() => handleToggle('responsible')}
-              className="w-full flex items-start gap-3 p-3 rounded-lg border border-charcoal-200 hover:border-primary-300 hover:bg-charcoal-50 transition-colors text-left"
+              className="w-full flex items-start gap-3 p-3 rounded-lg border border-charcoal-200 dark:border-charcoal-600 hover:border-primary-300 dark:hover:border-primary-600 hover:bg-charcoal-50 dark:hover:bg-charcoal-700 transition-colors text-left"
             >
               {acknowledgments.responsible ? (
                 <CheckSquare className="w-5 h-5 text-primary-600 flex-shrink-0 mt-0.5" />
               ) : (
                 <Square className="w-5 h-5 text-charcoal-400 flex-shrink-0 mt-0.5" />
               )}
-              <span className="text-sm text-charcoal-700">
+              <span className="text-sm text-charcoal-700 dark:text-charcoal-300">
                 I accept responsibility for verifying and editing the content before use
               </span>
             </button>
           </div>
 
           {/* Policy Link */}
-          <div className="mt-4 pt-4 border-t border-charcoal-100">
+          <div className="mt-4 pt-4 border-t border-charcoal-100 dark:border-charcoal-700">
             <Link
               to="/ai-policy"
               target="_blank"
@@ -181,7 +181,7 @@ export default function AIExportConfirmation({
         </div>
 
         {/* Footer */}
-        <div className="bg-charcoal-50 px-6 py-4 flex items-center justify-end gap-3">
+        <div className="bg-charcoal-50 dark:bg-charcoal-900 px-6 py-4 flex items-center justify-end gap-3">
           <button
             onClick={onClose}
             className="px-4 py-2 text-charcoal-600 hover:text-charcoal-800 hover:bg-charcoal-100 rounded-lg transition-colors"

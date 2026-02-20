@@ -72,7 +72,7 @@ export default function AccessibilityUploadScreen({ onFileSelect }) {
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-charcoal-50 to-white">
+    <div className="min-h-screen bg-gradient-to-b from-charcoal-50 to-white dark:from-charcoal-900 dark:to-charcoal-800">
       {/* Hero Section */}
       <div className="relative overflow-hidden">
         {/* Background Decorations */}
@@ -86,10 +86,10 @@ export default function AccessibilityUploadScreen({ onFileSelect }) {
             <div className="w-20 h-20 bg-gradient-to-br from-purple-500 to-indigo-600 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-xl shadow-purple-500/25">
               <Accessibility className="w-10 h-10 text-white" />
             </div>
-            <h1 className="text-4xl sm:text-5xl font-bold text-charcoal-900 mb-4">
+            <h1 className="text-4xl sm:text-5xl font-bold text-charcoal-900 dark:text-white mb-4">
               Accessibility <span className="text-gradient-purple">Analyzer</span>
             </h1>
-            <p className="text-lg text-charcoal-600 max-w-2xl mx-auto">
+            <p className="text-lg text-charcoal-600 dark:text-charcoal-300 max-w-2xl mx-auto">
               Upload your Screaming Frog export to generate a comprehensive WCAG 2.2 compliance
               audit with AI-powered remediation suggestions.
             </p>
@@ -108,7 +108,7 @@ export default function AccessibilityUploadScreen({ onFileSelect }) {
           >
             {/* Border gradient effect */}
             <div className={`absolute inset-0 bg-gradient-to-br transition-opacity duration-300
-              ${isDragActive ? 'from-purple-500/10 to-indigo-600/10 opacity-100' : 'from-charcoal-100/50 to-charcoal-200/50 opacity-0 group-hover:opacity-100'}
+              ${isDragActive ? 'from-purple-500/10 to-indigo-600/10 opacity-100' : 'from-charcoal-100/50 to-charcoal-200/50 dark:from-charcoal-700/50 dark:to-charcoal-600/50 opacity-0 group-hover:opacity-100'}
               ${validationResult?.valid ? 'from-emerald-500/10 to-emerald-600/10 opacity-100' : ''}
               ${validationResult && !validationResult.valid ? 'from-red-500/10 to-red-600/10 opacity-100' : ''}
             `} />
@@ -121,17 +121,17 @@ export default function AccessibilityUploadScreen({ onFileSelect }) {
                   <div className={`w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-6 transition-all duration-300
                     ${isDragActive
                       ? 'bg-gradient-to-br from-purple-500 to-indigo-600 shadow-lg shadow-purple-500/30 scale-110'
-                      : 'bg-charcoal-100 group-hover:bg-gradient-to-br group-hover:from-purple-500 group-hover:to-indigo-600 group-hover:shadow-lg group-hover:shadow-purple-500/30'
+                      : 'bg-charcoal-100 dark:bg-charcoal-700 group-hover:bg-gradient-to-br group-hover:from-purple-500 group-hover:to-indigo-600 group-hover:shadow-lg group-hover:shadow-purple-500/30'
                     }
                   `}>
                     <Upload className={`w-8 h-8 transition-colors duration-300
-                      ${isDragActive ? 'text-white' : 'text-charcoal-400 group-hover:text-white'}
+                      ${isDragActive ? 'text-white' : 'text-charcoal-400 dark:text-charcoal-300 group-hover:text-white'}
                     `} />
                   </div>
-                  <h3 className="text-xl font-bold text-charcoal-900 mb-2">
+                  <h3 className="text-xl font-bold text-charcoal-900 dark:text-white mb-2">
                     {isDragActive ? 'Drop your file here' : 'Upload Screaming Frog Export'}
                   </h3>
-                  <p className="text-charcoal-600 mb-4">
+                  <p className="text-charcoal-600 dark:text-charcoal-300 mb-4">
                     Drag and drop your ZIP file, or click to browse
                   </p>
                   <p className="text-sm text-charcoal-400">
@@ -168,7 +168,7 @@ export default function AccessibilityUploadScreen({ onFileSelect }) {
 
           {/* Warnings */}
           {validationResult?.warnings?.length > 0 && (
-            <div className="mt-4 card p-4 bg-amber-50 border-amber-200">
+            <div className="mt-4 card p-4 bg-amber-50 dark:bg-amber-900/20 border-amber-200 dark:border-amber-800">
               <div className="flex items-start gap-3">
                 <div className="w-8 h-8 rounded-lg bg-amber-100 flex items-center justify-center flex-shrink-0">
                   <AlertCircle className="w-4 h-4 text-amber-600" />
@@ -184,7 +184,7 @@ export default function AccessibilityUploadScreen({ onFileSelect }) {
 
           {/* Info messages (estimated time, tips) */}
           {validationResult?.info?.length > 0 && (
-            <div className="mt-4 card p-4 bg-blue-50 border-blue-200">
+            <div className="mt-4 card p-4 bg-blue-50 dark:bg-blue-900/20 border-blue-200 dark:border-blue-800">
               <div className="flex items-start gap-3">
                 <div className="w-8 h-8 rounded-lg bg-blue-100 flex items-center justify-center flex-shrink-0">
                   <Info className="w-4 h-4 text-blue-600" />
@@ -212,13 +212,13 @@ export default function AccessibilityUploadScreen({ onFileSelect }) {
               <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${feature.color} flex items-center justify-center mx-auto mb-3 shadow-lg group-hover:scale-105 transition-transform`}>
                 <feature.icon className="w-6 h-6 text-white" />
               </div>
-              <span className="text-sm font-medium text-charcoal-700">{feature.label}</span>
+              <span className="text-sm font-medium text-charcoal-700 dark:text-charcoal-200">{feature.label}</span>
             </div>
           ))}
         </div>
 
         {/* WCAG Level Info */}
-        <div className="card p-6 mb-6 bg-gradient-to-br from-purple-50/50 to-white border-purple-100">
+        <div className="card p-6 mb-6 bg-gradient-to-br from-purple-50/50 to-white dark:from-purple-900/20 dark:to-charcoal-800 border-purple-100 dark:border-purple-800">
           <div className="flex items-start gap-4">
             <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-purple-500 to-indigo-600 flex items-center justify-center shadow-lg flex-shrink-0">
               <Shield className="w-6 h-6 text-white" />
@@ -226,17 +226,17 @@ export default function AccessibilityUploadScreen({ onFileSelect }) {
             <div>
               <h4 className="font-bold text-charcoal-900 mb-2">WCAG 2.2 Compliance Levels</h4>
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-4">
-                <div className="p-3 rounded-xl bg-emerald-50 border border-emerald-200">
-                  <div className="font-bold text-emerald-700 mb-1">Level A</div>
-                  <p className="text-xs text-emerald-600">31 criteria - Minimum accessibility requirements</p>
+                <div className="p-3 rounded-xl bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-200 dark:border-emerald-800">
+                  <div className="font-bold text-emerald-700 dark:text-emerald-300 mb-1">Level A</div>
+                  <p className="text-xs text-emerald-600 dark:text-emerald-400">31 criteria - Minimum accessibility requirements</p>
                 </div>
-                <div className="p-3 rounded-xl bg-amber-50 border border-amber-200">
-                  <div className="font-bold text-amber-700 mb-1">Level AA</div>
-                  <p className="text-xs text-amber-600">25 criteria - Standard compliance (recommended)</p>
+                <div className="p-3 rounded-xl bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800">
+                  <div className="font-bold text-amber-700 dark:text-amber-300 mb-1">Level AA</div>
+                  <p className="text-xs text-amber-600 dark:text-amber-400">25 criteria - Standard compliance (recommended)</p>
                 </div>
-                <div className="p-3 rounded-xl bg-purple-50 border border-purple-200">
-                  <div className="font-bold text-purple-700 mb-1">Level AAA</div>
-                  <p className="text-xs text-purple-600">31 criteria - Enhanced accessibility</p>
+                <div className="p-3 rounded-xl bg-purple-50 dark:bg-purple-900/20 border border-purple-200 dark:border-purple-800">
+                  <div className="font-bold text-purple-700 dark:text-purple-300 mb-1">Level AAA</div>
+                  <p className="text-xs text-purple-600 dark:text-purple-400">31 criteria - Enhanced accessibility</p>
                 </div>
               </div>
             </div>
@@ -244,7 +244,7 @@ export default function AccessibilityUploadScreen({ onFileSelect }) {
         </div>
 
         {/* Pre-flight Checklist */}
-        <div className="card p-6 mb-6 bg-gradient-to-br from-indigo-50/50 to-white border-indigo-100">
+        <div className="card p-6 mb-6 bg-gradient-to-br from-indigo-50/50 to-white dark:from-indigo-900/20 dark:to-charcoal-800 border-indigo-100 dark:border-indigo-800">
           <div className="flex items-center gap-3 mb-4">
             <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-500 to-indigo-600 flex items-center justify-center shadow-lg">
               <CheckCircle2 className="w-5 h-5 text-white" />
@@ -388,7 +388,7 @@ export default function AccessibilityUploadScreen({ onFileSelect }) {
         </div>
 
         {/* Help Section */}
-        <div className="card p-6 bg-gradient-to-br from-charcoal-50 to-white">
+        <div className="card p-6 bg-gradient-to-br from-charcoal-50 to-white dark:from-charcoal-800 dark:to-charcoal-700">
           <div className="flex items-start gap-4">
             <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-charcoal-700 to-charcoal-800 flex items-center justify-center flex-shrink-0 shadow-lg">
               <HelpCircle className="w-6 h-6 text-white" />
