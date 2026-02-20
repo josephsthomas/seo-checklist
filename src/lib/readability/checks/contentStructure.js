@@ -147,27 +147,23 @@ export function checkContentDepth(parsedData) {
 
 export function checkReadingOrder(parsedData) {
   const headings = parsedData.headings;
-  if (headings.length < 2) {
-    return {
-      id: 'CS-09', category: CATEGORY, title: 'Logical reading order',
-      status: headings.length === 0 ? 'warn' : 'pass', severity: 'medium',
-      details: headings.length === 0 ? 'No headings to assess reading order.' : 'Single heading present.',
-      affectedElements: [], recommendation: ''
-    };
-  }
-  let issues = 0;
-  for (let i = 1; i < headings.length; i++) {
-    if (headings[i].level > headings[i - 1].level + 1) {
-      issues++;
-    }
-  }
+  const semantics = parsedData.semanticElements || {};
+  const hasMain = semantics.main > 0;
+  const hasNav = semantics.nav > 0;
+  const hasHeader = semantics.header > 0;
+
+  // Evaluate overall reading order based on semantic structure (not heading skips, which CS-02 covers)
+  const structureScore = [hasMain, hasNav, hasHeader].filter(Boolean).length;
+
   return {
     id: 'CS-09', category: CATEGORY, title: 'Logical reading order',
-    status: issues === 0 ? 'pass' : 'warn',
+    status: structureScore >= 2 ? 'pass' : structureScore >= 1 ? 'warn' : 'fail',
     severity: 'medium',
-    details: issues === 0 ? 'Content follows a logical reading order.' : `${issues} heading order issue(s) detected.`,
+    details: structureScore >= 2
+      ? 'Page uses semantic landmarks for logical reading order.'
+      : `Page is missing semantic landmarks (main, nav, header). Found ${structureScore}/3.`,
     affectedElements: [],
-    recommendation: issues > 0 ? 'Ensure headings follow a logical top-to-bottom reading order.' : ''
+    recommendation: structureScore < 2 ? 'Use <main>, <nav>, and <header> elements to establish clear reading order.' : ''
   };
 }
 

@@ -33,22 +33,30 @@ export function checkMetaDescription(parsedData) {
 
 export function checkOpenGraphTags(parsedData) {
   const meta = parsedData.metadata;
+  const VALID_OG_TYPES = ['website', 'article', 'profile', 'book', 'music.song', 'music.album', 'video.movie', 'video.episode', 'product'];
   const checks = [
     { key: 'ogTitle', label: 'og:title' },
     { key: 'ogDescription', label: 'og:description' },
     { key: 'ogImage', label: 'og:image' },
-    { key: 'ogUrl', label: 'og:url' }
+    { key: 'ogUrl', label: 'og:url' },
+    { key: 'ogType', label: 'og:type' }
   ];
   const present = checks.filter(c => meta[c.key]);
   const missing = checks.filter(c => !meta[c.key]).map(c => c.label);
+  const warnings = [];
+
+  // Validate og:type value
+  if (meta.ogType && !VALID_OG_TYPES.includes(meta.ogType)) {
+    warnings.push(`og:type "${meta.ogType}" is not a standard Open Graph type.`);
+  }
 
   return {
     id: 'MS-03', category: CATEGORY, title: 'Open Graph tags complete',
-    status: missing.length === 0 ? 'pass' : present.length >= 2 ? 'warn' : 'fail',
+    status: missing.length === 0 && warnings.length === 0 ? 'pass' : present.length >= 3 ? 'warn' : 'fail',
     severity: 'medium',
-    details: `${present.length}/${checks.length} Open Graph tags present.${missing.length > 0 ? ` Missing: ${missing.join(', ')}.` : ''}`,
-    affectedElements: missing,
-    recommendation: missing.length > 0 ? `Add missing OG tags: ${missing.join(', ')}.` : ''
+    details: `${present.length}/${checks.length} Open Graph tags present.${missing.length > 0 ? ` Missing: ${missing.join(', ')}.` : ''}${warnings.length > 0 ? ` ${warnings.join(' ')}` : ''}`,
+    affectedElements: [...missing, ...warnings],
+    recommendation: missing.length > 0 ? `Add missing OG tags: ${missing.join(', ')}.` : warnings.length > 0 ? 'Use a standard og:type value (e.g., website, article).' : ''
   };
 }
 
@@ -57,19 +65,21 @@ export function checkTwitterCardTags(parsedData) {
   const hasCard = !!meta.twitterCard;
   const hasTitle = !!meta.twitterTitle;
   const hasDesc = !!meta.twitterDescription;
-  const count = [hasCard, hasTitle, hasDesc].filter(Boolean).length;
+  const hasImage = !!meta.twitterImage;
+  const count = [hasCard, hasTitle, hasDesc, hasImage].filter(Boolean).length;
   const missing = [];
   if (!hasCard) missing.push('twitter:card');
   if (!hasTitle) missing.push('twitter:title');
   if (!hasDesc) missing.push('twitter:description');
+  if (!hasImage) missing.push('twitter:image');
 
   return {
     id: 'MS-04', category: CATEGORY, title: 'Twitter Card tags present',
-    status: count === 3 ? 'pass' : count >= 1 ? 'warn' : 'fail',
+    status: count === 4 ? 'pass' : count >= 2 ? 'warn' : 'fail',
     severity: 'low',
-    details: `${count}/3 Twitter Card tags present.`,
+    details: `${count}/4 Twitter Card tags present.${missing.length > 0 ? ` Missing: ${missing.join(', ')}.` : ''}`,
     affectedElements: missing,
-    recommendation: count < 3 ? 'Add missing Twitter Card meta tags for better social sharing.' : ''
+    recommendation: count < 4 ? `Add missing Twitter Card meta tags: ${missing.join(', ')}.` : ''
   };
 }
 

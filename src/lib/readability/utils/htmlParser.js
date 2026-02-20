@@ -212,7 +212,19 @@ function extractLists(doc) {
 function extractLinks(doc) {
   return Array.from(doc.querySelectorAll('a[href]')).map(a => {
     const href = a.getAttribute('href') || '';
-    const isInternal = href.startsWith('/') || href.startsWith('#') || href.startsWith('./');
+    const isFragment = href.startsWith('#');
+    const isRelative = href.startsWith('/') || href.startsWith('./');
+    let isInternal = isFragment || isRelative;
+    // Absolute URLs: check if same origin as page
+    if (!isInternal && !isFragment) {
+      try {
+        const linkUrl = new URL(href, doc.baseURI || 'http://localhost');
+        const pageUrl = new URL(doc.baseURI || 'http://localhost');
+        isInternal = linkUrl.hostname === pageUrl.hostname;
+      } catch {
+        // Malformed URL — treat as external
+      }
+    }
     return {
       href,
       text: a.textContent?.trim() || '',
