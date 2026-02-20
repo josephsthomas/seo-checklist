@@ -1,4 +1,4 @@
-import { useState, useCallback, useMemo, useEffect, lazy, Suspense } from 'react';
+import { useState, useCallback, useMemo, useEffect, Suspense } from 'react';
 import {
   ExternalLink, Share2, Download, FileJson, FileText, ChevronDown,
   Zap, ArrowRight, ArrowLeft, ListChecks, Eye, MessageSquare, AlertTriangle, Sliders
@@ -6,10 +6,12 @@ import {
 import { useReadabilityExport } from '../../hooks/useReadabilityExport';
 import { useReadabilityShare } from '../../hooks/useReadabilityShare';
 import { useReadabilityHistory } from '../../hooks/useReadabilityHistory';
+import { lazyWithRetry } from '../../utils/lazyWithRetry';
+import { AIDisclaimerInline } from '../shared/AIDisclaimer';
 import ReadabilityScoreCard from './ReadabilityScoreCard';
-const ReadabilityCategoryChart = lazy(() => import('./ReadabilityCategoryChart'));
+const ReadabilityCategoryChart = lazyWithRetry(() => import('./ReadabilityCategoryChart'), 'ReadabilityCategoryChart');
 import ReadabilityCategoryAccordion from './ReadabilityCategoryAccordion';
-const ReadabilityLLMPreview = lazy(() => import('./ReadabilityLLMPreview'));
+const ReadabilityLLMPreview = lazyWithRetry(() => import('./ReadabilityLLMPreview'), 'ReadabilityLLMPreview');
 import ReadabilityRecommendations from './ReadabilityRecommendations';
 import ReadabilityIssuesTable from './ReadabilityIssuesTable';
 import ReadabilityCrossToolLinks from './ReadabilityCrossToolLinks';
@@ -22,10 +24,10 @@ import { ScoreCardSkeleton, CategoryChartSkeleton, LLMPreviewSkeleton } from './
  * Dashboard tabs
  */
 const TABS = [
-  { id: 'details', label: 'Score Details', icon: ListChecks },
-  { id: 'llm', label: 'How AI Sees Your Content', icon: Eye },
-  { id: 'recommendations', label: 'Recommendations', icon: MessageSquare },
-  { id: 'issues', label: 'Issues', icon: AlertTriangle }
+  { id: 'details', label: 'Score Details', shortLabel: 'Details', icon: ListChecks },
+  { id: 'llm', label: 'How AI Sees Your Content', shortLabel: 'AI View', icon: Eye },
+  { id: 'recommendations', label: 'Recommendations', shortLabel: 'Recs', icon: MessageSquare },
+  { id: 'issues', label: 'Issues', shortLabel: 'Issues', icon: AlertTriangle }
 ];
 
 /**
@@ -53,11 +55,15 @@ export default function ReadabilityDashboard({
 
   // Load trend data
   useEffect(() => {
+    let cancelled = false;
     if (analysis?.sourceUrl) {
       historyHook.getTrendData(analysis.sourceUrl).then(data => {
-        if (data?.length > 0) setTrendData(data);
+        if (!cancelled && data?.length > 0) setTrendData(data);
+      }).catch(() => {
+        // Trend data is non-critical; silently ignore errors
       });
     }
+    return () => { cancelled = true; };
   }, [analysis?.sourceUrl]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Quick wins (top 3 high-impact, low-effort)
@@ -116,15 +122,27 @@ export default function ReadabilityDashboard({
   }, [analysis, exportHook]);
 
   // Share handler
+  const [shareError, setShareError] = useState(null);
   const handleShare = useCallback(async () => {
     if (!analysis?.id) return;
-    const result = await shareHook.createShareLink(analysis.id, { expiryDays: shareExpiry });
-    if (result?.shareUrl) {
-      setGeneratedShareUrl(result.shareUrl);
+    setShareError(null);
+    try {
+      const result = await shareHook.createShareLink(analysis.id, { expiryDays: shareExpiry });
+      if (result?.shareUrl) {
+        setGeneratedShareUrl(result.shareUrl);
+      }
+    } catch {
+      setShareError('Failed to create share link. Please try again.');
     }
   }, [analysis?.id, shareExpiry, shareHook]);
 
-  if (!analysis) return null;
+  if (!analysis) {
+    return (
+      <div className="text-center py-12">
+        <p className="text-sm text-charcoal-500 dark:text-charcoal-400">No analysis data available.</p>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6 motion-safe:animate-fade-in print:space-y-4">
@@ -176,6 +194,8 @@ export default function ReadabilityDashboard({
           <div className="relative">
             <button
               onClick={() => setShowShareDialog(!showShareDialog)}
+              aria-haspopup="dialog"
+              aria-expanded={showShareDialog}
               className="inline-flex items-center gap-1.5 px-3 py-2 text-sm font-medium text-charcoal-700 dark:text-charcoal-300 bg-white dark:bg-charcoal-800 border border-charcoal-300 dark:border-charcoal-600 rounded-lg hover:bg-charcoal-50 dark:hover:bg-charcoal-700 transition-colors
                 focus:outline-none focus:ring-2 focus:ring-teal-500"
             >
@@ -185,7 +205,12 @@ export default function ReadabilityDashboard({
 
             {/* Share dialog dropdown */}
             {showShareDialog && (
-              <div className="absolute right-0 top-full mt-2 w-72 bg-white dark:bg-charcoal-800 border border-charcoal-200 dark:border-charcoal-700 rounded-lg shadow-lg z-20 p-4">
+              <div
+                role="dialog"
+                aria-label="Share this analysis"
+                onKeyDown={(e) => { if (e.key === 'Escape') setShowShareDialog(false); }}
+                className="absolute right-0 top-full mt-2 w-72 bg-white dark:bg-charcoal-800 border border-charcoal-200 dark:border-charcoal-700 rounded-lg shadow-lg z-20 p-4"
+              >
                 <p className="text-sm font-medium text-charcoal-900 dark:text-charcoal-100 mb-3">
                   Share this analysis
                 </p>
@@ -217,6 +242,9 @@ export default function ReadabilityDashboard({
                 >
                   {shareHook.isSharing ? 'Creating...' : 'Create & Copy Link'}
                 </button>
+                {shareError && (
+                  <p className="text-xs text-red-600 dark:text-red-400 mt-2">{shareError}</p>
+                )}
                 {generatedShareUrl && (
                   <div className="mt-3 p-2 bg-charcoal-50 dark:bg-charcoal-700 rounded-lg">
                     <p className="text-xs text-charcoal-500 dark:text-charcoal-400 mb-1">Share link:</p>
@@ -225,6 +253,7 @@ export default function ReadabilityDashboard({
                         type="text"
                         readOnly
                         value={generatedShareUrl}
+                        aria-label="Share link URL"
                         className="flex-1 text-xs px-2 py-1 bg-white dark:bg-charcoal-800 border border-charcoal-300 dark:border-charcoal-600 rounded text-charcoal-700 dark:text-charcoal-200"
                         onFocus={(e) => e.target.select()}
                       />
@@ -239,6 +268,8 @@ export default function ReadabilityDashboard({
           <div className="relative">
             <button
               onClick={() => setShowExportMenu(!showExportMenu)}
+              aria-haspopup="menu"
+              aria-expanded={showExportMenu}
               className="inline-flex items-center gap-1.5 px-3 py-2 text-sm font-medium text-white bg-teal-500 hover:bg-teal-600 rounded-lg transition-colors
                 focus:outline-none focus:ring-2 focus:ring-teal-500 focus:ring-offset-2 dark:focus:ring-offset-charcoal-900"
             >
@@ -308,6 +339,7 @@ export default function ReadabilityDashboard({
             {executiveSummary}
           </p>
         )}
+        <AIDisclaimerInline className="mt-2" />
       </div>
 
       {/* Category Breakdown Chart */}
@@ -334,9 +366,9 @@ export default function ReadabilityDashboard({
         <div className="bg-white dark:bg-charcoal-800 rounded-xl border border-charcoal-200 dark:border-charcoal-700 p-5">
           <div className="flex items-center gap-2 mb-3">
             <Zap className="w-5 h-5 text-amber-500" aria-hidden="true" />
-            <h3 className="text-sm font-semibold text-charcoal-900 dark:text-charcoal-100">
+            <h2 className="text-sm font-semibold text-charcoal-900 dark:text-charcoal-100">
               Quick Wins
-            </h3>
+            </h2>
           </div>
           <div className="space-y-2">
             {quickWins.map((rec, i) => (
@@ -405,7 +437,7 @@ export default function ReadabilityDashboard({
             >
               <Icon className="w-4 h-4" aria-hidden="true" />
               <span className="hidden sm:inline">{tab.label}</span>
-              <span className="sm:hidden">{tab.label.split(' ')[0]}</span>
+              <span className="sm:hidden">{tab.shortLabel}</span>
               {issueCount !== null && issueCount > 0 && (
                 <span className={`text-xs px-1.5 py-0.5 rounded-full
                   ${isActive
@@ -444,9 +476,7 @@ export default function ReadabilityDashboard({
             <div className="bg-white dark:bg-charcoal-800 rounded-xl border border-charcoal-200 dark:border-charcoal-700 p-5 motion-safe:animate-fade-in">
               <ReadabilityWeightConfig
                 weights={null}
-                onChange={(weights) => {
-                  console.log('Custom weights applied:', weights);
-                }}
+                onChange={() => {}}
               />
             </div>
           )}
