@@ -22,6 +22,9 @@ import {
 import { useExportHistory, EXPORT_TYPES } from '../../hooks/useExportHistory';
 import { useProjects } from '../../hooks/useProjects';
 import { exportChecklistProgress } from '../../lib/unifiedExportService';
+import { checklistData } from '../../data/checklistData';
+import { doc, getDoc } from 'firebase/firestore';
+import { db } from '../../lib/firebase';
 import { formatDistanceToNow } from 'date-fns';
 import toast from 'react-hot-toast';
 
@@ -218,6 +221,9 @@ export default function ExportHubPage() {
   const { exports, loading: exportsLoading, logExport, deleteExport } = useExportHistory(10);
   const { projects, loading: projectsLoading } = useProjects();
   const [filter, setFilter] = useState('all');
+  const [projectSearch, setProjectSearch] = useState('');
+  const [showAllProjects, setShowAllProjects] = useState(false);
+  const PROJECT_DISPLAY_LIMIT = 12;
 
   // Filter exports by type
   const filteredExports = useMemo(() => {
@@ -239,9 +245,25 @@ export default function ExportHubPage() {
 
   // Handle project export
   const handleProjectExport = async (project, format) => {
-    // Get project items (would normally fetch from database)
-    const mockItems = []; // This would be actual checklist items
-    exportChecklistProgress(project, mockItems, format);
+    // Fetch completion status for this project from Firestore
+    let completions = {};
+    try {
+      const completionsRef = doc(db, 'checklist_completions', `${project.id}_completions`);
+      const completionsSnap = await getDoc(completionsRef);
+      if (completionsSnap.exists()) {
+        completions = completionsSnap.data();
+      }
+    } catch (err) {
+      console.warn('Failed to fetch checklist completions for export:', err);
+    }
+
+    // Build items from static checklist data with completion status
+    const items = checklistData.map(item => ({
+      ...item,
+      completed: !!completions[item.id]
+    }));
+
+    exportChecklistProgress(project, items, format);
 
     await logExport({
       type: 'checklist',
@@ -258,7 +280,7 @@ export default function ExportHubPage() {
         {/* Header */}
         <div className="mb-8">
           <Link
-            to="/"
+            to="/app"
             className="inline-flex items-center gap-2 text-charcoal-600 hover:text-charcoal-800 mb-4 transition-colors"
           >
             <ArrowLeft className="w-4 h-4" />
@@ -317,15 +339,45 @@ export default function ExportHubPage() {
                   </Link>
                 </div>
               ) : (
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  {projects.slice(0, 6).map(project => (
-                    <ProjectExportCard
-                      key={project.id}
-                      project={project}
-                      onExport={handleProjectExport}
-                    />
-                  ))}
-                </div>
+                <>
+                  {projects.length > PROJECT_DISPLAY_LIMIT && (
+                    <div className="mb-4">
+                      <div className="relative">
+                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-charcoal-400 pointer-events-none" />
+                        <input
+                          type="text"
+                          placeholder="Search projects..."
+                          value={projectSearch}
+                          onChange={(e) => setProjectSearch(e.target.value)}
+                          className="w-full pl-9 pr-4 py-2 bg-white border border-charcoal-100 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-500"
+                        />
+                      </div>
+                    </div>
+                  )}
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {(() => {
+                      const filtered = projectSearch
+                        ? projects.filter(p => p.name?.toLowerCase().includes(projectSearch.toLowerCase()))
+                        : projects;
+                      const displayed = showAllProjects ? filtered : filtered.slice(0, PROJECT_DISPLAY_LIMIT);
+                      return displayed.map(project => (
+                        <ProjectExportCard
+                          key={project.id}
+                          project={project}
+                          onExport={handleProjectExport}
+                        />
+                      ));
+                    })()}
+                  </div>
+                  {!showAllProjects && !projectSearch && projects.length > PROJECT_DISPLAY_LIMIT && (
+                    <button
+                      onClick={() => setShowAllProjects(true)}
+                      className="mt-4 w-full py-2 text-sm text-primary-600 hover:text-primary-700 font-medium bg-primary-50 hover:bg-primary-100 rounded-lg transition-colors"
+                    >
+                      Show all {projects.length} projects
+                    </button>
+                  )}
+                </>
               )}
             </div>
           </div>

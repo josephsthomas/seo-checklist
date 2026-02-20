@@ -43,7 +43,7 @@ export const TOOLS = {
   },
   'meta-generator': {
     id: 'meta-generator',
-    name: 'Meta Data Generator',
+    name: 'Metadata Generator',
     description: 'Generate titles and descriptions',
     path: '/meta-generator',
     icon: 'Tags',
@@ -74,7 +74,7 @@ const RECOMMENDATION_RULES = [
     context: 'audit',
     condition: (data) => data?.hasMissingMeta,
     recommend: ['meta-generator'],
-    reason: 'Your audit shows missing meta data'
+    reason: 'Your audit shows missing metadata'
   },
   {
     context: 'audit',

@@ -8,8 +8,10 @@ import {
   addDoc,
   updateDoc,
   deleteDoc,
+  getDoc,
   doc,
-  serverTimestamp
+  serverTimestamp,
+  arrayUnion
 } from 'firebase/firestore';
 import { db } from '../lib/firebase';
 import { useAuth } from '../contexts/AuthContext';
@@ -78,11 +80,30 @@ export function useComments(projectId, itemId) {
   };
 
   const updateComment = async (commentId, newText) => {
+    if (!currentUser) return;
+
     try {
       const commentRef = doc(db, 'comments', commentId);
+
+      // Verify ownership before updating
+      const commentSnap = await getDoc(commentRef);
+      if (!commentSnap.exists()) {
+        toast.error('Comment not found');
+        return;
+      }
+      const commentData = commentSnap.data();
+      if (commentData.userId !== currentUser.uid) {
+        toast.error('You can only edit your own comments');
+        return;
+      }
+
       await updateDoc(commentRef, {
         text: newText,
-        updatedAt: serverTimestamp()
+        updatedAt: serverTimestamp(),
+        editHistory: arrayUnion({
+          previousText: commentData.text,
+          editedAt: new Date().toISOString()
+        })
       });
       toast.success('Comment updated');
     } catch (error) {
@@ -92,8 +113,23 @@ export function useComments(projectId, itemId) {
   };
 
   const deleteComment = async (commentId) => {
+    if (!currentUser) return;
+
     try {
-      await deleteDoc(doc(db, 'comments', commentId));
+      const commentRef = doc(db, 'comments', commentId);
+
+      // Verify ownership before deleting
+      const commentSnap = await getDoc(commentRef);
+      if (!commentSnap.exists()) {
+        toast.error('Comment not found');
+        return;
+      }
+      if (commentSnap.data().userId !== currentUser.uid) {
+        toast.error('You can only delete your own comments');
+        return;
+      }
+
+      await deleteDoc(commentRef);
       toast.success('Comment deleted');
     } catch (error) {
       toast.error('Failed to delete comment');
