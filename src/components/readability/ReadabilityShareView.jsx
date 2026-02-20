@@ -92,6 +92,22 @@ export default function ReadabilityShareView() {
     }
   }, [token, loadSharedAnalysis]);
 
+  // PDF export — uses full report generation from useReadabilityExport
+  const handleExportPDF = async () => {
+    if (!sharedAnalysis) return;
+    setExportError(null);
+    try {
+      await exportPDF(sharedAnalysis);
+    } catch (err) {
+      console.error('PDF export failed:', err);
+      setExportError('PDF export failed. Please try again.');
+    }
+  };
+
+  const data = sharedAnalysis;
+  const grade = data ? getGradeFromScore(data.overallScore ?? 0) : null;
+  const colors = grade ? GRADE_COLORS[grade.color] : null;
+
   // Set document meta tags for SEO on public page
   useEffect(() => {
     if (data) {
@@ -112,22 +128,6 @@ export default function ReadabilityShareView() {
       setMeta('twitter:description', desc);
     }
   }, [data]);
-
-  // PDF export — uses full report generation from useReadabilityExport
-  const handleExportPDF = async () => {
-    if (!sharedAnalysis) return;
-    setExportError(null);
-    try {
-      await exportPDF(sharedAnalysis);
-    } catch (err) {
-      console.error('PDF export failed:', err);
-      setExportError('PDF export failed. Please try again.');
-    }
-  };
-
-  const data = sharedAnalysis;
-  const grade = data ? getGradeFromScore(data.overallScore ?? 0) : null;
-  const colors = grade ? GRADE_COLORS[grade.color] : null;
 
   // Wrapper class handles dark mode via prefers-color-scheme
   const wrapperClass = isDark ? 'dark' : '';
