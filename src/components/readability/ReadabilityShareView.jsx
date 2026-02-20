@@ -25,6 +25,7 @@ import {
 } from 'lucide-react';
 import { useReadabilityShare } from '../../hooks/useReadabilityShare';
 import { useReadabilityExport } from '../../hooks/useReadabilityExport';
+import { AIDisclaimerInline } from '../shared/AIDisclaimer';
 
 const CATEGORY_META = {
   contentStructure: { label: 'Content Structure', icon: Layers },
@@ -72,6 +73,8 @@ export default function ReadabilityShareView() {
   const { loadSharedAnalysis, sharedAnalysis, shareLoading, shareError } = useReadabilityShare();
   const { exportPDF, isExporting: pdfExporting } = useReadabilityExport();
 
+  const [exportError, setExportError] = useState(null);
+
   // Detect system color scheme for standalone page
   const [isDark, setIsDark] = useState(false);
   useEffect(() => {
@@ -89,13 +92,36 @@ export default function ReadabilityShareView() {
     }
   }, [token, loadSharedAnalysis]);
 
+  // Set document meta tags for SEO on public page
+  useEffect(() => {
+    if (data) {
+      document.title = `AI Readability Report${data.sourceUrl ? ` — ${data.sourceUrl}` : ''} | Content Strategy Portal`;
+      const setMeta = (name, content) => {
+        let tag = document.querySelector(`meta[property="${name}"], meta[name="${name}"]`);
+        if (!tag) { tag = document.createElement('meta'); tag.setAttribute(name.startsWith('og:') ? 'property' : 'name', name); document.head.appendChild(tag); }
+        tag.setAttribute('content', content);
+      };
+      const title = `AI Readability Report — Score: ${Math.round(data.overallScore ?? 0)}/100`;
+      const desc = data.gradeSummary || `AI readability analysis with an overall score of ${Math.round(data.overallScore ?? 0)}/100.`;
+      setMeta('description', desc);
+      setMeta('og:title', title);
+      setMeta('og:description', desc);
+      setMeta('og:type', 'article');
+      setMeta('twitter:card', 'summary');
+      setMeta('twitter:title', title);
+      setMeta('twitter:description', desc);
+    }
+  }, [data]);
+
   // PDF export — uses full report generation from useReadabilityExport
   const handleExportPDF = async () => {
     if (!sharedAnalysis) return;
+    setExportError(null);
     try {
       await exportPDF(sharedAnalysis);
     } catch (err) {
       console.error('PDF export failed:', err);
+      setExportError('PDF export failed. Please try again.');
     }
   };
 
@@ -305,6 +331,7 @@ export default function ReadabilityShareView() {
                       </tbody>
                     </table>
                   </div>
+                  <AIDisclaimerInline toolName="AI Readability Checker" className="mt-3" />
                 </div>
               )}
 
@@ -377,6 +404,9 @@ export default function ReadabilityShareView() {
                   )}
                   Download PDF Report
                 </button>
+                {exportError && (
+                  <p className="text-sm text-red-600 dark:text-red-400">{exportError}</p>
+                )}
                 <Link
                   to="/app/readability"
                   className="inline-flex items-center gap-2 px-5 py-2.5 border border-gray-200 dark:border-charcoal-600 bg-white dark:bg-charcoal-800 text-gray-700 dark:text-gray-300 rounded-lg font-medium text-sm hover:bg-gray-50 dark:hover:bg-charcoal-750 transition-colors"

@@ -17,11 +17,12 @@ export default defineConfig({
           'vendor-jspdf': ['jspdf', 'jspdf-autotable'],
           'vendor-firebase': ['firebase/app', 'firebase/auth', 'firebase/firestore', 'firebase/storage'],
           'vendor-react': ['react', 'react-dom', 'react-router-dom'],
-          'vendor-readability': ['htmlparser2', 'franc', 'jszip']
+          'vendor-readability': ['htmlparser2', 'franc'],
+          'vendor-jszip': ['jszip']
         }
       }
     },
-    // Increase warning limit since we have lazy loading
-    chunkSizeWarningLimit: 600
+    sourcemap: 'hidden',
+    chunkSizeWarningLimit: 500
   }
 })

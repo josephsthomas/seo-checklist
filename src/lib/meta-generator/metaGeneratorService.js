@@ -120,7 +120,7 @@ async function extractFromPdf(file) {
   const pdfjsLib = await import('pdfjs-dist');
 
   // Set worker source
-  pdfjsLib.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjsLib.version}/pdf.worker.min.js`;
+  pdfjsLib.GlobalWorkerOptions.workerSrc = `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjsLib.version}/pdf.worker.min.js`;
 
   const arrayBuffer = await file.arrayBuffer();
   const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
@@ -206,8 +206,13 @@ export async function generateMetadata(extractedContent, options = {}) {
   const { text, headings = [], existingMeta = {} } = extractedContent;
   const { targetUrl, brandName, industry, primaryKeyword, secondaryKeywords, tone = 'Professional' } = options;
 
-  // Truncate text if too long (Claude has token limits)
-  const truncatedText = text.slice(0, 15000);
+  // Truncate text at sentence boundary if too long
+  let truncatedText = text;
+  if (text.length > 15000) {
+    truncatedText = text.slice(0, 15000);
+    const lastSentence = truncatedText.lastIndexOf('. ');
+    if (lastSentence > 10000) truncatedText = truncatedText.slice(0, lastSentence + 1);
+  }
 
   const prompt = buildPrompt({
     text: truncatedText,
@@ -357,11 +362,13 @@ function parseMetadataResponse(content, extractedContent, options) {
     if (jsonMatch) {
       const parsed = JSON.parse(jsonMatch[0]);
 
+      const metaTitle = (parsed.meta_title || '').slice(0, 70);
+      const metaDescription = (parsed.meta_description || '').slice(0, 170);
       return {
-        metaTitle: parsed.meta_title || '',
-        metaTitleLength: parsed.meta_title?.length || 0,
-        metaDescription: parsed.meta_description || '',
-        metaDescriptionLength: parsed.meta_description?.length || 0,
+        metaTitle,
+        metaTitleLength: metaTitle.length,
+        metaDescription,
+        metaDescriptionLength: metaDescription.length,
         ogTitle: parsed.og_title || parsed.meta_title || '',
         ogDescription: parsed.og_description || parsed.meta_description || '',
         ogType: parsed.og_type || 'website',
@@ -385,6 +392,16 @@ function parseMetadataResponse(content, extractedContent, options) {
 }
 
 /**
+ * Truncate string at word boundary
+ */
+function truncateAtWord(str, max) {
+  if (!str || str.length <= max) return str || '';
+  const truncated = str.slice(0, max);
+  const lastSpace = truncated.lastIndexOf(' ');
+  return lastSpace > max * 0.6 ? truncated.slice(0, lastSpace) : truncated;
+}
+
+/**
  * Get static metadata suggestion when API is unavailable
  */
 function getStaticMetadataSuggestion(extractedContent, options = {}) {
@@ -396,11 +413,11 @@ function getStaticMetadataSuggestion(extractedContent, options = {}) {
   const firstSentence = text.split(/[.!?]/)[0]?.trim() || '';
 
   // Generate basic title
-  let metaTitle = firstHeading || firstSentence.slice(0, 50);
+  let metaTitle = firstHeading || truncateAtWord(firstSentence, 50);
   if (brandName && metaTitle.length < 45) {
     metaTitle += ` | ${brandName}`;
   }
-  metaTitle = metaTitle.slice(0, 60);
+  metaTitle = truncateAtWord(metaTitle, 60);
 
   // Generate basic description
   let metaDescription = firstSentence.slice(0, 155);
@@ -448,10 +465,6 @@ export function generateHtmlCode(metadata, options = {}) {
   html += `<meta name="title" content="${escapeHtml(metadata.metaTitle)}">\n`;
   html += `<meta name="description" content="${escapeHtml(metadata.metaDescription)}">\n`;
 
-  if (metadata.focusKeywords?.length > 0) {
-    html += `<meta name="keywords" content="${escapeHtml(metadata.focusKeywords.join(', '))}">\n`;
-  }
-
   if (metadata.robots) {
     html += `<meta name="robots" content="${metadata.robots}">\n`;
   }
@@ -470,6 +483,9 @@ export function generateHtmlCode(metadata, options = {}) {
   }
   html += `<meta property="og:title" content="${escapeHtml(metadata.ogTitle)}">\n`;
   html += `<meta property="og:description" content="${escapeHtml(metadata.ogDescription)}">\n`;
+  if (metadata.ogImage) {
+    html += `<meta property="og:image" content="${escapeHtml(metadata.ogImage)}">\n`;
+  }
 
   html += '\n';
   if (includeComments) {
@@ -481,6 +497,9 @@ export function generateHtmlCode(metadata, options = {}) {
   }
   html += `<meta name="twitter:title" content="${escapeHtml(metadata.twitterTitle)}">\n`;
   html += `<meta name="twitter:description" content="${escapeHtml(metadata.twitterDescription)}">\n`;
+  if (metadata.twitterImage) {
+    html += `<meta name="twitter:image" content="${escapeHtml(metadata.twitterImage)}">\n`;
+  }
 
   return html;
 }
