@@ -28,7 +28,7 @@ const CROSS_TOOL_LINKS = [
     label: 'Generate Schema Markup',
     description: 'Create structured data markup based on detected content type.',
     icon: Code,
-    path: '/app/schema',
+    path: '/app/schema-generator',
     paramKey: 'url',
     extraParams: (analysis) => {
       const types = analysis?.checkResults;

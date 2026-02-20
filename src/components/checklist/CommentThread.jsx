@@ -1,7 +1,8 @@
 import { useState } from 'react';
-import { Send, Trash2, Edit2, User } from 'lucide-react';
+import { Send, User } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 import { format } from 'date-fns';
+import toast from 'react-hot-toast';
 
 export default function CommentThread({ comments, loading, onAddComment }) {
   const [newComment, setNewComment] = useState('');
@@ -22,6 +23,7 @@ export default function CommentThread({ comments, loading, onAddComment }) {
       setIsInternal(false);
     } catch (error) {
       console.error('Error adding comment:', error);
+      toast.error('Failed to add comment. Please try again.');
     } finally {
       setSubmitting(false);
     }
@@ -136,22 +138,7 @@ export default function CommentThread({ comments, loading, onAddComment }) {
                         </span>
                       )}
                     </div>
-                    {comment.userId === currentUser?.uid && (
-                      <div className="flex gap-1">
-                        <button
-                          className="p-1 text-charcoal-400 hover:text-charcoal-600"
-                          aria-label="Edit comment"
-                        >
-                          <Edit2 className="w-4 h-4" aria-hidden="true" />
-                        </button>
-                        <button
-                          className="p-1 text-charcoal-400 hover:text-red-600"
-                          aria-label="Delete comment"
-                        >
-                          <Trash2 className="w-4 h-4" aria-hidden="true" />
-                        </button>
-                      </div>
-                    )}
+                    {/* Edit/Delete buttons hidden until handlers are implemented */}
                   </div>
 
                   <p className="text-charcoal-700 text-sm whitespace-pre-wrap">

@@ -170,12 +170,12 @@ export default function NotificationPanel() {
               <div className="p-3 border-t bg-charcoal-50 text-center">
                 <button
                   onClick={() => {
-                    navigate('/notifications');
+                    markAllAsRead();
                     setIsOpen(false);
                   }}
                   className="text-sm text-primary-600 hover:text-primary-700 font-medium"
                 >
-                  View all notifications
+                  Dismiss all notifications
                 </button>
               </div>
             )}

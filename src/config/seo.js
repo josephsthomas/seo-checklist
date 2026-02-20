@@ -76,7 +76,7 @@ export const pageSEO = {
 
   'features/schema-generator': {
     title: 'Schema Generator - JSON-LD Structured Data Markup | CSP',
-    description: 'Generate valid JSON-LD structured data for 15+ schema types. Product, Article, FAQ, HowTo, Organization and more. Preview rich snippets before implementation.',
+    description: 'Generate valid JSON-LD structured data for 40+ schema types. Product, Article, FAQ, HowTo, Organization and more. Preview rich snippets before implementation.',
     canonical: '/features/schema-generator',
     keywords: 'schema markup generator, JSON-LD generator, structured data, rich snippets'
   },
@@ -248,7 +248,7 @@ export const softwareSchemas = {
     '@context': 'https://schema.org',
     '@type': 'SoftwareApplication',
     name: 'Schema Markup Generator',
-    description: 'Generate valid JSON-LD structured data for 15+ schema types.',
+    description: 'Generate valid JSON-LD structured data for 40+ schema types.',
     applicationCategory: 'BusinessApplication',
     operatingSystem: 'Web',
     offers: {
@@ -257,7 +257,7 @@ export const softwareSchemas = {
       priceCurrency: 'USD'
     },
     featureList: [
-      '15+ schema types',
+      '40+ schema types',
       'JSON-LD format',
       'Real-time validation',
       'Rich snippet preview',
