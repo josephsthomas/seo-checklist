@@ -1,7 +1,7 @@
 {
   "roles_completed": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11],
   "current_role": null,
-  "total_defects": 492,
+  "total_defects": 524,
   "role_defect_counts": {
     "Lead React Developer": 43,
     "Visual Designer": 55,
@@ -9,8 +9,8 @@
     "Content Designer": 43,
     "Accessibility Strategist": 47,
     "SEO Strategist": 53,
-    "Generative AI Strategist": 32,
-    "SVP Project Management": 31,
+    "Generative AI Strategist": 48,
+    "SVP Project Management": 47,
     "SVP Integrated Production": 51,
     "SVP User Experience": 48,
     "SVP Content Strategy": 45
