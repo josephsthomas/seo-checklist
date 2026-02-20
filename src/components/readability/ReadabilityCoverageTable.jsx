@@ -33,11 +33,11 @@ function formatScore(value) {
 
 const COLUMNS = [
   { key: 'llm', label: 'AI Model', sortable: true, align: 'left' },
-  { key: 'contentCoverage', label: 'Content %', sortable: true, align: 'center' },
-  { key: 'headingsCoverage', label: 'Headings %', sortable: true, align: 'center' },
-  { key: 'entitiesCoverage', label: 'Entities %', sortable: true, align: 'center' },
+  { key: 'contentCoverage', label: 'Content Coverage', sortable: true, align: 'center' },
+  { key: 'headingsCoverage', label: 'Headings Coverage', sortable: true, align: 'center' },
+  { key: 'entitiesCoverage', label: 'Named Entities', sortable: true, align: 'center', title: 'Named entity recognition coverage (people, places, organizations)' },
   { key: 'usefulness', label: 'Usefulness', sortable: true, align: 'center' },
-  { key: 'processingTime', label: 'Time', sortable: true, align: 'center' },
+  { key: 'processingTime', label: 'Response Time', sortable: true, align: 'center' },
 ];
 
 export default function ReadabilityCoverageTable({ data }) {
@@ -55,7 +55,7 @@ export default function ReadabilityCoverageTable({ data }) {
 
   if (!data || data.length === 0) return null;
 
-  const sortedData = [...data].sort((a, b) => {
+  const sortedData = React.useMemo(() => [...data].sort((a, b) => {
     if (!sortCol) return 0;
     const valA = a[sortCol];
     const valB = b[sortCol];
@@ -65,7 +65,7 @@ export default function ReadabilityCoverageTable({ data }) {
       return sortDir === 'asc' ? valA.localeCompare(valB) : valB.localeCompare(valA);
     }
     return sortDir === 'asc' ? valA - valB : valB - valA;
-  });
+  }), [data, sortCol, sortDir]);
 
   return (
     <div className="bg-white dark:bg-charcoal-800 rounded-xl border border-gray-200 dark:border-charcoal-700 overflow-hidden">
@@ -77,7 +77,7 @@ export default function ReadabilityCoverageTable({ data }) {
       </div>
 
       <div className="overflow-x-auto">
-        <table className="w-full" role="table">
+        <table className="w-full" role="table" aria-label="AI model coverage comparison">
           <thead>
             <tr className="bg-gray-50 dark:bg-charcoal-850">
               {COLUMNS.map((col) => (
@@ -87,7 +87,11 @@ export default function ReadabilityCoverageTable({ data }) {
                   className={`px-4 py-3 text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400 ${
                     col.align === 'center' ? 'text-center' : 'text-left'
                   } ${col.sortable ? 'cursor-pointer select-none' : ''}`}
+                  tabIndex={col.sortable ? 0 : undefined}
+                  role={col.sortable ? 'button' : undefined}
+                  title={col.title || undefined}
                   onClick={col.sortable ? () => handleSort(col.key) : undefined}
+                  onKeyDown={col.sortable ? (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); handleSort(col.key); } } : undefined}
                   aria-sort={
                     sortCol === col.key
                       ? sortDir === 'asc'

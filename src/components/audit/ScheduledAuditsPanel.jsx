@@ -251,6 +251,18 @@ export default function ScheduledAuditsPanel() {
     }, 3000);
   };
 
+  // Score color class maps (static for Tailwind JIT)
+  const SCORE_CLASSES = {
+    emerald: { bg: 'bg-emerald-100 dark:bg-emerald-900/30', text: 'text-emerald-600 dark:text-emerald-400', bar: 'bg-emerald-500' },
+    amber: { bg: 'bg-amber-100 dark:bg-amber-900/30', text: 'text-amber-600 dark:text-amber-400', bar: 'bg-amber-500' },
+    red: { bg: 'bg-red-100 dark:bg-red-900/30', text: 'text-red-600 dark:text-red-400', bar: 'bg-red-500' }
+  };
+  const TREND_CLASSES = {
+    emerald: { bg: 'bg-emerald-100 dark:bg-emerald-900/50', text: 'text-emerald-600' },
+    red: { bg: 'bg-red-100 dark:bg-red-900/50', text: 'text-red-600' },
+    charcoal: { bg: 'bg-charcoal-100 dark:bg-charcoal-900/50', text: 'text-charcoal-600' }
+  };
+
   // Get score color
   const getScoreColor = (score) => {
     if (score >= 80) return 'emerald';
@@ -360,7 +372,7 @@ export default function ScheduledAuditsPanel() {
               <p className="text-2xl font-bold text-charcoal-900 dark:text-white">
                 {audits.reduce((sum, a) => sum + (a.lastRun?.pagesScanned || 0), 0)}
               </p>
-              <p className="text-sm text-charcoal-500 dark:text-charcoal-400">Pages Scanned</p>
+              <p className="text-sm text-charcoal-500 dark:text-charcoal-400">Pages Audited</p>
             </div>
           </div>
         </div>
@@ -416,15 +428,15 @@ export default function ScheduledAuditsPanel() {
                 {/* Main row */}
                 <div className="p-4 flex items-center gap-4">
                   {/* Score badge */}
-                  <div className={`relative w-16 h-16 rounded-xl bg-${scoreColor}-100 dark:bg-${scoreColor}-900/30 flex items-center justify-center`}>
-                    <span className={`text-2xl font-bold text-${scoreColor}-600 dark:text-${scoreColor}-400`}>
+                  <div className={`relative w-16 h-16 rounded-xl ${SCORE_CLASSES[scoreColor].bg} flex items-center justify-center`}>
+                    <span className={`text-2xl font-bold ${SCORE_CLASSES[scoreColor].text}`}>
                       {audit.lastRun?.score || '–'}
                     </span>
                     {trend && (
-                      <div className={`absolute -top-1 -right-1 p-1 rounded-full bg-${trend.color}-100 dark:bg-${trend.color}-900/50`}>
-                        {trend.direction === 'up' && <TrendingUp className={`w-3 h-3 text-${trend.color}-600`} />}
-                        {trend.direction === 'down' && <TrendingDown className={`w-3 h-3 text-${trend.color}-600`} />}
-                        {trend.direction === 'same' && <Minus className={`w-3 h-3 text-${trend.color}-600`} />}
+                      <div className={`absolute -top-1 -right-1 p-1 rounded-full ${TREND_CLASSES[trend.color].bg}`}>
+                        {trend.direction === 'up' && <TrendingUp className={`w-3 h-3 ${TREND_CLASSES[trend.color].text}`} />}
+                        {trend.direction === 'down' && <TrendingDown className={`w-3 h-3 ${TREND_CLASSES[trend.color].text}`} />}
+                        {trend.direction === 'same' && <Minus className={`w-3 h-3 ${TREND_CLASSES[trend.color].text}`} />}
                       </div>
                     )}
                   </div>
@@ -483,6 +495,7 @@ export default function ScheduledAuditsPanel() {
                       </div>
                     </div>
                   )}
+
 
                   {/* Actions */}
                   <div className="flex items-center gap-2">
@@ -638,7 +651,7 @@ export default function ScheduledAuditsPanel() {
                                 className="flex-1 flex flex-col items-center gap-1"
                               >
                                 <div
-                                  className={`w-full bg-${color}-500 rounded-t`}
+                                  className={`w-full ${SCORE_CLASSES[color].bar} rounded-t`}
                                   style={{ height: `${height}%` }}
                                   title={`${format(entry.date, 'MMM d')}: ${entry.score}`}
                                 />
@@ -840,6 +853,7 @@ function AuditScheduleFormModal({ audit, onSave, onClose }) {
             <button
               onClick={onClose}
               className="p-2 text-charcoal-400 hover:text-charcoal-600 hover:bg-charcoal-100 dark:hover:bg-charcoal-700 rounded-lg"
+              aria-label="Close audit schedule form"
             >
               <X className="w-5 h-5" />
             </button>
@@ -1305,14 +1319,15 @@ function AuditHistoryModal({ audit, onClose }) {
           ) : (
             <div className="space-y-3">
               {audit.history.map((entry, idx) => {
-                const scoreColor = entry.score >= 80 ? 'emerald' : entry.score >= 60 ? 'amber' : 'red';
+                const scoreColorKey = entry.score >= 80 ? 'emerald' : entry.score >= 60 ? 'amber' : 'red';
+                const scoreClasses = { emerald: { bg: 'bg-emerald-100 dark:bg-emerald-900/30', text: 'text-emerald-600 dark:text-emerald-400' }, amber: { bg: 'bg-amber-100 dark:bg-amber-900/30', text: 'text-amber-600 dark:text-amber-400' }, red: { bg: 'bg-red-100 dark:bg-red-900/30', text: 'text-red-600 dark:text-red-400' } };
                 const prevEntry = audit.history[idx + 1];
                 const scoreDiff = prevEntry ? entry.score - prevEntry.score : 0;
 
                 return (
                   <div key={idx} className="flex items-center gap-4 p-4 bg-charcoal-50 dark:bg-charcoal-700/50 rounded-xl">
-                    <div className={`w-14 h-14 rounded-xl bg-${scoreColor}-100 dark:bg-${scoreColor}-900/30 flex items-center justify-center`}>
-                      <span className={`text-xl font-bold text-${scoreColor}-600 dark:text-${scoreColor}-400`}>
+                    <div className={`w-14 h-14 rounded-xl ${scoreClasses[scoreColorKey].bg} flex items-center justify-center`}>
+                      <span className={`text-xl font-bold ${scoreClasses[scoreColorKey].text}`}>
                         {entry.score}
                       </span>
                     </div>
