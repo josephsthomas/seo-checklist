@@ -42,6 +42,9 @@ export function useAssignments(projectId) {
   const assignTask = async (itemId, userIds, dueDate = null, estimatedHours = null, startDate = null) => {
     if (!projectId || !currentUser) return;
 
+    // Save previous state for rollback
+    const previousAssignments = { ...assignments };
+
     try {
       const docRef = doc(db, 'checklist_assignments', `${projectId}_assignments`);
       const assignmentData = {
@@ -98,6 +101,8 @@ export function useAssignments(projectId) {
 
       toast.success('Task assigned successfully');
     } catch (error) {
+      // Rollback optimistic update
+      setAssignments(previousAssignments);
       console.error('Error assigning task:', error);
       toast.error('Failed to assign task');
       throw error;
