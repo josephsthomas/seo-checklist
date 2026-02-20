@@ -1,0 +1,161 @@
+[
+  {
+    "bug_id": "R01-001",
+    "severity": "MEDIUM",
+    "category": "Memory Leak",
+    "component": "FixSuggestionsPanel",
+    "file_line": "src/components/accessibility/FixSuggestionsPanel.jsx:740",
+    "description": "setTimeout in handleCopy never cleared on unmount. If component unmounts before 2s timer completes, setCopiedSection will be called on unmounted component.",
+    "steps": [
+      "1. Click copy button in FixSuggestionsPanel",
+      "2. Close the panel within 2 seconds",
+      "3. Observe console warning about state update on unmounted component"
+    ],
+    "expected": "Timer should be cleaned up when component unmounts via useEffect cleanup or useRef.",
+    "actual": "setTimeout at line 740 is never cleared, causing potential state update on unmounted component.",
+    "impact": "React warning about state update on unmounted component; potential memory leak in rapid open/close scenarios."
+  },
+  {
+    "bug_id": "R01-002",
+    "severity": "MEDIUM",
+    "category": "React Anti-Pattern",
+    "component": "VPATReportGenerator",
+    "file_line": "src/components/accessibility/VPATReportGenerator.jsx:99",
+    "description": "Unused state variables _showPreview and _setShowPreview declared with eslint-disable. The Preview button at line 427-429 has no onClick handler, making it non-functional.",
+    "steps": [
+      "1. Open VPATReportGenerator",
+      "2. Click the Preview button in the footer"
+    ],
+    "expected": "Preview button should toggle a preview view of the VPAT report.",
+    "actual": "Preview button has no onClick handler and the state variables for preview are unused (prefixed with underscores).",
+    "impact": "Dead code and non-functional UI element; users cannot preview their VPAT report before exporting."
+  },
+  {
+    "bug_id": "R01-003",
+    "severity": "HIGH",
+    "category": "Missing Error Handling",
+    "component": "AccessibilityDashboard",
+    "file_line": "src/components/accessibility/dashboard/AccessibilityDashboard.jsx:536",
+    "description": "new URL(page.address) at line 536 will throw if page.address is not a valid URL, crashing the component inside a render path without try-catch.",
+    "steps": [
+      "1. Process a crawl export containing relative URLs or malformed addresses",
+      "2. Navigate to the Overview tab",
+      "3. Component crashes with TypeError"
+    ],
+    "expected": "Invalid URLs should be handled gracefully with a fallback display.",
+    "actual": "Unhandled URL constructor throws TypeError, crashing the entire dashboard via React error boundary.",
+    "impact": "Complete dashboard crash if any page address in worstPages is not a valid absolute URL."
+  },
+  {
+    "bug_id": "R01-004",
+    "severity": "LOW",
+    "category": "Performance Bug",
+    "component": "AccessibilityDashboard",
+    "file_line": "src/components/accessibility/dashboard/AccessibilityDashboard.jsx:146",
+    "description": "handleExportPDF, handleExportExcel, and handleExportVPAT functions are not wrapped in useCallback despite referencing stable dependencies. These get recreated on every render.",
+    "steps": [
+      "1. Open AccessibilityDashboard",
+      "2. Interact with any filter or state change",
+      "3. All export handler functions are recreated"
+    ],
+    "expected": "Export handlers should be memoized with useCallback to prevent unnecessary recreations.",
+    "actual": "Functions are recreated on every render, though impact is minimal since they are not passed as props to memoized children.",
+    "impact": "Minor performance concern; unnecessary function recreations on each render cycle."
+  },
+  {
+    "bug_id": "R01-005",
+    "severity": "HIGH",
+    "category": "State Bug",
+    "component": "AuditLogViewer",
+    "file_line": "src/components/admin/AuditLogViewer.jsx:261",
+    "description": "Refresh button sets loading to true but never triggers data re-fetch. The useEffect at line 93 depends only on dateRange, but the Refresh button only calls setLoading(true) without changing dateRange.",
+    "steps": [
+      "1. Open AuditLogViewer",
+      "2. Click the Refresh button",
+      "3. Observe that loading spinner appears but never completes"
+    ],
+    "expected": "Refresh button should re-trigger the data fetch and eventually set loading to false.",
+    "actual": "Loading state is set to true but fetchLogs is never re-invoked, leaving the component in a permanent loading state.",
+    "impact": "Users clicking Refresh will see an infinite loading spinner with no way to recover except page reload."
+  },
+  {
+    "bug_id": "R01-006",
+    "severity": "MEDIUM",
+    "category": "React Anti-Pattern",
+    "component": "AuditLogViewer",
+    "file_line": "src/components/admin/AuditLogViewer.jsx:428",
+    "description": "Dynamic Tailwind CSS class names constructed via string interpolation (e.g., bg-${color}-100) will not work. Tailwind purges classes at build time and cannot detect dynamically composed class names.",
+    "steps": [
+      "1. Open AuditLogViewer with action log entries",
+      "2. Observe that action badges have no background colors applied"
+    ],
+    "expected": "Action type badges should display appropriate colors (emerald for Create, blue for Read, etc.).",
+    "actual": "Dynamic class interpolation produces class names that are purged by Tailwind CSS at build time, resulting in unstyled elements.",
+    "impact": "Visual degradation; action type badges will have no background or text colors in production builds."
+  },
+  {
+    "bug_id": "R01-007",
+    "severity": "HIGH",
+    "category": "State Bug",
+    "component": "UsageAnalyticsDashboard",
+    "file_line": "src/components/admin/UsageAnalyticsDashboard.jsx:259",
+    "description": "Same Refresh button bug as AuditLogViewer: setLoading(true) without triggering re-fetch. The useEffect depends on [dateRange, dateRangeConfig], but clicking Refresh only sets loading state without changing dependencies.",
+    "steps": [
+      "1. Open UsageAnalyticsDashboard",
+      "2. Click the Refresh button",
+      "3. Component stays in loading state indefinitely"
+    ],
+    "expected": "Refresh should re-trigger the fetchStats function.",
+    "actual": "Loading state is set to true but fetchStats is never re-invoked. Component remains in permanent loading state.",
+    "impact": "Permanent loading spinner after clicking Refresh; requires page reload to recover."
+  },
+  {
+    "bug_id": "R01-008",
+    "severity": "CRITICAL",
+    "category": "Race Condition",
+    "component": "BatchAuditPanel",
+    "file_line": "src/components/audit/BatchAuditPanel.jsx:314",
+    "description": "Stale closure bug in runBatchAudit: the for-loop checks 'if (!isRunning) break;' at line 314, but isRunning is captured by closure at the time runBatchAudit starts. It will always be the initial value (true, set at line 309), so the pause functionality (pauseAudit at line 385) will never actually stop the loop.",
+    "steps": [
+      "1. Add multiple URLs to batch audit",
+      "2. Click Start Batch Audit",
+      "3. Click Pause while audit is running",
+      "4. Observe that the audit continues despite isRunning being set to false"
+    ],
+    "expected": "Clicking Pause should stop the batch audit loop at the next iteration.",
+    "actual": "The isRunning check inside the async for-loop references the stale closure value, so the loop never breaks. Pause button appears to work (state changes) but the loop continues.",
+    "impact": "Pause functionality is completely broken. Users cannot stop a running batch audit. The loop will process all URLs regardless of user action."
+  },
+  {
+    "bug_id": "R01-009",
+    "severity": "MEDIUM",
+    "category": "React Anti-Pattern",
+    "component": "ScheduledAuditsPanel",
+    "file_line": "src/components/audit/ScheduledAuditsPanel.jsx:419",
+    "description": "Multiple dynamic Tailwind CSS class names constructed via string interpolation throughout the component (e.g., bg-${scoreColor}-100, text-${scoreColor}-600, bg-${trend.color}-100). These will be purged by Tailwind at build time.",
+    "steps": [
+      "1. Create a scheduled audit with history",
+      "2. View the audit score badge and trend indicator",
+      "3. Observe missing background and text colors"
+    ],
+    "expected": "Score badges and trend indicators should show proper emerald/amber/red colors.",
+    "actual": "Dynamic class construction produces class names that Tailwind cannot detect during build-time purge, resulting in unstyled elements.",
+    "impact": "Score badges, trend indicators, and history chart bars will have no colors in production. Widespread visual degradation."
+  },
+  {
+    "bug_id": "R01-010",
+    "severity": "MEDIUM",
+    "category": "Hook Misuse",
+    "component": "ScheduledAuditsPanel",
+    "file_line": "src/components/audit/ScheduledAuditsPanel.jsx:790",
+    "description": "The useEffect for checking schedule conflicts has eslint-disable-next-line for exhaustive deps. checkConflicts function is defined inside the component body and not memoized, but is excluded from the dependency array. More importantly, checkConflicts could reference stale formData values.",
+    "steps": [
+      "1. Open AuditScheduleFormModal",
+      "2. Change the time to a peak hours value",
+      "3. Conflicts may not update correctly due to stale closure"
+    ],
+    "expected": "checkConflicts should be either memoized with useCallback or included as a dependency.",
+    "actual": "The eslint-disable hides the dependency warning. checkConflicts references formData but is not listed as a dependency, potentially showing stale conflict data.",
+    "impact": "Schedule conflict warnings may not appear or disappear correctly when form data changes."
+  }
+]
