@@ -2,9 +2,9 @@
   "completed": "2026-02-20T23:12:00",
   "branch": "claude/fix-qa-defects-jpa0E",
   "total_defects": 524,
-  "total_fixed": 369,
-  "total_skipped": 155,
-  "fix_rate": "70.4%",
+  "total_fixed": 379,
+  "total_skipped": 145,
+  "fix_rate": "72.3%",
   "tests": {
     "total": 593,
     "passed": 593,
@@ -53,6 +53,7 @@
   },
   "additional_fixes": {
     "test_repairs": 7,
-    "build_fix": "Removed phantom htmlparser2/franc references from vite.config.js manual chunks"
+    "build_fix": "Removed phantom htmlparser2/franc references from vite.config.js manual chunks",
+    "quick_wins_pass": "10 additional defects fixed from skipped backlog — 6 SEO meta, 2 dark mode, 1 a11y, 1 text clarity"
   }
 }
