@@ -1,14 +1,18 @@
 /**
  * Multi-LLM Extraction Orchestrator
- * Sends content to Claude, OpenAI, Gemini in parallel
- * Each function catches its own errors (never rejects)
- * Perplexity is Phase 2 - not implemented
+ * Sends content to Claude, OpenAI, Gemini via a single batch endpoint
+ * Server handles parallel execution and per-provider timeouts
+ * Partial failure is expected — each provider result is independent
  */
 
 import { truncateAtSentenceBoundary } from './utils/textAnalysis.js';
 import { retryFetch } from './utils/retryFetch.js';
 
-const EXTRACTION_TIMEOUT_MS = 60000;
+const LLM_PROVIDERS = {
+  claude: { provider: 'anthropic', model: 'claude-sonnet-4-5-20250929' },
+  openai: { provider: 'openai', model: 'gpt-4o' },
+  gemini: { provider: 'google', model: 'gemini-2.0-flash' }
+};
 
 function getApiConfig() {
   const proxyUrl = import.meta.env.VITE_AI_PROXY_URL;
@@ -35,9 +39,9 @@ PAGE CONTENT:
 }
 
 /**
- * Extract content via all supported LLMs in parallel
+ * Extract content via all supported LLMs using the batch endpoint
  * @param {Object} extractedContent - From extractor.js
- * @param {Object} options - { signal, enabledLLMs }
+ * @param {Object} options - { signal, enabledLLMs, sourceUrl, authToken }
  * @returns {Object} { claude, openai, gemini }
  */
 export async function extractWithAllLLMs(extractedContent, options = {}) {
@@ -45,133 +49,85 @@ export async function extractWithAllLLMs(extractedContent, options = {}) {
   const prompt = buildExtractionPrompt(options.sourceUrl) + truncatedContent;
   const config = getApiConfig();
   const authToken = options.authToken || null;
-
   const enabledLLMs = options.enabledLLMs || ['claude', 'openai', 'gemini'];
-
-  const tasks = [];
-  if (enabledLLMs.includes('claude')) {
-    tasks.push(extractWithClaude(prompt, config, options.signal, authToken).then(r => ['claude', r]));
-  }
-  if (enabledLLMs.includes('openai')) {
-    tasks.push(extractWithOpenAI(prompt, config, options.signal, authToken).then(r => ['openai', r]));
-  }
-  if (enabledLLMs.includes('gemini')) {
-    tasks.push(extractWithGemini(prompt, config, options.signal, authToken).then(r => ['gemini', r]));
-  }
-
-  const results = await Promise.all(tasks);
-
-  const output = {};
-  results.forEach(([name, result]) => {
-    output[name] = result;
-  });
-
-  return output;
-}
-
-async function extractWithClaude(prompt, config, signal, authToken) {
   const start = Date.now();
+
+  if (!config) {
+    const output = {};
+    enabledLLMs.forEach(llm => {
+      const provInfo = LLM_PROVIDERS[llm];
+      output[llm] = createErrorResult(llm, provInfo?.model || 'unknown', 'No API configuration', start);
+    });
+    return output;
+  }
+
+  // Build batch request
+  const requests = enabledLLMs
+    .filter(llm => LLM_PROVIDERS[llm])
+    .map(llm => ({
+      id: llm,
+      provider: LLM_PROVIDERS[llm].provider,
+      model: LLM_PROVIDERS[llm].model,
+      content: prompt,
+      parameters: { temperature: 0.2, max_tokens: 4096 }
+    }));
+
+  const batchUrl = config.proxyUrl.replace(/\/$/, '').replace(/\/api\/ai$/, '') + '/api/ai/batch';
+
+  const headers = { 'Content-Type': 'application/json' };
+  if (authToken) headers['Authorization'] = `Bearer ${authToken}`;
+
   try {
-    if (!config) {
-      return createErrorResult('claude', 'claude-sonnet-4-5-20250929', 'No API configuration', start);
-    }
-
-    const headers = { 'Content-Type': 'application/json' };
-    if (authToken) headers['Authorization'] = `Bearer ${authToken}`;
-
-    const response = await retryFetch(config.proxyUrl, {
+    const response = await retryFetch(batchUrl, {
       method: 'POST',
       headers,
-      body: JSON.stringify({
-        provider: 'anthropic',
-        model: 'claude-sonnet-4-5-20250929',
-        task: 'readability-llm-preview',
-        content: prompt,
-        parameters: { temperature: 0.2, max_tokens: 4096 }
-      }),
-      signal
+      body: JSON.stringify({ requests }),
+      signal: options.signal
     });
 
     if (!response.ok) {
-      return createErrorResult('claude', 'claude-sonnet-4-5-20250929', `API error: ${response.status}`, start);
+      // Batch endpoint failed — return errors for all providers
+      const output = {};
+      enabledLLMs.forEach(llm => {
+        const provInfo = LLM_PROVIDERS[llm];
+        output[llm] = createErrorResult(llm, provInfo?.model || 'unknown', `Batch API error: ${response.status}`, start);
+      });
+      return output;
     }
 
     const data = await response.json();
-    const content = data.content || data.text || data.response;
+    const output = {};
 
-    return parseExtractionResponse('claude', 'claude-sonnet-4-5-20250929', content, start);
-  } catch (error) {
-    return createErrorResult('claude', 'claude-sonnet-4-5-20250929', error.message, start);
-  }
-}
+    // Map batch results back to per-LLM format
+    for (const result of (data.results || [])) {
+      const llm = result.id;
+      const provInfo = LLM_PROVIDERS[llm];
+      if (!provInfo) continue;
 
-async function extractWithOpenAI(prompt, config, signal, authToken) {
-  const start = Date.now();
-  try {
-    if (!config) {
-      return createErrorResult('openai', 'gpt-4o', 'OpenAI requires proxy configuration', start);
+      if (result.success && result.content) {
+        output[llm] = parseExtractionResponse(llm, result.model || provInfo.model, result.content, start);
+      } else {
+        output[llm] = createErrorResult(llm, result.model || provInfo.model, result.error || 'Unknown error', start);
+      }
     }
 
-    const headers = { 'Content-Type': 'application/json' };
-    if (authToken) headers['Authorization'] = `Bearer ${authToken}`;
-
-    const response = await retryFetch(config.proxyUrl, {
-      method: 'POST',
-      headers,
-      body: JSON.stringify({
-        provider: 'openai',
-        model: 'gpt-4o',
-        task: 'readability-llm-preview',
-        content: prompt,
-        parameters: { temperature: 0.2, max_tokens: 4096 }
-      }),
-      signal
+    // Fill in any missing LLMs that weren't in the response
+    enabledLLMs.forEach(llm => {
+      if (!output[llm]) {
+        const provInfo = LLM_PROVIDERS[llm];
+        output[llm] = createErrorResult(llm, provInfo?.model || 'unknown', 'Not included in batch response', start);
+      }
     });
 
-    if (!response.ok) {
-      return createErrorResult('openai', 'gpt-4o', `API error: ${response.status}`, start);
-    }
-
-    const data = await response.json();
-    const content = data.content || data.text || data.response || data.choices?.[0]?.message?.content;
-    return parseExtractionResponse('openai', 'gpt-4o', content, start);
+    return output;
   } catch (error) {
-    return createErrorResult('openai', 'gpt-4o', error.message, start);
-  }
-}
-
-async function extractWithGemini(prompt, config, signal, authToken) {
-  const start = Date.now();
-  try {
-    if (!config) {
-      return createErrorResult('gemini', 'gemini-2.0-flash', 'Gemini requires proxy configuration', start);
-    }
-
-    const headers = { 'Content-Type': 'application/json' };
-    if (authToken) headers['Authorization'] = `Bearer ${authToken}`;
-
-    const response = await retryFetch(config.proxyUrl, {
-      method: 'POST',
-      headers,
-      body: JSON.stringify({
-        provider: 'google',
-        model: 'gemini-2.0-flash',
-        task: 'readability-llm-preview',
-        content: prompt,
-        parameters: { temperature: 0.2, max_tokens: 4096 }
-      }),
-      signal
+    // Complete batch failure — return errors for all providers
+    const output = {};
+    enabledLLMs.forEach(llm => {
+      const provInfo = LLM_PROVIDERS[llm];
+      output[llm] = createErrorResult(llm, provInfo?.model || 'unknown', error.message, start);
     });
-
-    if (!response.ok) {
-      return createErrorResult('gemini', 'gemini-2.0-flash', `API error: ${response.status}`, start);
-    }
-
-    const data = await response.json();
-    const content = data.content || data.text || data.response || data.candidates?.[0]?.content?.parts?.[0]?.text;
-    return parseExtractionResponse('gemini', 'gemini-2.0-flash', content, start);
-  } catch (error) {
-    return createErrorResult('gemini', 'gemini-2.0-flash', error.message, start);
+    return output;
   }
 }
 

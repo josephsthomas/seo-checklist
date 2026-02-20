@@ -62,13 +62,16 @@ describe('ReadabilityShareView', () => {
 
   it('renders page title', () => {
     renderShareView();
-    expect(screen.getByText(/shared page/i)).toBeInTheDocument();
+    // Component renders "AI Readability Report" as title and sourceUrl as link
+    expect(screen.getByText(/AI Readability Report/i)).toBeInTheDocument();
   });
 
   it('renders category scores', () => {
     renderShareView();
-    expect(screen.getByText(/content structure/i)).toBeInTheDocument();
-    expect(screen.getByText(/content clarity/i)).toBeInTheDocument();
+    const matches = screen.getAllByText(/content structure/i);
+    expect(matches.length).toBeGreaterThanOrEqual(1);
+    const clarityMatches = screen.getAllByText(/content clarity/i);
+    expect(clarityMatches.length).toBeGreaterThanOrEqual(1);
   });
 
   it('renders recommendations (Task 18)', () => {
@@ -78,11 +81,12 @@ describe('ReadabilityShareView', () => {
 
   it('renders download PDF button', () => {
     renderShareView();
-    expect(screen.getByText(/download|pdf/i)).toBeInTheDocument();
+    expect(screen.getByText(/download.*pdf/i)).toBeInTheDocument();
   });
 
   it('renders branding/tool name', () => {
     renderShareView();
-    expect(screen.getByText(/ai readability/i)).toBeInTheDocument();
+    const matches = screen.getAllByText(/ai readability/i);
+    expect(matches.length).toBeGreaterThanOrEqual(1);
   });
 });

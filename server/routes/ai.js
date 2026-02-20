@@ -17,8 +17,13 @@ const { callProvider, callAnthropic, callAnthropicMultiModal } = require('../uti
 
 const router = express.Router();
 
-// Request timeout (30s — gives room within client's 45s timeout)
-const REQUEST_TIMEOUT_MS = 30000;
+// Per-provider timeouts — Claude/GPT-4o can take 30-60s on large prompts
+const PROVIDER_TIMEOUTS = {
+  anthropic: 90000,  // Claude Sonnet: 30-60s on 50K-char prompts
+  openai:    90000,  // GPT-4o: similar latency profile
+  google:    45000,  // Gemini Flash: faster inference
+  default:   60000
+};
 
 router.post('/', async (req, res) => {
   const { provider, model, task, content, parameters, prompt, maxTokens, image, mediaType, system, messages } = req.body;
@@ -63,9 +68,10 @@ async function handleMultiProvider(provider, content, model, parameters) {
     max_tokens: parameters?.max_tokens
   };
 
+  const timeoutMs = PROVIDER_TIMEOUTS[provider] || PROVIDER_TIMEOUTS.default;
   const result = await withTimeout(
     callProvider(provider, content, options),
-    REQUEST_TIMEOUT_MS
+    timeoutMs
   );
 
   // Return unified format: { content: "..." }
@@ -86,7 +92,7 @@ async function handleDirectMessages(messages, model, maxTokens, system) {
 
   const result = await withTimeout(
     callAnthropic(fullPrompt, { max_tokens: maxTokens || 4096, model }),
-    REQUEST_TIMEOUT_MS
+    PROVIDER_TIMEOUTS.anthropic
   );
 
   return { content: result.content, model: result.model };
@@ -104,7 +110,7 @@ async function handleLegacyClaude(prompt, maxTokens, image, mediaType, system) {
         max_tokens: maxTokens || 4096,
         system
       }),
-      REQUEST_TIMEOUT_MS
+      PROVIDER_TIMEOUTS.anthropic
     );
     return { content: result.content, model: result.model };
   }
@@ -113,7 +119,7 @@ async function handleLegacyClaude(prompt, maxTokens, image, mediaType, system) {
   const fullPrompt = system ? `${system}\n\n${prompt}` : prompt;
   const result = await withTimeout(
     callAnthropic(fullPrompt, { max_tokens: maxTokens || 4096 }),
-    REQUEST_TIMEOUT_MS
+    PROVIDER_TIMEOUTS.anthropic
   );
 
   return { content: result.content, model: result.model };

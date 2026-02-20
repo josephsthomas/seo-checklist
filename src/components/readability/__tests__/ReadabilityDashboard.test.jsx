@@ -5,6 +5,13 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 
+// Mock Firebase before any component imports
+vi.mock('../../../lib/firebase', () => ({
+  db: {},
+  storage: {},
+  auth: {},
+}));
+
 // Mock lazy-loaded components
 vi.mock('../ReadabilityCategoryChart', () => ({
   default: (props) => <div data-testid="category-chart">{JSON.stringify(props.categoryScores)}</div>,
@@ -53,10 +60,10 @@ const mockAnalysis = {
     metadataSchema: { score: 82 },
     aiSignals: { score: 84 },
   },
-  checkResults: {
-    'CS-01': { id: 'CS-01', status: 'pass', title: 'H1 Present', severity: 'critical' },
-    'CS-02': { id: 'CS-02', status: 'fail', title: 'Heading Hierarchy', severity: 'high' },
-  },
+  checkResults: [
+    { id: 'CS-01', status: 'pass', title: 'H1 Present', severity: 'critical', category: 'contentStructure' },
+    { id: 'CS-02', status: 'fail', title: 'Heading Hierarchy', severity: 'high', category: 'contentStructure' },
+  ],
   recommendations: [{ id: 'rec-1', title: 'Fix headings', priority: 'high', group: 'structural' }],
   llmExtractions: { claude: { mainContent: 'test' } },
   aiAssessment: null,

@@ -98,6 +98,9 @@ vi.mock('../../../lib/readability/utils/analysisCache', () => ({
   setCachedAnalysis: vi.fn(),
 }));
 
+const toastFn = Object.assign(vi.fn(), { success: vi.fn(), error: vi.fn() });
+vi.mock('react-hot-toast', () => ({ default: toastFn }));
+
 import { renderHook, act } from '@testing-library/react';
 
 // Use dynamic import after mocks to ensure mocks apply

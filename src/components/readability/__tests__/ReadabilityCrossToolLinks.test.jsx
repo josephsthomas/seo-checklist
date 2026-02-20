@@ -32,8 +32,8 @@ describe('ReadabilityCrossToolLinks', () => {
 
   it('renders without analysis data', () => {
     renderWithRouter(<ReadabilityCrossToolLinks analysis={null} />);
-    // Should still render, perhaps without URL params
-    expect(screen.getByText(/run technical audit/i)).toBeInTheDocument();
+    // Component returns null when no sourceUrl and no fromTool param
+    expect(screen.queryByText(/run technical audit/i)).not.toBeInTheDocument();
   });
 
   it('shows back-to-tool link when navigated from another tool', () => {
@@ -41,7 +41,7 @@ describe('ReadabilityCrossToolLinks', () => {
       <ReadabilityCrossToolLinks analysis={mockAnalysis} />,
       { route: '/app/readability?from=audit' }
     );
-    // Should show a "back to audit" style link
-    expect(screen.getByText(/technical audit/i)).toBeInTheDocument();
+    // Should show a "Back to Technical Audit" link
+    expect(screen.getByText(/back to technical audit/i)).toBeInTheDocument();
   });
 });

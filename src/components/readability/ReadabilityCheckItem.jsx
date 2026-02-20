@@ -108,100 +108,104 @@ function ReadabilityCheckItem({ check, defaultExpanded = false }) {
           : 'border-gray-100 dark:border-charcoal-700'
       } ${status.bgClass}`}
     >
-      {/* Header */}
-      <div
-        className={`flex items-start gap-3 p-3 ${
-          isExpandable ? 'cursor-pointer' : ''
-        }`}
-        {...(isExpandable
-          ? {
-              role: 'button',
-              tabIndex: 0,
-              'aria-expanded': expanded,
-              'aria-controls': panelId,
-              onClick: () => setExpanded(!expanded),
-              onKeyDown: (e) => {
-                if (e.key === 'Enter' || e.key === ' ') {
-                  e.preventDefault();
-                  setExpanded(!expanded);
-                }
-              },
-            }
-          : {})}
-      >
-        {/* Status icon */}
-        <StatusIcon
-          className={`w-5 h-5 mt-0.5 flex-shrink-0 ${status.iconClass}`}
-          aria-hidden="true"
-        />
+      {/* Header row: expandable area + copy button (siblings, not nested) */}
+      <div className="flex items-start gap-0 p-3">
+        {/* Expandable area — role="button" with no nested interactive elements */}
+        <div
+          className={`flex items-start gap-3 flex-1 min-w-0 ${
+            isExpandable ? 'cursor-pointer' : ''
+          }`}
+          {...(isExpandable
+            ? {
+                role: 'button',
+                tabIndex: 0,
+                'aria-expanded': expanded,
+                'aria-controls': panelId,
+                onClick: () => setExpanded(!expanded),
+                onKeyDown: (e) => {
+                  if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    setExpanded(!expanded);
+                  }
+                },
+              }
+            : {})}
+        >
+          {/* Status icon */}
+          <StatusIcon
+            className={`w-5 h-5 mt-0.5 flex-shrink-0 ${status.iconClass}`}
+            aria-hidden="true"
+          />
 
-        {/* Content */}
-        <div className="flex-1 min-w-0">
-          <div className="flex items-start justify-between gap-2">
-            <div className="flex items-center gap-2 flex-wrap">
-              {/* Check ID */}
-              {check.id && (
-                <span className="text-xs font-mono text-gray-400 dark:text-gray-500">
-                  {check.id}
-                </span>
-              )}
-              {/* Title (with jargon tooltips) */}
-              {annotateJargon(check.title || check.name || 'Unknown Check') ? (
-                <span
-                  className="text-sm font-medium text-gray-800 dark:text-gray-200"
-                  dangerouslySetInnerHTML={{ __html: annotateJargon(check.title || check.name || 'Unknown Check') }}
-                />
-              ) : (
-                <span className="text-sm font-medium text-gray-800 dark:text-gray-200">
-                  {check.title || check.name || 'Unknown Check'}
-                </span>
-              )}
-            </div>
-
-            <div className="flex items-center gap-2 flex-shrink-0">
-              {/* Copy button */}
-              <button
-                onClick={handleCopy}
-                className="p-1 rounded hover:bg-gray-200 dark:hover:bg-charcoal-600 transition-colors focus:outline-none focus:ring-1 focus:ring-teal-500"
-                title="Copy check result"
-                aria-label={`Copy ${check.id} result`}
-              >
-                <Copy className="w-3.5 h-3.5 text-gray-400 dark:text-gray-500" aria-hidden="true" />
-              </button>
-              {/* Severity badge */}
-              {check.severity && (
-                <span
-                  className={`text-xs font-medium px-1.5 py-0.5 rounded capitalize ${
-                    SEVERITY_BADGES[check.severity] || SEVERITY_BADGES.info
-                  }`}
-                >
-                  {check.severity}
-                </span>
-              )}
-
-              {/* Status label for screen readers */}
-              <span className="sr-only">{status.label}</span>
-
-              {/* Expand icon */}
-              {isExpandable && (
-                expanded ? (
-                  <ChevronDown className="w-4 h-4 text-gray-400 dark:text-gray-500" aria-hidden="true" />
+          {/* Content */}
+          <div className="flex-1 min-w-0">
+            <div className="flex items-start justify-between gap-2">
+              <div className="flex items-center gap-2 flex-wrap">
+                {/* Check ID */}
+                {check.id && (
+                  <span className="text-xs font-mono text-gray-400 dark:text-gray-500">
+                    {check.id}
+                  </span>
+                )}
+                {/* Title (with jargon tooltips) */}
+                {annotateJargon(check.title || check.name || 'Unknown Check') ? (
+                  <span
+                    className="text-sm font-medium text-gray-800 dark:text-gray-200"
+                    dangerouslySetInnerHTML={{ __html: annotateJargon(check.title || check.name || 'Unknown Check') }}
+                  />
                 ) : (
-                  <ChevronRight className="w-4 h-4 text-gray-400 dark:text-gray-500" aria-hidden="true" />
-                )
-              )}
-            </div>
-          </div>
+                  <span className="text-sm font-medium text-gray-800 dark:text-gray-200">
+                    {check.title || check.name || 'Unknown Check'}
+                  </span>
+                )}
+              </div>
 
-          {/* Score/value summary */}
-          {check.value !== undefined && check.value !== null && (
-            <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
-              {typeof check.value === 'number'
-                ? `Value: ${check.value}${check.threshold ? ` (threshold: ${check.threshold})` : ''}`
-                : String(check.value)}
-            </p>
-          )}
+              <div className="flex items-center gap-2 flex-shrink-0">
+                {/* Severity badge */}
+                {check.severity && (
+                  <span
+                    className={`text-xs font-medium px-1.5 py-0.5 rounded capitalize ${
+                      SEVERITY_BADGES[check.severity] || SEVERITY_BADGES.info
+                    }`}
+                  >
+                    {check.severity}
+                  </span>
+                )}
+
+                {/* Status label for screen readers */}
+                <span className="sr-only">{status.label}</span>
+
+                {/* Expand icon */}
+                {isExpandable && (
+                  expanded ? (
+                    <ChevronDown className="w-4 h-4 text-gray-400 dark:text-gray-500" aria-hidden="true" />
+                  ) : (
+                    <ChevronRight className="w-4 h-4 text-gray-400 dark:text-gray-500" aria-hidden="true" />
+                  )
+                )}
+              </div>
+            </div>
+
+            {/* Score/value summary */}
+            {check.value !== undefined && check.value !== null && (
+              <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
+                {typeof check.value === 'number'
+                  ? `Value: ${check.value}${check.threshold ? ` (threshold: ${check.threshold})` : ''}`
+                  : String(check.value)}
+              </p>
+            )}
+          </div>
         </div>
+
+        {/* Copy button — sibling of role="button", not nested inside it */}
+        <button
+          onClick={handleCopy}
+          className="p-1 rounded hover:bg-gray-200 dark:hover:bg-charcoal-600 transition-colors focus:outline-none focus:ring-1 focus:ring-teal-500 flex-shrink-0 mt-0.5 ml-2"
+          title="Copy check result"
+          aria-label={`Copy ${check.id} result`}
+        >
+          <Copy className="w-3.5 h-3.5 text-gray-400 dark:text-gray-500" aria-hidden="true" />
+        </button>
       </div>
 
       {/* Expandable detail panel */}

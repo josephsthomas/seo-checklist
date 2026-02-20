@@ -96,4 +96,40 @@ function startCleanupInterval() {
 // Start cleanup on module load
 startCleanupInterval();
 
-module.exports = { rateLimitMiddleware, TIER_LIMITS };
+/**
+ * Consume N rate-limit tokens at once (for batch requests)
+ * @param {string} userId - User UID or IP key
+ * @param {string} tier - User tier (free, pro, enterprise)
+ * @param {number} count - Number of tokens to consume
+ * @returns {null|Object} null if OK, or { message, retryAfter, limit } on limit exceeded
+ */
+function consumeRateLimitTokens(userId, tier, count) {
+  const limit = getLimit(tier);
+  const now = Date.now();
+
+  let timestamps = userRequests.get(userId) || [];
+  timestamps = pruneTimestamps(timestamps);
+
+  if (timestamps.length + count > limit) {
+    const retryAfterMs = timestamps.length > 0
+      ? (timestamps[0] + WINDOW_MS) - now
+      : WINDOW_MS;
+    const retryAfterSec = Math.ceil(Math.max(1, retryAfterMs / 1000));
+
+    return {
+      message: `Rate limit exceeded. Your ${tier} plan allows ${limit} requests per hour. Batch of ${count} would exceed remaining ${limit - timestamps.length} slots.`,
+      retryAfter: retryAfterSec,
+      limit
+    };
+  }
+
+  // Record all tokens
+  for (let i = 0; i < count; i++) {
+    timestamps.push(now);
+  }
+  userRequests.set(userId, timestamps);
+
+  return null;
+}
+
+module.exports = { rateLimitMiddleware, consumeRateLimitTokens, TIER_LIMITS };

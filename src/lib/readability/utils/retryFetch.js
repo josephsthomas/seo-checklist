@@ -4,8 +4,8 @@
  */
 
 const DEFAULT_OPTIONS = {
-  maxRetries: 3,
-  baseDelayMs: 1000,
+  maxRetries: 1,
+  baseDelayMs: 2000,
   retryableStatuses: [429, 500, 502, 503, 504]
 };
 

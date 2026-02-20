@@ -7,7 +7,7 @@
 import { truncateAtSentenceBoundary } from './utils/textAnalysis.js';
 import { retryFetch } from './utils/retryFetch.js';
 
-const API_TIMEOUT_MS = 45000; // 45 seconds for AI analysis
+const API_TIMEOUT_MS = 120000; // 120s — must exceed server's 90s provider timeout + retry headroom
 
 /**
  * Get API configuration — proxy-only (no direct API key fallback)
