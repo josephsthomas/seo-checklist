@@ -5,6 +5,7 @@
 
 import React, { useState, useCallback, useMemo } from 'react';
 import { Sliders, RotateCcw } from 'lucide-react';
+import toast from 'react-hot-toast';
 
 const DEFAULT_WEIGHTS = {
   contentStructure: 20,
@@ -33,12 +34,14 @@ export default function ReadabilityWeightConfig({ weights, onChange }) {
   const isValid = total === 100;
 
   const handleChange = useCallback((key, value) => {
-    const next = { ...localWeights, [key]: Number(value) };
-    setLocalWeights(next);
-  }, [localWeights]);
+    setLocalWeights(prev => ({ ...prev, [key]: Number(value) }));
+  }, []);
 
   const handleApply = useCallback(() => {
-    if (isValid) onChange?.(localWeights);
+    if (isValid) {
+      onChange?.(localWeights);
+      toast.success('Weights applied successfully');
+    }
   }, [localWeights, isValid, onChange]);
 
   const handleReset = useCallback(() => {
@@ -81,7 +84,7 @@ export default function ReadabilityWeightConfig({ weights, onChange }) {
         </div>
       ))}
 
-      <div className={`text-xs text-center font-medium ${isValid ? 'text-emerald-600' : 'text-red-600'}`}>
+      <div className={`text-xs text-center font-medium ${isValid ? 'text-emerald-600 dark:text-emerald-400' : 'text-red-600 dark:text-red-400'}`}>
         Total: {total}% {isValid ? '(valid)' : '(must equal 100%)'}
       </div>
 

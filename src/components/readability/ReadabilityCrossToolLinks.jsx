@@ -10,10 +10,8 @@ import {
   Search,
   Code,
   ArrowLeft,
-  ExternalLink,
+  ArrowRight,
   Wrench,
-  FileEdit,
-  Key,
 } from 'lucide-react';
 
 const CROSS_TOOL_LINKS = [
@@ -45,29 +43,13 @@ const CROSS_TOOL_LINKS = [
       return {};
     },
   },
-  // E-033: Extended deep links
-  {
-    key: 'content-planner',
-    label: 'Plan Content Updates',
-    description: 'Create a content plan based on readability recommendations.',
-    icon: FileEdit,
-    path: '/app/content-planner',
-    paramKey: 'url',
-  },
-  {
-    key: 'keyword-research',
-    label: 'Research Keywords',
-    description: 'Find keyword opportunities based on detected topics.',
-    icon: Key,
-    path: '/app/keyword-research',
-    paramKey: 'url',
-  },
 ];
 
-export default function ReadabilityCrossToolLinks({ analysis }) {
+export default function ReadabilityCrossToolLinks({ analysis, sourceUrl, checkResults }) {
   const location = useLocation();
   const [searchParams] = useSearchParams();
-  const currentUrl = analysis?.sourceUrl;
+  const currentUrl = sourceUrl || analysis?.sourceUrl;
+  const currentCheckResults = checkResults || analysis?.checkResults;
 
   // Check if user navigated from another tool
   const fromTool = searchParams.get('from');
@@ -75,8 +57,6 @@ export default function ReadabilityCrossToolLinks({ analysis }) {
     audit: 'Technical Audit',
     schema: 'Schema Generator',
     meta: 'Meta Generator',
-    'content-planner': 'Content Planner',
-    'keyword-research': 'Keyword Research',
   };
 
   if (!currentUrl && !fromTool) return null;
@@ -106,7 +86,7 @@ export default function ReadabilityCrossToolLinks({ analysis }) {
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
           {CROSS_TOOL_LINKS.map((tool) => {
             const Icon = tool.icon;
-            const extra = tool.extraParams?.(analysis) || {};
+            const extra = tool.extraParams?.({ checkResults: currentCheckResults }) || {};
             const params = new URLSearchParams({
               [tool.paramKey]: currentUrl,
               from: 'readability',
@@ -129,7 +109,7 @@ export default function ReadabilityCrossToolLinks({ analysis }) {
                     {tool.description}
                   </p>
                 </div>
-                <ExternalLink className="w-3.5 h-3.5 text-gray-300 dark:text-gray-600 group-hover:text-teal-400 flex-shrink-0 mt-1 transition-colors" aria-hidden="true" />
+                <ArrowRight className="w-3.5 h-3.5 text-gray-300 dark:text-gray-600 group-hover:text-teal-400 flex-shrink-0 mt-1 transition-colors" aria-hidden="true" />
               </Link>
             );
           })}

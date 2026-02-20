@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect, useRef } from 'react';
 import {
   Wrench,
   Copy,
@@ -640,6 +640,16 @@ function extendSession() {
 export default function FixSuggestionsPanel({ issue, onClose }) {
   const [copiedSection, setCopiedSection] = useState(null);
   const [expandedTips, setExpandedTips] = useState(true);
+  const copyTimerRef = useRef(null);
+
+  // Cleanup timeout on unmount to prevent memory leak
+  useEffect(() => {
+    return () => {
+      if (copyTimerRef.current) {
+        clearTimeout(copyTimerRef.current);
+      }
+    };
+  }, []);
 
   // Find the best matching suggestion
   const suggestion = useMemo(() => {
@@ -737,7 +747,8 @@ export default function FixSuggestionsPanel({ issue, onClose }) {
       await navigator.clipboard.writeText(text);
       setCopiedSection(section);
       toast.success('Code copied!');
-      setTimeout(() => setCopiedSection(null), 2000);
+      if (copyTimerRef.current) clearTimeout(copyTimerRef.current);
+      copyTimerRef.current = setTimeout(() => setCopiedSection(null), 2000);
     } catch {
       toast.error('Failed to copy');
     }
@@ -769,7 +780,7 @@ export default function FixSuggestionsPanel({ issue, onClose }) {
           <div className="w-16 h-16 bg-charcoal-100 dark:bg-charcoal-700 rounded-2xl flex items-center justify-center mx-auto mb-4">
             <Wrench className="w-8 h-8 text-charcoal-400" />
           </div>
-          <p className="text-charcoal-600 dark:text-charcoal-400">
+          <p className="text-charcoal-600 dark:text-charcoal-300">
             No specific fix suggestion available for this issue.
           </p>
           <p className="text-sm text-charcoal-500 dark:text-charcoal-500 mt-1">
@@ -833,6 +844,7 @@ export default function FixSuggestionsPanel({ issue, onClose }) {
               <button
                 onClick={() => handleCopy(suggestion.beforeCode, 'before')}
                 className="p-1.5 text-charcoal-400 hover:text-charcoal-600 dark:hover:text-charcoal-300 hover:bg-charcoal-100 dark:hover:bg-charcoal-700 rounded transition-colors"
+                aria-label="Copy problematic code example"
               >
                 {copiedSection === 'before' ? <Check className="w-4 h-4 text-emerald-500" /> : <Copy className="w-4 h-4" />}
               </button>
@@ -852,6 +864,7 @@ export default function FixSuggestionsPanel({ issue, onClose }) {
               <button
                 onClick={() => handleCopy(suggestion.afterCode, 'after')}
                 className="p-1.5 text-charcoal-400 hover:text-charcoal-600 dark:hover:text-charcoal-300 hover:bg-charcoal-100 dark:hover:bg-charcoal-700 rounded transition-colors"
+                aria-label="Copy fixed code example"
               >
                 {copiedSection === 'after' ? <Check className="w-4 h-4 text-emerald-500" /> : <Copy className="w-4 h-4" />}
               </button>
@@ -873,6 +886,7 @@ export default function FixSuggestionsPanel({ issue, onClose }) {
             <button
               onClick={() => setExpandedTips(!expandedTips)}
               className="flex items-center gap-2 text-sm font-medium text-charcoal-700 dark:text-charcoal-300 mb-3"
+              aria-expanded={expandedTips}
             >
               <Lightbulb className="w-4 h-4 text-amber-500" />
               Best Practices
