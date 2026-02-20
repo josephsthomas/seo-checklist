@@ -48,14 +48,14 @@ export const tools = [
     id: 'planner',
     name: 'Content Planner',
     shortName: 'Planner',
-    description: 'Comprehensive 321-item content and SEO checklist for website launches and refreshes. Track progress, assign tasks, and ensure nothing is missed.',
+    description: 'Comprehensive 353-item content and SEO checklist for website launches and refreshes. Track progress, assign tasks, and ensure nothing is missed.',
     icon: ClipboardList,
     path: '/app/planner',
     color: TOOL_COLORS.PRIMARY,
     status: TOOL_STATUS.ACTIVE,
     badge: null, // Dynamic - set based on project count
     features: [
-      '321 content checklist items',
+      '353 content checklist items',
       'Project tracking',
       'Team collaboration',
       'PDF & Excel export'
@@ -170,14 +170,14 @@ export const tools = [
     status: TOOL_STATUS.ACTIVE,
     badge: 'New',
     features: [
-      '50+ schema types',
+      '40+ schema types',
       'Rich snippet preview',
       'Google validation',
       'Batch processing'
     ],
     statsConfig: [
       { key: 'schemasGenerated', label: 'Generated' },
-      { key: 'schemaTypes', label: 'Types', static: '50+' }
+      { key: 'schemaTypes', label: 'Types', static: '40+' }
     ],
     permissions: ['canGenerateSchema'],
     order: 6

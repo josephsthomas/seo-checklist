@@ -33,10 +33,8 @@ async function retryImport(importFn, moduleName, retriesLeft = MAX_RETRIES) {
       return retryImport(importFn, moduleName, retriesLeft - 1);
     }
 
-    // Log the error in development
-    if (import.meta.env.DEV) {
-      console.error(`Failed to load ${moduleName} after ${MAX_RETRIES} retries:`, error);
-    }
+    // Log the error
+    console.error(`Failed to load ${moduleName} after ${MAX_RETRIES} retries:`, error);
 
     // Re-throw to be caught by ErrorBoundary
     throw new Error(`Failed to load ${moduleName}. Please check your connection and try again.`);
