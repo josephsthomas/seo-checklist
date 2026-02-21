@@ -85,7 +85,7 @@ export function useFileAttachments(projectId, itemId) {
     }
 
     if (!ALLOWED_TYPES.includes(file.type)) {
-      toast.error('File type not allowed');
+      toast.error('File type not allowed. Supported: images (JPEG, PNG, GIF, WebP), PDF, Word, Excel, and text files.');
       return false;
     }
 
@@ -172,6 +172,12 @@ export function useFileAttachments(projectId, itemId) {
     try {
       const attachment = attachments.find(a => a.id === attachmentId);
       if (!attachment) return;
+
+      // Ownership check: only the uploader can delete
+      if (attachment.uploadedBy !== currentUser?.uid) {
+        toast.error('You can only delete files you uploaded');
+        return;
+      }
 
       // Delete from storage
       const storageRef = ref(storage, attachment.storagePath);

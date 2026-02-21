@@ -1,9 +1,11 @@
 import { useState, useCallback } from 'react';
+import { Link } from 'react-router-dom';
 import toast from 'react-hot-toast';
 import SchemaUploadScreen from './upload/SchemaUploadScreen';
 import SchemaProcessingScreen from './upload/SchemaProcessingScreen';
 import SchemaDashboard from './dashboard/SchemaDashboard';
 import { extractHtmlContent, generateSchema } from '../../lib/schema-generator/schemaGeneratorService';
+import SEOHead from '../shared/SEOHead';
 
 // View states
 const VIEWS = {
@@ -115,21 +117,29 @@ export default function SchemaGeneratorPage() {
 
     case VIEWS.ERROR:
       return (
-        <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 flex items-center justify-center p-4">
-          <div className="bg-white rounded-xl shadow-xl p-8 max-w-md w-full text-center">
-            <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
-              <svg className="w-8 h-8 text-red-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <div className="min-h-screen bg-gradient-to-br from-slate-100 via-slate-50 to-white dark:from-charcoal-900 dark:via-charcoal-800 dark:to-charcoal-900 flex items-center justify-center p-4">
+          <div className="bg-white dark:bg-charcoal-800 rounded-xl shadow-xl dark:shadow-charcoal-900/50 p-8 max-w-md w-full text-center">
+            <div className="w-16 h-16 bg-red-100 dark:bg-red-900/30 rounded-full flex items-center justify-center mx-auto mb-4">
+              <svg className="w-8 h-8 text-red-600 dark:text-red-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
               </svg>
             </div>
-            <h2 className="text-xl font-bold text-charcoal-900 mb-2">Processing Error</h2>
-            <p className="text-charcoal-600 mb-6">{error}</p>
-            <button
-              onClick={handleNewProcess}
-              className="px-6 py-2 bg-rose-600 text-white rounded-lg hover:bg-rose-700 transition-colors"
-            >
-              Try Again
-            </button>
+            <h2 className="text-xl font-bold text-charcoal-900 dark:text-white mb-2">Processing Error</h2>
+            <p className="text-charcoal-600 dark:text-charcoal-400 mb-6">{error}</p>
+            <div className="flex gap-3 justify-center">
+              <button
+                onClick={handleNewProcess}
+                className="px-6 py-2 bg-rose-600 text-white rounded-lg hover:bg-rose-700 transition-colors"
+              >
+                Try Again
+              </button>
+              <Link
+                to="/app"
+                className="px-6 py-2 border border-charcoal-300 dark:border-charcoal-600 text-charcoal-700 dark:text-charcoal-300 rounded-lg hover:bg-charcoal-50 dark:hover:bg-charcoal-700 transition-colors"
+              >
+                Go Home
+              </Link>
+            </div>
           </div>
         </div>
       );
@@ -137,9 +147,12 @@ export default function SchemaGeneratorPage() {
     case VIEWS.INPUT:
     default:
       return (
-        <SchemaUploadScreen
-          onSubmit={handleSubmit}
-        />
+        <>
+          <SEOHead pageKey="schema-generator" />
+          <SchemaUploadScreen
+            onSubmit={handleSubmit}
+          />
+        </>
       );
   }
 }

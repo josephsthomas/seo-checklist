@@ -9,7 +9,9 @@ import {
   updateDoc,
   deleteDoc,
   doc,
-  serverTimestamp
+  getDoc,
+  serverTimestamp,
+  increment
 } from 'firebase/firestore';
 import { db } from '../lib/firebase';
 import { useAuth } from '../contexts/AuthContext';
@@ -19,6 +21,7 @@ export function useSchemaLibrary() {
   const { currentUser } = useAuth();
   const [schemas, setSchemas] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   // Fetch saved schemas
   useEffect(() => {
@@ -46,9 +49,11 @@ export function useSchemaLibrary() {
         }));
         setSchemas(schemaList);
         setLoading(false);
+        setError(null);
       },
       (err) => {
         console.error('Error fetching schemas:', err);
+        setError('Failed to load schemas');
         setLoading(false);
       }
     );
@@ -59,7 +64,7 @@ export function useSchemaLibrary() {
   // Save schema to library
   const saveSchema = useCallback(async (schemaData) => {
     if (!currentUser) {
-      toast.error('Please log in to save schemas');
+      toast.error('Please sign in to save schemas');
       return null;
     }
 
@@ -91,6 +96,11 @@ export function useSchemaLibrary() {
   const updateSchema = useCallback(async (schemaId, updates) => {
     try {
       const schemaRef = doc(db, 'schemaLibrary', schemaId);
+      const schemaSnap = await getDoc(schemaRef);
+      if (!schemaSnap.exists() || schemaSnap.data().userId !== currentUser?.uid) {
+        toast.error('You can only update your own schemas');
+        return false;
+      }
       await updateDoc(schemaRef, {
         ...updates,
         updatedAt: serverTimestamp(),
@@ -102,12 +112,17 @@ export function useSchemaLibrary() {
       toast.error('Failed to update schema');
       return false;
     }
-  }, []);
+  }, [currentUser]);
 
   // Delete schema
   const deleteSchema = useCallback(async (schemaId) => {
     try {
       const schemaRef = doc(db, 'schemaLibrary', schemaId);
+      const schemaSnap = await getDoc(schemaRef);
+      if (!schemaSnap.exists() || schemaSnap.data().userId !== currentUser?.uid) {
+        toast.error('You can only delete your own schemas');
+        return false;
+      }
       await deleteDoc(schemaRef);
       toast.success('Schema deleted');
       return true;
@@ -116,19 +131,20 @@ export function useSchemaLibrary() {
       toast.error('Failed to delete schema');
       return false;
     }
-  }, []);
+  }, [currentUser]);
 
   // Increment usage count
   const incrementUsage = useCallback(async (schemaId) => {
-    const schema = schemas.find(s => s.id === schemaId);
-    if (schema) {
+    try {
       const schemaRef = doc(db, 'schemaLibrary', schemaId);
       await updateDoc(schemaRef, {
-        usageCount: (schema.usageCount || 0) + 1,
+        usageCount: increment(1),
         lastUsedAt: serverTimestamp(),
       });
+    } catch (err) {
+      console.error('Error incrementing schema usage:', err);
     }
-  }, [schemas]);
+  }, []);
 
   // Duplicate schema
   const duplicateSchema = useCallback(async (schemaId) => {
@@ -163,6 +179,7 @@ export function useSchemaLibrary() {
   return {
     schemas,
     loading,
+    error,
     saveSchema,
     updateSchema,
     deleteSchema,

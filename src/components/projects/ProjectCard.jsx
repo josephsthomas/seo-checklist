@@ -20,8 +20,8 @@ const TYPE_COLORS = {
 export default function ProjectCard({ project }) {
   const navigate = useNavigate();
 
-  // Calculate completion percentage (would come from checklist data in real implementation)
-  const completionPercentage = 0; // Placeholder
+  // Calculate completion percentage from project data
+  const completionPercentage = project.progress ?? project.stats?.percentage ?? 0;
 
   const formatDate = (timestamp) => {
     if (!timestamp) return 'Not set';

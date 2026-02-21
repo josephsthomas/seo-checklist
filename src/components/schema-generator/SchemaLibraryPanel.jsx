@@ -81,7 +81,12 @@ export default function SchemaLibraryPanel({ onApply, onClose, currentSchema }) 
 
   const handleDelete = async (schemaId) => {
     if (confirm('Are you sure you want to delete this schema?')) {
-      await deleteSchema(schemaId);
+      try {
+        await deleteSchema(schemaId);
+      } catch (error) {
+        console.error('Failed to delete schema:', error);
+        toast.error('Failed to delete schema. Please try again.');
+      }
     }
   };
 

@@ -54,25 +54,64 @@ export function checkRobotsTxt(parsedData) {
   const directives = parsedData.metadata.aiDirectives || {};
   const crawlerIssues = Object.keys(directives).filter(k => k !== 'robotsNoAI');
 
+  // Determine status based on whether AI-specific directives restrict access
+  let status = 'pass';
+  if (crawlerIssues.length > 0) {
+    // Check if any directives are actually restrictive
+    const hasRestrictive = crawlerIssues.some(key => {
+      const val = (directives[key] || '').toLowerCase();
+      return val.includes('noindex') || val.includes('none') || val.includes('nofollow') || val.includes('disallow');
+    });
+    status = hasRestrictive ? 'fail' : 'warn';
+  }
+
   return {
     id: 'TA-03', category: CATEGORY, title: 'robots.txt AI crawler rules',
-    status: crawlerIssues.length > 0 ? 'warn' : 'warn',
+    status,
     severity: 'high',
-    details: 'robots.txt analysis requires server-side fetching. Check meta robot directives for AI crawler restrictions.' + (crawlerIssues.length > 0 ? ` Found ${crawlerIssues.length} AI-specific meta directive(s).` : ''),
+    details: crawlerIssues.length > 0
+      ? `Found ${crawlerIssues.length} AI-specific meta directive(s). Review to ensure they are not overly restrictive.`
+      : 'No AI-specific crawler directives found in meta tags. robots.txt file analysis requires server-side fetching.',
     affectedElements: crawlerIssues,
-    recommendation: 'Verify your robots.txt allows GPTBot, Google-Extended, ClaudeBot, and other AI crawlers.'
+    recommendation: crawlerIssues.length > 0
+      ? 'Review AI crawler directives. Verify your robots.txt allows GPTBot, Google-Extended, ClaudeBot, and other AI crawlers.'
+      : 'Verify your robots.txt file allows AI crawlers if you want your content to be discoverable by AI.'
   };
 }
 
 export function checkCanonicalUrl(parsedData) {
   const canonical = parsedData.metadata.canonical;
+
+  // Validate URL format if canonical is present
+  let isValidUrl = false;
+  if (canonical) {
+    try {
+      const url = new URL(canonical);
+      isValidUrl = url.protocol === 'http:' || url.protocol === 'https:';
+    } catch {
+      isValidUrl = false;
+    }
+  }
+
+  const status = !canonical ? 'warn' : isValidUrl ? 'pass' : 'fail';
+  const details = !canonical
+    ? 'No canonical URL found.'
+    : isValidUrl
+    ? `Canonical URL: ${canonical}`
+    : `Canonical URL is not a valid URL: ${canonical}`;
+  const recommendation = !canonical
+    ? 'Add a <link rel="canonical"> tag to prevent duplicate content issues.'
+    : !isValidUrl
+    ? 'The canonical URL must be a fully qualified URL starting with http:// or https://.'
+    : '';
+
   return {
     id: 'TA-04', category: CATEGORY, title: 'Canonical URL set',
-    status: canonical ? 'pass' : 'warn',
+    status,
     severity: 'medium',
-    details: canonical ? `Canonical URL: ${canonical}` : 'No canonical URL found.',
-    affectedElements: [],
-    recommendation: !canonical ? 'Add a <link rel="canonical"> tag to prevent duplicate content issues.' : ''
+    details,
+    affectedElements: !canonical || isValidUrl ? [] : [canonical],
+    recommendation
   };
 }
 
@@ -117,13 +156,38 @@ export function checkContentToCodeRatio(parsedData) {
 }
 
 export function checkHiddenContent(parsedData) {
+  const hiddenIndicators = [];
+
+  // Check for accordion/tab patterns that hide content
+  const html = parsedData.rawHtml || '';
+  const hiddenPatterns = [
+    { pattern: /display:\s*none/gi, label: 'display:none CSS rules' },
+    { pattern: /visibility:\s*hidden/gi, label: 'visibility:hidden CSS rules' },
+    { pattern: /aria-hidden="true"/gi, label: 'aria-hidden="true" elements' },
+    { pattern: /class="[^"]*collapse[^"]*"/gi, label: 'collapsed/accordion elements' },
+    { pattern: /<details[^>]*>/gi, label: '<details> elements (expandable sections)' },
+  ];
+
+  for (const { pattern, label } of hiddenPatterns) {
+    const matches = html.match(pattern);
+    if (matches && matches.length > 0) {
+      hiddenIndicators.push(`${matches.length} instance(s) of ${label}`);
+    }
+  }
+
+  const status = hiddenIndicators.length === 0 ? 'pass' : hiddenIndicators.length <= 2 ? 'warn' : 'fail';
+
   return {
     id: 'TA-08', category: CATEGORY, title: 'No content behind interactions',
-    status: 'pass',
+    status,
     severity: 'high',
-    details: 'Content appears to be directly accessible in the HTML without requiring user interaction.',
-    affectedElements: [],
-    recommendation: ''
+    details: hiddenIndicators.length === 0
+      ? 'Content appears to be directly accessible in the HTML without requiring user interaction.'
+      : `Found ${hiddenIndicators.length} pattern(s) that may hide content from AI crawlers.`,
+    affectedElements: hiddenIndicators,
+    recommendation: hiddenIndicators.length > 0
+      ? 'Ensure important content is not hidden behind tabs, accordions, or CSS display:none. AI crawlers may not trigger JavaScript interactions.'
+      : ''
   };
 }
 

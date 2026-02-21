@@ -19,6 +19,33 @@ import {
   Star,
 } from 'lucide-react';
 
+// Sanitize and truncate a string for safe display
+function sanitizeText(value, maxLength = 500) {
+  if (value == null) return '';
+  const str = typeof value === 'string' ? value : String(value);
+  const trimmed = str.trim();
+  if (trimmed.length <= maxLength) return trimmed;
+  return trimmed.slice(0, maxLength) + '...';
+}
+
+// Get a human-readable label for usefulness score
+function getUsefulnessLabel(score) {
+  if (typeof score !== 'number' || isNaN(score)) return '';
+  if (score >= 8) return 'Excellent';
+  if (score >= 6) return 'Good';
+  if (score >= 4) return 'Fair';
+  return 'Needs Work';
+}
+
+// Get the color class for the usefulness label
+function getUsefulnessLabelColor(score) {
+  if (typeof score !== 'number' || isNaN(score)) return 'text-gray-500';
+  if (score >= 8) return 'text-emerald-600 dark:text-emerald-400';
+  if (score >= 6) return 'text-emerald-500 dark:text-emerald-400';
+  if (score >= 4) return 'text-amber-600 dark:text-amber-400';
+  return 'text-red-600 dark:text-red-400';
+}
+
 function CollapsibleSection({ title, icon: Icon, children, defaultOpen = true, id }) {
   const [open, setOpen] = useState(defaultOpen);
   const panelId = `llm-section-${id}`;
@@ -112,7 +139,7 @@ function ReadabilityLLMColumn({
         <div className="p-6 text-center">
           <AlertCircle className="w-8 h-8 text-red-400 dark:text-red-500 mx-auto mb-2" />
           <p className="text-sm font-medium text-red-700 dark:text-red-300 mb-1">
-            Extraction Failed
+            Unable to Load Content
           </p>
           <p className="text-xs text-red-600 dark:text-red-400 mb-3">
             {extraction.error}
@@ -166,7 +193,7 @@ function ReadabilityLLMColumn({
         {extraction.title && (
           <CollapsibleSection title="Title" icon={Heading} id={`${llmKey}-title`}>
             <p className="text-sm text-gray-800 dark:text-gray-200 font-medium">
-              {extraction.title}
+              {sanitizeText(extraction.title, 200)}
             </p>
           </CollapsibleSection>
         )}
@@ -175,7 +202,7 @@ function ReadabilityLLMColumn({
         {extraction.description && (
           <CollapsibleSection title="Description" icon={FileText} id={`${llmKey}-desc`}>
             <p className="text-sm text-gray-600 dark:text-gray-300">
-              {extraction.description}
+              {sanitizeText(extraction.description, 500)}
             </p>
           </CollapsibleSection>
         )}
@@ -184,7 +211,7 @@ function ReadabilityLLMColumn({
         {extraction.primaryTopic && (
           <CollapsibleSection title="Primary Topic" icon={Target} id={`${llmKey}-topic`}>
             <p className="text-sm text-gray-700 dark:text-gray-300">
-              {extraction.primaryTopic}
+              {sanitizeText(extraction.primaryTopic, 200)}
             </p>
           </CollapsibleSection>
         )}
@@ -193,7 +220,7 @@ function ReadabilityLLMColumn({
         {extraction.mainContent && (
           <CollapsibleSection title="Main Content" icon={FileText} id={`${llmKey}-content`} defaultOpen={false}>
             <div className="max-h-64 overflow-y-auto text-sm text-gray-600 dark:text-gray-300 whitespace-pre-wrap font-mono text-xs leading-relaxed bg-gray-50 dark:bg-charcoal-900 p-3 rounded-lg">
-              {extraction.mainContent}
+              {sanitizeText(extraction.mainContent, 5000)}
             </div>
           </CollapsibleSection>
         )}
@@ -207,7 +234,7 @@ function ReadabilityLLMColumn({
                   key={i}
                   className="inline-flex items-center text-xs px-2 py-1 rounded-full bg-teal-50 text-teal-700 dark:bg-teal-900/20 dark:text-teal-300 border border-teal-100 dark:border-teal-800/30"
                 >
-                  {typeof entity === 'string' ? entity : entity.name || entity.text || String(entity)}
+                  {sanitizeText(typeof entity === 'string' ? entity : entity.name || entity.text || String(entity), 100)}
                 </span>
               ))}
             </div>
@@ -216,17 +243,17 @@ function ReadabilityLLMColumn({
 
         {/* Unprocessable content */}
         {extraction.unprocessableContent && extraction.unprocessableContent.length > 0 && (
-          <CollapsibleSection title="Unprocessable Content" icon={AlertTriangle} id={`${llmKey}-unproc`} defaultOpen={false}>
+          <CollapsibleSection title="Content Not Available" icon={AlertTriangle} id={`${llmKey}-unproc`} defaultOpen={false}>
             <ul className="space-y-2">
               {extraction.unprocessableContent.map((item, i) => (
                 <li key={i} className="flex items-start gap-2">
                   <AlertTriangle className="w-3.5 h-3.5 text-amber-500 mt-0.5 flex-shrink-0" aria-hidden="true" />
                   <div>
                     <p className="text-sm text-gray-700 dark:text-gray-300">
-                      {typeof item === 'string' ? item : item.element || item.content || String(item)}
+                      {sanitizeText(typeof item === 'string' ? item : item.element || item.content || String(item), 300)}
                     </p>
                     {item.reason && (
-                      <p className="text-xs text-gray-500 dark:text-gray-400">{item.reason}</p>
+                      <p className="text-xs text-gray-500 dark:text-gray-400">{sanitizeText(item.reason, 200)}</p>
                     )}
                   </div>
                 </li>
@@ -262,10 +289,19 @@ function ReadabilityLLMColumn({
               <span className="text-sm font-bold text-gray-900 dark:text-white">
                 {extraction.usefulnessScore ?? extraction.usefulness ?? 'N/A'}/10
               </span>
+              {(() => {
+                const score = extraction.usefulnessScore ?? extraction.usefulness;
+                const label = getUsefulnessLabel(score);
+                return label ? (
+                  <span className={`text-sm font-medium ${getUsefulnessLabelColor(score)}`}>
+                    {label}
+                  </span>
+                ) : null;
+              })()}
             </div>
             {extraction.usefulnessExplanation && (
               <p className="text-sm text-gray-500 dark:text-gray-400 mt-2">
-                {extraction.usefulnessExplanation}
+                {sanitizeText(extraction.usefulnessExplanation, 500)}
               </p>
             )}
           </CollapsibleSection>

@@ -162,8 +162,13 @@ export function useTimeTracking(projectId, itemId = null) {
     }
   };
 
-  // Delete time entry
+  // Delete time entry (with ownership check)
   const deleteEntry = async (entryId) => {
+    const entry = timeEntries.find(e => e.id === entryId);
+    if (entry && entry.userId !== currentUser?.uid) {
+      toast.error('You can only delete your own time entries');
+      return;
+    }
     try {
       await deleteDoc(doc(db, 'time_entries', entryId));
       toast.success('Time entry deleted');

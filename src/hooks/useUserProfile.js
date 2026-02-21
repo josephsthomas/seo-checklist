@@ -30,12 +30,16 @@ export function useUserProfile(userId) {
       return;
     }
 
+    let cancelled = false;
+
     const fetchProfile = async () => {
       setLoading(true);
       setError(null);
 
       try {
         const userDoc = await getDoc(doc(db, 'users', targetUserId));
+
+        if (cancelled) return;
 
         if (userDoc.exists()) {
           setProfile({
@@ -46,14 +50,21 @@ export function useUserProfile(userId) {
           setError('User not found');
         }
       } catch (err) {
+        if (cancelled) return;
         console.error('Error fetching user profile:', err);
         setError('Failed to load profile');
       } finally {
-        setLoading(false);
+        if (!cancelled) {
+          setLoading(false);
+        }
       }
     };
 
     fetchProfile();
+
+    return () => {
+      cancelled = true;
+    };
   }, [targetUserId]);
 
   return { profile, loading, error, isOwnProfile: targetUserId === currentUser?.uid };

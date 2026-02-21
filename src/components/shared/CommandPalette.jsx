@@ -179,7 +179,7 @@ export default function CommandPalette({ isOpen, onClose }) {
   let currentIndex = -1;
 
   return (
-    <div className="fixed inset-0 z-[100] flex items-start justify-center pt-[15vh]">
+    <div className="fixed inset-0 z-[100] flex items-start justify-center pt-[15vh]" role="dialog" aria-modal="true" aria-label="Command palette">
       {/* Backdrop */}
       <div
         className="absolute inset-0 bg-charcoal-900/60 dark:bg-charcoal-950/80 backdrop-blur-sm"

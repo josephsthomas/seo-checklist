@@ -36,9 +36,11 @@ export function useChecklist(projectId) {
   const toggleItem = async (itemId) => {
     if (!projectId) return;
 
+    const previousValue = !!completions[itemId];
+    const newValue = !previousValue;
+
     try {
       const docRef = doc(db, 'checklist_completions', `${projectId}_completions`);
-      const newValue = !completions[itemId];
 
       // Update local state immediately for better UX
       setCompletions(prev => ({
@@ -59,10 +61,10 @@ export function useChecklist(projectId) {
       }
     } catch {
       toast.error('Failed to update item');
-      // Revert on error
+      // Revert on error using captured previous value
       setCompletions(prev => ({
         ...prev,
-        [itemId]: !completions[itemId]
+        [itemId]: previousValue
       }));
     }
   };

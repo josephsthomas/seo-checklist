@@ -32,22 +32,22 @@ export const ITEM_TYPE_INFO = {
     icon: 'Search'
   },
   [LINKED_ITEM_TYPES.ACCESSIBILITY]: {
-    label: 'Accessibility Audit',
+    label: 'Accessibility Analysis',
     color: 'purple',
     icon: 'Accessibility'
   },
   [LINKED_ITEM_TYPES.IMAGE_ALT]: {
-    label: 'Image Alt Text',
+    label: 'Image Alt',
     color: 'emerald',
     icon: 'Image'
   },
   [LINKED_ITEM_TYPES.META_DATA]: {
-    label: 'Meta Data',
+    label: 'Metadata',
     color: 'amber',
     icon: 'Tags'
   },
   [LINKED_ITEM_TYPES.SCHEMA]: {
-    label: 'Structured Data',
+    label: 'Schema',
     color: 'rose',
     icon: 'Code2'
   }

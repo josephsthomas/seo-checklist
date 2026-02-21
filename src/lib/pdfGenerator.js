@@ -4,8 +4,6 @@
  * Phase 9 - Batch 4
  */
 
-import jsPDF from 'jspdf';
-import 'jspdf-autotable';
 import { format } from 'date-fns';
 
 /**
@@ -13,7 +11,10 @@ import { format } from 'date-fns';
  * @param {Object} options - PDF generation options
  * @returns {jsPDF} PDF document
  */
-export function generateChecklistPDF(options) {
+export async function generateChecklistPDF(options) {
+  const { default: jsPDF } = await import('jspdf');
+  await import('jspdf-autotable');
+
   const {
     items,
     completions = {},
@@ -299,9 +300,9 @@ export function downloadPDF(doc, filename = 'seo-checklist.pdf') {
 export function previewPDF(doc) {
   const blob = doc.output('blob');
   const url = URL.createObjectURL(blob);
-  window.open(url, '_blank');
-  // URL will be revoked when window closes
-  setTimeout(() => URL.revokeObjectURL(url), 100);
+  const win = window.open(url, '_blank', 'noopener');
+  // Revoke after a generous delay to ensure the browser has loaded the blob
+  setTimeout(() => URL.revokeObjectURL(url), 60000);
 }
 
 export default {

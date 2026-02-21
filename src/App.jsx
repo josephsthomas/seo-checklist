@@ -21,14 +21,14 @@ import ErrorBoundary, { ToolErrorBoundary } from './components/shared/ErrorBound
 // Home - eager load for fast initial render
 import HomePage from './components/home/HomePage';
 
-// Public Pages - eager load for fast marketing site
-import LandingPage from './components/public/LandingPage';
-import AboutPage from './components/public/AboutPage';
-import FeaturesPage from './components/public/FeaturesPage';
-import FeatureDetailPage from './components/public/FeatureDetailPage';
-import HelpCenterPage from './components/public/HelpCenterPage';
-import GettingStartedPage from './components/public/GettingStartedPage';
-import PublicNotFoundPage from './components/public/NotFoundPage';
+// Public Pages - lazy load to reduce initial bundle for authenticated users
+const LandingPage = lazyWithRetry(() => import('./components/public/LandingPage'), 'LandingPage');
+const AboutPage = lazyWithRetry(() => import('./components/public/AboutPage'), 'AboutPage');
+const FeaturesPage = lazyWithRetry(() => import('./components/public/FeaturesPage'), 'FeaturesPage');
+const FeatureDetailPage = lazyWithRetry(() => import('./components/public/FeatureDetailPage'), 'FeatureDetailPage');
+const HelpCenterPage = lazyWithRetry(() => import('./components/public/HelpCenterPage'), 'HelpCenterPage');
+const GettingStartedPage = lazyWithRetry(() => import('./components/public/GettingStartedPage'), 'GettingStartedPage');
+const PublicNotFoundPage = lazyWithRetry(() => import('./components/public/NotFoundPage'), 'NotFoundPage');
 
 // Lazy loaded components for code splitting (with retry logic)
 const ProjectDashboard = lazyWithRetry(() => import('./components/projects/ProjectDashboard'), 'ProjectDashboard');
@@ -45,11 +45,12 @@ const ActivityPage = lazyWithRetry(() => import('./components/activity/ActivityP
 // Help Components - lazy load
 const ResourceLibrary = lazyWithRetry(() => import('./components/help/ResourceLibrary'), 'ResourceLibrary');
 const GlossaryPage = lazyWithRetry(() => import('./components/help/GlossaryPage'), 'GlossaryPage');
-import KeyboardShortcuts from './components/help/KeyboardShortcuts';
-import OnboardingWalkthrough from './components/help/OnboardingWalkthrough';
-import FeedbackWidget from './components/shared/FeedbackWidget';
-import CookieConsent from './components/shared/CookieConsent';
-import CommandPalette, { useCommandPalette } from './components/shared/CommandPalette';
+const KeyboardShortcuts = lazyWithRetry(() => import('./components/help/KeyboardShortcuts'), 'KeyboardShortcuts');
+const OnboardingWalkthrough = lazyWithRetry(() => import('./components/help/OnboardingWalkthrough'), 'OnboardingWalkthrough');
+const FeedbackWidget = lazyWithRetry(() => import('./components/shared/FeedbackWidget'), 'FeedbackWidget');
+const CookieConsent = lazyWithRetry(() => import('./components/shared/CookieConsent'), 'CookieConsent');
+import { useCommandPalette } from './components/shared/CommandPalette';
+const CommandPalette = lazyWithRetry(() => import('./components/shared/CommandPalette'), 'CommandPalette');
 
 // Audit Components - lazy load (heaviest components with exceljs, jspdf)
 const AuditPage = lazyWithRetry(() => import('./components/audit/AuditPage'), 'AuditPage');
@@ -91,15 +92,16 @@ const AccessibilityStatement = lazyWithRetry(() => import('./components/legal/Ac
  */
 function PageLoader() {
   return (
-    <div className="min-h-screen bg-gradient-to-b from-charcoal-50 to-white flex items-center justify-center">
+    <div className="min-h-screen bg-gradient-to-b from-charcoal-50 to-white dark:from-charcoal-900 dark:to-charcoal-800 flex items-center justify-center" role="status" aria-live="polite">
       <div className="text-center">
         <div className="relative">
           {/* Outer ring */}
-          <div className="w-16 h-16 border-4 border-charcoal-100 rounded-full"></div>
+          <div className="w-16 h-16 border-4 border-charcoal-100 dark:border-charcoal-700 rounded-full"></div>
           {/* Spinning gradient ring */}
           <div className="absolute inset-0 w-16 h-16 border-4 border-transparent border-t-primary-500 border-r-cyan-500 rounded-full animate-spin"></div>
         </div>
-        <p className="text-charcoal-500 mt-4 font-medium">Loading...</p>
+        <p className="text-charcoal-500 dark:text-charcoal-400 mt-4 font-medium">Loading...</p>
+        <span className="sr-only">Loading page content</span>
       </div>
     </div>
   );
@@ -150,7 +152,7 @@ function AppContent() {
       {currentUser && <CommandPalette isOpen={commandPalette.isOpen} onClose={commandPalette.close} />}
       {currentUser && <OnboardingWalkthrough />}
       {currentUser && <KeyboardShortcuts />}
-          <main id="main-content" className="flex-1" role="main">
+      <main id="main-content" className="flex-1" role="main">
             <ErrorBoundary variant="page" message="Failed to load this page. This might be a temporary issue.">
               <Suspense fallback={<PageLoader />}>
                 <Routes>

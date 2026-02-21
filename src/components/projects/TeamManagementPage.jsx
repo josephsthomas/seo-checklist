@@ -34,6 +34,11 @@ export default function TeamManagementPage() {
   };
 
   const handleUpdateRole = async (userId, newRole) => {
+    // Only admins can assign the admin role
+    if (newRole === USER_ROLES.ADMIN && userProfile?.role !== USER_ROLES.ADMIN) {
+      toast.error('Only administrators can assign the Admin role');
+      return;
+    }
     try {
       const userRef = doc(db, 'users', userId);
       await updateDoc(userRef, { role: newRole });
@@ -238,7 +243,9 @@ export default function TeamManagementPage() {
                           className="input text-sm py-1"
                           autoFocus
                         >
-                          {Object.entries(ROLE_LABELS).map(([value, label]) => (
+                          {Object.entries(ROLE_LABELS)
+                            .filter(([value]) => value !== USER_ROLES.ADMIN || userProfile?.role === USER_ROLES.ADMIN)
+                            .map(([value, label]) => (
                             <option key={value} value={value}>
                               {label}
                             </option>

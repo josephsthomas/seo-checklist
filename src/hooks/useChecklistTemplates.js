@@ -9,7 +9,8 @@ import {
   updateDoc,
   deleteDoc,
   doc,
-  serverTimestamp
+  serverTimestamp,
+  increment
 } from 'firebase/firestore';
 import { db } from '../lib/firebase';
 import { useAuth } from '../contexts/AuthContext';
@@ -119,18 +120,18 @@ export function useChecklistTemplates() {
   // Increment usage count
   const incrementUsage = useCallback(async (templateId) => {
     try {
-      const template = templates.find(t => t.id === templateId);
-      if (template) {
-        const templateRef = doc(db, 'checklistTemplates', templateId);
-        await updateDoc(templateRef, {
-          usageCount: (template.usageCount || 0) + 1,
-          lastUsedAt: serverTimestamp(),
-        });
-      }
+      const templateRef = doc(db, 'checklistTemplates', templateId);
+      setTemplates(prev => prev.map(t =>
+        t.id === templateId ? { ...t, usageCount: (t.usageCount || 0) + 1 } : t
+      ));
+      await updateDoc(templateRef, {
+        usageCount: increment(1),
+        lastUsedAt: serverTimestamp(),
+      });
     } catch (err) {
       console.error('Error updating usage count:', err);
     }
-  }, [templates]);
+  }, []);
 
   // Duplicate a template
   const duplicateTemplate = useCallback(async (templateId) => {
@@ -173,7 +174,7 @@ export const DEFAULT_TEMPLATES = [
     name: 'Technical SEO Focus',
     description: 'Focus on technical aspects: site speed, crawlability, indexing',
     isDefault: true,
-    categories: ['technical', 'site-speed', 'indexing'],
+    categories: ['Technical SEO', 'Performance', 'Security'],
     itemCount: 35,
     icon: 'settings',
   },
@@ -182,7 +183,7 @@ export const DEFAULT_TEMPLATES = [
     name: 'Content Optimization',
     description: 'Content-focused checklist for blog posts and landing pages',
     isDefault: true,
-    categories: ['content', 'on-page', 'meta-tags'],
+    categories: ['Content Strategy', 'On-Page Optimization', 'Keyword Research'],
     itemCount: 40,
     icon: 'file-text',
   },
@@ -191,7 +192,7 @@ export const DEFAULT_TEMPLATES = [
     name: 'Local SEO',
     description: 'Local business optimization checklist',
     isDefault: true,
-    categories: ['local-seo', 'google-business', 'citations'],
+    categories: ['Local SEO', 'Schema Markup', 'Knowledge Graph'],
     itemCount: 25,
     icon: 'map-pin',
   },
@@ -200,7 +201,7 @@ export const DEFAULT_TEMPLATES = [
     name: 'E-commerce SEO',
     description: 'Product pages, categories, and e-commerce specific optimizations',
     isDefault: true,
-    categories: ['product-pages', 'category-pages', 'schema'],
+    categories: ['E-Commerce SEO', 'Schema Markup', 'On-Page Optimization'],
     itemCount: 45,
     icon: 'shopping-cart',
   },
@@ -209,7 +210,7 @@ export const DEFAULT_TEMPLATES = [
     name: 'Website Launch',
     description: 'Pre-launch and post-launch SEO checklist',
     isDefault: true,
-    categories: ['pre-launch', 'post-launch', 'redirects'],
+    categories: ['Foundation & Setup', 'Site Refresh/Migration', 'Testing & QA'],
     itemCount: 30,
     icon: 'rocket',
   },

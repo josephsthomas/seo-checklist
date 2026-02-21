@@ -116,7 +116,7 @@ const FAQ_ITEMS = [
   },
   {
     question: 'How does the AI feature work?',
-    answer: 'We use Claude AI to provide intelligent recommendations, generate content, and analyze your data. AI features are available across all tools.'
+    answer: 'We use Claude AI to help provide recommendations, generate content suggestions, and analyze your data. AI-generated outputs should be reviewed for accuracy before use. AI features are available across all tools.'
   },
   {
     question: 'Can I export reports for clients?',

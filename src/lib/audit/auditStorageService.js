@@ -15,7 +15,8 @@ import {
   limit,
   deleteDoc,
   updateDoc,
-  serverTimestamp
+  serverTimestamp,
+  increment
 } from 'firebase/firestore';
 import { db, auth } from '../firebase';
 
@@ -74,14 +75,23 @@ export async function saveAudit(auditResults, urlData = [], domainInfo = {}) {
     urlCount: auditResults.urlCount,
     issueCount: auditResults.issues?.length || 0,
     // Store issues separately to handle large datasets
-    issues: auditResults.issues.slice(0, 500), // Limit to prevent exceeding Firestore doc size
+    issues: auditResults.issues.slice(0, 500),
+    issuesTruncated: auditResults.issues?.length > 500,
     // Store metadata about URL data
     urlDataCount: urlData.length,
     // Store sample URL data (full data would exceed limits)
     urlDataSample: urlData.slice(0, 100),
+    urlDataTruncated: urlData.length > 100,
     createdAt: serverTimestamp(),
     updatedAt: serverTimestamp()
   };
+
+  if (auditResults.issues?.length > 500) {
+    console.warn(`Audit saved with truncated issues: ${auditResults.issues.length} issues found, only 500 stored.`);
+  }
+  if (urlData.length > 100) {
+    console.warn(`Audit saved with truncated URL data: ${urlData.length} URLs found, only 100 stored.`);
+  }
 
   await setDoc(doc(db, AUDITS_COLLECTION, auditId), auditDoc);
 
@@ -293,9 +303,9 @@ export async function getSharedAudit(shareId, password = null) {
     throw new Error('Audit not found');
   }
 
-  // Increment view count
+  // Increment view count atomically
   await updateDoc(shareRef, {
-    viewCount: (shareData.viewCount || 0) + 1
+    viewCount: increment(1)
   });
 
   const auditData = auditSnap.data();

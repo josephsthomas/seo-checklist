@@ -51,8 +51,7 @@ body {
 }
 
 .dark body,
-body.dark,
-.dark {
+body.dark {
   background: linear-gradient(180deg, #0f172a 0%, #020617 100%);
 }
 
@@ -98,6 +97,18 @@ html {
 }
 
 /* Dark mode scrollbar */
+html.dark::-webkit-scrollbar-track {
+  background: #1e293b;
+}
+
+html.dark::-webkit-scrollbar-thumb {
+  background: #475569;
+}
+
+html.dark::-webkit-scrollbar-thumb:hover {
+  background: #64748b;
+}
+
 .dark ::-webkit-scrollbar-track {
   background: #1e293b;
 }
@@ -175,7 +186,8 @@ html {
   .btn-icon {
     @apply p-2.5 rounded-xl
            hover:bg-charcoal-100
-           transition-colors duration-200;
+           transition-colors duration-200
+           focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2;
   }
 
   /* ----- CARDS ----- */
@@ -213,7 +225,7 @@ html {
            bg-white
            border border-charcoal-200
            rounded-xl
-           text-charcoal-900 placeholder:text-charcoal-400
+           text-charcoal-900 placeholder:text-charcoal-500
            transition-all duration-200
            focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500
            hover:border-charcoal-300;
@@ -304,7 +316,7 @@ html {
 
   /* ----- DROPDOWN ----- */
   .dropdown-menu {
-    @apply absolute z-50
+    @apply absolute z-[60]
            min-w-[12rem] p-1.5
            bg-white rounded-xl
            border border-charcoal-100
@@ -401,7 +413,7 @@ html {
   }
 
   .avatar-ring {
-    @apply ring-2 ring-white ring-offset-2 ring-offset-charcoal-50;
+    @apply ring-2 ring-white ring-offset-2 ring-offset-charcoal-50 dark:ring-charcoal-800 dark:ring-offset-charcoal-900;
   }
 
   /* ----- TABS ----- */
@@ -506,6 +518,13 @@ html {
 .stagger-children > *:nth-child(4) { animation-delay: 150ms; }
 .stagger-children > *:nth-child(5) { animation-delay: 200ms; }
 .stagger-children > *:nth-child(6) { animation-delay: 250ms; }
+.stagger-children > *:nth-child(7) { animation-delay: 300ms; }
+.stagger-children > *:nth-child(8) { animation-delay: 350ms; }
+.stagger-children > *:nth-child(9) { animation-delay: 400ms; }
+.stagger-children > *:nth-child(10) { animation-delay: 450ms; }
+.stagger-children > *:nth-child(11) { animation-delay: 500ms; }
+.stagger-children > *:nth-child(12) { animation-delay: 550ms; }
+.stagger-children > *:nth-child(n+13) { animation-delay: 600ms; }
 
 @keyframes fadeInUp {
   from {
@@ -549,6 +568,12 @@ html {
 
 .dark .card-glass {
   @apply bg-charcoal-800/70 border-charcoal-700/20;
+  --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+  box-shadow: var(--glass-shadow);
+}
+
+.dark .card-gradient {
+  @apply bg-gradient-to-br from-charcoal-800 to-charcoal-900/50;
 }
 
 /* Dark mode buttons */
@@ -746,6 +771,10 @@ html {
 /* Focus Within for Form Groups */
 .form-group:focus-within label {
   @apply text-primary-600;
+}
+
+.dark .form-group:focus-within label {
+  @apply text-primary-400;
 }
 
 /* Screen Reader Only - Enhanced */

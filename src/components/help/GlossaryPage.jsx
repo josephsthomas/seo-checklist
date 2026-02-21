@@ -1,4 +1,4 @@
-import { useState, useMemo, useDeferredValue } from 'react';
+import { useState, useMemo, useDeferredValue, useEffect } from 'react';
 import { Search, BookOpen, Tag, Link as LinkIcon } from 'lucide-react';
 import { glossaryTerms, glossaryCategories } from '../../data/glossary';
 
@@ -7,6 +7,10 @@ export default function GlossaryPage() {
   const deferredSearchQuery = useDeferredValue(searchQuery);
   const [selectedCategory, setSelectedCategory] = useState('All');
   const [selectedTerm, setSelectedTerm] = useState(null);
+
+  useEffect(() => {
+    document.title = 'SEO Glossary | Content Strategy Portal';
+  }, []);
 
   const filteredTerms = useMemo(() => {
     return glossaryTerms.filter(term => {

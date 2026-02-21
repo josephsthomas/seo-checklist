@@ -7,6 +7,7 @@
 const CACHE_DURATION_MS = 24 * 60 * 60 * 1000; // 24 hours
 const CACHE_KEY_PREFIX = 'readability_cache_';
 const MAX_CACHE_ENTRIES = 20;
+const MAX_CACHE_ENTRY_SIZE = 512 * 1024; // 512KB max per cache entry
 
 /**
  * Simple content hash using DJB2 algorithm
@@ -104,7 +105,12 @@ export function setCachedAnalysis(url, htmlContent, result) {
       }
     };
 
-    localStorage.setItem(key, JSON.stringify(cacheEntry));
+    const serialized = JSON.stringify(cacheEntry);
+    if (serialized.length > MAX_CACHE_ENTRY_SIZE) {
+      console.warn(`Analysis cache entry too large (${(serialized.length / 1024).toFixed(1)}KB), skipping cache`);
+      return;
+    }
+    localStorage.setItem(key, serialized);
     pruneCache();
   } catch {
     // localStorage full or quota exceeded — non-fatal

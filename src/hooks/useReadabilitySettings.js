@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { doc, getDoc, setDoc, serverTimestamp } from 'firebase/firestore';
 import { db } from '../lib/firebase';
 import { useAuth } from '../contexts/AuthContext';
+import toast from 'react-hot-toast';
 
 /**
  * Default settings for readability checker
@@ -58,8 +59,11 @@ export function useReadabilitySettings() {
   const updateSettings = useCallback(async (updates) => {
     if (!currentUser) return;
 
-    const newSettings = { ...settings, ...updates };
-    setSettings(newSettings);
+    let newSettings;
+    setSettings(prev => {
+      newSettings = { ...prev, ...updates };
+      return newSettings;
+    });
 
     try {
       const docRef = doc(db, 'readability-settings', currentUser.uid);
@@ -70,8 +74,9 @@ export function useReadabilitySettings() {
     } catch (err) {
       console.error('Could not save readability settings:', err);
       setError(err.message);
+      toast.error('Failed to save settings. Please try again.');
     }
-  }, [currentUser, settings]);
+  }, [currentUser]);
 
   // Reset to defaults
   const resetSettings = useCallback(async () => {

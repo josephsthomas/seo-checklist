@@ -1,3 +1,4 @@
+import { useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 import { useProjects } from '../../hooks/useProjects';
@@ -29,6 +30,7 @@ import {
   ScanEye
 } from 'lucide-react';
 import { format } from 'date-fns';
+import SEOHead from '../shared/SEOHead';
 
 export default function HomePage() {
   const { userProfile } = useAuth();
@@ -85,6 +87,7 @@ export default function HomePage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-charcoal-50 to-white">
+      <SEOHead pageKey="home" />
       {/* Hero Section with Gradient */}
       <div className="relative overflow-hidden">
         {/* Background Decorations */}
@@ -213,7 +216,7 @@ export default function HomePage() {
                 <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-purple-500 to-purple-600 flex items-center justify-center mb-2 group-hover:scale-110 transition-transform shadow-md" aria-hidden="true">
                   <Accessibility className="w-5 h-5 text-white" />
                 </div>
-                <span className="text-sm font-medium text-charcoal-700 group-hover:text-purple-700 text-center">A11y Check</span>
+                <span className="text-sm font-medium text-charcoal-700 group-hover:text-purple-700 text-center">Accessibility</span>
               </Link>
 
               <Link

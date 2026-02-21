@@ -28,7 +28,7 @@ export function computeLLMConsensus(llmExtractions) {
   const llms = Object.entries(llmExtractions).filter(([, data]) => data && !data.error);
   if (llms.length < 2) return { overall: 0, fields: {}, available: false };
 
-  const fields = ['title', 'description', 'mainContent'];
+  const fields = ['extractedTitle', 'extractedDescription', 'mainContent'];
   const fieldScores = {};
 
   for (const field of fields) {

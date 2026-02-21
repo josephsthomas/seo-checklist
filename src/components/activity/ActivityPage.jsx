@@ -7,13 +7,13 @@ import ActivityTimeline from './ActivityTimeline';
  */
 export default function ActivityPage() {
   return (
-    <div className="min-h-screen bg-charcoal-50">
+    <div className="min-h-screen bg-charcoal-50 dark:bg-charcoal-900">
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Header */}
         <div className="mb-8">
           <Link
-            to="/"
-            className="inline-flex items-center gap-2 text-charcoal-600 hover:text-charcoal-800 mb-4 transition-colors"
+            to="/app"
+            className="inline-flex items-center gap-2 text-charcoal-600 dark:text-charcoal-400 hover:text-charcoal-800 dark:hover:text-charcoal-200 mb-4 transition-colors"
           >
             <ArrowLeft className="w-4 h-4" />
             Back to Dashboard
@@ -23,14 +23,14 @@ export default function ActivityPage() {
               <Clock className="w-6 h-6 text-white" />
             </div>
             <div>
-              <h1 className="text-2xl font-bold text-charcoal-900">Activity Timeline</h1>
-              <p className="text-charcoal-500">Your complete activity history across all tools</p>
+              <h1 className="text-2xl font-bold text-charcoal-900 dark:text-white">Activity Timeline</h1>
+              <p className="text-charcoal-500 dark:text-charcoal-400">Your complete activity history across all tools</p>
             </div>
           </div>
         </div>
 
         {/* Timeline */}
-        <div className="bg-white rounded-2xl border border-charcoal-100 p-6">
+        <div className="bg-white dark:bg-charcoal-800 rounded-2xl border border-charcoal-100 dark:border-charcoal-700 p-6">
           <ActivityTimeline showFilters={true} />
         </div>
       </div>

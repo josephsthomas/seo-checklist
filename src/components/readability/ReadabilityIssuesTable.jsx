@@ -34,9 +34,9 @@ const STATUS_ORDER = { fail: 0, warn: 1, na: 2, pass: 3 };
 const CATEGORY_LABELS = {
   contentStructure: 'Content Structure',
   contentClarity: 'Content Clarity',
-  technicalAccessibility: 'Technical Access.',
+  technicalAccessibility: 'Technical Accessibility',
   metadataSchema: 'Metadata & Schema',
-  aiSignals: 'AI Signals',
+  aiSignals: 'AI-Specific Signals',
 };
 
 const ITEMS_PER_PAGE = 20;
@@ -156,7 +156,7 @@ export default function ReadabilityIssuesTable({ checkResults }) {
     page * ITEMS_PER_PAGE
   );
 
-  function SortHeader({ column, label, align = 'left' }) {
+  const SortHeader = useCallback(({ column, label, align = 'left' }) => {
     const isSorted = sortCol === column;
     return (
       <th
@@ -164,8 +164,11 @@ export default function ReadabilityIssuesTable({ checkResults }) {
         className={`px-3 py-3 text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400 cursor-pointer select-none hover:text-gray-700 dark:hover:text-gray-300 ${
           align === 'center' ? 'text-center' : 'text-left'
         }`}
+        tabIndex={0}
         onClick={() => handleSort(column)}
+        onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); handleSort(column); } }}
         aria-sort={isSorted ? (sortDir === 'asc' ? 'ascending' : 'descending') : 'none'}
+        role="columnheader"
       >
         <span className="inline-flex items-center gap-1">
           {label}
@@ -181,7 +184,7 @@ export default function ReadabilityIssuesTable({ checkResults }) {
         </span>
       </th>
     );
-  }
+  }, [sortCol, sortDir, handleSort]);
 
   if (!checkResults || checks.length === 0) {
     return (
@@ -310,12 +313,20 @@ export default function ReadabilityIssuesTable({ checkResults }) {
                         className={`hover:bg-gray-50 dark:hover:bg-charcoal-750 transition-colors ${
                           hasDetails ? 'cursor-pointer' : ''
                         }`}
+                        tabIndex={hasDetails ? 0 : undefined}
+                        role={hasDetails ? 'button' : undefined}
+                        aria-expanded={hasDetails ? isExpanded : undefined}
                         onClick={
                           hasDetails
                             ? () =>
                                 setExpandedRow(
                                   isExpanded ? null : check.id || check.name
                                 )
+                            : undefined
+                        }
+                        onKeyDown={
+                          hasDetails
+                            ? (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setExpandedRow(isExpanded ? null : check.id || check.name); } }
                             : undefined
                         }
                       >

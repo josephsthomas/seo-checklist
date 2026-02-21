@@ -35,6 +35,7 @@ export default function ChecklistTemplates({ onApplyTemplate, onClose }) {
   const [activeTab, setActiveTab] = useState('default');
   const [showCreateForm, setShowCreateForm] = useState(false);
   const [deleteConfirm, setDeleteConfirm] = useState(null);
+  const [actionLoading, setActionLoading] = useState(null);
 
   const allTemplates = activeTab === 'default' ? DEFAULT_TEMPLATES : templates;
 
@@ -44,8 +45,22 @@ export default function ChecklistTemplates({ onApplyTemplate, onClose }) {
 
   const confirmDelete = async () => {
     if (deleteConfirm) {
-      await deleteTemplate(deleteConfirm.id);
+      setActionLoading(`delete-${deleteConfirm.id}`);
+      try {
+        await deleteTemplate(deleteConfirm.id);
+      } finally {
+        setActionLoading(null);
+      }
       setDeleteConfirm(null);
+    }
+  };
+
+  const handleDuplicate = async (templateId) => {
+    setActionLoading(`duplicate-${templateId}`);
+    try {
+      await duplicateTemplate(templateId);
+    } finally {
+      setActionLoading(null);
     }
   };
 
@@ -183,11 +198,12 @@ export default function ChecklistTemplates({ onApplyTemplate, onClose }) {
                       {!template.isDefault && (
                         <>
                           <button
-                            onClick={() => duplicateTemplate(template.id)}
-                            className="p-2 text-charcoal-400 hover:text-charcoal-600 dark:hover:text-charcoal-300 hover:bg-charcoal-100 dark:hover:bg-charcoal-700 rounded-lg transition-colors"
+                            onClick={() => handleDuplicate(template.id)}
+                            disabled={actionLoading === `duplicate-${template.id}`}
+                            className="p-2 text-charcoal-400 hover:text-charcoal-600 dark:hover:text-charcoal-300 hover:bg-charcoal-100 dark:hover:bg-charcoal-700 rounded-lg transition-colors disabled:opacity-50"
                             title="Duplicate"
                           >
-                            <Copy className="w-4 h-4" />
+                            <Copy className={`w-4 h-4 ${actionLoading === `duplicate-${template.id}` ? 'animate-spin' : ''}`} />
                           </button>
                           <button
                             onClick={() => handleDeleteClick(template)}
@@ -259,9 +275,10 @@ export default function ChecklistTemplates({ onApplyTemplate, onClose }) {
                 </button>
                 <button
                   onClick={confirmDelete}
-                  className="btn bg-red-500 hover:bg-red-600 text-white"
+                  disabled={actionLoading?.startsWith('delete-')}
+                  className="btn bg-red-500 hover:bg-red-600 text-white disabled:opacity-50"
                 >
-                  Delete Template
+                  {actionLoading?.startsWith('delete-') ? 'Deleting...' : 'Delete Template'}
                 </button>
               </div>
             </div>
@@ -295,20 +312,20 @@ function CreateTemplateForm({ onClose, onCreate }) {
 
   const CATEGORY_OPTIONS = [
     'Technical SEO',
-    'On-Page SEO',
-    'Content Optimization',
-    'Meta Tags',
+    'On-Page Optimization',
+    'Content Strategy',
     'Schema Markup',
-    'Site Speed',
+    'Performance',
     'Mobile Optimization',
-    'Internal Linking',
-    'External Linking',
     'Image Optimization',
+    'Link Architecture',
+    'Foundation & Setup',
+    'Keyword Research',
     'Security',
     'Accessibility',
-    'Analytics',
     'Local SEO',
-    'E-commerce',
+    'E-Commerce SEO',
+    'Monitoring',
   ];
 
   const handleSubmit = async (e) => {

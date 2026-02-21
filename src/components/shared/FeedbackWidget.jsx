@@ -80,7 +80,8 @@ export default function FeedbackWidget() {
 
       setIsSubmitted(true);
       toast.success('Thank you for your feedback!');
-    } catch {
+    } catch (error) {
+      console.warn('Feedback submission failed:', error);
       toast.error('Failed to submit feedback. Please try again.');
     } finally {
       setIsSubmitting(false);

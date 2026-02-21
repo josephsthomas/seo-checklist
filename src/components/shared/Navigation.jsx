@@ -160,7 +160,7 @@ export default function Navigation() {
                               <span className="badge badge-info text-2xs">{tool.badge}</span>
                             )}
                           </div>
-                          <div className="text-xs text-charcoal-500">{tool.features[0]}</div>
+                          <div className="text-xs text-charcoal-500">{tool.tagline || tool.description}</div>
                         </div>
                       </Link>
                     );

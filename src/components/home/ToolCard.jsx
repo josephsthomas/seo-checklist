@@ -138,7 +138,10 @@ export default function ToolCard({
 
   return (
     <div
+      role="link"
+      tabIndex={0}
       onClick={handleClick}
+      onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); handleClick(); } }}
       className={`group relative card card-hover cursor-pointer overflow-hidden bg-gradient-to-br ${colors.lightGradient} p-6`}
     >
       {/* Hover Glow Effect */}

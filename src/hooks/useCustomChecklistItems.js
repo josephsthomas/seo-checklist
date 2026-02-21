@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import {
   collection,
   query,
@@ -22,6 +22,8 @@ export function useCustomChecklistItems(projectId) {
   const [customItems, setCustomItems] = useState([]);
   const [loading, setLoading] = useState(true);
   const { currentUser } = useAuth();
+  const customItemsRef = useRef(customItems);
+  customItemsRef.current = customItems;
 
   useEffect(() => {
     if (!projectId || !currentUser) {
@@ -43,6 +45,10 @@ export function useCustomChecklistItems(projectId) {
         ...doc.data()
       }));
       setCustomItems(items);
+      setLoading(false);
+    }, (error) => {
+      console.error('Error listening to custom checklist items:', error);
+      toast.error('Failed to load custom checklist items');
       setLoading(false);
     });
 
@@ -106,7 +112,7 @@ export function useCustomChecklistItems(projectId) {
 
   // Toggle completion
   const toggleComplete = useCallback(async (itemId) => {
-    const item = customItems.find(i => i.id === itemId);
+    const item = customItemsRef.current.find(i => i.id === itemId);
     if (!item) return;
 
     try {
@@ -120,7 +126,7 @@ export function useCustomChecklistItems(projectId) {
       console.error('Error toggling custom item:', error);
       toast.error('Failed to update item');
     }
-  }, [customItems]);
+  }, []);
 
   return {
     customItems,

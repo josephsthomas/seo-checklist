@@ -347,10 +347,10 @@ export default function ProgressDashboard() {
     return projects.map(project => ({
       project,
       stats: project.stats || {
-        total: 321,
-        completed: Math.floor(Math.random() * 200),
-        percentage: Math.floor(Math.random() * 100),
-        critical: Math.floor(Math.random() * 10),
+        total: 0,
+        completed: 0,
+        percentage: 0,
+        critical: 0,
         byPhase: {},
         byPriority: {}
       }

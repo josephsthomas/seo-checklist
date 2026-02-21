@@ -12,6 +12,7 @@ const ROUTE_CONFIG = {
   '/image-alt': { label: 'Image Alt Generator', parent: '/' },
   '/meta-generator': { label: 'Meta Generator', parent: '/' },
   '/schema-generator': { label: 'Schema Generator', parent: '/' },
+  '/readability': { label: 'Readability Analyzer', parent: '/' },
   '/my-tasks': { label: 'My Tasks', parent: '/' },
   '/team': { label: 'Team Management', parent: '/' },
   '/activity': { label: 'Activity', parent: '/' },

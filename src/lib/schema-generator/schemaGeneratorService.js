@@ -36,6 +36,10 @@ function getApiConfig() {
   }
 
   if (apiKey) {
+    if (import.meta.env.PROD) {
+      console.error('Direct API key usage is not allowed in production. Configure VITE_AI_PROXY_URL instead.');
+      return null;
+    }
     return { useProxy: false, apiKey };
   }
 
@@ -377,13 +381,17 @@ function parseSchemaResponse(content, htmlContent, options) {
       const parsed = JSON.parse(jsonMatch[0]);
 
       return {
-        schemas: parsed.schemas?.map(s => ({
-          type: s.type,
-          jsonLd: s.jsonLd,
-          richSnippetEligible: s.richSnippetEligible ?? SCHEMA_TYPES[s.type]?.richSnippet ?? false,
-          missingProperties: s.missingProperties || [],
-          suggestions: s.suggestions || []
-        })) || [],
+        schemas: parsed.schemas?.map(s => {
+          const validation = s.jsonLd ? validateSchema(s.jsonLd) : { valid: true, errors: [], warnings: [] };
+          return {
+            type: s.type,
+            jsonLd: s.jsonLd,
+            richSnippetEligible: s.richSnippetEligible ?? SCHEMA_TYPES[s.type]?.richSnippet ?? false,
+            missingProperties: s.missingProperties || [],
+            suggestions: [...(s.suggestions || []), ...validation.warnings],
+            validationErrors: validation.errors
+          };
+        }) || [],
         summary: parsed.summary || '',
         warnings: parsed.warnings || [],
         detectedTypes: htmlContent.detectedTypes,
@@ -434,7 +442,16 @@ function getStaticSchemaSuggestion(htmlContent, selectedType, options = {}) {
     case 'FAQPage':
       jsonLd = {
         ...jsonLd,
-        mainEntity: []
+        mainEntity: [
+          {
+            '@type': 'Question',
+            name: 'Sample question — replace with your FAQ',
+            acceptedAnswer: {
+              '@type': 'Answer',
+              text: 'Sample answer — replace with your answer'
+            }
+          }
+        ]
       };
       break;
 
@@ -493,8 +510,8 @@ export function validateSchema(jsonLd) {
   // Check for @context
   if (!jsonLd['@context']) {
     errors.push('Missing @context property');
-  } else if (!jsonLd['@context'].includes('schema.org')) {
-    warnings.push('@context should reference schema.org');
+  } else if (jsonLd['@context'] !== 'https://schema.org' && jsonLd['@context'] !== 'http://schema.org') {
+    warnings.push('@context should be exactly "https://schema.org"');
   }
 
   // Check for @type
@@ -507,6 +524,7 @@ export function validateSchema(jsonLd) {
 
   if (type === 'Article' || type === 'BlogPosting' || type === 'NewsArticle') {
     if (!jsonLd.headline) errors.push('Article requires headline property');
+    if (jsonLd.headline && jsonLd.headline.length > 110) warnings.push('Article headline exceeds 110 characters — Google recommends keeping headlines under 110 characters for rich results');
     if (!jsonLd.datePublished) warnings.push('Article should have datePublished');
     if (!jsonLd.author) warnings.push('Article should have author');
     if (!jsonLd.image) warnings.push('Article should have image for rich results');

@@ -24,7 +24,7 @@ export default function AccessibilityProcessingScreen({ progress, stage, message
   const isComplete = stage === 'complete';
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-charcoal-50 to-white flex items-center justify-center">
+    <div className="min-h-screen bg-gradient-to-b from-charcoal-50 to-white dark:from-charcoal-900 dark:to-charcoal-950 flex items-center justify-center">
       {/* Background Decorations */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <div className="absolute -top-24 -right-24 w-96 h-96 bg-purple-500/10 rounded-full blur-3xl" />
@@ -47,21 +47,26 @@ export default function AccessibilityProcessingScreen({ progress, stage, message
           </div>
 
           {/* Stage Info */}
-          <h2 className="text-2xl font-bold text-charcoal-900 mb-2">
+          <h2 className="text-2xl font-bold text-charcoal-900 dark:text-white mb-2">
             {stageInfo.label}
           </h2>
-          <p className="text-charcoal-600 mb-8">
+          <p className="text-charcoal-600 dark:text-charcoal-400 mb-8">
             {message || stageInfo.description}
           </p>
 
           {/* Progress Bar */}
           <div className="mb-8">
             <div className="flex items-center justify-between text-sm mb-2">
-              <span className="text-charcoal-500">Progress</span>
-              <span className="font-bold text-charcoal-900">{progress}%</span>
+              <span className="text-charcoal-500 dark:text-charcoal-400">Progress</span>
+              <span className="font-bold text-charcoal-900 dark:text-white">{progress}%</span>
             </div>
-            <div className="h-3 bg-charcoal-100 rounded-full overflow-hidden">
+            <div className="h-3 bg-charcoal-100 dark:bg-charcoal-700 rounded-full overflow-hidden">
               <div
+                role="progressbar"
+                aria-valuenow={progress}
+                aria-valuemin={0}
+                aria-valuemax={100}
+                aria-label="Processing progress"
                 className={`h-full rounded-full transition-all duration-500 ease-out ${
                   isComplete
                     ? 'bg-gradient-to-r from-emerald-500 to-emerald-600'
@@ -85,9 +90,9 @@ export default function AccessibilityProcessingScreen({ progress, stage, message
                 <div
                   key={key}
                   className={`flex items-center gap-3 p-3 rounded-xl transition-colors ${
-                    isCurrent ? 'bg-purple-50 border border-purple-200' :
-                    isPast ? 'bg-emerald-50 border border-emerald-200' :
-                    'bg-charcoal-50 border border-transparent'
+                    isCurrent ? 'bg-purple-50 dark:bg-purple-900/20 border border-purple-200 dark:border-purple-800' :
+                    isPast ? 'bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-200 dark:border-emerald-800' :
+                    'bg-charcoal-50 dark:bg-charcoal-800 border border-transparent'
                   }`}
                 >
                   <div className={`w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 ${
@@ -104,9 +109,9 @@ export default function AccessibilityProcessingScreen({ progress, stage, message
                     )}
                   </div>
                   <span className={`text-sm font-medium ${
-                    isPast ? 'text-emerald-700' :
-                    isCurrent ? 'text-purple-700' :
-                    'text-charcoal-400'
+                    isPast ? 'text-emerald-700 dark:text-emerald-400' :
+                    isCurrent ? 'text-purple-700 dark:text-purple-400' :
+                    'text-charcoal-400 dark:text-charcoal-500'
                   }`}>
                     {info.label}
                   </span>
@@ -117,8 +122,8 @@ export default function AccessibilityProcessingScreen({ progress, stage, message
 
           {/* File Name */}
           {fileName && (
-            <div className="mt-8 pt-6 border-t border-charcoal-100">
-              <div className="flex items-center justify-center gap-2 text-sm text-charcoal-500">
+            <div className="mt-8 pt-6 border-t border-charcoal-100 dark:border-charcoal-700">
+              <div className="flex items-center justify-center gap-2 text-sm text-charcoal-500 dark:text-charcoal-400">
                 <FileArchive className="w-4 h-4" />
                 <span className="truncate max-w-xs">{fileName}</span>
               </div>

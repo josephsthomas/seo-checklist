@@ -19,18 +19,18 @@ function DueDateItem({ item, onComplete, onDelete }) {
   const [completing, setCompleting] = useState(false);
 
   const urgencyColors = {
-    overdue: 'bg-red-50 border-red-200 text-red-700',
-    today: 'bg-amber-50 border-amber-200 text-amber-700',
-    tomorrow: 'bg-orange-50 border-orange-200 text-orange-700',
-    soon: 'bg-yellow-50 border-yellow-200 text-yellow-700',
-    week: 'bg-blue-50 border-blue-200 text-blue-700',
-    future: 'bg-charcoal-50 border-charcoal-200 text-charcoal-600'
+    overdue: 'bg-red-50 border-red-200 text-red-700 dark:bg-red-900/20 dark:border-red-800 dark:text-red-300',
+    today: 'bg-amber-50 border-amber-200 text-amber-700 dark:bg-amber-900/20 dark:border-amber-800 dark:text-amber-300',
+    tomorrow: 'bg-orange-50 border-orange-200 text-orange-700 dark:bg-orange-900/20 dark:border-orange-800 dark:text-orange-300',
+    soon: 'bg-yellow-50 border-yellow-200 text-yellow-700 dark:bg-yellow-900/20 dark:border-yellow-800 dark:text-yellow-300',
+    week: 'bg-blue-50 border-blue-200 text-blue-700 dark:bg-blue-900/20 dark:border-blue-800 dark:text-blue-300',
+    future: 'bg-charcoal-50 border-charcoal-200 text-charcoal-600 dark:bg-charcoal-700 dark:border-charcoal-600 dark:text-charcoal-300'
   };
 
   const priorityColors = {
-    high: 'text-red-500',
-    medium: 'text-amber-500',
-    low: 'text-blue-500'
+    high: 'text-red-500 dark:text-red-400',
+    medium: 'text-amber-500 dark:text-amber-400',
+    low: 'text-blue-500 dark:text-blue-400'
   };
 
   const handleComplete = async () => {
@@ -41,7 +41,7 @@ function DueDateItem({ item, onComplete, onDelete }) {
 
   return (
     <div className={`flex items-start gap-3 p-3 rounded-xl border transition-all ${
-      item.completed ? 'bg-charcoal-50 border-charcoal-100 opacity-60' : urgencyColors[urgency.level]
+      item.completed ? 'bg-charcoal-50 border-charcoal-100 opacity-60 dark:bg-charcoal-800 dark:border-charcoal-700' : urgencyColors[urgency.level]
     }`}>
       {/* Complete Button */}
       <button
@@ -50,7 +50,7 @@ function DueDateItem({ item, onComplete, onDelete }) {
         className={`w-5 h-5 rounded-full border-2 flex items-center justify-center flex-shrink-0 mt-0.5 transition-colors ${
           item.completed
             ? 'bg-emerald-500 border-emerald-500'
-            : 'border-charcoal-300 hover:border-primary-500 hover:bg-primary-50'
+            : 'border-charcoal-300 hover:border-primary-500 hover:bg-primary-50 dark:border-charcoal-500 dark:hover:border-primary-400 dark:hover:bg-primary-900/20'
         }`}
       >
         {completing ? (
@@ -62,12 +62,12 @@ function DueDateItem({ item, onComplete, onDelete }) {
 
       {/* Content */}
       <div className="flex-1 min-w-0">
-        <p className={`font-medium text-sm ${item.completed ? 'line-through text-charcoal-400' : 'text-charcoal-900'}`}>
+        <p className={`font-medium text-sm ${item.completed ? 'line-through text-charcoal-400 dark:text-charcoal-500' : 'text-charcoal-900 dark:text-white'}`}>
           {item.title}
         </p>
         <div className="flex items-center gap-2 mt-1">
           <span className={`text-xs font-medium px-1.5 py-0.5 rounded ${
-            item.completed ? 'bg-charcoal-100 text-charcoal-400' : ''
+            item.completed ? 'bg-charcoal-100 text-charcoal-400 dark:bg-charcoal-700 dark:text-charcoal-500' : ''
           }`}>
             {urgency.label}
           </span>
@@ -88,7 +88,7 @@ function DueDateItem({ item, onComplete, onDelete }) {
       {/* Delete */}
       <button
         onClick={() => onDelete(item.id)}
-        className="p-1 text-charcoal-400 hover:text-red-500 hover:bg-red-50 rounded transition-colors"
+        className="p-1 text-charcoal-400 hover:text-red-500 hover:bg-red-50 dark:text-charcoal-500 dark:hover:text-red-400 dark:hover:bg-red-900/20 rounded transition-colors"
         aria-label={`Delete due date: ${item.title}`}
       >
         <X className="w-4 h-4" aria-hidden="true" />
@@ -124,37 +124,37 @@ function AddDueDateModal({ isOpen, onClose, onSave }) {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center">
       <div className="absolute inset-0 bg-black/50" onClick={onClose} />
-      <div className="relative bg-white rounded-2xl shadow-xl w-full max-w-md mx-4 p-6">
-        <h3 className="text-lg font-semibold text-charcoal-900 mb-4">Add Due Date</h3>
+      <div className="relative bg-white dark:bg-charcoal-800 rounded-2xl shadow-xl w-full max-w-md mx-4 p-6">
+        <h3 className="text-lg font-semibold text-charcoal-900 dark:text-white mb-4">Add Due Date</h3>
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label className="block text-sm font-medium text-charcoal-700 mb-1">Title</label>
+            <label className="block text-sm font-medium text-charcoal-700 dark:text-charcoal-300 mb-1">Title</label>
             <input
               type="text"
               value={formData.title}
               onChange={(e) => setFormData({ ...formData, title: e.target.value })}
               placeholder="Task or reminder..."
-              className="w-full px-4 py-2 border border-charcoal-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500"
+              className="w-full px-4 py-2 border border-charcoal-200 dark:border-charcoal-600 rounded-xl bg-white dark:bg-charcoal-700 text-charcoal-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500"
               required
               autoFocus
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-charcoal-700 mb-1">Due Date</label>
+            <label className="block text-sm font-medium text-charcoal-700 dark:text-charcoal-300 mb-1">Due Date</label>
             <input
               type="date"
               value={formData.dueDate}
               onChange={(e) => setFormData({ ...formData, dueDate: e.target.value })}
               min={new Date().toISOString().split('T')[0]}
-              className="w-full px-4 py-2 border border-charcoal-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500"
+              className="w-full px-4 py-2 border border-charcoal-200 dark:border-charcoal-600 rounded-xl bg-white dark:bg-charcoal-700 text-charcoal-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500"
               required
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-charcoal-700 mb-1">Priority</label>
+            <label className="block text-sm font-medium text-charcoal-700 dark:text-charcoal-300 mb-1">Priority</label>
             <div className="flex gap-2">
               {['high', 'medium', 'low'].map(p => (
                 <button
@@ -166,7 +166,7 @@ function AddDueDateModal({ isOpen, onClose, onSave }) {
                       ? p === 'high' ? 'bg-red-100 text-red-700 border-2 border-red-300'
                         : p === 'medium' ? 'bg-amber-100 text-amber-700 border-2 border-amber-300'
                         : 'bg-blue-100 text-blue-700 border-2 border-blue-300'
-                      : 'bg-charcoal-50 text-charcoal-600 border-2 border-transparent'
+                      : 'bg-charcoal-50 text-charcoal-600 border-2 border-transparent dark:bg-charcoal-700 dark:text-charcoal-300'
                   }`}
                 >
                   {p}
@@ -201,9 +201,9 @@ export default function DueDatesWidget({ className = '' }) {
 
   if (loading) {
     return (
-      <div className={`bg-white rounded-xl border border-charcoal-100 p-6 ${className}`}>
+      <div className={`bg-white dark:bg-charcoal-800 rounded-xl border border-charcoal-100 dark:border-charcoal-700 p-6 ${className}`}>
         <div className="animate-pulse space-y-3">
-          <div className="h-6 bg-charcoal-100 rounded w-1/3" />
+          <div className="h-6 bg-charcoal-100 dark:bg-charcoal-700 rounded w-1/3" />
           {[1,2,3].map(i => (
             <div key={i} className="h-16 bg-charcoal-50 rounded-xl" />
           ))}
@@ -213,12 +213,12 @@ export default function DueDatesWidget({ className = '' }) {
   }
 
   return (
-    <div className={`bg-white rounded-xl border border-charcoal-100 p-6 ${className}`}>
+    <div className={`bg-white dark:bg-charcoal-800 rounded-xl border border-charcoal-100 dark:border-charcoal-700 p-6 ${className}`}>
       {/* Header */}
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-2">
-          <Calendar className={`w-5 h-5 ${hasOverdue ? 'text-red-500' : 'text-charcoal-500'}`} />
-          <h3 className="font-semibold text-charcoal-900">Due Dates</h3>
+          <Calendar className={`w-5 h-5 ${hasOverdue ? 'text-red-500 dark:text-red-400' : 'text-charcoal-500 dark:text-charcoal-400'}`} />
+          <h3 className="font-semibold text-charcoal-900 dark:text-white">Due Dates</h3>
           {hasOverdue && (
             <span className="flex items-center gap-1 text-xs bg-red-100 text-red-700 px-2 py-0.5 rounded-full">
               <AlertTriangle className="w-3 h-3" />
@@ -238,8 +238,8 @@ export default function DueDatesWidget({ className = '' }) {
       {/* Items */}
       {allItems.length === 0 ? (
         <div className="text-center py-8">
-          <Calendar className="w-10 h-10 text-charcoal-300 mx-auto mb-2" />
-          <p className="text-charcoal-500 text-sm">No upcoming due dates</p>
+          <Calendar className="w-10 h-10 text-charcoal-300 dark:text-charcoal-600 mx-auto mb-2" />
+          <p className="text-charcoal-500 dark:text-charcoal-400 text-sm">No upcoming due dates</p>
           <button
             onClick={() => setShowAddModal(true)}
             className="text-primary-600 hover:text-primary-700 text-sm font-medium mt-2"

@@ -8,7 +8,9 @@ import { useState } from 'react';
 import { useDropzone } from 'react-dropzone';
 import { Upload, File, FileText, Image, Table, Trash2, Download, Loader, AlertTriangle } from 'lucide-react';
 import { useFileAttachments } from '../../hooks/useFileAttachments';
+import { useAuth } from '../../contexts/AuthContext';
 import { format } from 'date-fns';
+import toast from 'react-hot-toast';
 
 export default function FileUpload({ projectId, itemId }) {
   const {
@@ -22,6 +24,7 @@ export default function FileUpload({ projectId, itemId }) {
     MAX_FILE_SIZE
   } = useFileAttachments(projectId, itemId);
 
+  const { currentUser } = useAuth();
   const [description, setDescription] = useState('');
   const [deleteConfirm, setDeleteConfirm] = useState(null);
 
@@ -29,8 +32,12 @@ export default function FileUpload({ projectId, itemId }) {
     if (acceptedFiles.length === 0) return;
 
     const file = acceptedFiles[0]; // Handle one file at a time
-    await uploadFile(file, description);
-    setDescription('');
+    try {
+      await uploadFile(file, description);
+      setDescription('');
+    } catch (error) {
+      toast.error('Failed to upload file. Please try again.');
+    }
   };
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
@@ -199,13 +206,15 @@ export default function FileUpload({ projectId, itemId }) {
                   >
                     <Download className="w-4 h-4" aria-hidden="true" />
                   </a>
-                  <button
-                    onClick={() => handleDelete(attachment.id)}
-                    className="p-2 text-charcoal-400 hover:text-red-600 hover:bg-red-50 rounded"
-                    aria-label={`Delete ${attachment.filename}`}
-                  >
-                    <Trash2 className="w-4 h-4" aria-hidden="true" />
-                  </button>
+                  {attachment.uploadedBy === currentUser?.uid && (
+                    <button
+                      onClick={() => handleDelete(attachment.id)}
+                      className="p-2 text-charcoal-400 hover:text-red-600 hover:bg-red-50 rounded"
+                      aria-label={`Delete ${attachment.filename}`}
+                    >
+                      <Trash2 className="w-4 h-4" aria-hidden="true" />
+                    </button>
+                  )}
                 </div>
               </div>
             ))}

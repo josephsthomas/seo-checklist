@@ -17,8 +17,7 @@ import {
 } from 'lucide-react';
 import { format } from 'date-fns';
 import toast from 'react-hot-toast';
-import jsPDF from 'jspdf';
-import 'jspdf-autotable';
+// jsPDF loaded dynamically in exportComparisonPDF to reduce bundle size
 
 export default function CompetitorAnalysisPanel({ currentMeta, onClose }) {
   const [competitorUrl, setCompetitorUrl] = useState('');
@@ -103,12 +102,14 @@ export default function CompetitorAnalysisPanel({ currentMeta, onClose }) {
   };
 
   // Export comparison report as PDF
-  const exportComparisonPDF = () => {
+  const exportComparisonPDF = async () => {
     if (!competitorMeta) {
       toast.error('No competitor data to export');
       return;
     }
 
+    const { default: jsPDF } = await import('jspdf');
+    await import('jspdf-autotable');
     const doc = new jsPDF();
     const pageWidth = doc.internal.pageSize.getWidth();
 

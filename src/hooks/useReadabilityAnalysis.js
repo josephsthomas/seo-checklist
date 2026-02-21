@@ -57,7 +57,7 @@ function getStorageLimit(role) {
 async function fetchUrlViaProxy(url, signal, authToken) {
   const proxyUrl = import.meta.env.VITE_AI_PROXY_URL;
   if (!proxyUrl) {
-    throw new Error('AI proxy URL not configured. Set VITE_AI_PROXY_URL in your environment.');
+    throw new Error('URL analysis is not available. Please contact your administrator to enable this feature.');
   }
 
   const headers = { 'Content-Type': 'application/json' };
@@ -99,7 +99,7 @@ async function fetchUrlViaProxy(url, signal, authToken) {
   const data = await response.json();
 
   if (!data.success) {
-    throw new Error(data.error || 'Failed to fetch URL content');
+    throw new Error(data.error || 'Could not load the page content. Please check the URL and try again.');
   }
 
   // Also check actual HTML size after parsing
@@ -189,6 +189,10 @@ async function enforceStorageLimit(userId, role) {
 
     for (const docSnap of docsToDelete) {
       await deleteDoc(doc(db, 'readability-analyses', docSnap.id));
+    }
+
+    if (docsToDelete.length > 0) {
+      console.info(`Auto-archived ${docsToDelete.length} oldest analyses to stay within storage limit (${storageLimit}).`);
     }
   }
 }
@@ -437,6 +441,10 @@ export function useReadabilityAnalysis() {
     }
     lastSubmissionRef.current = { url: validatedUrl, time: now };
 
+    // Create AbortController before fetching to avoid race condition
+    const controller = new AbortController();
+    abortControllerRef.current = controller;
+
     setState(STATES.FETCHING);
     setProgress({
       stage: 'fetching',
@@ -451,7 +459,7 @@ export function useReadabilityAnalysis() {
       try { authToken = await currentUser.getIdToken(); } catch (_) { /* proceed without */ }
 
       // Fetch via proxy
-      const fetchResult = await fetchUrlViaProxy(validatedUrl, abortControllerRef.current?.signal, authToken);
+      const fetchResult = await fetchUrlViaProxy(validatedUrl, controller.signal, authToken);
 
       if (!fetchResult.html || fetchResult.html.length < 50) {
         throw new Error('The fetched page contains very little content. Try uploading the HTML directly.');
@@ -646,5 +654,5 @@ export function useReadabilityAnalysis() {
   };
 }
 
-export { STATES as ANALYSIS_STATES };
+export { STATES as ANALYSIS_STATES, STORAGE_LIMITS };
 export default useReadabilityAnalysis;

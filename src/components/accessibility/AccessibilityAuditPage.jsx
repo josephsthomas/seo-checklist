@@ -238,32 +238,32 @@ export default function AccessibilityAuditPage() {
       const guidance = getErrorGuidance(error || '');
       const ErrorIcon = guidance.icon;
       return (
-        <div className="min-h-screen bg-gradient-to-b from-charcoal-50 to-white flex items-center justify-center">
+        <div className="min-h-screen bg-gradient-to-b from-charcoal-50 to-white dark:from-charcoal-900 dark:to-charcoal-800 flex items-center justify-center">
           <div className="max-w-lg mx-auto px-4">
             <div className="text-center mb-8">
               <div className="w-20 h-20 bg-gradient-to-br from-red-500 to-red-600 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-xl shadow-red-500/25">
                 <ErrorIcon className="w-10 h-10 text-white" />
               </div>
-              <h2 className="text-2xl font-bold text-charcoal-900 mb-3">{guidance.title}</h2>
-              <p className="text-charcoal-600">{guidance.description}</p>
+              <h1 className="text-2xl font-bold text-charcoal-900 dark:text-white mb-3">{guidance.title}</h1>
+              <p className="text-charcoal-600 dark:text-charcoal-400">{guidance.description}</p>
             </div>
 
             {/* Error Details */}
-            <div className="bg-red-50 border border-red-200 rounded-xl p-4 mb-6">
-              <p className="text-sm text-red-800 font-medium mb-1">Error Details:</p>
-              <p className="text-sm text-red-700">{error}</p>
+            <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800/30 rounded-xl p-4 mb-6">
+              <p className="text-sm text-red-800 dark:text-red-300 font-medium mb-1">Error Details:</p>
+              <p className="text-sm text-red-700 dark:text-red-400">{error}</p>
             </div>
 
             {/* How to Fix */}
-            <div className="bg-white rounded-xl border border-charcoal-200 p-6 mb-6">
-              <h3 className="text-sm font-semibold text-charcoal-900 mb-4 flex items-center gap-2">
+            <div className="bg-white dark:bg-charcoal-800 rounded-xl border border-charcoal-200 dark:border-charcoal-700 p-6 mb-6">
+              <h2 className="text-sm font-semibold text-charcoal-900 dark:text-white mb-4 flex items-center gap-2">
                 <Lightbulb className="w-4 h-4 text-amber-500" />
                 How to fix this:
-              </h3>
+              </h2>
               <ol className="space-y-3">
                 {guidance.steps.map((step, idx) => (
-                  <li key={idx} className="flex items-start gap-3 text-sm text-charcoal-600">
-                    <span className="w-6 h-6 rounded-lg bg-purple-100 text-purple-700 flex items-center justify-center text-xs font-bold flex-shrink-0">
+                  <li key={idx} className="flex items-start gap-3 text-sm text-charcoal-600 dark:text-charcoal-300">
+                    <span className="w-6 h-6 rounded-lg bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300 flex items-center justify-center text-xs font-bold flex-shrink-0">
                       {idx + 1}
                     </span>
                     <span>{step}</span>

@@ -75,13 +75,12 @@ describe('ReadabilityLLMPreview', () => {
 
   it('shows empty state when no extractions', () => {
     render(<ReadabilityLLMPreview llmExtractions={{}} />);
-    expect(screen.getByText(/LLM Preview Not Available/i)).toBeInTheDocument();
+    expect(screen.getByText(/AI Preview Not Available/i)).toBeInTheDocument();
   });
 
-  it('expands LLM abbreviation on first use', () => {
+  it('shows AI preview info text', () => {
     render(<ReadabilityLLMPreview llmExtractions={mockExtractions} />);
-    // Should contain the expanded abbreviation somewhere
     const container = document.body;
-    expect(container.textContent).toMatch(/large language model|LLM/i);
+    expect(container.textContent).toMatch(/AI Preview|AI model/i);
   });
 });

@@ -30,16 +30,43 @@ const JARGON = {
   'hreflang': 'An HTML attribute indicating the language of a linked page',
 };
 
-/** Wrap known jargon terms in title-bearing abbr tags */
-function annotateJargon(text) {
+/** Escape HTML special characters to prevent XSS */
+function escapeHtml(text) {
   if (!text) return text;
-  let result = text;
-  for (const [term, definition] of Object.entries(JARGON)) {
-    if (result.includes(term)) {
-      result = result.replace(term, `<abbr title="${definition}" class="underline decoration-dotted cursor-help">${term}</abbr>`);
+  return text
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#039;');
+}
+
+/** Check if text contains known jargon terms */
+function hasJargon(text) {
+  if (!text) return false;
+  return Object.keys(JARGON).some(term => text.includes(term));
+}
+
+/** Render text with jargon terms wrapped in <abbr> React elements */
+function renderWithJargon(text) {
+  if (!text) return text;
+  // Build a regex that matches any jargon term
+  const terms = Object.keys(JARGON).filter(term => text.includes(term));
+  if (terms.length === 0) return text;
+
+  const pattern = new RegExp(`(${terms.map(t => t.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')).join('|')})`);
+  const parts = text.split(pattern);
+
+  return parts.map((part, i) => {
+    if (JARGON[part]) {
+      return (
+        <abbr key={i} title={JARGON[part]} className="underline decoration-dotted cursor-help">
+          {part}
+        </abbr>
+      );
     }
-  }
-  return result === text ? null : result;
+    return part;
+  });
 }
 
 const STATUS_CONFIG = {
@@ -95,8 +122,8 @@ function ReadabilityCheckItem({ check, defaultExpanded = false }) {
   const StatusIcon = status.icon;
   const hasDetails = check.description || check.details || check.recommendation ||
     (check.affectedElements && check.affectedElements.length > 0) ||
-    check.codeSnippet;
-  const isExpandable = hasDetails && (check.status === 'fail' || check.status === 'warn' || defaultExpanded);
+    check.codeSnippet || getWhyItMatters(check.id);
+  const isExpandable = hasDetails;
   const itemId = `check-${check.id || 'unknown'}`;
   const panelId = `${itemId}-panel`;
 
@@ -110,26 +137,14 @@ function ReadabilityCheckItem({ check, defaultExpanded = false }) {
     >
       {/* Header row: expandable area + copy button (siblings, not nested) */}
       <div className="flex items-start gap-0 p-3">
-        {/* Expandable area — role="button" with no nested interactive elements */}
-        <div
-          className={`flex items-start gap-3 flex-1 min-w-0 ${
-            isExpandable ? 'cursor-pointer' : ''
-          }`}
-          {...(isExpandable
-            ? {
-                role: 'button',
-                tabIndex: 0,
-                'aria-expanded': expanded,
-                'aria-controls': panelId,
-                onClick: () => setExpanded(!expanded),
-                onKeyDown: (e) => {
-                  if (e.key === 'Enter' || e.key === ' ') {
-                    e.preventDefault();
-                    setExpanded(!expanded);
-                  }
-                },
-              }
-            : {})}
+        {/* Expandable area */}
+        {isExpandable ? (
+        <button
+          type="button"
+          className="flex items-start gap-3 flex-1 min-w-0 cursor-pointer text-left bg-transparent border-0 p-0"
+          aria-expanded={expanded}
+          aria-controls={panelId}
+          onClick={() => setExpanded(!expanded)}
         >
           {/* Status icon */}
           <StatusIcon
@@ -141,27 +156,19 @@ function ReadabilityCheckItem({ check, defaultExpanded = false }) {
           <div className="flex-1 min-w-0">
             <div className="flex items-start justify-between gap-2">
               <div className="flex items-center gap-2 flex-wrap">
-                {/* Check ID */}
                 {check.id && (
                   <span className="text-xs font-mono text-gray-400 dark:text-gray-500">
                     {check.id}
                   </span>
                 )}
-                {/* Title (with jargon tooltips) */}
-                {annotateJargon(check.title || check.name || 'Unknown Check') ? (
-                  <span
-                    className="text-sm font-medium text-gray-800 dark:text-gray-200"
-                    dangerouslySetInnerHTML={{ __html: annotateJargon(check.title || check.name || 'Unknown Check') }}
-                  />
-                ) : (
-                  <span className="text-sm font-medium text-gray-800 dark:text-gray-200">
-                    {check.title || check.name || 'Unknown Check'}
-                  </span>
-                )}
+                <span className="text-sm font-medium text-gray-800 dark:text-gray-200">
+                  {hasJargon(check.title || check.name || 'Unknown Check')
+                    ? renderWithJargon(check.title || check.name || 'Unknown Check')
+                    : (check.title || check.name || 'Unknown Check')}
+                </span>
               </div>
 
               <div className="flex items-center gap-2 flex-shrink-0">
-                {/* Severity badge */}
                 {check.severity && (
                   <span
                     className={`text-xs font-medium px-1.5 py-0.5 rounded capitalize ${
@@ -171,22 +178,64 @@ function ReadabilityCheckItem({ check, defaultExpanded = false }) {
                     {check.severity}
                   </span>
                 )}
-
-                {/* Status label for screen readers */}
                 <span className="sr-only">{status.label}</span>
-
-                {/* Expand icon */}
-                {isExpandable && (
-                  expanded ? (
-                    <ChevronDown className="w-4 h-4 text-gray-400 dark:text-gray-500" aria-hidden="true" />
-                  ) : (
-                    <ChevronRight className="w-4 h-4 text-gray-400 dark:text-gray-500" aria-hidden="true" />
-                  )
+                {expanded ? (
+                  <ChevronDown className="w-4 h-4 text-gray-400 dark:text-gray-500" aria-hidden="true" />
+                ) : (
+                  <ChevronRight className="w-4 h-4 text-gray-400 dark:text-gray-500" aria-hidden="true" />
                 )}
               </div>
             </div>
 
-            {/* Score/value summary */}
+            {check.value !== undefined && check.value !== null && (
+              <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
+                {typeof check.value === 'number'
+                  ? `Value: ${check.value}${check.threshold ? ` (threshold: ${check.threshold})` : ''}`
+                  : String(check.value)}
+              </p>
+            )}
+          </div>
+        </button>
+        ) : (
+        <div
+          className="flex items-start gap-3 flex-1 min-w-0"
+        >
+          {/* Status icon */}
+          <StatusIcon
+            className={`w-5 h-5 mt-0.5 flex-shrink-0 ${status.iconClass}`}
+            aria-hidden="true"
+          />
+
+          {/* Content */}
+          <div className="flex-1 min-w-0">
+            <div className="flex items-start justify-between gap-2">
+              <div className="flex items-center gap-2 flex-wrap">
+                {check.id && (
+                  <span className="text-xs font-mono text-gray-400 dark:text-gray-500">
+                    {check.id}
+                  </span>
+                )}
+                <span className="text-sm font-medium text-gray-800 dark:text-gray-200">
+                  {hasJargon(check.title || check.name || 'Unknown Check')
+                    ? renderWithJargon(check.title || check.name || 'Unknown Check')
+                    : (check.title || check.name || 'Unknown Check')}
+                </span>
+              </div>
+
+              <div className="flex items-center gap-2 flex-shrink-0">
+                {check.severity && (
+                  <span
+                    className={`text-xs font-medium px-1.5 py-0.5 rounded capitalize ${
+                      SEVERITY_BADGES[check.severity] || SEVERITY_BADGES.info
+                    }`}
+                  >
+                    {check.severity}
+                  </span>
+                )}
+                <span className="sr-only">{status.label}</span>
+              </div>
+            </div>
+
             {check.value !== undefined && check.value !== null && (
               <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
                 {typeof check.value === 'number'
@@ -196,6 +245,7 @@ function ReadabilityCheckItem({ check, defaultExpanded = false }) {
             )}
           </div>
         </div>
+        )}
 
         {/* Copy button — sibling of role="button", not nested inside it */}
         <button

@@ -422,7 +422,13 @@ export default function ImageAltDashboard({ results, onNewProcess, onUpdateResul
                     </div>
                     <div>
                       <span className="text-slate-500">Confidence:</span>
-                      <p className="text-white mt-1">{Math.round((img.confidence || 0) * 100)}%</p>
+                      <p className="text-white mt-1">
+                        {Math.round((img.confidence || 0) * 100)}%
+                        {' '}
+                        <span className="text-slate-400 text-xs">
+                          ({(img.confidence || 0) >= 0.9 ? 'High' : (img.confidence || 0) >= 0.7 ? 'Medium' : 'Low'})
+                        </span>
+                      </p>
                     </div>
                     <div>
                       <span className="text-slate-500">File Size:</span>

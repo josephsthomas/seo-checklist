@@ -3,10 +3,7 @@
  * Centralizes all export functionality across the application
  */
 
-import jsPDF from 'jspdf';
-import 'jspdf-autotable';
-import ExcelJS from 'exceljs';
-import JSZip from 'jszip';
+// Dynamic imports for bundle size optimization — jsPDF, ExcelJS, JSZip loaded on demand
 
 /**
  * Download helper
@@ -16,6 +13,8 @@ function downloadBlob(blob, filename) {
   const a = document.createElement('a');
   a.href = url;
   a.download = filename;
+  a.setAttribute('aria-hidden', 'true');
+  a.style.display = 'none';
   document.body.appendChild(a);
   a.click();
   document.body.removeChild(a);
@@ -39,6 +38,7 @@ export async function exportToExcel(data, options = {}) {
     columnWidths = {}
   } = options;
 
+  const { default: ExcelJS } = await import('exceljs');
   const wb = new ExcelJS.Workbook();
   wb.creator = 'Content Strategy Portal';
   wb.created = new Date();
@@ -115,7 +115,7 @@ export function exportToJSON(data, options = {}) {
 /**
  * Export to PDF format
  */
-export function exportToPDF(options = {}) {
+export async function exportToPDF(options = {}) {
   const {
     filename = 'export.pdf',
     title = 'Export Report',
@@ -124,6 +124,8 @@ export function exportToPDF(options = {}) {
     orientation = 'portrait'
   } = options;
 
+  const { default: jsPDF } = await import('jspdf');
+  await import('jspdf-autotable');
   const doc = new jsPDF({ orientation });
   let yPos = 20;
 
@@ -204,6 +206,7 @@ export function exportToPDF(options = {}) {
 export async function exportToZip(files, options = {}) {
   const { filename = 'export.zip' } = options;
 
+  const { default: JSZip } = await import('jszip');
   const zip = new JSZip();
 
   for (const file of files) {
@@ -233,6 +236,7 @@ export async function batchExport(items, format, options = {}) {
   for (const item of items) {
     try {
       if (format === 'xlsx') {
+        const { default: ExcelJS } = await import('exceljs');
         const wb = new ExcelJS.Workbook();
         wb.creator = 'Content Strategy Portal';
         const ws = wb.addWorksheet('Data');

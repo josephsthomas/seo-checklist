@@ -77,10 +77,10 @@ export default function PdfExportModal({ items, completions, onClose }) {
         />
 
         {/* Modal panel */}
-        <div className="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-2xl sm:w-full">
+        <div className="inline-block align-bottom bg-white dark:bg-charcoal-800 rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-2xl sm:w-full">
           {/* Header */}
-          <div className="bg-white px-6 py-4 border-b flex items-center justify-between">
-            <h3 id="pdf-export-title" className="text-lg font-semibold text-charcoal-900 flex items-center gap-2">
+          <div className="bg-white dark:bg-charcoal-800 px-6 py-4 border-b dark:border-charcoal-700 flex items-center justify-between">
+            <h3 id="pdf-export-title" className="text-lg font-semibold text-charcoal-900 dark:text-white flex items-center gap-2">
               <FileText className="w-5 h-5 text-blue-600" aria-hidden="true" />
               Export to PDF
             </h3>
@@ -96,8 +96,8 @@ export default function PdfExportModal({ items, completions, onClose }) {
           {/* Content */}
           <div className="px-6 py-6 space-y-6">
             {/* Export Summary */}
-            <div className="p-4 bg-blue-50 border border-blue-200 rounded-lg">
-              <h4 className="text-sm font-medium text-blue-900 mb-2">Export Summary</h4>
+            <div className="p-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg">
+              <h4 className="text-sm font-medium text-blue-900 dark:text-blue-200 mb-2">Export Summary</h4>
               <div className="grid grid-cols-2 gap-4 text-sm">
                 <div>
                   <span className="text-blue-700">Total Items:</span>
@@ -112,10 +112,10 @@ export default function PdfExportModal({ items, completions, onClose }) {
 
             {/* Project Information */}
             <div className="space-y-4">
-              <h4 className="text-sm font-medium text-charcoal-900">Project Information</h4>
+              <h4 className="text-sm font-medium text-charcoal-900 dark:text-white">Project Information</h4>
 
               <div>
-                <label className="block text-sm font-medium text-charcoal-700 mb-2">
+                <label className="block text-sm font-medium text-charcoal-700 dark:text-charcoal-300 mb-2">
                   Project Name *
                 </label>
                 <input
@@ -129,7 +129,7 @@ export default function PdfExportModal({ items, completions, onClose }) {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-charcoal-700 mb-2">
+                <label className="block text-sm font-medium text-charcoal-700 dark:text-charcoal-300 mb-2">
                   Client Name (optional)
                 </label>
                 <input
@@ -144,10 +144,10 @@ export default function PdfExportModal({ items, completions, onClose }) {
 
             {/* Export Options */}
             <div className="space-y-4">
-              <h4 className="text-sm font-medium text-charcoal-900">Export Options</h4>
+              <h4 className="text-sm font-medium text-charcoal-900 dark:text-white">Export Options</h4>
 
               <div>
-                <label className="block text-sm font-medium text-charcoal-700 mb-2">
+                <label className="block text-sm font-medium text-charcoal-700 dark:text-charcoal-300 mb-2">
                   Report Type
                 </label>
                 <div className="grid grid-cols-2 gap-3">
@@ -155,12 +155,12 @@ export default function PdfExportModal({ items, completions, onClose }) {
                     onClick={() => setConfig(prev => ({ ...prev, exportType: 'executive' }))}
                     className={`p-4 border-2 rounded-lg text-left transition-all ${
                       config.exportType === 'executive'
-                        ? 'border-blue-600 bg-blue-50'
-                        : 'border-charcoal-200 hover:border-charcoal-400'
+                        ? 'border-blue-600 bg-blue-50 dark:bg-blue-900/20'
+                        : 'border-charcoal-200 dark:border-charcoal-600 hover:border-charcoal-400'
                     }`}
                   >
-                    <div className="font-medium text-charcoal-900 mb-1">Executive Summary</div>
-                    <div className="text-xs text-charcoal-600">
+                    <div className="font-medium text-charcoal-900 dark:text-white mb-1">Executive Summary</div>
+                    <div className="text-xs text-charcoal-600 dark:text-charcoal-400">
                       Overview with completion statistics by phase (2-3 pages)
                     </div>
                   </button>
@@ -169,12 +169,12 @@ export default function PdfExportModal({ items, completions, onClose }) {
                     onClick={() => setConfig(prev => ({ ...prev, exportType: 'detailed' }))}
                     className={`p-4 border-2 rounded-lg text-left transition-all ${
                       config.exportType === 'detailed'
-                        ? 'border-blue-600 bg-blue-50'
-                        : 'border-charcoal-200 hover:border-charcoal-400'
+                        ? 'border-blue-600 bg-blue-50 dark:bg-blue-900/20'
+                        : 'border-charcoal-200 dark:border-charcoal-600 hover:border-charcoal-400'
                     }`}
                   >
-                    <div className="font-medium text-charcoal-900 mb-1">Detailed Report</div>
-                    <div className="text-xs text-charcoal-600">
+                    <div className="font-medium text-charcoal-900 dark:text-white mb-1">Detailed Report</div>
+                    <div className="text-xs text-charcoal-600 dark:text-charcoal-400">
                       Complete checklist with all items listed (10+ pages)
                     </div>
                   </button>
@@ -189,13 +189,13 @@ export default function PdfExportModal({ items, completions, onClose }) {
                   onChange={(e) => setConfig(prev => ({ ...prev, includeCompleted: e.target.checked }))}
                   className="w-4 h-4 text-blue-600 border-charcoal-200 rounded focus:ring-blue-500"
                 />
-                <label htmlFor="includeCompleted" className="ml-2 text-sm text-charcoal-700">
+                <label htmlFor="includeCompleted" className="ml-2 text-sm text-charcoal-700 dark:text-charcoal-300">
                   Include completed items in detailed report
                 </label>
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-charcoal-700 mb-2">
+                <label className="block text-sm font-medium text-charcoal-700 dark:text-charcoal-300 mb-2">
                   Brand Color
                 </label>
                 <div className="flex items-center gap-3">
@@ -223,16 +223,16 @@ export default function PdfExportModal({ items, completions, onClose }) {
             </div>
 
             {/* Preview Note */}
-            <div className="p-3 bg-yellow-50 border border-yellow-200 rounded text-sm text-yellow-800">
+            <div className="p-3 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded text-sm text-yellow-800 dark:text-yellow-200">
               <strong>Tip:</strong> Use Preview to check the PDF before downloading.
             </div>
           </div>
 
           {/* Footer */}
-          <div className="bg-charcoal-50 px-6 py-4 border-t flex items-center justify-between">
+          <div className="bg-charcoal-50 dark:bg-charcoal-900 px-6 py-4 border-t dark:border-charcoal-700 flex items-center justify-between">
             <button
               onClick={onClose}
-              className="px-4 py-2 text-sm font-medium text-charcoal-700 bg-white border border-charcoal-200 rounded hover:bg-charcoal-50"
+              className="px-4 py-2 text-sm font-medium text-charcoal-700 dark:text-charcoal-300 bg-white dark:bg-charcoal-700 border border-charcoal-200 dark:border-charcoal-600 rounded hover:bg-charcoal-50 dark:hover:bg-charcoal-600"
               disabled={exporting}
             >
               Cancel

@@ -3,6 +3,7 @@
  */
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen } from '@testing-library/react';
+import { BrowserRouter } from 'react-router-dom';
 import userEvent from '@testing-library/user-event';
 
 // Mock Firebase before any component imports
@@ -48,6 +49,8 @@ vi.mock('../../../hooks/useReadabilityShare', () => ({
 
 import ReadabilityDashboard from '../ReadabilityDashboard';
 
+const renderWithRouter = (ui) => render(<BrowserRouter>{ui}</BrowserRouter>);
+
 const mockAnalysis = {
   id: 'test-123',
   overallScore: 82,
@@ -86,43 +89,43 @@ describe('ReadabilityDashboard', () => {
   });
 
   it('renders the score card', () => {
-    render(<ReadabilityDashboard {...defaultProps} />);
+    renderWithRouter(<ReadabilityDashboard {...defaultProps} />);
     expect(screen.getByTestId('score-card')).toBeInTheDocument();
     expect(screen.getByTestId('score-card')).toHaveTextContent('82');
   });
 
   it('renders the back button', () => {
-    render(<ReadabilityDashboard {...defaultProps} />);
+    renderWithRouter(<ReadabilityDashboard {...defaultProps} />);
     const backBtn = screen.getByRole('button', { name: /back|new analysis/i });
     expect(backBtn).toBeInTheDocument();
   });
 
   it('calls onBack when back button clicked', async () => {
     const user = userEvent.setup();
-    render(<ReadabilityDashboard {...defaultProps} />);
+    renderWithRouter(<ReadabilityDashboard {...defaultProps} />);
     const backBtn = screen.getByRole('button', { name: /back|new analysis/i });
     await user.click(backBtn);
     expect(defaultProps.onBack).toHaveBeenCalled();
   });
 
   it('renders category chart', () => {
-    render(<ReadabilityDashboard {...defaultProps} />);
+    renderWithRouter(<ReadabilityDashboard {...defaultProps} />);
     expect(screen.getByTestId('category-chart')).toBeInTheDocument();
   });
 
   it('renders page metadata', () => {
-    render(<ReadabilityDashboard {...defaultProps} />);
+    renderWithRouter(<ReadabilityDashboard {...defaultProps} />);
     expect(screen.getByText(/test page|example\.com/i)).toBeInTheDocument();
   });
 
   it('renders check items', () => {
-    render(<ReadabilityDashboard {...defaultProps} />);
+    renderWithRouter(<ReadabilityDashboard {...defaultProps} />);
     const checks = screen.getAllByTestId('check-item');
     expect(checks.length).toBeGreaterThan(0);
   });
 
   it('renders export button', () => {
-    render(<ReadabilityDashboard {...defaultProps} />);
+    renderWithRouter(<ReadabilityDashboard {...defaultProps} />);
     expect(screen.getByRole('button', { name: /export/i })).toBeInTheDocument();
   });
 });

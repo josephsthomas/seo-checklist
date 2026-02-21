@@ -145,7 +145,7 @@ function ReadabilityCategoryChart({ categoryScores, onCategoryClick }) {
   return (
     <div className="bg-white dark:bg-charcoal-800 rounded-xl border border-gray-200 dark:border-charcoal-700 p-6">
       <div className="flex items-center gap-2 mb-5">
-        <BarChart3 className="w-5 h-5 text-teal-500" />
+        <BarChart3 className="w-5 h-5 text-teal-500" aria-hidden="true" />
         <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Category Breakdown</h3>
       </div>
 
@@ -174,13 +174,13 @@ function ReadabilityCategoryChart({ categoryScores, onCategoryClick }) {
         <p className="text-xs text-gray-400 dark:text-gray-500 mb-2">Score weights:</p>
         <div className="flex flex-wrap gap-x-4 gap-y-1">
           {[
-            { label: 'CS', weight: '20%' },
-            { label: 'CC', weight: '25%' },
-            { label: 'TA', weight: '20%' },
-            { label: 'MS', weight: '15%' },
-            { label: 'AS', weight: '20%' },
-          ].map(({ label, weight }) => (
-            <span key={label} className="text-xs text-gray-400 dark:text-gray-500">
+            { label: 'CS', full: 'Content Structure', weight: '20%' },
+            { label: 'CC', full: 'Content Clarity', weight: '25%' },
+            { label: 'TA', full: 'Technical Accessibility', weight: '20%' },
+            { label: 'MS', full: 'Metadata & Schema', weight: '15%' },
+            { label: 'AS', full: 'AI-Specific Signals', weight: '20%' },
+          ].map(({ label, full, weight }) => (
+            <span key={label} className="text-xs text-gray-400 dark:text-gray-500" title={full}>
               <span className="font-mono">{label}</span> {weight}
             </span>
           ))}

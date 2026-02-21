@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom';
 import { ArrowLeft, Accessibility, Eye, Keyboard, Monitor, MessageSquare, CheckCircle } from 'lucide-react';
+import SEOHead from '../shared/SEOHead';
 
 export default function AccessibilityStatement() {
   const currentDate = new Date().toLocaleDateString('en-US', {
@@ -10,6 +11,12 @@ export default function AccessibilityStatement() {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-charcoal-50 to-white py-12 px-4">
+      <SEOHead
+        title="Accessibility Statement | Content Strategy Portal"
+        description="Accessibility statement for Content Strategy Portal. Learn about our commitment to digital accessibility."
+        canonical="/accessibility-statement"
+        noindex={true}
+      />
       <div className="max-w-4xl mx-auto">
         {/* Back Button */}
         <Link

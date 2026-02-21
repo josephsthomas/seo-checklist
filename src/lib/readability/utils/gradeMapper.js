@@ -6,8 +6,8 @@
 const GRADE_MAP = [
   { min: 95, max: 100, grade: 'A+', color: 'emerald', label: 'Excellent' },
   { min: 90, max: 94, grade: 'A', color: 'emerald', label: 'Great' },
-  { min: 85, max: 89, grade: 'B+', color: 'teal', label: 'Very Good' },
-  { min: 80, max: 84, grade: 'B', color: 'teal', label: 'Good' },
+  { min: 85, max: 89, grade: 'B+', color: 'cyan', label: 'Very Good' },
+  { min: 80, max: 84, grade: 'B', color: 'cyan', label: 'Good' },
   { min: 75, max: 79, grade: 'C+', color: 'amber', label: 'Above Average' },
   { min: 70, max: 74, grade: 'C', color: 'amber', label: 'Average' },
   { min: 60, max: 69, grade: 'D', color: 'orange', label: 'Below Average' },

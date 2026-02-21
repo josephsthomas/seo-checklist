@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useProjects } from '../../hooks/useProjects';
 import { ArrowLeft, ArrowRight, Check, X, HelpCircle, Info, Lightbulb, AlertTriangle } from 'lucide-react';
 import { format } from 'date-fns';
+import toast from 'react-hot-toast';
 
 // Help content for each project type
 const PROJECT_TYPE_HELP = {
@@ -120,6 +121,15 @@ export default function ProjectCreationWizard() {
     if (step === 2) {
       if (!formData.startDate) newErrors.startDate = 'Start date is required';
       if (!formData.targetLaunchDate) newErrors.targetLaunchDate = 'Target launch date is required';
+      if (formData.targetLaunchDate && formData.startDate && formData.targetLaunchDate <= formData.startDate) {
+        newErrors.targetLaunchDate = 'Target launch date must be after start date';
+      }
+      if (formData.targetLaunchDate) {
+        const today = format(new Date(), 'yyyy-MM-dd');
+        if (formData.targetLaunchDate <= today) {
+          newErrors.targetLaunchDate = 'Target launch date must be in the future';
+        }
+      }
     }
 
     setErrors(newErrors);
@@ -159,6 +169,7 @@ export default function ProjectCreationWizard() {
       navigate(`/planner/projects/${projectId}`);
     } catch (error) {
       console.error('Error creating project:', error);
+      toast.error('Failed to create project. Please try again.');
     } finally {
       setLoading(false);
     }

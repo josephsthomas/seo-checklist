@@ -107,13 +107,13 @@ export function RecentItems({ limit = 5, showClear = true }) {
             <Link
               key={`${item.type}-${item.id}`}
               to={item.path}
-              className="flex items-center gap-3 p-3 bg-white border border-charcoal-100 rounded-xl hover:border-charcoal-200 hover:shadow-sm transition-all group"
+              className="flex items-center gap-3 p-3 bg-white dark:bg-charcoal-800 border border-charcoal-100 dark:border-charcoal-700 rounded-xl hover:border-charcoal-200 dark:hover:border-charcoal-600 hover:shadow-sm transition-all group"
             >
               <div className={`w-10 h-10 rounded-lg bg-gradient-to-br ${colorClass} flex items-center justify-center`}>
                 <Icon className="w-5 h-5" />
               </div>
               <div className="flex-1 min-w-0">
-                <p className="font-medium text-charcoal-900 truncate">{item.name}</p>
+                <p className="font-medium text-charcoal-900 dark:text-white truncate">{item.name}</p>
                 <p className="text-xs text-charcoal-500">
                   {formatDistanceToNow(new Date(item.accessedAt), { addSuffix: true })}
                 </p>
@@ -165,14 +165,14 @@ export function FavoriteItems({ limit, type }) {
         return (
           <div
             key={`${item.type}-${item.id}`}
-            className="flex items-center gap-3 p-3 bg-white border border-charcoal-100 rounded-xl hover:border-charcoal-200 hover:shadow-sm transition-all group"
+            className="flex items-center gap-3 p-3 bg-white dark:bg-charcoal-800 border border-charcoal-100 dark:border-charcoal-700 rounded-xl hover:border-charcoal-200 dark:hover:border-charcoal-600 hover:shadow-sm transition-all group"
           >
             <Link to={item.path} className="flex items-center gap-3 flex-1 min-w-0">
               <div className={`w-10 h-10 rounded-lg bg-gradient-to-br ${colorClass} flex items-center justify-center`}>
                 <Icon className="w-5 h-5" />
               </div>
               <div className="flex-1 min-w-0">
-                <p className="font-medium text-charcoal-900 truncate">{item.name}</p>
+                <p className="font-medium text-charcoal-900 dark:text-white truncate">{item.name}</p>
                 <p className="text-xs text-charcoal-500 capitalize">{item.type}</p>
               </div>
             </Link>
@@ -233,7 +233,7 @@ export default function FavoritesAndRecentsWidget({ className = '' }) {
 
   if (loading) {
     return (
-      <div className={`bg-white rounded-2xl border border-charcoal-100 p-6 ${className}`}>
+      <div className={`bg-white dark:bg-charcoal-800 rounded-2xl border border-charcoal-100 dark:border-charcoal-700 p-6 ${className}`}>
         <div className="animate-pulse space-y-4">
           <div className="h-6 bg-charcoal-100 rounded w-1/3" />
           <div className="space-y-3">
@@ -250,7 +250,7 @@ export default function FavoritesAndRecentsWidget({ className = '' }) {
 
   if (!hasContent) {
     return (
-      <div className={`bg-white rounded-2xl border border-charcoal-100 p-6 ${className}`}>
+      <div className={`bg-white dark:bg-charcoal-800 rounded-2xl border border-charcoal-100 dark:border-charcoal-700 p-6 ${className}`}>
         <div className="text-center py-4">
           <div className="w-12 h-12 bg-charcoal-100 rounded-xl flex items-center justify-center mx-auto mb-3">
             <Star className="w-6 h-6 text-charcoal-400" />
@@ -265,10 +265,10 @@ export default function FavoritesAndRecentsWidget({ className = '' }) {
   }
 
   return (
-    <div className={`bg-white rounded-2xl border border-charcoal-100 overflow-hidden ${className}`}>
+    <div className={`bg-white dark:bg-charcoal-800 rounded-2xl border border-charcoal-100 dark:border-charcoal-700 overflow-hidden ${className}`}>
       {/* Favorites Section */}
       {favorites.length > 0 && (
-        <div className="p-6 border-b border-charcoal-100">
+        <div className="p-6 border-b border-charcoal-100 dark:border-charcoal-700">
           <h3 className="flex items-center gap-2 text-sm font-semibold text-charcoal-700 mb-4">
             <Star className="w-4 h-4 text-amber-500" />
             Favorites

@@ -15,16 +15,8 @@ import { db } from '../lib/firebase';
 import { useAuth } from '../contexts/AuthContext';
 import toast from 'react-hot-toast';
 
-/**
- * Storage limits per role (Q7, promoted to MVP)
- */
-const STORAGE_LIMITS = {
-  admin: 500,
-  project_manager: 250,
-  seo_specialist: 100,
-  developer: 100,
-  content_writer: 100
-};
+// Re-use STORAGE_LIMITS from useReadabilityAnalysis to avoid duplication
+import { STORAGE_LIMITS } from './useReadabilityAnalysis';
 
 const PAGE_SIZE = 20;
 
@@ -368,8 +360,7 @@ export function useReadabilityHistory() {
     deleteAnalysis,
     getAnalysisById,
     getTrendData,
-    getTrendArrow,
-    refresh
+    getTrendArrow
   };
 }
 

@@ -78,6 +78,11 @@ export default function SchemaProcessingScreen({ progress, stage }) {
         <p className="mt-6 text-xs text-slate-500">
           Tip: AI generates production-ready JSON-LD with required and recommended properties
         </p>
+
+        {/* AI Disclaimer */}
+        <p className="mt-3 text-xs text-slate-500">
+          Note: Schema markup is AI-generated and should be reviewed for accuracy before deployment.
+        </p>
       </div>
     </div>
   );

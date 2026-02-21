@@ -22,8 +22,8 @@ import {
   ArrowUpDown,
   ChevronLeft,
   ChevronRight,
+  ChevronDown,
   AlertTriangle,
-  BarChart3,
 } from 'lucide-react';
 import { useReadabilityHistory } from '../../hooks/useReadabilityHistory';
 
@@ -219,15 +219,28 @@ export default function ReadabilityHistory({ onAnalyze, storageLimit }) {
             type="button"
             onClick={() =>
               updateSort(
-                sortField === 'date' ? 'score' : 'date',
+                sortField,
                 sortDirection === 'asc' ? 'desc' : 'asc'
               )
             }
             className="inline-flex items-center gap-1.5 px-3 py-1.5 text-sm border border-gray-200 dark:border-charcoal-600 rounded-lg bg-white dark:bg-charcoal-800 text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-charcoal-750 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-teal-500"
-            aria-label={`Sort by ${sortField === 'date' ? 'score' : 'date'}`}
+            aria-label={`Sort by ${sortField}, currently ${sortDirection === 'asc' ? 'ascending' : 'descending'}`}
           >
             <ArrowUpDown className="w-3.5 h-3.5" aria-hidden="true" />
-            {sortField === 'date' ? 'Date' : 'Score'}
+            {sortField === 'date' ? 'Date' : 'Score'} {sortDirection === 'asc' ? '↑' : '↓'}
+          </button>
+          <button
+            type="button"
+            onClick={() =>
+              updateSort(
+                sortField === 'date' ? 'score' : 'date',
+                sortDirection
+              )
+            }
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 text-sm border border-gray-200 dark:border-charcoal-600 rounded-lg bg-white dark:bg-charcoal-800 text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-charcoal-750 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-teal-500"
+            aria-label={`Switch to sort by ${sortField === 'date' ? 'score' : 'date'}`}
+          >
+            {sortField === 'date' ? 'Score' : 'Date'}
           </button>
         </div>
       </div>
@@ -243,6 +256,24 @@ export default function ReadabilityHistory({ onAnalyze, storageLimit }) {
             className="ml-auto text-sm text-red-600 dark:text-red-400 hover:underline"
           >
             Retry
+          </button>
+        </div>
+      )}
+
+      {/* No search results state */}
+      {!loading && history.length === 0 && (searchInput || filters?.searchUrl) && (
+        <div className="text-center py-8 bg-white dark:bg-charcoal-800 rounded-xl border border-gray-200 dark:border-charcoal-700">
+          <Search className="w-10 h-10 text-gray-300 dark:text-gray-600 mx-auto mb-3" aria-hidden="true" />
+          <p className="text-gray-600 dark:text-gray-300 font-medium">No analyses found</p>
+          <p className="text-gray-400 dark:text-gray-500 text-sm mt-1">
+            No results matching &quot;{searchInput || filters?.searchUrl}&quot;
+          </p>
+          <button
+            type="button"
+            onClick={() => setSearchInput('')}
+            className="mt-3 text-sm text-teal-600 dark:text-teal-400 hover:underline focus:outline-none focus-visible:ring-2 focus-visible:ring-teal-500 rounded"
+          >
+            Clear search
           </button>
         </div>
       )}
@@ -354,12 +385,12 @@ export default function ReadabilityHistory({ onAnalyze, storageLimit }) {
           >
             {loading ? (
               <>
-                <span className="animate-spin w-4 h-4 border-2 border-gray-300 border-t-teal-500 rounded-full" />
+                <span className="animate-spin w-4 h-4 border-2 border-gray-300 border-t-teal-500 rounded-full" role="status" aria-label="Loading more analyses" />
                 Loading...
               </>
             ) : (
               <>
-                <BarChart3 className="w-4 h-4" />
+                <ChevronDown className="w-4 h-4" />
                 Load More
               </>
             )}

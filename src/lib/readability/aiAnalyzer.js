@@ -51,7 +51,16 @@ export async function analyzeWithAI(extractedContent, options = {}) {
   try {
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), API_TIMEOUT_MS);
-    const signal = options.signal || controller.signal;
+
+    // If caller provides an abort signal, listen for it and abort our controller
+    if (options.signal) {
+      if (options.signal.aborted) {
+        controller.abort();
+      } else {
+        options.signal.addEventListener('abort', () => controller.abort(), { once: true });
+      }
+    }
+    const signal = controller.signal;
 
     let response;
     try {
@@ -138,12 +147,20 @@ function parseAIResponse(content) {
 
     const parsed = JSON.parse(jsonMatch[0]);
 
+    // Validate numeric fields — reject non-number values
+    const qualityScore = typeof parsed.qualityScore === 'number'
+      ? Math.round(Math.max(0, Math.min(100, parsed.qualityScore)))
+      : 50;
+    const citationWorthiness = typeof parsed.citationWorthiness === 'number'
+      ? Math.round(Math.max(0, Math.min(100, parsed.citationWorthiness)))
+      : 50;
+
     return {
       available: true,
       contentSummary: parsed.contentSummary || '',
       qualityAssessment: parsed.qualityAssessment || '',
-      qualityScore: Math.max(0, Math.min(100, parsed.qualityScore || 50)),
-      citationWorthiness: Math.max(0, Math.min(100, parsed.citationWorthiness || 50)),
+      qualityScore,
+      citationWorthiness,
       citationExplanation: parsed.citationExplanation || '',
       readabilityIssues: (parsed.readabilityIssues || []).slice(0, 10),
       aiRecommendations: (parsed.aiRecommendations || []).slice(0, 5).map(rec => ({

@@ -123,9 +123,9 @@ export default function AddCustomItemModal({ isOpen, onClose, onSave, editItem =
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center">
+    <div className="fixed inset-0 z-50 flex items-center justify-center" role="dialog" aria-modal="true" aria-labelledby="add-item-title">
       {/* Backdrop */}
-      <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={onClose} />
+      <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={onClose} aria-hidden="true" />
 
       {/* Modal */}
       <div className="relative bg-white rounded-2xl shadow-2xl w-full max-w-lg mx-4 max-h-[90vh] overflow-y-auto">
@@ -136,7 +136,7 @@ export default function AddCustomItemModal({ isOpen, onClose, onSave, editItem =
               <Plus className="w-5 h-5 text-white" />
             </div>
             <div>
-              <h2 className="text-lg font-semibold text-charcoal-900">
+              <h2 id="add-item-title" className="text-lg font-semibold text-charcoal-900">
                 {editItem ? 'Edit Custom Item' : 'Add Custom Item'}
               </h2>
               <p className="text-sm text-charcoal-500">Add your own checklist item</p>

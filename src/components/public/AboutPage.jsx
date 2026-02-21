@@ -150,7 +150,7 @@ export default function AboutPage() {
                 </div>
                 <div className="text-center">
                   <div className="text-4xl font-bold text-primary-600">93</div>
-                  <div className="mt-1 text-sm text-charcoal-600">A11y Rules</div>
+                  <div className="mt-1 text-sm text-charcoal-600">Accessibility Checks</div>
                 </div>
                 <div className="text-center">
                   <div className="text-4xl font-bold text-primary-600">200+</div>

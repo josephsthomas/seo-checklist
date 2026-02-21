@@ -77,7 +77,7 @@ export function validateReadabilityUrl(input) {
   const parts = parsed.hostname.split('.');
   // Allow IDN domains (which may have non-ASCII chars) and standard domains
   if (parts.length < 2) {
-    return { valid: false, url: null, reason: 'Invalid domain - missing TLD' };
+    return { valid: false, url: null, reason: 'Invalid domain format' };
   }
 
   const tld = parts[parts.length - 1];

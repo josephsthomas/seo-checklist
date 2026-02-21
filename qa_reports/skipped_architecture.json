@@ -1,0 +1,211 @@
+[
+  {
+    "bug_id": "R08-A-006",
+    "batch": 2,
+    "severity": "HIGH",
+    "category": "Audit Trail",
+    "file": "src/components/admin/AuditLogViewer.jsx",
+    "line": 0,
+    "description": "The Audit Log Viewer has a TODO placeholder that returns empty logs. No actual audit logging is implemented, making the entire compliance tracking feature non-functional.",
+    "skip_reason": "Audit Log Viewer has TODO placeholder \u2014 no logging exists",
+    "fix_approach": "Create auditLog collection; implement logAuditEvent() utility"
+  },
+  {
+    "bug_id": "R06-209",
+    "batch": 16,
+    "severity": "HIGH",
+    "category": "Schema Error",
+    "file": "src/lib/readability/utils/schemaValidator.js",
+    "line": 0,
+    "description": "SCHEMA_FIELDS only covers 7 schema types (Article, NewsArticle, Product, FAQPage, HowTo, Organization, Person) but schemaGeneratorService supports 40+ types - most schema types get no field-level validation",
+    "skip_reason": "Schema validator covers only 7 of 40+ types",
+    "fix_approach": "Extend with comprehensive type coverage and field rules"
+  },
+  {
+    "bug_id": "R08-A-002",
+    "batch": 16,
+    "severity": "HIGH",
+    "category": "Permission Issue",
+    "file": "src/components/checklist/TimeTracker.jsx",
+    "line": 0,
+    "description": "Time entry deletion has no ownership or permission check. Any user who can view the item detail modal can delete any other user's time entries.",
+    "skip_reason": "TimeTracker no ownership check \u2014 users can view/edit others entries",
+    "fix_approach": "Add user.uid check against doc owner before view/edit/delete"
+  },
+  {
+    "bug_id": "R08-A-004",
+    "batch": 16,
+    "severity": "HIGH",
+    "category": "Data Integrity",
+    "file": "src/components/checklist/ItemDetailModal.jsx",
+    "line": 0,
+    "description": "Task assignment uses free-text comma-separated input for user identifiers with no validation against actual team members in the system.",
+    "skip_reason": "ItemDetailModal saves without server-side validation",
+    "fix_approach": "Add Firestore rules for field validation; validate before writes"
+  },
+  {
+    "bug_id": "R08-C-005",
+    "batch": 17,
+    "severity": "HIGH",
+    "category": "Permission Issue",
+    "file": "src/hooks/useTimeTracking.js",
+    "line": 0,
+    "description": "The deleteEntry function for time tracking performs no ownership verification. Any user who knows a time entry ID can delete any other user's time entry. The hook loads all time entries for a project (not filtered by user), so all entries are visible to all project participants, but the delete operation should be restricted to the entry owner or an admin.",
+    "skip_reason": "useTimeTracking no ownership verification on delete",
+    "fix_approach": "Add doc.userId === currentUser.uid check before deleteDoc"
+  },
+  {
+    "bug_id": "R08-C-007",
+    "batch": 17,
+    "severity": "HIGH",
+    "category": "Scope Gap",
+    "file": "src/utils/roles.js",
+    "line": 0,
+    "description": "The permission system defined in roles.js is comprehensive but almost entirely unenforced in the CRUD hooks. The ROLE_PERMISSIONS matrix defines granular permissions (canCreateProjects, canDeleteProjects, canAssignTasks, canEditAllItems, canViewAllProjects, canManageTeam, etc.), and the hasPermission() utility function exists, but none of the data mutation hooks (useProjects, useComments, useTimeTracking, useFileAttachments, useSchemaLibrary, useReportBuilder, useDueDates, useProjectLinkedItems) import or call hasPermission() before performing create/update/delete operations.",
+    "skip_reason": "RBAC permission system defined but not enforced across CRUD operations",
+    "fix_approach": "Audit all Firestore mutations; wrap with hasPermission(); add Firestore security rules"
+  },
+  {
+    "bug_id": "R11-C-004",
+    "batch": 17,
+    "severity": "HIGH",
+    "category": "Lifecycle Issue",
+    "file": "src/lib/retentionPolicy.js",
+    "line": 0,
+    "description": "The retention policy provides options for audit log retention (30, 90, 180, 365 days, unlimited) but lacks any content-specific retention policy. There is no retention or archiving strategy defined for the primary content types managed by the portal: readability analyses, schemas in the schema library, custom reports, checklist state, or project data. The useReadabilityAnalysis hook enforces per-role storage limits (line 38-44) but this is disconnected from the retention policy module, creating two independent lifecycle management systems.",
+    "skip_reason": "Retention policies exist but stale content persists indefinitely",
+    "fix_approach": "Create enforcement service; warn on stale access"
+  },
+  {
+    "bug_id": "R11-C-005",
+    "batch": 17,
+    "severity": "HIGH",
+    "category": "Governance Gap",
+    "file": "src/utils/roles.js",
+    "line": 0,
+    "description": "The role-permission model defines 6 roles with 10 permissions but lacks critical content governance permissions. There are no permissions for: canApproveContent, canPublish, canArchive, canDeleteContent, canManageGlossary, canManageTaxonomy, or canConfigureRetention. The CONTENT_WRITER role has identical permissions to DEVELOPER (lines 60-71 vs 48-59), which means there is no differentiation between these distinct professional roles. Additionally, the TASK_STATUS model (line 107) has only 4 states with no 'approved' or 'archived' state, missing critical editorial workflow stages.",
+    "skip_reason": "Content governance permissions missing \u2014 any user can edit/delete any content",
+    "fix_approach": "Extend ROLE_PERMISSIONS; enforce in hooks and Firestore rules"
+  },
+  {
+    "bug_id": "R10-A-007",
+    "batch": 2,
+    "severity": "MEDIUM",
+    "category": "Feedback Gap",
+    "file": "src/components/admin/AuditLogViewer.jsx",
+    "line": 0,
+    "description": "The retention policy 'Save Policy' button at line 664 only shows a toast success message but does not actually persist the retention policy change. The onClick handler calls toast.success() and closes the modal but performs no API call, Firestore update, or localStorage write. The retention period state resets when the component remounts.",
+    "skip_reason": "Retention Save shows toast but never persists to Firestore",
+    "fix_approach": "Persist to Firestore org-settings; load on mount"
+  },
+  {
+    "bug_id": "R11-C-013",
+    "batch": 4,
+    "severity": "MEDIUM",
+    "category": "Governance Gap",
+    "file": "src/hooks/useSchemaLibrary.js",
+    "line": 0,
+    "description": "The schema library allows users to mark schemas as public (isPublic: true, line 75) but there is no governance mechanism to review or approve publicly shared schemas. Any user can make a schema public without editorial review, and there is no moderation, version control, or quality gate. The deleteSchema function (line 108) also lacks ownership verification - it does not check if the current user owns the schema before deletion, unlike saveSchema which requires authentication.",
+    "skip_reason": "Schema library lets any user publish \u2014 no governance",
+    "fix_approach": "Add approval workflow; gate with canPublishSchemas permission"
+  },
+  {
+    "bug_id": "R10-C-005",
+    "batch": 12,
+    "severity": "MEDIUM",
+    "category": "Flow Break",
+    "file": "src/hooks/useUnsavedChanges.js",
+    "line": 0,
+    "description": "The useUnsavedChanges hook only handles browser beforeunload events (page refresh/close) but provides no mechanism for intercepting in-app navigation via React Router. The JSDoc comment at line 9 says 'Can be used with React Router for navigation warnings' but the implementation does not include any React Router navigation blocking (e.g., useBlocker or usePrompt). This means users can navigate away within the SPA and lose unsaved changes without any warning.",
+    "skip_reason": "useUnsavedChanges does not handle concurrent edit conflicts",
+    "fix_approach": "Add conflict detection via version/timestamp; show merge dialog"
+  },
+  {
+    "bug_id": "R10-C-006",
+    "batch": 12,
+    "severity": "MEDIUM",
+    "category": "Form UX Issue",
+    "file": "src/hooks/useUnsavedChanges.js",
+    "line": 0,
+    "description": "The dirty state detection in useFormWithUnsavedChanges uses JSON.stringify comparison (line 58) to detect changes. This is unreliable for several edge cases: (1) Object property order differences will cause false positives, (2) Date objects serialize differently than Firestore Timestamps, (3) undefined values are stripped during stringify causing false negatives, and (4) it runs on every render via useEffect, which is inefficient for large forms.",
+    "skip_reason": "useUnsavedChanges no draft persistence \u2014 work lost on navigation",
+    "fix_approach": "Add localStorage draft with user-scoped keys; auto-restore"
+  },
+  {
+    "bug_id": "R08-C-014",
+    "batch": 14,
+    "severity": "MEDIUM",
+    "category": "Data Integrity",
+    "file": "src/utils/storageHelpers.js",
+    "line": 0,
+    "description": "The storageHelpers module maintains a parallel localStorage-based data system (time entries, project metadata, filter presets, activity log) that is completely disconnected from the Firestore-based system used by the hooks. For example, addTimeEntry in storageHelpers writes to localStorage, while useTimeTracking writes to Firestore. There is no synchronization between these two data stores, meaning data written via one mechanism is invisible to the other. This creates a split-brain data integrity problem.",
+    "skip_reason": "storageHelpers no cleanup for orphaned Storage files",
+    "fix_approach": "Create orphan detection; run cleanup on cascade delete"
+  },
+  {
+    "bug_id": "R09-B-012",
+    "batch": 14,
+    "severity": "MEDIUM",
+    "category": "Caching Gap",
+    "file": "src/utils/storageHelpers.js",
+    "line": 0,
+    "description": "When localStorage quota is exceeded (QuotaExceededError), the recovery strategy is to remove STORAGE_KEYS.RECENT_ACTIVITY and retry the write. This approach has several issues: (1) It only evicts one specific key, ignoring potentially larger data stores like ITEM_TIMELINE_DATA or TIME_ENTRIES. (2) It does not assess which key is consuming the most space before evicting. (3) The checkStorageUsage function exists but is never called during quota recovery to make an informed eviction decision. (4) There is no proactive quota management -- the system only reacts after writes fail, by which point user data may already be lost.",
+    "skip_reason": "storageHelpers cache no size limits or eviction",
+    "fix_approach": "Add LRU eviction; enforce per-feature storage budget"
+  },
+  {
+    "bug_id": "R08-A-005",
+    "batch": 16,
+    "severity": "MEDIUM",
+    "category": "Missing Feature",
+    "file": "src/components/checklist/TimeTracker.jsx",
+    "line": 0,
+    "description": "Time entries cannot be edited after creation. The component only supports Create and Delete operations for time entries, missing the Update operation from CRUD.",
+    "skip_reason": "TimeTracker missing edit and approval workflow",
+    "fix_approach": "Add inline edit; add approval gated by canManageProject"
+  },
+  {
+    "bug_id": "R08-A-008",
+    "batch": 16,
+    "severity": "MEDIUM",
+    "category": "Risk",
+    "file": "src/components/audit/dashboard/AuditDashboard.jsx",
+    "line": 0,
+    "description": "Shared audit links have no expiration mechanism or revocation capability. Once a share link is created, it remains accessible indefinitely with no way to revoke access.",
+    "skip_reason": "AuditDashboard no concurrency guard for simultaneous runs",
+    "fix_approach": "Add isAuditRunning check before starting new audit"
+  },
+  {
+    "bug_id": "R11-C-007",
+    "batch": 16,
+    "severity": "MEDIUM",
+    "category": "Metadata Issue",
+    "file": "src/lib/readability/utils/schemaValidator.js",
+    "line": 0,
+    "description": "The SCHEMA_FIELDS definitions for schema completeness scoring cover only 7 schema types (Article, NewsArticle, Product, FAQPage, HowTo, Organization, Person) while the SCHEMA_TYPES exported from useSchemaLibrary.js (line 178) lists 15 types including LocalBusiness, Event, Recipe, Review, BreadcrumbList, VideoObject, JobPosting, Course, and SoftwareApplication. This means the schema validator cannot provide detailed completeness scoring for over half the schema types that users can create and save in the library.",
+    "skip_reason": "Schema validator metadata incomplete for extended types",
+    "fix_approach": "Add validation for all supported types; warn on missing fields"
+  },
+  {
+    "bug_id": "R08-C-013",
+    "batch": 17,
+    "severity": "MEDIUM",
+    "category": "Workflow Gap",
+    "file": "src/lib/retentionPolicy.js",
+    "line": 0,
+    "description": "The retention policy module defines retention periods and provides utility functions (calculateRetentionCutoff, isWithinRetention), but there is no actual enforcement mechanism. No scheduled job, cleanup function, or data pruning logic references these utilities. The retention policy is purely configuration with no implementation. Data that exceeds the configured retention period is never automatically purged.",
+    "skip_reason": "retentionPolicy defined but never enforced",
+    "fix_approach": "Implement retention check on access; auto-archive stale content"
+  },
+  {
+    "bug_id": "R08-A-015",
+    "batch": 17,
+    "severity": "LOW",
+    "category": "Audit Trail",
+    "file": "src/components/projects/TeamManagementPage.jsx",
+    "line": 0,
+    "description": "Role changes are not logged to any audit trail. When a user's role is updated, no record is created documenting who made the change, what the previous role was, or when it occurred.",
+    "skip_reason": "TeamManagement no audit trail for role changes",
+    "fix_approach": "Log role changes to auditLog with before/after, actor, timestamp"
+  }
+]

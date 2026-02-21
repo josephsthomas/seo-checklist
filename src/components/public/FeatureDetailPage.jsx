@@ -72,7 +72,7 @@ const FEATURE_DATA = {
     ],
     stats: [
       { value: '321', label: 'Checklist Items' },
-      { value: '8', label: 'Project Phases' },
+      { value: '4', label: 'Project Phases' },
       { value: '∞', label: 'Projects' }
     ]
   },
@@ -389,12 +389,12 @@ const getColorClasses = (color) => {
 
 // Map feature slugs to schema keys
 const SCHEMA_KEY_MAP = {
-  'planner': 'contentPlanner',
-  'audit': 'technicalAudit',
-  'accessibility': 'accessibilityAnalyzer',
-  'meta-generator': 'metaGenerator',
-  'schema-generator': 'schemaGenerator',
-  'image-alt': 'imageAltGenerator'
+  'planner': 'planner',
+  'audit': 'audit',
+  'accessibility': 'accessibility',
+  'meta-generator': 'meta-generator',
+  'schema-generator': 'schema-generator',
+  'image-alt': 'image-alt'
 };
 
 export default function FeatureDetailPage() {

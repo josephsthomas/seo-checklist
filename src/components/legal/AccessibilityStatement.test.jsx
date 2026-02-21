@@ -1,14 +1,17 @@
 import { describe, it, expect } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import { BrowserRouter } from 'react-router-dom';
+import { HelmetProvider } from 'react-helmet-async';
 import AccessibilityStatement from './AccessibilityStatement';
 
-// Wrapper to provide routing context
+// Wrapper to provide routing context and helmet provider
 const renderWithRouter = (component) => {
   return render(
-    <BrowserRouter>
-      {component}
-    </BrowserRouter>
+    <HelmetProvider>
+      <BrowserRouter>
+        {component}
+      </BrowserRouter>
+    </HelmetProvider>
   );
 };
 

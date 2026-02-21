@@ -46,6 +46,7 @@ const ACTIVITY_ICONS = {
   'favorite.added': Star,
   'favorite.removed': Star,
   'notification.received': Bell,
+  'readability.analyzed': Search,
   'settings.updated': Settings,
   'default': Clock
 };
@@ -71,6 +72,7 @@ const ACTIVITY_COLORS = {
   'favorite.added': 'bg-amber-100 text-amber-600',
   'favorite.removed': 'bg-charcoal-100 text-charcoal-600',
   'notification.received': 'bg-orange-100 text-orange-600',
+  'readability.analyzed': 'bg-teal-100 text-teal-600',
   'settings.updated': 'bg-charcoal-100 text-charcoal-600',
   'default': 'bg-charcoal-100 text-charcoal-600'
 };
@@ -97,7 +99,7 @@ function getActivityMessage(activity) {
     'checklist.item_uncompleted': `Marked incomplete: ${activity.metadata?.itemTitle || 'Unknown'}`,
     'audit.created': `Ran technical audit on ${activity.metadata?.domain || 'site'}`,
     'audit.shared': `Shared audit for ${activity.metadata?.domain || 'site'}`,
-    'accessibility.scan': `Scanned ${activity.metadata?.url || 'page'} for accessibility`,
+    'accessibility.scan': `Audited ${activity.metadata?.url || 'page'} for accessibility`,
     'imagealt.generated': `Generated ${activity.metadata?.count || 0} alt text descriptions`,
     'meta.generated': `Generated meta data for ${activity.metadata?.title || 'document'}`,
     'schema.generated': `Created ${activity.metadata?.schemaType || 'structured'} data`,
@@ -109,6 +111,7 @@ function getActivityMessage(activity) {
     'favorite.added': `Added ${activity.metadata?.itemName || 'item'} to favorites`,
     'favorite.removed': `Removed ${activity.metadata?.itemName || 'item'} from favorites`,
     'notification.received': activity.metadata?.message || 'Received notification',
+    'readability.analyzed': `Analyzed readability for ${activity.metadata?.url || 'page'}`,
     'settings.updated': 'Updated settings'
   };
 
@@ -326,7 +329,7 @@ export function ActivityWidget({ limit = 5, className = '' }) {
 
   if (loading) {
     return (
-      <div className={`bg-white rounded-xl border border-charcoal-100 p-6 ${className}`}>
+      <div className={`bg-white dark:bg-charcoal-800 rounded-xl border border-charcoal-100 dark:border-charcoal-700 p-6 ${className}`}>
         <div className="animate-pulse space-y-4">
           <div className="h-6 bg-charcoal-100 rounded w-1/3" />
           {[1, 2, 3].map(i => (
@@ -344,7 +347,7 @@ export function ActivityWidget({ limit = 5, className = '' }) {
   }
 
   return (
-    <div className={`bg-white rounded-xl border border-charcoal-100 p-6 ${className}`}>
+    <div className={`bg-white dark:bg-charcoal-800 rounded-xl border border-charcoal-100 dark:border-charcoal-700 p-6 ${className}`}>
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-2">
           <Clock className="w-5 h-5 text-charcoal-500" />

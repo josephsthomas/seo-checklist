@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { doc, setDoc, onSnapshot } from 'firebase/firestore';
 import { db } from '../lib/firebase';
+import toast from 'react-hot-toast';
 
 const MAX_RECENT_ITEMS = 10;
 
@@ -10,7 +11,10 @@ export const ITEM_TYPES = {
   PROJECT: 'project',
   TOOL: 'tool',
   AUDIT: 'audit',
-  RESOURCE: 'resource'
+  RESOURCE: 'resource',
+  READABILITY: 'readability',
+  SCHEMA: 'schema',
+  META: 'meta'
 };
 
 /**
@@ -59,40 +63,67 @@ export function useFavoritesAndRecents() {
       }, { merge: true });
     } catch (error) {
       console.error('Error saving favorites/recents:', error);
+      toast.error('Failed to save favorites/recents');
     }
   }, [currentUser]);
 
   // Add to favorites
   const addToFavorites = useCallback((item) => {
-    const exists = favorites.some(f => f.id === item.id && f.type === item.type);
-    if (exists) return;
+    setFavorites(prevFavorites => {
+      const exists = prevFavorites.some(f => f.id === item.id && f.type === item.type);
+      if (exists) return prevFavorites;
 
-    const newItem = {
-      ...item,
-      addedAt: new Date().toISOString()
-    };
+      const newItem = {
+        ...item,
+        addedAt: new Date().toISOString()
+      };
 
-    const newFavorites = [newItem, ...favorites];
-    setFavorites(newFavorites);
-    saveData(newFavorites, recents);
-  }, [favorites, recents, saveData]);
+      const newFavorites = [newItem, ...prevFavorites];
+      setRecents(prevRecents => {
+        saveData(newFavorites, prevRecents);
+        return prevRecents;
+      });
+      return newFavorites;
+    });
+  }, [saveData]);
 
   // Remove from favorites
   const removeFromFavorites = useCallback((itemId, itemType) => {
-    const newFavorites = favorites.filter(f => !(f.id === itemId && f.type === itemType));
-    setFavorites(newFavorites);
-    saveData(newFavorites, recents);
-  }, [favorites, recents, saveData]);
+    setFavorites(prevFavorites => {
+      const newFavorites = prevFavorites.filter(f => !(f.id === itemId && f.type === itemType));
+      setRecents(prevRecents => {
+        saveData(newFavorites, prevRecents);
+        return prevRecents;
+      });
+      return newFavorites;
+    });
+  }, [saveData]);
 
   // Toggle favorite
   const toggleFavorite = useCallback((item) => {
-    const isFav = favorites.some(f => f.id === item.id && f.type === item.type);
-    if (isFav) {
-      removeFromFavorites(item.id, item.type);
-    } else {
-      addToFavorites(item);
-    }
-  }, [favorites, addToFavorites, removeFromFavorites]);
+    // addToFavorites already checks for existence and is a no-op if already present
+    // removeFromFavorites is safe if item doesn't exist
+    // Both use functional setState so they read the latest state
+    setFavorites(prevFavorites => {
+      const isFav = prevFavorites.some(f => f.id === item.id && f.type === item.type);
+      if (isFav) {
+        const newFavorites = prevFavorites.filter(f => !(f.id === item.id && f.type === item.type));
+        setRecents(prevRecents => {
+          saveData(newFavorites, prevRecents);
+          return prevRecents;
+        });
+        return newFavorites;
+      } else {
+        const newItem = { ...item, addedAt: new Date().toISOString() };
+        const newFavorites = [newItem, ...prevFavorites];
+        setRecents(prevRecents => {
+          saveData(newFavorites, prevRecents);
+          return prevRecents;
+        });
+        return newFavorites;
+      }
+    });
+  }, [saveData]);
 
   // Check if item is a favorite
   const isFavorite = useCallback((itemId, itemType) => {
@@ -101,25 +132,29 @@ export function useFavoritesAndRecents() {
 
   // Add to recents
   const addToRecents = useCallback((item) => {
-    // Remove if already exists
-    const filtered = recents.filter(r => !(r.id === item.id && r.type === item.type));
-
-    const newItem = {
-      ...item,
-      accessedAt: new Date().toISOString()
-    };
-
-    // Add to front and limit
-    const newRecents = [newItem, ...filtered].slice(0, MAX_RECENT_ITEMS);
-    setRecents(newRecents);
-    saveData(favorites, newRecents);
-  }, [favorites, recents, saveData]);
+    setRecents(prevRecents => {
+      const filtered = prevRecents.filter(r => !(r.id === item.id && r.type === item.type));
+      const newItem = {
+        ...item,
+        accessedAt: new Date().toISOString()
+      };
+      const newRecents = [newItem, ...filtered].slice(0, MAX_RECENT_ITEMS);
+      setFavorites(prevFavorites => {
+        saveData(prevFavorites, newRecents);
+        return prevFavorites;
+      });
+      return newRecents;
+    });
+  }, [saveData]);
 
   // Clear recents
   const clearRecents = useCallback(() => {
     setRecents([]);
-    saveData(favorites, []);
-  }, [favorites, saveData]);
+    setFavorites(prevFavorites => {
+      saveData(prevFavorites, []);
+      return prevFavorites;
+    });
+  }, [saveData]);
 
   // Get recents by type
   const getRecentsByType = useCallback((type) => {

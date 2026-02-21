@@ -12,6 +12,7 @@ import {
   Heading1
 } from 'lucide-react';
 import { suggestAllSEO, isAIAvailable } from '../../../lib/ai/suggestionService';
+import { AIDisclaimerInline } from '../../shared/AIDisclaimer';
 
 export default function AISuggestions({ pageData }) {
   const [loading, setLoading] = useState(false);
@@ -39,9 +40,33 @@ export default function AISuggestions({ pageData }) {
         h1: pageData.h1,
         metaDescription: pageData.metaDescription1
       });
+
+      // Validate AI response structure
+      if (!result || typeof result !== 'object') {
+        throw new Error('Invalid response from AI service.');
+      }
+      const sections = ['title', 'metaDescription', 'h1'];
+      for (const section of sections) {
+        if (result[section]) {
+          if (result[section].suggestions && !Array.isArray(result[section].suggestions)) {
+            result[section].suggestions = [];
+          }
+          if (result[section].issues && !Array.isArray(result[section].issues)) {
+            result[section].issues = [];
+          }
+        }
+      }
+
       setSuggestions(result);
     } catch (err) {
-      setError(err.message);
+      const msg = err.message || '';
+      if (msg.includes('429') || msg.toLowerCase().includes('rate limit')) {
+        setError('AI service is busy. Please try again in a few seconds.');
+      } else if (msg.includes('503') || msg.includes('timeout') || msg.toLowerCase().includes('unavailable')) {
+        setError('AI service is temporarily unavailable. Please try again shortly.');
+      } else {
+        setError(msg || 'An unexpected error occurred.');
+      }
     } finally {
       setLoading(false);
     }
@@ -128,6 +153,20 @@ export default function AISuggestions({ pageData }) {
             <span className="font-medium">Error generating suggestions</span>
           </div>
           <p className="text-sm text-red-600 mt-1">{error}</p>
+          <button
+            onClick={generateSuggestions}
+            disabled={loading}
+            className="mt-2 text-sm text-red-700 hover:text-red-800 underline focus:outline-none focus-visible:ring-2 focus-visible:ring-red-500 rounded"
+          >
+            Try again
+          </button>
+        </div>
+      )}
+
+      {/* AI Disclaimer */}
+      {suggestions && (
+        <div className="px-6 py-3 border-b border-charcoal-100">
+          <AIDisclaimerInline />
         </div>
       )}
 

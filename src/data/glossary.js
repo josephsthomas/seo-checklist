@@ -207,7 +207,7 @@ export const glossaryTerms = [
     definition: "HTML element specifying page title. Shows in search results and browser tabs. Major ranking factor.",
     category: "On-Page SEO",
     relatedTerms: ["Meta Description", "Keywords"],
-    example: "<title>Best Running Shoes 2024 - Reviews & Buying Guide</title>"
+    example: "<title>Best Running Shoes 2025 - Reviews & Buying Guide</title>"
   },
   {
     id: 27,
@@ -249,8 +249,11 @@ export const glossaryCategories = [
   "On-Page SEO",
   "Technical SEO",
   "Content Strategy",
+  "Content Quality",
   "Performance",
   "Off-Page SEO",
+  "Link Building",
   "Metrics",
+  "SERP Features",
   "International SEO"
 ];

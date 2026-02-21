@@ -87,6 +87,14 @@ export default function BulkEditPanel({
       return;
     }
 
+    // Confirm destructive actions
+    const destructiveActions = ['mark_decorative', 'lowercase'];
+    if (destructiveActions.includes(action) && selectedIds.size > 1) {
+      if (!window.confirm(`Apply "${action.replace(/_/g, ' ')}" to ${selectedIds.size} items? This cannot be undone.`)) {
+        return;
+      }
+    }
+
     const updatedResults = [...results];
 
     switch (action) {

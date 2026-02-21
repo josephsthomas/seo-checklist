@@ -74,7 +74,7 @@ export default function KeyboardShortcuts() {
     return (
       <button
         onClick={() => setIsOpen(true)}
-        className="fixed bottom-6 right-6 p-3 bg-primary-600 text-white rounded-full shadow-lg hover:bg-primary-700 transition-colors z-40"
+        className="fixed bottom-6 right-6 p-3 bg-primary-600 text-white rounded-full shadow-lg hover:bg-primary-700 transition-colors z-40 dark:bg-primary-500 dark:hover:bg-primary-600"
         title="Keyboard Shortcuts (Press ?)"
       >
         <Keyboard className="w-6 h-6" />
@@ -86,27 +86,27 @@ export default function KeyboardShortcuts() {
     <>
       {/* Backdrop */}
       <div
-        className="fixed inset-0 bg-black bg-opacity-50 z-50"
+        className="fixed inset-0 bg-black bg-opacity-50 z-[70]"
         onClick={() => setIsOpen(false)}
       />
 
       {/* Modal */}
-      <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-        <div className="bg-white rounded-xl shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-y-auto">
+      <div className="fixed inset-0 z-[70] flex items-center justify-center p-4">
+        <div className="bg-white dark:bg-charcoal-800 rounded-xl shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-y-auto">
           {/* Header */}
-          <div className="sticky top-0 bg-white border-b px-6 py-4 flex items-center justify-between">
+          <div className="sticky top-0 bg-white dark:bg-charcoal-800 border-b dark:border-charcoal-700 px-6 py-4 flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <div className="p-2 bg-primary-100 rounded-lg">
+              <div className="p-2 bg-primary-100 dark:bg-primary-900/30 rounded-lg">
                 <Keyboard className="w-6 h-6 text-primary-600" />
               </div>
               <div>
-                <h2 className="text-2xl font-bold text-charcoal-900">Keyboard Shortcuts</h2>
-                <p className="text-sm text-charcoal-600">Work faster with keyboard commands</p>
+                <h2 className="text-2xl font-bold text-charcoal-900 dark:text-white">Keyboard Shortcuts</h2>
+                <p className="text-sm text-charcoal-600 dark:text-charcoal-400">Work faster with keyboard commands</p>
               </div>
             </div>
             <button
               onClick={() => setIsOpen(false)}
-              className="text-charcoal-400 hover:text-charcoal-600"
+              className="text-charcoal-400 hover:text-charcoal-600 dark:text-charcoal-500 dark:hover:text-charcoal-300"
             >
               <X className="w-6 h-6" />
             </button>
@@ -117,25 +117,25 @@ export default function KeyboardShortcuts() {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
               {shortcuts.map((category, idx) => (
                 <div key={idx}>
-                  <h3 className="text-lg font-semibold text-charcoal-900 mb-4">
+                  <h3 className="text-lg font-semibold text-charcoal-900 dark:text-white mb-4">
                     {category.category}
                   </h3>
                   <div className="space-y-3">
                     {category.items.map((shortcut, index) => (
                       <div
                         key={index}
-                        className="flex items-center justify-between p-3 bg-charcoal-50 rounded-lg hover:bg-charcoal-100 transition-colors"
+                        className="flex items-center justify-between p-3 bg-charcoal-50 dark:bg-charcoal-700 rounded-lg hover:bg-charcoal-100 dark:hover:bg-charcoal-600 transition-colors"
                       >
-                        <span className="text-sm text-charcoal-700">
+                        <span className="text-sm text-charcoal-700 dark:text-charcoal-200">
                           {shortcut.description}
                         </span>
                         <div className="flex items-center gap-1">
                           {shortcut.keys.map((key, keyIndex) => (
                             <React.Fragment key={keyIndex}>
                               {keyIndex > 0 && (
-                                <span className="text-charcoal-400 text-xs">+</span>
+                                <span className="text-charcoal-400 dark:text-charcoal-500 text-xs">+</span>
                               )}
-                              <kbd className="px-2 py-1 bg-white border border-charcoal-200 rounded text-xs font-mono text-charcoal-700 shadow-sm min-w-[32px] text-center">
+                              <kbd className="px-2 py-1 bg-white dark:bg-charcoal-600 border border-charcoal-200 dark:border-charcoal-500 rounded text-xs font-mono text-charcoal-700 dark:text-charcoal-200 shadow-sm min-w-[32px] text-center">
                                 {key}
                               </kbd>
                             </React.Fragment>
@@ -149,13 +149,13 @@ export default function KeyboardShortcuts() {
             </div>
 
             {/* Pro Tip */}
-            <div className="mt-8 p-4 bg-primary-50 border border-primary-200 rounded-lg">
+            <div className="mt-8 p-4 bg-primary-50 dark:bg-primary-900/20 border border-primary-200 dark:border-primary-800 rounded-lg">
               <div className="flex items-start gap-3">
-                <Command className="w-5 h-5 text-primary-600 flex-shrink-0 mt-0.5" />
+                <Command className="w-5 h-5 text-primary-600 dark:text-primary-400 flex-shrink-0 mt-0.5" />
                 <div>
-                  <h4 className="font-semibold text-primary-900 mb-1">Pro Tip</h4>
-                  <p className="text-sm text-primary-800">
-                    Press <kbd className="px-2 py-1 bg-white border border-primary-300 rounded text-xs font-mono mx-1">?</kbd>
+                  <h4 className="font-semibold text-primary-900 dark:text-primary-200 mb-1">Pro Tip</h4>
+                  <p className="text-sm text-primary-800 dark:text-primary-300">
+                    Press <kbd className="px-2 py-1 bg-white dark:bg-charcoal-700 border border-primary-300 dark:border-primary-700 rounded text-xs font-mono mx-1 dark:text-primary-300">?</kbd>
                     anytime to view this shortcuts panel. Most shortcuts work globally throughout the app.
                   </p>
                 </div>
@@ -164,7 +164,7 @@ export default function KeyboardShortcuts() {
           </div>
 
           {/* Footer */}
-          <div className="border-t px-6 py-4 bg-charcoal-50 flex justify-end">
+          <div className="border-t dark:border-charcoal-700 px-6 py-4 bg-charcoal-50 dark:bg-charcoal-900 flex justify-end">
             <button
               onClick={() => setIsOpen(false)}
               className="btn btn-primary"

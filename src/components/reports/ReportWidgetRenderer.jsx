@@ -171,7 +171,7 @@ function renderArrayChart(data, chartType) {
             const y = 100 - ((d.score || d.value || 0) / maxValue) * 80;
             return (
               <circle
-                key={i}
+                key={d.id || d.date || d.name || `point-${i}`}
                 cx={x}
                 cy={y}
                 r="3"

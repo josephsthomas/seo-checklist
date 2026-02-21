@@ -41,6 +41,7 @@ export default function UsageAnalyticsDashboard() {
   const [dateRange, setDateRange] = useState('7d');
   const [loading, setLoading] = useState(true);
   const [stats, setStats] = useState(null);
+  const [refreshKey, setRefreshKey] = useState(0);
 
   // Calculate date range
   const dateRangeConfig = useMemo(() => {
@@ -124,7 +125,7 @@ export default function UsageAnalyticsDashboard() {
     };
 
     fetchStats();
-  }, [dateRange, dateRangeConfig]);
+  }, [dateRange, dateRangeConfig, refreshKey]);
 
   const getChangeIndicator = (change) => {
     if (change > 0) {
@@ -248,6 +249,7 @@ export default function UsageAnalyticsDashboard() {
               value={dateRange}
               onChange={(e) => setDateRange(e.target.value)}
               className="select py-2"
+              aria-label="Select date range"
             >
               <option value="24h">Last 24 Hours</option>
               <option value="7d">Last 7 Days</option>
@@ -256,7 +258,7 @@ export default function UsageAnalyticsDashboard() {
               <option value="month">This Month</option>
             </select>
             <button
-              onClick={() => setLoading(true)}
+              onClick={() => setRefreshKey(k => k + 1)}
               className="btn btn-secondary flex items-center gap-2"
             >
               <RefreshCcw className="w-4 h-4" />

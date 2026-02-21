@@ -32,7 +32,7 @@ function getApiConfig() {
     return { useProxy: false, apiKey };
   }
 
-  throw new Error('AI not configured. Set VITE_AI_PROXY_URL (recommended) or VITE_CLAUDE_API_KEY in your .env file.');
+  throw new Error('AI suggestions are not configured. Please contact your administrator to set up the AI proxy.');
 }
 
 /**

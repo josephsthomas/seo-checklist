@@ -1,9 +1,11 @@
 import { Link } from 'react-router-dom';
 import { Home, ArrowLeft, Search, HelpCircle } from 'lucide-react';
+import SEOHead from '../shared/SEOHead';
 
 export default function NotFoundPage() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-charcoal-50 via-white to-primary-50 flex items-center justify-center px-4">
+      <SEOHead title="Page Not Found | Content Strategy Portal" noindex={true} />
       <div className="max-w-2xl mx-auto text-center">
         {/* 404 Illustration */}
         <div className="relative mb-8">

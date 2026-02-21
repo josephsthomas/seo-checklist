@@ -111,8 +111,8 @@ function ComparisonModal({ audits, onClose }) {
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-      <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={onClose} />
-      <div className="relative bg-white rounded-2xl shadow-2xl w-full max-w-4xl max-h-[90vh] overflow-y-auto">
+      <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={onClose} aria-hidden="true" />
+      <div role="dialog" aria-modal="true" aria-labelledby="comparison-modal-title" className="relative bg-white rounded-2xl shadow-2xl w-full max-w-4xl max-h-[90vh] overflow-y-auto">
         {/* Header */}
         <div className="sticky top-0 bg-white border-b border-charcoal-100 p-6 flex items-center justify-between">
           <div className="flex items-center gap-3">
@@ -120,12 +120,13 @@ function ComparisonModal({ audits, onClose }) {
               <GitCompare className="w-5 h-5 text-white" />
             </div>
             <div>
-              <h2 className="text-lg font-semibold text-charcoal-900">Audit Comparison</h2>
+              <h2 id="comparison-modal-title" className="text-lg font-semibold text-charcoal-900">Audit Comparison</h2>
               <p className="text-sm text-charcoal-500">Compare two audit results side by side</p>
             </div>
           </div>
           <button
             onClick={onClose}
+            aria-label="Close comparison"
             className="p-2 text-charcoal-400 hover:text-charcoal-600 hover:bg-charcoal-100 rounded-lg transition-colors"
           >
             <X className="w-5 h-5" />

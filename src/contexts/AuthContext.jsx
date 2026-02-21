@@ -49,7 +49,7 @@ export function AuthProvider({ children }) {
       await setDoc(doc(db, 'users', user.uid), {
         email: user.email,
         name: displayName,
-        role: 'project_manager', // Default role
+        role: 'content_writer', // Default role (least privilege)
         createdAt: new Date(),
         avatar: null,
         emailVerified: false
@@ -87,7 +87,7 @@ export function AuthProvider({ children }) {
         await setDoc(doc(db, 'users', user.uid), {
           email: user.email,
           name: user.displayName,
-          role: 'project_manager',
+          role: 'content_writer',
           createdAt: new Date(),
           avatar: user.photoURL,
           emailVerified: true // Google accounts are already verified
@@ -168,6 +168,34 @@ export function AuthProvider({ children }) {
         batch.delete(projectDoc.ref);
       });
 
+      // Delete user's checklist assignments
+      const assignmentsQuery = query(collection(db, 'checklist_assignments'), where('assignedBy', '==', userId));
+      const assignmentsSnapshot = await getDocs(assignmentsQuery);
+      assignmentsSnapshot.forEach((assignmentDoc) => {
+        batch.delete(assignmentDoc.ref);
+      });
+
+      // Delete user's time entries
+      const timeEntriesQuery = query(collection(db, 'time_entries'), where('userId', '==', userId));
+      const timeEntriesSnapshot = await getDocs(timeEntriesQuery);
+      timeEntriesSnapshot.forEach((timeDoc) => {
+        batch.delete(timeDoc.ref);
+      });
+
+      // Delete user's comments
+      const commentsQuery = query(collection(db, 'comments'), where('userId', '==', userId));
+      const commentsSnapshot = await getDocs(commentsQuery);
+      commentsSnapshot.forEach((commentDoc) => {
+        batch.delete(commentDoc.ref);
+      });
+
+      // Delete user's notifications
+      const notificationsQuery = query(collection(db, 'notifications'), where('userId', '==', userId));
+      const notificationsSnapshot = await getDocs(notificationsQuery);
+      notificationsSnapshot.forEach((notifDoc) => {
+        batch.delete(notifDoc.ref);
+      });
+
       // Delete user's notification settings
       const notificationSettingsRef = doc(db, 'users', userId, 'settings', 'notifications');
       batch.delete(notificationSettingsRef);
@@ -184,8 +212,8 @@ export function AuthProvider({ children }) {
         const userStorageRef = ref(storage, `users/${userId}`);
         const files = await listAll(userStorageRef);
         await Promise.all(files.items.map(file => deleteObject(file)));
-      } catch {
-        // Silently fail if no files exist or storage error
+      } catch (storageError) {
+        console.warn('Failed to delete user storage files:', storageError);
       }
 
       // Delete Firebase Auth user
@@ -214,8 +242,8 @@ export function AuthProvider({ children }) {
       if (docSnap.exists()) {
         setUserProfile({ id: uid, ...docSnap.data() });
       }
-    } catch {
-      // Silently fail - profile will be null
+    } catch (profileError) {
+      console.warn('Failed to fetch user profile:', profileError);
     }
   };
 

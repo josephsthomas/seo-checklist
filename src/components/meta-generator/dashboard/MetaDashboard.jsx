@@ -444,7 +444,10 @@ export default function MetaDashboard({ results, onNewProcess, onUpdateMetadata 
         {/* AI Suggestions */}
         {metadata.suggestions?.length > 0 && (
           <div className="mt-8 bg-slate-800/30 rounded-xl p-4 border border-slate-700">
-            <h3 className="text-sm font-medium text-slate-300 mb-3">💡 AI Suggestions</h3>
+            <div className="flex items-center gap-2 mb-3">
+              <h3 className="text-sm font-medium text-slate-300">💡 AI Suggestions</h3>
+              <AIBadge />
+            </div>
             <ul className="space-y-2">
               {metadata.suggestions.map((suggestion, idx) => (
                 <li key={idx} className="flex items-start gap-2 text-sm text-slate-400">
@@ -453,6 +456,7 @@ export default function MetaDashboard({ results, onNewProcess, onUpdateMetadata 
                 </li>
               ))}
             </ul>
+            <p className="text-xs text-slate-500 mt-3 italic">AI-generated suggestions should be reviewed before implementation.</p>
           </div>
         )}
 

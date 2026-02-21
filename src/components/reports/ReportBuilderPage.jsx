@@ -1,4 +1,4 @@
-import { useState, useCallback, useMemo, useRef } from 'react';
+import { useState, useCallback, useMemo, useRef, useEffect } from 'react';
 import {
   Plus,
   Save,
@@ -30,8 +30,7 @@ import {
 import { format } from 'date-fns';
 import toast from 'react-hot-toast';
 import InfoTooltip from '../common/InfoTooltip';
-import jsPDF from 'jspdf';
-import html2canvas from 'html2canvas';
+// jsPDF and html2canvas are dynamically imported at point of use for bundle size
 import useReportBuilder, {
   DATA_SOURCES,
   WIDGET_TYPES,
@@ -80,6 +79,16 @@ export default function ReportBuilderPage() {
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
 
   const canvasRef = useRef(null);
+  const [isSaving, setIsSaving] = useState(false);
+
+  // Warn on unsaved changes before unload
+  useEffect(() => {
+    const handler = (e) => {
+      if (hasUnsavedChanges) { e.preventDefault(); }
+    };
+    window.addEventListener('beforeunload', handler);
+    return () => window.removeEventListener('beforeunload', handler);
+  }, [hasUnsavedChanges]);
 
   // Group data sources by category
   const groupedDataSources = useMemo(() => {
@@ -172,6 +181,7 @@ export default function ReportBuilderPage() {
 
   // Delete widget
   const removeWidget = useCallback((widgetId) => {
+    if (!confirm('Delete this widget?')) return;
     setWidgets(prev => prev.filter(w => w.id !== widgetId));
     if (selectedWidget === widgetId) {
       setSelectedWidget(null);
@@ -253,29 +263,34 @@ export default function ReportBuilderPage() {
 
   // Save report
   const saveReport = useCallback(async () => {
-    const reportData = {
-      name: reportName,
-      description: reportDescription,
-      widgets,
-      settings: {
-        gridCols: GRID_COLS,
-        rowHeight: GRID_ROW_HEIGHT
-      }
-    };
+    setIsSaving(true);
+    try {
+      const reportData = {
+        name: reportName,
+        description: reportDescription,
+        widgets,
+        settings: {
+          gridCols: GRID_COLS,
+          rowHeight: GRID_ROW_HEIGHT
+        }
+      };
 
-    let success;
-    if (currentReport) {
-      success = await updateReport(currentReport.id, reportData);
-    } else {
-      const newId = await createReport(reportData);
-      if (newId) {
-        setCurrentReport({ id: newId, ...reportData });
-        success = true;
+      let success;
+      if (currentReport) {
+        success = await updateReport(currentReport.id, reportData);
+      } else {
+        const newId = await createReport(reportData);
+        if (newId) {
+          setCurrentReport({ id: newId, ...reportData });
+          success = true;
+        }
       }
-    }
 
-    if (success) {
-      setHasUnsavedChanges(false);
+      if (success) {
+        setHasUnsavedChanges(false);
+      }
+    } finally {
+      setIsSaving(false);
     }
   }, [currentReport, reportName, reportDescription, widgets, createReport, updateReport]);
 
@@ -290,6 +305,7 @@ export default function ReportBuilderPage() {
     const loadingToast = toast.loading(`Exporting as ${exportFormat.toUpperCase()}...`);
 
     try {
+      const { default: html2canvas } = await import('html2canvas');
       if (exportFormat === 'pdf') {
         // Capture the report grid as canvas
         const canvas = await html2canvas(reportGrid, {
@@ -300,6 +316,7 @@ export default function ReportBuilderPage() {
         });
 
         const imgData = canvas.toDataURL('image/png');
+        const { default: jsPDF } = await import('jspdf');
         const pdf = new jsPDF({
           orientation: canvas.width > canvas.height ? 'landscape' : 'portrait',
           unit: 'px',
@@ -359,11 +376,14 @@ export default function ReportBuilderPage() {
         });
 
         const imgData = canvas.toDataURL('image/png');
+        const escapeHtml = (str) => str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+        const safeName = escapeHtml(reportName || 'Custom Report');
         const htmlContent = `<!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>${reportName || 'Custom Report'}</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>${safeName}</title>
   <style>
     body { font-family: system-ui, sans-serif; margin: 0; padding: 40px; background: #f9fafb; }
     .report-container { max-width: 1200px; margin: 0 auto; background: white; padding: 40px; border-radius: 16px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
@@ -374,7 +394,7 @@ export default function ReportBuilderPage() {
 </head>
 <body>
   <div class="report-container">
-    <h1>${reportName || 'Custom Report'}</h1>
+    <h1>${safeName}</h1>
     <p class="date">Generated: ${format(new Date(), 'MMMM d, yyyy h:mm a')}</p>
     <img src="${imgData}" alt="Report" />
   </div>
@@ -409,9 +429,9 @@ export default function ReportBuilderPage() {
           {/* Sidebar Header */}
           <div className="p-4 border-b border-charcoal-200 dark:border-charcoal-700">
             <div className="flex items-center justify-between mb-3">
-              <h2 className="font-semibold text-charcoal-900 dark:text-white">
+              <h1 className="font-semibold text-charcoal-900 dark:text-white text-base">
                 Report Builder
-              </h2>
+              </h1>
               <button
                 onClick={() => setShowSidebar(false)}
                 className="p-1 text-charcoal-400 hover:text-charcoal-600 dark:hover:text-charcoal-300"
@@ -519,7 +539,7 @@ export default function ReportBuilderPage() {
                             <Copy className="w-3.5 h-3.5" />
                           </button>
                           <button
-                            onClick={() => deleteReport(report.id)}
+                            onClick={() => { if (confirm(`Delete "${report.name}"? This cannot be undone.`)) deleteReport(report.id); }}
                             className="p-1 text-charcoal-400 hover:text-red-600"
                             title="Delete"
                           >
@@ -661,12 +681,12 @@ export default function ReportBuilderPage() {
 
               <button
                 onClick={saveReport}
-                disabled={!hasUnsavedChanges && currentReport}
+                disabled={isSaving || (!hasUnsavedChanges && currentReport)}
                 className="px-3 py-2 text-sm bg-primary-500 text-white rounded-lg hover:bg-primary-600 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
                 title="Save your report layout to reuse and schedule for automatic delivery"
               >
-                <Save className="w-4 h-4" />
-                Save
+                <Save className={`w-4 h-4 ${isSaving ? 'animate-pulse' : ''}`} />
+                {isSaving ? 'Saving...' : 'Save'}
               </button>
 
               <div className="relative group">
@@ -674,7 +694,7 @@ export default function ReportBuilderPage() {
                   <Download className="w-4 h-4" />
                   Export
                 </button>
-                <div className="absolute right-0 top-full mt-1 w-40 bg-white dark:bg-charcoal-800 border border-charcoal-200 dark:border-charcoal-700 rounded-lg shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-10">
+                <div className="absolute right-0 top-full mt-1 w-40 bg-white dark:bg-charcoal-800 border border-charcoal-200 dark:border-charcoal-700 rounded-lg shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-20">
                   <button
                     onClick={() => exportReport('pdf')}
                     className="w-full px-4 py-2 text-sm text-left text-charcoal-700 dark:text-charcoal-300 hover:bg-charcoal-100 dark:hover:bg-charcoal-700 first:rounded-t-lg"
@@ -741,9 +761,10 @@ export default function ReportBuilderPage() {
                     className="absolute inset-0 pointer-events-none"
                     style={{
                       backgroundImage: `
-                        linear-gradient(to right, rgba(0,0,0,0.03) 1px, transparent 1px),
-                        linear-gradient(to bottom, rgba(0,0,0,0.03) 1px, transparent 1px)
+                        linear-gradient(to right, var(--grid-color, rgba(0,0,0,0.03)) 1px, transparent 1px),
+                        linear-gradient(to bottom, var(--grid-color, rgba(0,0,0,0.03)) 1px, transparent 1px)
                       `,
+                      '--grid-color': document.documentElement.classList.contains('dark') ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.03)',
                       backgroundSize: `calc((100% - ${(GRID_COLS - 1) * GRID_GAP}px) / ${GRID_COLS} + ${GRID_GAP}px) ${GRID_ROW_HEIGHT + GRID_GAP}px`
                     }}
                   />

@@ -46,7 +46,7 @@ const FEATURES = [
     name: 'Accessibility Analyzer',
     slug: 'accessibility',
     icon: Eye,
-    description: 'WCAG 2.2 compliance scanning with impact-based prioritization and remediation guidance.',
+    description: 'WCAG 2.2 compliance auditing with impact-based prioritization and remediation guidance.',
     highlights: [
       'WCAG 2.2 compliance scoring (A, AA, AAA)',
       '93 Axe-core accessibility rules',

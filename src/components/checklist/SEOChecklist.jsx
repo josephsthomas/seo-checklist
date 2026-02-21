@@ -47,7 +47,7 @@ export default function SEOChecklist() {
   const [showPresetManager, setShowPresetManager] = useState(false);
   const [showPdfExport, setShowPdfExport] = useState(false);
   const [filters, setFilters] = useState(DEFAULT_FILTERS);
-  const [expandedPhases, setExpandedPhases] = useState(PHASES);
+  const [expandedPhases, setExpandedPhases] = useState([PHASES[0]]);
 
   // Debounced search handler
   // eslint-disable-next-line react-hooks/exhaustive-deps

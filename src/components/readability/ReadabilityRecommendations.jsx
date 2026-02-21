@@ -17,6 +17,7 @@ import {
   Code,
 } from 'lucide-react';
 import ReadabilityRecommendationCard from './ReadabilityRecommendationCard';
+import { AIDisclaimerInline } from '../shared/AIDisclaimer';
 
 const FILTER_OPTIONS = [
   { key: 'all', label: 'All', icon: Lightbulb },
@@ -169,6 +170,9 @@ export default function ReadabilityRecommendations({ recommendations, aiAssessme
           ))}
         </div>
       </div>
+
+      {/* AI disclaimer */}
+      <AIDisclaimerInline />
 
       {/* Recommendation cards */}
       {filteredRecs.length === 0 ? (

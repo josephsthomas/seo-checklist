@@ -1,9 +1,12 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 import { Mail, ArrowLeft, Send, CheckCircle } from 'lucide-react';
 
 export default function ForgotPassword() {
+  useEffect(() => {
+    document.title = 'Forgot Password | Content Strategy Portal';
+  }, []);
   const [email, setEmail] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');

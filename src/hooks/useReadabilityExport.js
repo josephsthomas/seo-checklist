@@ -57,11 +57,11 @@ function urlToSlug(url) {
  * Get grade color as RGB array for PDF
  */
 function getGradeColorRGB(score) {
-  if (score >= 90) return [16, 185, 129]; // emerald-500
-  if (score >= 80) return [20, 184, 166]; // teal-500
-  if (score >= 70) return [245, 158, 11]; // amber-500
-  if (score >= 60) return [249, 115, 22]; // orange-500
-  return [239, 68, 68]; // red-500
+  if (score >= 85) return [16, 185, 129]; // emerald-500 (A-/A/A+)
+  if (score >= 75) return [20, 184, 166]; // teal-500 (B/B+)
+  if (score >= 65) return [245, 158, 11]; // amber-500 (C/C-)
+  if (score >= 60) return [249, 115, 22]; // orange-500 (D)
+  return [239, 68, 68]; // red-500 (F)
 }
 
 /**
@@ -785,7 +785,7 @@ export function useReadabilityExport() {
         if (i > 1) {
           doc.setFontSize(7);
           doc.setTextColor(...LIGHT_GRAY);
-          doc.text('AI Readability Checker', margin, 8);
+          doc.text('AI Readability Analyzer', margin, 8);
           doc.text(reportDate, pageWidth - margin, 8, { align: 'right' });
           doc.setDrawColor(...LIGHT_GRAY);
           doc.line(margin, 10, pageWidth - margin, 10);

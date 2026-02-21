@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect } from 'react';
+import { useState, useCallback, useEffect, useRef } from 'react';
 import {
   Globe,
   Upload,
@@ -28,6 +28,7 @@ export default function BatchAuditPanel({ onClose, onStartBatch }) {
   const [urls, setUrls] = useState([]);
   const [inputValue, setInputValue] = useState('');
   const [isRunning, setIsRunning] = useState(false);
+  const isRunningRef = useRef(false);
   const [results, setResults] = useState([]);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [showResults, setShowResults] = useState(false);
@@ -307,11 +308,12 @@ export default function BatchAuditPanel({ onClose, onStartBatch }) {
     }
 
     setIsRunning(true);
+    isRunningRef.current = true;
     setShowResults(true);
     setResults([]);
 
     for (let i = 0; i < urls.length; i++) {
-      if (!isRunning) break;
+      if (!isRunningRef.current) break;
 
       setCurrentIndex(i);
       const url = urls[i];
@@ -339,6 +341,7 @@ export default function BatchAuditPanel({ onClose, onStartBatch }) {
     }
 
     setIsRunning(false);
+    isRunningRef.current = false;
     toast.success('Batch audit complete!');
 
     // Auto-save results
@@ -384,6 +387,7 @@ export default function BatchAuditPanel({ onClose, onStartBatch }) {
 
   const pauseAudit = () => {
     setIsRunning(false);
+    isRunningRef.current = false;
     toast('Audit paused', { icon: '⏸️' });
   };
 

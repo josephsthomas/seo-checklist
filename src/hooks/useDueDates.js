@@ -94,7 +94,7 @@ export function useDueDates() {
       toast.success('Due date updated');
     } catch (error) {
       console.error('Error updating due date:', error);
-      toast.error('Failed to update');
+      toast.error('Failed to update due date');
     }
   }, []);
 
@@ -105,7 +105,7 @@ export function useDueDates() {
       toast.success('Due date removed');
     } catch (error) {
       console.error('Error deleting due date:', error);
-      toast.error('Failed to delete');
+      toast.error('Failed to delete due date');
     }
   }, []);
 
@@ -117,8 +117,10 @@ export function useDueDates() {
         completed: true,
         completedAt: serverTimestamp()
       });
+      toast.success('Due date marked as complete');
     } catch (error) {
       console.error('Error marking complete:', error);
+      toast.error('Failed to mark due date as complete');
     }
   }, []);
 
@@ -178,12 +180,12 @@ export function getDueDateUrgency(dueDate) {
   const now = new Date();
   const days = differenceInDays(dueDate, now);
 
-  if (days < 0) return { level: 'overdue', label: 'Overdue', color: 'red' };
-  if (days === 0) return { level: 'today', label: 'Today', color: 'amber' };
-  if (days === 1) return { level: 'tomorrow', label: 'Tomorrow', color: 'orange' };
-  if (days <= 3) return { level: 'soon', label: `${days} days`, color: 'yellow' };
-  if (days <= 7) return { level: 'week', label: `${days} days`, color: 'blue' };
-  return { level: 'future', label: `${days} days`, color: 'charcoal' };
+  if (days < 0) return { level: 'overdue', label: 'Overdue', color: 'red', ariaLabel: `Overdue by ${Math.abs(days)} day${Math.abs(days) === 1 ? '' : 's'}` };
+  if (days === 0) return { level: 'today', label: 'Today', color: 'amber', ariaLabel: 'Due today' };
+  if (days === 1) return { level: 'tomorrow', label: 'Tomorrow', color: 'orange', ariaLabel: 'Due tomorrow' };
+  if (days <= 3) return { level: 'soon', label: `${days} days`, color: 'orange', ariaLabel: `Due in ${days} days — soon` };
+  if (days <= 7) return { level: 'week', label: `${days} days`, color: 'blue', ariaLabel: `Due in ${days} days — this week` };
+  return { level: 'future', label: `${days} days`, color: 'gray', ariaLabel: `Due in ${days} days` };
 }
 
 export default useDueDates;
