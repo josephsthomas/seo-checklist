@@ -227,6 +227,7 @@ export default function AuditHistoryPanel({ domain, className = '' }) {
   const [compareMode, setCompareMode] = useState(false);
   const [selectedAudits, setSelectedAudits] = useState([]);
   const [showComparison, setShowComparison] = useState(false);
+  const [displayLimit, setDisplayLimit] = useState(10);
 
   // Filter audits by domain if provided
   const filteredAudits = useMemo(() => {
@@ -322,17 +323,27 @@ export default function AuditHistoryPanel({ domain, className = '' }) {
           <p className="text-charcoal-500 text-sm">No audit history yet</p>
         </div>
       ) : (
-        <div className="space-y-2">
-          {filteredAudits.slice(0, 10).map(audit => (
-            <AuditHistoryItem
-              key={audit.id}
-              audit={audit}
-              onSelect={handleSelectAudit}
-              isSelected={selectedAudits.some(a => a.id === audit.id)}
-              compareMode={compareMode}
-            />
-          ))}
-        </div>
+        <>
+          <div className="space-y-2">
+            {filteredAudits.slice(0, displayLimit).map(audit => (
+              <AuditHistoryItem
+                key={audit.id}
+                audit={audit}
+                onSelect={handleSelectAudit}
+                isSelected={selectedAudits.some(a => a.id === audit.id)}
+                compareMode={compareMode}
+              />
+            ))}
+          </div>
+          {filteredAudits.length > displayLimit && (
+            <button
+              onClick={() => setDisplayLimit(prev => prev + 10)}
+              className="mt-3 w-full py-2 text-sm text-primary-600 hover:text-primary-700 font-medium bg-primary-50 hover:bg-primary-100 rounded-lg transition-colors"
+            >
+              Load more ({filteredAudits.length - displayLimit} remaining)
+            </button>
+          )}
+        </>
       )}
 
       {/* Comparison Modal */}

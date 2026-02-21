@@ -240,6 +240,166 @@ export const glossaryTerms = [
     category: "Content Quality",
     relatedTerms: ["E-E-A-T", "White Hat SEO"],
     example: "Medical advice, financial planning, and legal information are YMYL topics."
+  },
+  {
+    id: 31,
+    term: "Anchor Text",
+    definition: "The clickable text in a hyperlink. Descriptive anchor text helps search engines understand the linked page's content.",
+    category: "On-Page SEO",
+    relatedTerms: ["Internal Linking", "Backlink"],
+    example: "In '<a href=\"/guide\">SEO best practices</a>', 'SEO best practices' is the anchor text."
+  },
+  {
+    id: 32,
+    term: "Bounce Rate",
+    definition: "The percentage of visitors who leave a site after viewing only one page. A high bounce rate may indicate poor UX or irrelevant content.",
+    category: "Metrics",
+    relatedTerms: ["User Experience (UX)", "Core Web Vitals"],
+    example: "A landing page with 80% bounce rate may need better content or faster load times."
+  },
+  {
+    id: 33,
+    term: "Click-Through Rate (CTR)",
+    definition: "The ratio of users who click on a search result to the total number who see it. Higher CTR indicates compelling titles and descriptions.",
+    category: "Metrics",
+    relatedTerms: ["Title Tag", "Meta Description"],
+    example: "If 100 people see your result and 5 click, your CTR is 5%."
+  },
+  {
+    id: 34,
+    term: "Content Audit",
+    definition: "A systematic review of all content on a website to assess quality, relevance, and performance.",
+    category: "Content Strategy",
+    relatedTerms: ["E-E-A-T", "Content Pruning"],
+    example: "Reviewing all blog posts to identify outdated, underperforming, or duplicate content."
+  },
+  {
+    id: 35,
+    term: "Content Pruning",
+    definition: "Removing or consolidating low-quality or outdated content to improve overall site quality and crawl efficiency.",
+    category: "Content Strategy",
+    relatedTerms: ["Content Audit", "Crawlability"],
+    example: "Deleting old blog posts with zero traffic and thin content."
+  },
+  {
+    id: 36,
+    term: "CLS (Cumulative Layout Shift)",
+    definition: "Core Web Vital measuring visual stability. Tracks unexpected layout shifts during page load.",
+    category: "Performance",
+    relatedTerms: ["Core Web Vitals", "LCP (Largest Contentful Paint)"],
+    example: "CLS should be under 0.1 for good user experience."
+  },
+  {
+    id: 37,
+    term: "INP (Interaction to Next Paint)",
+    definition: "Core Web Vital measuring responsiveness. Tracks the latency of user interactions throughout the page lifecycle.",
+    category: "Performance",
+    relatedTerms: ["Core Web Vitals", "Page Speed"],
+    example: "INP should be under 200ms for good interactivity."
+  },
+  {
+    id: 38,
+    term: "Keyword Density",
+    definition: "The percentage of times a keyword appears on a page relative to total word count. Over-optimization can be penalized.",
+    category: "On-Page SEO",
+    relatedTerms: ["Search Intent", "Keyword Cannibalization"],
+    example: "A 500-word article with the keyword appearing 10 times has 2% keyword density."
+  },
+  {
+    id: 39,
+    term: "Long-Tail Keywords",
+    definition: "Longer, more specific keyword phrases with lower search volume but higher conversion rates.",
+    category: "Content Strategy",
+    relatedTerms: ["Search Intent", "Keyword Cannibalization"],
+    example: "'Best waterproof hiking boots for wide feet' vs. 'hiking boots'."
+  },
+  {
+    id: 40,
+    term: "Mobile-First Indexing",
+    definition: "Google's practice of using the mobile version of a page for indexing and ranking.",
+    category: "Technical SEO",
+    relatedTerms: ["User Experience (UX)", "Core Web Vitals"],
+    example: "Ensuring your mobile site has the same content and structured data as your desktop site."
+  },
+  {
+    id: 41,
+    term: "Open Graph Tags",
+    definition: "Meta tags that control how content appears when shared on social media platforms.",
+    category: "On-Page SEO",
+    relatedTerms: ["Meta Description", "Title Tag"],
+    example: '<meta property="og:title" content="My Article Title" />'
+  },
+  {
+    id: 42,
+    term: "Orphan Page",
+    definition: "A page with no internal links pointing to it, making it difficult for search engines and users to discover.",
+    category: "Technical SEO",
+    relatedTerms: ["Internal Linking", "Crawlability"],
+    example: "A blog post that exists but is not linked from any other page on the site."
+  },
+  {
+    id: 43,
+    term: "Rich Snippet",
+    definition: "Enhanced search results with additional visual information like ratings, prices, or availability.",
+    category: "SERP Features",
+    relatedTerms: ["Schema Markup", "Featured Snippet"],
+    example: "A recipe result showing star ratings, cooking time, and calorie count."
+  },
+  {
+    id: 44,
+    term: "Semantic Search",
+    definition: "Search engine's ability to understand the meaning and context behind queries, not just matching keywords.",
+    category: "Fundamentals",
+    relatedTerms: ["Search Intent", "E-E-A-T"],
+    example: "Searching 'apple' and getting results about the tech company based on context."
+  },
+  {
+    id: 45,
+    term: "SSL Certificate",
+    definition: "Security certificate that enables HTTPS. Google considers HTTPS a ranking signal.",
+    category: "Technical SEO",
+    relatedTerms: ["URL Structure", "Crawlability"],
+    example: "Sites with HTTPS show a lock icon in the browser and are preferred by Google."
+  },
+  {
+    id: 46,
+    term: "Thin Content",
+    definition: "Pages with little or no substantive content that provide minimal value to users.",
+    category: "Content Quality",
+    relatedTerms: ["Content Pruning", "E-E-A-T"],
+    example: "A 50-word page that doesn't answer any user question meaningfully."
+  },
+  {
+    id: 47,
+    term: "Topic Cluster",
+    definition: "A content strategy model where a pillar page links to multiple related cluster pages covering subtopics.",
+    category: "Content Strategy",
+    relatedTerms: ["Pillar Page", "Internal Linking"],
+    example: "A pillar page on 'Digital Marketing' linking to clusters on SEO, PPC, Social Media, etc."
+  },
+  {
+    id: 48,
+    term: "Structured Data",
+    definition: "Standardized format for providing information about a page's content to search engines using vocabulary like Schema.org.",
+    category: "Technical SEO",
+    relatedTerms: ["Schema Markup", "Rich Snippet"],
+    example: "Adding JSON-LD markup to a product page with price, availability, and reviews."
+  },
+  {
+    id: 49,
+    term: "Dwell Time",
+    definition: "The amount of time a user spends on a page after clicking a search result before returning to the SERP.",
+    category: "Metrics",
+    relatedTerms: ["Bounce Rate", "User Experience (UX)"],
+    example: "Long dwell time suggests the content satisfied the user's search intent."
+  },
+  {
+    id: 50,
+    term: "404 Error",
+    definition: "HTTP status code indicating a page was not found. Excessive 404s can harm crawl efficiency and user experience.",
+    category: "Technical SEO",
+    relatedTerms: ["Redirect (301)", "Crawlability"],
+    example: "A broken link leading to a page that no longer exists returns a 404 error."
   }
 ];
 

@@ -19,7 +19,10 @@ export const ROLE_PERMISSIONS = {
     canExport: true,
     canManageTeam: true,
     canViewInternal: true,
-    canRunReadabilityCheck: true
+    canRunReadabilityCheck: true,
+    canEditContent: true,
+    canPublishContent: true,
+    canArchiveContent: true
   },
   [USER_ROLES.PROJECT_MANAGER]: {
     canCreateProjects: true,
@@ -31,7 +34,10 @@ export const ROLE_PERMISSIONS = {
     canExport: true,
     canManageTeam: true,
     canViewInternal: true,
-    canRunReadabilityCheck: true
+    canRunReadabilityCheck: true,
+    canEditContent: true,
+    canPublishContent: true,
+    canArchiveContent: true
   },
   [USER_ROLES.SEO_SPECIALIST]: {
     canCreateProjects: false,
@@ -43,7 +49,10 @@ export const ROLE_PERMISSIONS = {
     canExport: true,
     canManageTeam: false,
     canViewInternal: true,
-    canRunReadabilityCheck: true
+    canRunReadabilityCheck: true,
+    canEditContent: true,
+    canPublishContent: false,
+    canArchiveContent: false
   },
   [USER_ROLES.DEVELOPER]: {
     canCreateProjects: false,
@@ -55,7 +64,10 @@ export const ROLE_PERMISSIONS = {
     canExport: true,
     canManageTeam: false,
     canViewInternal: true,
-    canRunReadabilityCheck: true
+    canRunReadabilityCheck: true,
+    canEditContent: false,
+    canPublishContent: false,
+    canArchiveContent: false
   },
   [USER_ROLES.CONTENT_WRITER]: {
     canCreateProjects: false,
@@ -67,7 +79,10 @@ export const ROLE_PERMISSIONS = {
     canExport: true,
     canManageTeam: false,
     canViewInternal: true,
-    canRunReadabilityCheck: true
+    canRunReadabilityCheck: true,
+    canEditContent: true,
+    canPublishContent: false,
+    canArchiveContent: false
   },
   [USER_ROLES.CLIENT]: {
     canCreateProjects: false,
@@ -79,7 +94,10 @@ export const ROLE_PERMISSIONS = {
     canExport: false,
     canManageTeam: false,
     canViewInternal: false,
-    canRunReadabilityCheck: false
+    canRunReadabilityCheck: false,
+    canEditContent: false,
+    canPublishContent: false,
+    canArchiveContent: false
   }
 };
 

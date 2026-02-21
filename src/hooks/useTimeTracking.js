@@ -18,13 +18,14 @@ import {
 } from 'firebase/firestore';
 import { db } from '../lib/firebase';
 import { useAuth } from '../contexts/AuthContext';
+import { hasPermission } from '../utils/roles';
 import toast from 'react-hot-toast';
 
 export function useTimeTracking(projectId, itemId = null) {
   const [timeEntries, setTimeEntries] = useState([]);
   const [activeTimer, setActiveTimer] = useState(null);
   const [loading, setLoading] = useState(true);
-  const { currentUser } = useAuth();
+  const { currentUser, userProfile } = useAuth();
 
   // Load time entries
   useEffect(() => {
@@ -162,10 +163,11 @@ export function useTimeTracking(projectId, itemId = null) {
     }
   };
 
-  // Delete time entry (with ownership check and confirmation)
+  // Delete time entry (with ownership check, admin bypass, and confirmation)
   const deleteEntry = async (entryId) => {
     const entry = timeEntries.find(e => e.id === entryId);
-    if (entry && entry.userId !== currentUser?.uid) {
+    const userRole = userProfile?.role;
+    if (entry && entry.userId !== currentUser?.uid && !hasPermission(userRole, 'canEditAllItems')) {
       toast.error('You can only delete your own time entries');
       return;
     }
@@ -202,7 +204,8 @@ export function useTimeTracking(projectId, itemId = null) {
   // Update a time entry (minutes and/or notes)
   const updateEntry = async (entryId, updates) => {
     const entry = timeEntries.find(e => e.id === entryId);
-    if (entry && entry.userId !== currentUser?.uid) {
+    const userRole = userProfile?.role;
+    if (entry && entry.userId !== currentUser?.uid && !hasPermission(userRole, 'canEditAllItems')) {
       toast.error('You can only edit your own time entries');
       return;
     }

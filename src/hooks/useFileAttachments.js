@@ -23,6 +23,7 @@ import {
 } from 'firebase/storage';
 import { db, storage } from '../lib/firebase';
 import { useAuth } from '../contexts/AuthContext';
+import { hasPermission } from '../utils/roles';
 import toast from 'react-hot-toast';
 
 // Max file size: 10MB
@@ -48,7 +49,7 @@ export function useFileAttachments(projectId, itemId) {
   const [uploading, setUploading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
   const [loading, setLoading] = useState(true);
-  const { currentUser } = useAuth();
+  const { currentUser, userProfile } = useAuth();
 
   // Load attachments
   useEffect(() => {
@@ -173,8 +174,9 @@ export function useFileAttachments(projectId, itemId) {
       const attachment = attachments.find(a => a.id === attachmentId);
       if (!attachment) return;
 
-      // Ownership check: only the uploader can delete
-      if (attachment.uploadedBy !== currentUser?.uid) {
+      // Ownership check: only the uploader or admins/PMs can delete
+      const userRole = userProfile?.role;
+      if (attachment.uploadedBy !== currentUser?.uid && !hasPermission(userRole, 'canEditAllItems')) {
         toast.error('You can only delete files you uploaded');
         return;
       }

@@ -21,7 +21,7 @@ export function useProjects() {
   const [projects, setProjects] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const { currentUser } = useAuth();
+  const { currentUser, userProfile } = useAuth();
 
   useEffect(() => {
     if (!currentUser) {
@@ -53,6 +53,11 @@ export function useProjects() {
   }, [currentUser]);
 
   const createProject = async (projectData) => {
+    const userRole = userProfile?.role;
+    if (!hasPermission(userRole, 'canCreateProjects')) {
+      toast.error('You do not have permission to create projects');
+      return null;
+    }
     try {
       const docRef = await addDoc(collection(db, 'projects'), {
         ...projectData,
@@ -72,6 +77,20 @@ export function useProjects() {
   const updateProject = async (projectId, updates) => {
     try {
       const projectRef = doc(db, 'projects', projectId);
+      const projectSnap = await getDoc(projectRef);
+      if (!projectSnap.exists()) {
+        toast.error('Project not found');
+        return;
+      }
+      const userRole = userProfile?.role;
+      const projectData = projectSnap.data();
+      // Only owner, team members, or users with canEditAllItems can update
+      if (projectData.ownerId !== currentUser?.uid &&
+          !projectData.teamMembers?.includes(currentUser?.uid) &&
+          !hasPermission(userRole, 'canEditAllItems')) {
+        toast.error('You do not have permission to update this project');
+        return;
+      }
       await updateDoc(projectRef, {
         ...updates,
         updatedAt: serverTimestamp()
@@ -84,7 +103,7 @@ export function useProjects() {
   };
 
   const deleteProject = async (projectId) => {
-    const userRole = currentUser?.role || 'viewer';
+    const userRole = userProfile?.role || 'viewer';
     if (!hasPermission(userRole, 'canDeleteProjects')) {
       toast.error('You do not have permission to delete projects');
       return;
