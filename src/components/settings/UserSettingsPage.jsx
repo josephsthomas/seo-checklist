@@ -180,6 +180,11 @@ export default function UserSettingsPage() {
     e.preventDefault();
     if (!currentUser) return;
 
+    if (!profileForm.name.trim()) {
+      toast.error('Full Name is required');
+      return;
+    }
+
     setSaving(true);
     try {
       // Update Firebase Auth profile

@@ -17,18 +17,24 @@ import { Link } from 'react-router-dom';
  * Modal for linking a tool item to a project
  */
 export default function LinkToProjectModal({ isOpen, onClose, item }) {
-  const { projects, loading, linkToProject, getLinkedProjects } = useLinkToProject();
+  const { projects, loading, linkToProject, unlinkFromProject, getLinkedProjectLinks } = useLinkToProject();
   const [searchQuery, setSearchQuery] = useState('');
   const [linkedProjectIds, setLinkedProjectIds] = useState([]);
+  const [projectLinkMap, setProjectLinkMap] = useState({});
   const [linking, setLinking] = useState(false);
   const dialogRef = useRef(null);
 
-  // Load which projects this item is already linked to
+  // Load which projects this item is already linked to (with link IDs for unlink)
   useEffect(() => {
     if (isOpen && item?.id) {
-      getLinkedProjects(item.id).then(setLinkedProjectIds);
+      getLinkedProjectLinks(item.id).then(links => {
+        setLinkedProjectIds(links.map(l => l.projectId));
+        const map = {};
+        links.forEach(l => { map[l.projectId] = l.linkId; });
+        setProjectLinkMap(map);
+      });
     }
-  }, [isOpen, item?.id, getLinkedProjects]);
+  }, [isOpen, item?.id, getLinkedProjectLinks]);
 
   // Handle escape key
   useEffect(() => {
@@ -90,6 +96,29 @@ export default function LinkToProjectModal({ isOpen, onClose, item }) {
     try {
       await linkToProject(projectId, item);
       setLinkedProjectIds(prev => [...prev, projectId]);
+      // Re-fetch links to get the new link ID
+      const links = await getLinkedProjectLinks(item.id);
+      const map = {};
+      links.forEach(l => { map[l.projectId] = l.linkId; });
+      setProjectLinkMap(map);
+    } finally {
+      setLinking(false);
+    }
+  };
+
+  const handleUnlink = async (projectId) => {
+    const linkId = projectLinkMap[projectId];
+    if (!linkId) return;
+
+    setLinking(true);
+    try {
+      await unlinkFromProject(linkId);
+      setLinkedProjectIds(prev => prev.filter(id => id !== projectId));
+      setProjectLinkMap(prev => {
+        const next = { ...prev };
+        delete next[projectId];
+        return next;
+      });
     } finally {
       setLinking(false);
     }
@@ -185,47 +214,55 @@ export default function LinkToProjectModal({ isOpen, onClose, item }) {
                 const isLinked = linkedProjectIds.includes(project.id);
 
                 return (
-                  <button
+                  <div
                     key={project.id}
-                    onClick={() => handleLink(project.id)}
-                    disabled={linking || isLinked}
                     className={`w-full flex items-center gap-3 p-3 rounded-xl border transition-all text-left ${
                       isLinked
-                        ? 'bg-emerald-50 dark:bg-emerald-900/20 border-emerald-200 dark:border-emerald-800 cursor-default'
+                        ? 'bg-emerald-50 dark:bg-emerald-900/20 border-emerald-200 dark:border-emerald-800'
                         : 'bg-white dark:bg-charcoal-700 border-charcoal-100 dark:border-charcoal-600 hover:border-primary-300 dark:hover:border-primary-600 hover:shadow-sm'
                     }`}
                   >
-                    <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${
-                      isLinked
-                        ? 'bg-emerald-100 text-emerald-600'
-                        : 'bg-gradient-to-br from-primary-100 to-primary-50 text-primary-600'
-                    }`}>
-                      {isLinked ? (
-                        <Check className="w-5 h-5" />
-                      ) : (
-                        <ClipboardList className="w-5 h-5" />
-                      )}
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <p className="font-medium text-charcoal-900 dark:text-white truncate">
-                        {project.name}
-                      </p>
-                      <p className="text-xs text-charcoal-500 dark:text-charcoal-400">
-                        {project.siteName && `${project.siteName} · `}
-                        {project.createdAt && formatDistanceToNow(
-                          project.createdAt.toDate ? project.createdAt.toDate() : new Date(project.createdAt),
-                          { addSuffix: true }
+                    <button
+                      onClick={() => !isLinked && handleLink(project.id)}
+                      disabled={linking || isLinked}
+                      className="flex items-center gap-3 flex-1 min-w-0 text-left"
+                    >
+                      <div className={`w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0 ${
+                        isLinked
+                          ? 'bg-emerald-100 text-emerald-600'
+                          : 'bg-gradient-to-br from-primary-100 to-primary-50 text-primary-600'
+                      }`}>
+                        {isLinked ? (
+                          <Check className="w-5 h-5" />
+                        ) : (
+                          <ClipboardList className="w-5 h-5" />
                         )}
-                      </p>
-                    </div>
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="font-medium text-charcoal-900 dark:text-white truncate">
+                          {project.name}
+                        </p>
+                        <p className="text-xs text-charcoal-500 dark:text-charcoal-400">
+                          {project.siteName && `${project.siteName} · `}
+                          {project.createdAt && formatDistanceToNow(
+                            project.createdAt.toDate ? project.createdAt.toDate() : new Date(project.createdAt),
+                            { addSuffix: true }
+                          )}
+                        </p>
+                      </div>
+                    </button>
                     {isLinked ? (
-                      <span className="text-xs font-medium text-emerald-600 bg-emerald-100 px-2 py-1 rounded-full">
-                        Linked
-                      </span>
+                      <button
+                        onClick={() => handleUnlink(project.id)}
+                        disabled={linking}
+                        className="text-xs font-medium text-red-600 bg-red-50 hover:bg-red-100 px-2 py-1 rounded-full transition-colors"
+                      >
+                        Unlink
+                      </button>
                     ) : (
-                      <ChevronRight className="w-4 h-4 text-charcoal-300" />
+                      <ChevronRight className="w-4 h-4 text-charcoal-300 flex-shrink-0" />
                     )}
-                  </button>
+                  </div>
                 );
               })}
             </div>

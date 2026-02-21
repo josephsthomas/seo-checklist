@@ -1,5 +1,6 @@
 import React from 'react';
 import { AlertTriangle, RefreshCw, Home, ArrowLeft } from 'lucide-react';
+import { logError } from '../../utils/logger';
 
 /**
  * Error Boundary component to catch React rendering errors
@@ -17,8 +18,7 @@ class ErrorBoundary extends React.Component {
 
   componentDidCatch(error, errorInfo) {
     this.setState({ errorInfo });
-    // Always log errors to console in all environments
-    console.error('ErrorBoundary caught an error:', error, errorInfo);
+    logError('ErrorBoundary', error, { componentStack: errorInfo?.componentStack });
   }
 
   handleRetry = () => {

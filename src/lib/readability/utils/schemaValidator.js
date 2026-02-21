@@ -14,6 +14,11 @@ const SCHEMA_FIELDS = {
     recommended: ['author', 'dateModified', 'publisher', 'image', 'description'],
     optional: ['mainEntityOfPage', 'dateline', 'articleSection'],
   },
+  BlogPosting: {
+    required: ['headline', '@type'],
+    recommended: ['author', 'datePublished', 'dateModified', 'publisher', 'image', 'description'],
+    optional: ['mainEntityOfPage', 'wordCount', 'articleBody', 'keywords'],
+  },
   Product: {
     required: ['name', '@type'],
     recommended: ['image', 'description', 'offers', 'brand', 'sku'],
@@ -38,6 +43,66 @@ const SCHEMA_FIELDS = {
     required: ['@type', 'name'],
     recommended: ['url', 'image', 'sameAs', 'jobTitle'],
     optional: ['email', 'affiliation', 'description'],
+  },
+  LocalBusiness: {
+    required: ['@type', 'name'],
+    recommended: ['address', 'telephone', 'url', 'openingHours', 'image'],
+    optional: ['priceRange', 'geo', 'sameAs', 'description'],
+  },
+  Event: {
+    required: ['@type', 'name', 'startDate'],
+    recommended: ['location', 'description', 'endDate', 'image', 'offers'],
+    optional: ['performer', 'organizer', 'eventStatus', 'eventAttendanceMode'],
+  },
+  Recipe: {
+    required: ['@type', 'name'],
+    recommended: ['image', 'author', 'description', 'recipeIngredient', 'recipeInstructions'],
+    optional: ['prepTime', 'cookTime', 'totalTime', 'recipeYield', 'nutrition'],
+  },
+  VideoObject: {
+    required: ['@type', 'name', 'uploadDate'],
+    recommended: ['description', 'thumbnailUrl', 'contentUrl', 'duration'],
+    optional: ['embedUrl', 'interactionStatistic', 'expires'],
+  },
+  WebSite: {
+    required: ['@type', 'name', 'url'],
+    recommended: ['potentialAction', 'description'],
+    optional: ['sameAs', 'publisher'],
+  },
+  WebPage: {
+    required: ['@type', 'name'],
+    recommended: ['description', 'url', 'datePublished', 'dateModified'],
+    optional: ['breadcrumb', 'mainEntity', 'primaryImageOfPage'],
+  },
+  BreadcrumbList: {
+    required: ['@type', 'itemListElement'],
+    recommended: [],
+    optional: ['name'],
+  },
+  JobPosting: {
+    required: ['@type', 'title', 'datePosted', 'description', 'hiringOrganization'],
+    recommended: ['validThrough', 'employmentType', 'jobLocation'],
+    optional: ['baseSalary', 'applicantLocationRequirements', 'jobLocationType'],
+  },
+  Course: {
+    required: ['@type', 'name'],
+    recommended: ['description', 'provider', 'offers'],
+    optional: ['courseCode', 'hasCourseInstance', 'educationalLevel'],
+  },
+  SoftwareApplication: {
+    required: ['@type', 'name'],
+    recommended: ['operatingSystem', 'applicationCategory', 'offers', 'description'],
+    optional: ['screenshot', 'featureList', 'aggregateRating'],
+  },
+  Review: {
+    required: ['@type', 'itemReviewed', 'reviewRating'],
+    recommended: ['author', 'datePublished', 'reviewBody'],
+    optional: ['publisher', 'name'],
+  },
+  Book: {
+    required: ['@type', 'name'],
+    recommended: ['author', 'isbn', 'description', 'image'],
+    optional: ['publisher', 'datePublished', 'numberOfPages'],
   },
 };
 

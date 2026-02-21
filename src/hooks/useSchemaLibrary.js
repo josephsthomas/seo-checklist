@@ -114,13 +114,16 @@ export function useSchemaLibrary() {
     }
   }, [currentUser]);
 
-  // Delete schema
+  // Delete schema (with confirmation)
   const deleteSchema = useCallback(async (schemaId) => {
     try {
       const schemaRef = doc(db, 'schemaLibrary', schemaId);
       const schemaSnap = await getDoc(schemaRef);
       if (!schemaSnap.exists() || schemaSnap.data().userId !== currentUser?.uid) {
         toast.error('You can only delete your own schemas');
+        return false;
+      }
+      if (!window.confirm('Delete this schema? This cannot be undone.')) {
         return false;
       }
       await deleteDoc(schemaRef);

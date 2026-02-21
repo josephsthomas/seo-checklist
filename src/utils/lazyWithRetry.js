@@ -3,6 +3,7 @@
  * Catches network errors and provides graceful error handling
  */
 import { lazy } from 'react';
+import { logError } from './logger';
 
 const MAX_RETRIES = 3;
 const RETRY_DELAY = 1000;
@@ -33,8 +34,8 @@ async function retryImport(importFn, moduleName, retriesLeft = MAX_RETRIES) {
       return retryImport(importFn, moduleName, retriesLeft - 1);
     }
 
-    // Log the error
-    console.error(`Failed to load ${moduleName} after ${MAX_RETRIES} retries:`, error);
+    // Log the error with centralized logger for production monitoring
+    logError('lazyWithRetry', error, { moduleName, retriesExhausted: true });
 
     // Re-throw to be caught by ErrorBoundary
     throw new Error(`Failed to load ${moduleName}. Please check your connection and try again.`);

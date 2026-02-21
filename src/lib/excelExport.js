@@ -160,10 +160,21 @@ export async function exportToExcel(items, completions, project) {
   const link = document.createElement('a');
   link.href = url;
   link.download = filename;
+  link.setAttribute('aria-label', `Download ${filename}`);
   link.setAttribute('aria-hidden', 'true');
   link.style.display = 'none';
   document.body.appendChild(link);
+
+  // Announce download to assistive technologies
+  const announcement = document.createElement('div');
+  announcement.setAttribute('role', 'status');
+  announcement.setAttribute('aria-live', 'polite');
+  announcement.className = 'sr-only';
+  announcement.textContent = `Downloading ${filename}`;
+  document.body.appendChild(announcement);
+
   link.click();
   document.body.removeChild(link);
   URL.revokeObjectURL(url);
+  setTimeout(() => announcement.remove(), 3000);
 }

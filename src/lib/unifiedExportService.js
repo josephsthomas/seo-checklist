@@ -13,12 +13,23 @@ function downloadBlob(blob, filename) {
   const a = document.createElement('a');
   a.href = url;
   a.download = filename;
+  a.setAttribute('aria-label', `Download ${filename}`);
   a.setAttribute('aria-hidden', 'true');
   a.style.display = 'none';
   document.body.appendChild(a);
+
+  // Announce download to assistive technologies
+  const announcement = document.createElement('div');
+  announcement.setAttribute('role', 'status');
+  announcement.setAttribute('aria-live', 'polite');
+  announcement.className = 'sr-only';
+  announcement.textContent = `Downloading ${filename}`;
+  document.body.appendChild(announcement);
+
   a.click();
   document.body.removeChild(a);
   URL.revokeObjectURL(url);
+  setTimeout(() => announcement.remove(), 3000);
 }
 
 /**

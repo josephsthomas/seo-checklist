@@ -236,11 +236,43 @@ export function useLinkToProject() {
     }
   }, [currentUser]);
 
+  // Unlink an item from a project by link document ID
+  const unlinkFromProject = useCallback(async (linkId) => {
+    try {
+      await deleteDoc(doc(db, 'projectLinks', linkId));
+      toast.success('Unlinked from project');
+    } catch (error) {
+      console.error('Error unlinking from project:', error);
+      toast.error('Failed to unlink from project');
+      throw error;
+    }
+  }, []);
+
+  // Get linked projects with their link document IDs
+  const getLinkedProjectLinks = useCallback(async (itemId) => {
+    if (!currentUser) return [];
+
+    try {
+      const q = query(
+        collection(db, 'projectLinks'),
+        where('userId', '==', currentUser.uid),
+        where('itemId', '==', itemId)
+      );
+      const snapshot = await getDocs(q);
+      return snapshot.docs.map(d => ({ linkId: d.id, projectId: d.data().projectId }));
+    } catch (error) {
+      console.error('Error getting linked project links:', error);
+      return [];
+    }
+  }, [currentUser]);
+
   return {
     projects,
     loading,
     linkToProject,
-    getLinkedProjects
+    unlinkFromProject,
+    getLinkedProjects,
+    getLinkedProjectLinks
   };
 }
 
