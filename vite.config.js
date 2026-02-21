@@ -17,7 +17,10 @@ export default defineConfig({
           'vendor-jspdf': ['jspdf', 'jspdf-autotable'],
           'vendor-firebase': ['firebase/app', 'firebase/auth', 'firebase/firestore', 'firebase/storage'],
           'vendor-react': ['react', 'react-dom', 'react-router-dom'],
-          'vendor-jszip': ['jszip']
+          'vendor-jszip': ['jszip'],
+          'vendor-charts': ['chart.js', 'react-chartjs-2'],
+          'vendor-pdf': ['pdfjs-dist'],
+          'vendor-docx': ['mammoth']
         }
       }
     },

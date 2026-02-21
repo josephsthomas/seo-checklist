@@ -183,7 +183,7 @@ function handleAIError(err, res) {
   }
 
   // Generic upstream failure
-  console.error('[AI ERROR]', err.message, err.stack);
+  console.error(JSON.stringify({ level: 'error', correlationId: req.correlationId, source: 'ai', error: err.message, stack: err.stack }));
   return res.status(502).json({
     error: 'AI provider returned an error. Please try again.',
     code: 'PROVIDER_ERROR'

@@ -31,6 +31,9 @@ import {
 import { format, formatDistanceToNow, addDays, addWeeks, addMonths } from 'date-fns';
 import toast from 'react-hot-toast';
 import InfoTooltip from '../common/InfoTooltip';
+import { collection, doc, addDoc, updateDoc, deleteDoc, onSnapshot, query, where, serverTimestamp, writeBatch } from 'firebase/firestore';
+import { db } from '../../lib/firebase';
+import { useAuth } from '../../contexts/AuthContext';
 
 /**
  * Scheduled Audits Panel
@@ -100,15 +103,54 @@ const TIMEZONES = [
 ];
 
 export default function ScheduledAuditsPanel() {
+  const { currentUser } = useAuth();
   const [audits, setAudits] = useState([]);
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [editingAudit, setEditingAudit] = useState(null);
   const [expandedId, setExpandedId] = useState(null);
   const [viewingHistory, setViewingHistory] = useState(null);
   const [filter, setFilter] = useState('all');
+  const [firestoreLoading, setFirestoreLoading] = useState(true);
 
-  // TODO: Load scheduled audits from Firestore
-  // Audits will be populated when users create scheduled audits
+  // Load scheduled audits from Firestore
+  useEffect(() => {
+    if (!currentUser?.uid) {
+      setFirestoreLoading(false);
+      return;
+    }
+
+    const q = query(
+      collection(db, 'scheduled_audits'),
+      where('userId', '==', currentUser.uid)
+    );
+
+    const unsubscribe = onSnapshot(q, (snapshot) => {
+      const loaded = snapshot.docs.map(docSnap => {
+        const data = docSnap.data();
+        return {
+          id: docSnap.id,
+          ...data,
+          createdAt: data.createdAt?.toDate?.() || new Date(),
+          lastRun: data.lastRun ? {
+            ...data.lastRun,
+            date: data.lastRun.date?.toDate?.() || new Date()
+          } : null,
+          nextRun: data.nextRun?.toDate?.() || null,
+          history: (data.history || []).map(h => ({
+            ...h,
+            date: h.date?.toDate?.() || new Date()
+          }))
+        };
+      });
+      setAudits(loaded);
+      setFirestoreLoading(false);
+    }, (error) => {
+      console.error('Error loading scheduled audits:', error);
+      setFirestoreLoading(false);
+    });
+
+    return () => unsubscribe();
+  }, [currentUser]);
 
   // Filter audits
   const filteredAudits = audits.filter(audit => {
@@ -118,16 +160,19 @@ export default function ScheduledAuditsPanel() {
   });
 
   // Toggle audit active status
-  const toggleAudit = (id) => {
-    setAudits(prev => prev.map(a =>
-      a.id === id ? {
-        ...a,
-        isActive: !a.isActive,
-        nextRun: !a.isActive ? calculateNextRun(a) : null
-      } : a
-    ));
+  const toggleAudit = async (id) => {
     const audit = audits.find(a => a.id === id);
-    toast.success(audit?.isActive ? 'Audit schedule paused' : 'Audit schedule activated');
+    const wasActive = audit?.isActive;
+    try {
+      await updateDoc(doc(db, 'scheduled_audits', id), {
+        isActive: !wasActive,
+        nextRun: !wasActive ? calculateNextRun(audit) : null
+      });
+      toast.success(wasActive ? 'Audit schedule paused' : 'Audit schedule activated');
+    } catch (error) {
+      console.error('Error toggling audit:', error);
+      toast.error('Failed to update audit schedule');
+    }
   };
 
   // Calculate next run time
@@ -178,77 +223,107 @@ export default function ScheduledAuditsPanel() {
     });
   };
 
-  const confirmDelete = () => {
+  const confirmDelete = async () => {
     if (!deleteConfirm) return;
 
     const deletedAudit = audits.find(a => a.id === deleteConfirm.id);
-    setAudits(prev => prev.filter(a => a.id !== deleteConfirm.id));
     setDeleteConfirm(null);
 
-    // Show toast with undo option
-    toast((t) => (
-      <div className="flex items-center gap-3">
-        <span>Audit schedule deleted</span>
-        <button
-          onClick={() => {
-            setAudits(prev => [...prev, deletedAudit]);
-            toast.dismiss(t.id);
-            toast.success('Audit schedule restored');
-          }}
-          className="px-2 py-1 bg-cyan-500 text-white rounded text-sm font-medium hover:bg-cyan-600"
-        >
-          Undo
-        </button>
-      </div>
-    ), { duration: 5000 });
-  };
-
-  // Toggle all audits (maintenance mode)
-  const toggleAllAudits = (activate) => {
-    const activeCount = audits.filter(a => a.isActive).length;
-
-    if (activate) {
-      setAudits(prev => prev.map(a => ({ ...a, isActive: true })));
-      toast.success(`All ${audits.length} audit schedules activated`);
-    } else {
-      setAudits(prev => prev.map(a => ({ ...a, isActive: false })));
-      toast.success(`All ${activeCount} audit schedules paused (maintenance mode)`);
+    try {
+      await deleteDoc(doc(db, 'scheduled_audits', deleteConfirm.id));
+      // Show toast with undo option
+      toast((t) => (
+        <div className="flex items-center gap-3">
+          <span>Audit schedule deleted</span>
+          <button
+            onClick={async () => {
+              try {
+                const { id: _id, ...auditData } = deletedAudit;
+                await addDoc(collection(db, 'scheduled_audits'), {
+                  ...auditData,
+                  userId: currentUser.uid,
+                  createdAt: serverTimestamp()
+                });
+                toast.dismiss(t.id);
+                toast.success('Audit schedule restored');
+              } catch (err) {
+                console.error('Error restoring audit:', err);
+                toast.error('Failed to restore audit schedule');
+              }
+            }}
+            className="px-2 py-1 bg-cyan-500 text-white rounded text-sm font-medium hover:bg-cyan-600"
+          >
+            Undo
+          </button>
+        </div>
+      ), { duration: 5000 });
+    } catch (error) {
+      console.error('Error deleting audit:', error);
+      toast.error('Failed to delete audit schedule');
     }
   };
 
-  // Run audit now
-  const runNow = (id) => {
+  // Toggle all audits (maintenance mode) — uses writeBatch with 500-op chunking
+  const toggleAllAudits = async (activate) => {
+    const activeCount = audits.filter(a => a.isActive).length;
+    try {
+      const BATCH_SIZE = 500;
+      for (let i = 0; i < audits.length; i += BATCH_SIZE) {
+        const batch = writeBatch(db);
+        audits.slice(i, i + BATCH_SIZE).forEach(a => {
+          batch.update(doc(db, 'scheduled_audits', a.id), { isActive: activate });
+        });
+        await batch.commit();
+      }
+      toast.success(
+        activate
+          ? `All ${audits.length} audit schedules activated`
+          : `All ${activeCount} audit schedules paused (maintenance mode)`
+      );
+    } catch (error) {
+      console.error('Error toggling all audits:', error);
+      toast.error('Failed to update audit schedules');
+    }
+  };
+
+  // Run audit now — persists results to Firestore
+  const runNow = async (id) => {
     const audit = audits.find(a => a.id === id);
     toast.success(`Starting audit for ${audit?.url}...`);
 
-    // Simulate running
-    setTimeout(() => {
-      const newScore = Math.floor(Math.random() * 20) + 70;
-      const newIssues = {
-        critical: Math.floor(Math.random() * 5),
-        warnings: Math.floor(Math.random() * 15) + 5,
-        info: Math.floor(Math.random() * 10) + 3
-      };
+    // Simulate running (in production this would trigger a real crawl)
+    const newScore = Math.floor(Math.random() * 20) + 70;
+    const newIssues = {
+      critical: Math.floor(Math.random() * 5),
+      warnings: Math.floor(Math.random() * 15) + 5,
+      info: Math.floor(Math.random() * 10) + 3
+    };
 
-      setAudits(prev => prev.map(a =>
-        a.id === id ? {
-          ...a,
-          lastRun: {
-            date: new Date(),
-            score: newScore,
-            issues: newIssues,
-            duration: Math.floor(Math.random() * 60) + 20,
-            pagesScanned: audit.lastRun?.pagesScanned || 100
-          },
-          history: [
-            { date: new Date(), score: newScore, issues: Object.values(newIssues).reduce((a, b) => a + b, 0) },
-            ...a.history.slice(0, 9)
-          ],
-          runCount: a.runCount + 1
-        } : a
-      ));
+    const runResult = {
+      date: new Date(),
+      score: newScore,
+      issues: newIssues,
+      duration: Math.floor(Math.random() * 60) + 20,
+      pagesScanned: audit.lastRun?.pagesScanned || 100
+    };
+
+    const historyEntry = {
+      date: new Date(),
+      score: newScore,
+      issues: Object.values(newIssues).reduce((a, b) => a + b, 0)
+    };
+
+    try {
+      await updateDoc(doc(db, 'scheduled_audits', id), {
+        lastRun: runResult,
+        history: [historyEntry, ...(audit.history || []).slice(0, 9)],
+        runCount: (audit.runCount || 0) + 1
+      });
       toast.success('Audit completed!');
-    }, 3000);
+    } catch (error) {
+      console.error('Error saving audit run:', error);
+      toast.error('Audit completed but failed to save results');
+    }
   };
 
   // Score color class maps (static for Tailwind JIT)
@@ -676,24 +751,29 @@ export default function ScheduledAuditsPanel() {
       {(showCreateModal || editingAudit) && (
         <AuditScheduleFormModal
           audit={editingAudit}
-          onSave={(newAudit) => {
-            if (editingAudit) {
-              setAudits(prev => prev.map(a => a.id === editingAudit.id ? { ...a, ...newAudit } : a));
-              toast.success('Audit schedule updated');
-            } else {
-              const nextRun = calculateNextRun({ ...newAudit, time: newAudit.time || '09:00' });
-              setAudits(prev => [...prev, {
-                ...newAudit,
-                id: Date.now().toString(),
-                createdAt: new Date(),
-                runCount: 0,
-                history: [],
-                nextRun
-              }]);
-              toast.success('Audit schedule created');
+          onSave={async (newAudit) => {
+            try {
+              if (editingAudit) {
+                await updateDoc(doc(db, 'scheduled_audits', editingAudit.id), newAudit);
+                toast.success('Audit schedule updated');
+              } else {
+                const nextRun = calculateNextRun({ ...newAudit, time: newAudit.time || '09:00' });
+                await addDoc(collection(db, 'scheduled_audits'), {
+                  ...newAudit,
+                  userId: currentUser.uid,
+                  createdAt: serverTimestamp(),
+                  runCount: 0,
+                  history: [],
+                  nextRun
+                });
+                toast.success('Audit schedule created');
+              }
+              setShowCreateModal(false);
+              setEditingAudit(null);
+            } catch (error) {
+              console.error('Error saving audit schedule:', error);
+              toast.error('Failed to save audit schedule');
             }
-            setShowCreateModal(false);
-            setEditingAudit(null);
           }}
           onClose={() => {
             setShowCreateModal(false);

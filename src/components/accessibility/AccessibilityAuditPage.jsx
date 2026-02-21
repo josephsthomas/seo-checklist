@@ -262,7 +262,7 @@ export default function AccessibilityAuditPage() {
               </h2>
               <ol className="space-y-3">
                 {guidance.steps.map((step, idx) => (
-                  <li key={idx} className="flex items-start gap-3 text-sm text-charcoal-600 dark:text-charcoal-300">
+                  <li key={step} className="flex items-start gap-3 text-sm text-charcoal-600 dark:text-charcoal-300">
                     <span className="w-6 h-6 rounded-lg bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300 flex items-center justify-center text-xs font-bold flex-shrink-0">
                       {idx + 1}
                     </span>

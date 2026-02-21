@@ -13,6 +13,7 @@
  *   POST /                — AI request (legacy format: { prompt, maxTokens })
  *   POST /api/ai          — AI request (multi-provider: { provider, model, content })
  *   POST /api/fetch-url   — Fetch URL content for readability analysis
+ *   POST /api/errors      — Client error reporting (no auth)
  */
 
 const express = require('express');
@@ -27,6 +28,7 @@ const healthRouter = require('./routes/health');
 const aiRouter = require('./routes/ai');
 const aiBatchRouter = require('./routes/aiBatch');
 const fetchRouter = require('./routes/fetch');
+const errorsRouter = require('./routes/errors');
 
 const app = express();
 const PORT = process.env.PORT || 3001;
@@ -82,6 +84,9 @@ app.use(requestLogger);
 
 // Health check — no auth required
 app.use('/health', healthRouter);
+
+// Client error reporting — no auth required, IP rate limited
+app.post('/api/errors', errorsRouter);
 
 // Protected API routes — auth + rate limiting
 app.post('/api/fetch-url', authMiddleware, rateLimitMiddleware, fetchRouter);
@@ -145,7 +150,7 @@ app.use((err, req, res, _next) => {
 // Start server
 // ---------------------------------------------------------------------------
 
-app.listen(PORT, () => {
+const server = app.listen(PORT, () => {
   console.log(`
 ╔══════════════════════════════════════════════╗
 ║  Content Strategy Portal — AI Proxy Server   ║
@@ -161,7 +166,29 @@ Endpoints:
   POST /api/ai          AI request (multi-provider)
   POST /api/ai/batch    AI batch request (multiple providers)
   POST /api/fetch-url   Fetch URL content
+  POST /api/errors      Client error reporting
 `);
 });
+
+// ---------------------------------------------------------------------------
+// Graceful shutdown
+// ---------------------------------------------------------------------------
+
+function shutdown(signal) {
+  console.log(`[SHUTDOWN] ${signal} received. Closing HTTP server...`);
+  server.close(() => {
+    console.log('[SHUTDOWN] HTTP server closed. Exiting.');
+    process.exit(0);
+  });
+
+  // Force exit after 30 seconds if connections don't close
+  setTimeout(() => {
+    console.error('[SHUTDOWN] Forced exit after 30s timeout');
+    process.exit(1);
+  }, 30000);
+}
+
+process.on('SIGTERM', () => shutdown('SIGTERM'));
+process.on('SIGINT', () => shutdown('SIGINT'));
 
 module.exports = app;
