@@ -39,7 +39,10 @@ export async function analyzeWithAI(extractedContent, options = {}) {
     return createFallbackResult('AI analysis unavailable - no API configuration found');
   }
 
-  const truncatedContent = truncateAtSentenceBoundary(extractedContent.textContent, 50000);
+  // Reserve ~2000 chars for the prompt template, headings, and metadata
+  const TEMPLATE_OVERHEAD = 2000;
+  const maxContentLength = 50000 - TEMPLATE_OVERHEAD;
+  const truncatedContent = truncateAtSentenceBoundary(extractedContent.textContent, maxContentLength);
 
   const prompt = buildAnalysisPrompt(extractedContent, truncatedContent);
 
@@ -134,18 +137,46 @@ Respond in JSON format ONLY:
 Limit aiRecommendations to a maximum of 5. Focus on the most impactful improvements for AI readability.`;
 }
 
+/**
+ * Extract the first balanced JSON object from a string
+ */
+function extractBalancedJson(text) {
+  const start = text.indexOf('{');
+  if (start === -1) return null;
+
+  let depth = 0;
+  let inString = false;
+  let escaped = false;
+
+  for (let i = start; i < text.length; i++) {
+    const ch = text[i];
+    if (escaped) { escaped = false; continue; }
+    if (ch === '\\') { escaped = true; continue; }
+    if (ch === '"') { inString = !inString; continue; }
+    if (inString) continue;
+    if (ch === '{') depth++;
+    if (ch === '}') {
+      depth--;
+      if (depth === 0) return text.slice(start, i + 1);
+    }
+  }
+  const match = text.match(/\{[\s\S]*\}/);
+  return match ? match[0] : null;
+}
+
 function parseAIResponse(content) {
   if (!content) {
     return createFallbackResult('Empty AI response');
   }
 
   try {
-    const jsonMatch = content.match(/\{[\s\S]*\}/);
-    if (!jsonMatch) {
+    // Use balanced brace extraction instead of greedy regex
+    const jsonStr = extractBalancedJson(content);
+    if (!jsonStr) {
       return createFallbackResult('Could not parse AI response');
     }
 
-    const parsed = JSON.parse(jsonMatch[0]);
+    const parsed = JSON.parse(jsonStr);
 
     // Validate numeric fields — reject non-number values
     const qualityScore = typeof parsed.qualityScore === 'number'
@@ -155,22 +186,40 @@ function parseAIResponse(content) {
       ? Math.round(Math.max(0, Math.min(100, parsed.citationWorthiness)))
       : 50;
 
+    // Semantic validation: ensure string fields are meaningful
+    const contentSummary = typeof parsed.contentSummary === 'string' && parsed.contentSummary.length > 5
+      ? parsed.contentSummary.slice(0, 1000) : '';
+    const qualityAssessment = typeof parsed.qualityAssessment === 'string' && parsed.qualityAssessment.length > 5
+      ? parsed.qualityAssessment.slice(0, 1000) : '';
+    const citationExplanation = typeof parsed.citationExplanation === 'string'
+      ? parsed.citationExplanation.slice(0, 500) : '';
+
+    // Validate recommendations have required fields
+    const validRecommendations = (parsed.aiRecommendations || [])
+      .filter(rec => rec && typeof rec === 'object' && rec.title && rec.description)
+      .slice(0, 5)
+      .map(rec => ({
+        title: String(rec.title).slice(0, 200),
+        description: String(rec.description).slice(0, 500),
+        priority: ['high', 'medium', 'low'].includes(rec.priority) ? rec.priority : 'medium',
+        effort: ['quick', 'moderate', 'significant'].includes(rec.effort) ? rec.effort : 'moderate',
+        estimatedImpact: ['high', 'medium', 'low'].includes(rec.estimatedImpact) ? rec.estimatedImpact : 'medium',
+        source: 'ai'
+      }));
+
     return {
       available: true,
-      contentSummary: parsed.contentSummary || '',
-      qualityAssessment: parsed.qualityAssessment || '',
+      contentSummary,
+      qualityAssessment,
       qualityScore,
       citationWorthiness,
-      citationExplanation: parsed.citationExplanation || '',
-      readabilityIssues: (parsed.readabilityIssues || []).slice(0, 10),
-      aiRecommendations: (parsed.aiRecommendations || []).slice(0, 5).map(rec => ({
-        title: rec.title || '',
-        description: rec.description || '',
-        priority: rec.priority || 'medium',
-        effort: rec.effort || 'moderate',
-        estimatedImpact: rec.estimatedImpact || 'medium',
-        source: 'ai'
-      })),
+      citationExplanation,
+      readabilityIssues: (parsed.readabilityIssues || [])
+        .filter(issue => typeof issue === 'string' && issue.length > 0)
+        .slice(0, 10)
+        .map(issue => String(issue).slice(0, 500)),
+      aiRecommendations: validRecommendations,
+      aiGenerated: true,
       fallback: false
     };
   } catch (e) {

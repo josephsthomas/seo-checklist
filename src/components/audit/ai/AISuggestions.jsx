@@ -102,10 +102,10 @@ export default function AISuggestions({ pageData }) {
           </div>
         </div>
         <p className="text-sm text-charcoal-600">
-          To enable AI-powered suggestions, add your Claude API key to your environment variables:
+          To enable AI-assisted suggestions, configure the AI proxy URL in your environment variables:
         </p>
         <code className="block mt-2 p-3 bg-charcoal-100 rounded-lg text-sm font-mono text-charcoal-700">
-          VITE_CLAUDE_API_KEY=your-api-key-here
+          VITE_AI_PROXY_URL=your-proxy-url-here
         </code>
       </div>
     );
@@ -122,7 +122,7 @@ export default function AISuggestions({ pageData }) {
             </div>
             <div>
               <h3 className="text-lg font-semibold text-charcoal-900">AI Suggestions</h3>
-              <p className="text-sm text-charcoal-500">Claude-powered optimization recommendations</p>
+              <p className="text-sm text-charcoal-500">AI-assisted optimization recommendations — review before implementing</p>
             </div>
           </div>
           <button

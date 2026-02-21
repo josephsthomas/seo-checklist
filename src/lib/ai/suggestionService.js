@@ -101,11 +101,13 @@ export async function suggestTitles(pageData) {
 
   const prompt = `You are an SEO expert. Analyze this page and suggest 3 optimized title tag alternatives.
 
+<page_data>
 URL: ${url}
 Current Title: ${currentTitle || 'None'}
 H1: ${h1 || 'None'}
 Meta Description: ${metaDescription || 'None'}
 ${contentSummary ? `Content Summary: ${contentSummary}` : ''}
+</page_data>
 
 Requirements:
 - Each title should be 50-60 characters
@@ -127,10 +129,12 @@ Respond in JSON format only:
 
   try {
     const response = await callClaude(prompt);
-    // Parse JSON from response
     const jsonMatch = response.match(/\{[\s\S]*\}/);
     if (jsonMatch) {
-      return JSON.parse(jsonMatch[0]);
+      const result = JSON.parse(jsonMatch[0]);
+      result.aiGenerated = true;
+      result.disclaimer = 'AI-generated suggestions require human review before implementation.';
+      return result;
     }
     throw new Error('Invalid response format');
   } catch (error) {
@@ -147,11 +151,13 @@ export async function suggestMetaDescriptions(pageData) {
 
   const prompt = `You are an SEO expert. Analyze this page and suggest 3 optimized meta description alternatives.
 
+<page_data>
 URL: ${url}
 Title: ${currentTitle || 'None'}
 H1: ${h1 || 'None'}
 Current Meta Description: ${currentMetaDescription || 'None'}
 ${contentSummary ? `Content Summary: ${contentSummary}` : ''}
+</page_data>
 
 Requirements:
 - Each meta description should be 150-160 characters
@@ -176,7 +182,10 @@ Respond in JSON format only:
     const response = await callClaude(prompt);
     const jsonMatch = response.match(/\{[\s\S]*\}/);
     if (jsonMatch) {
-      return JSON.parse(jsonMatch[0]);
+      const result = JSON.parse(jsonMatch[0]);
+      result.aiGenerated = true;
+      result.disclaimer = 'AI-generated suggestions require human review before implementation.';
+      return result;
     }
     throw new Error('Invalid response format');
   } catch (error) {
@@ -193,11 +202,13 @@ export async function suggestH1(pageData) {
 
   const prompt = `You are an SEO expert. Analyze this page and suggest 3 optimized H1 heading alternatives.
 
+<page_data>
 URL: ${url}
 Title: ${currentTitle || 'None'}
 Current H1: ${currentH1 || 'None'}
 Meta Description: ${metaDescription || 'None'}
 ${contentSummary ? `Content Summary: ${contentSummary}` : ''}
+</page_data>
 
 Requirements:
 - H1 should be unique and descriptive
@@ -220,7 +231,10 @@ Respond in JSON format only:
     const response = await callClaude(prompt);
     const jsonMatch = response.match(/\{[\s\S]*\}/);
     if (jsonMatch) {
-      return JSON.parse(jsonMatch[0]);
+      const result = JSON.parse(jsonMatch[0]);
+      result.aiGenerated = true;
+      result.disclaimer = 'AI-generated suggestions require human review before implementation.';
+      return result;
     }
     throw new Error('Invalid response format');
   } catch (error) {
@@ -237,11 +251,13 @@ export async function suggestAllSEO(pageData) {
 
   const prompt = `You are an SEO expert. Analyze this page and provide comprehensive optimization suggestions.
 
+<page_data>
 URL: ${url}
 Current Title: ${title || 'None'}
 Current H1: ${h1 || 'None'}
 Current Meta Description: ${metaDescription || 'None'}
 ${contentSummary ? `Content Summary: ${contentSummary}` : ''}
+</page_data>
 
 Provide optimized alternatives for title (50-60 chars), meta description (150-160 chars), and H1.
 
@@ -271,7 +287,10 @@ Respond in JSON format only:
     const response = await callClaude(prompt, 2048);
     const jsonMatch = response.match(/\{[\s\S]*\}/);
     if (jsonMatch) {
-      return JSON.parse(jsonMatch[0]);
+      const result = JSON.parse(jsonMatch[0]);
+      result.aiGenerated = true;
+      result.disclaimer = 'AI-generated suggestions require human review before implementation.';
+      return result;
     }
     throw new Error('Invalid response format');
   } catch (error) {
