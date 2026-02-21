@@ -19,10 +19,10 @@ const FEATURES = [
     name: 'Content Planner',
     slug: 'planner',
     icon: LayoutDashboard,
-    description: 'Comprehensive project management with a 321-item SEO checklist covering all project phases.',
+    description: 'Comprehensive project management with a 353-item checklist covering all content and SEO phases.',
     highlights: [
       'Multi-project dashboard with progress tracking',
-      '321-item checklist across all SEO phases',
+      '353-item checklist across all content phases',
       'Team collaboration with role-based permissions',
       'Timeline management with due dates',
       'Professional Excel and PDF exports'

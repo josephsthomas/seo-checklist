@@ -24,7 +24,7 @@ const FEATURES = [
     name: 'Content Planner',
     href: '/features/planner',
     icon: LayoutDashboard,
-    description: 'Comprehensive project management with 321-item SEO checklist covering all project phases.',
+    description: 'Comprehensive project management with 353-item checklist covering all content and SEO phases.',
     color: 'primary'
   },
   {

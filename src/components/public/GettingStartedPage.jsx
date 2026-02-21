@@ -59,10 +59,10 @@ const STEPS = [
     description: 'Use the checklist to manage your SEO tasks.',
     icon: BarChart3,
     details: [
-      'Work through the 321-item checklist',
+      'Work through the 353-item checklist',
       'Mark items complete as you go',
       'Track progress with visual dashboards',
-      'Never miss an SEO best practice'
+      'Never miss a content best practice'
     ]
   },
   {
@@ -98,7 +98,7 @@ const QUICK_TIPS = [
   },
   {
     title: 'Use the Checklist',
-    description: 'The 321-item checklist ensures you never miss important SEO elements.'
+    description: 'The 353-item checklist ensures you never miss important content and SEO elements.'
   },
   {
     title: 'Leverage AI Features',

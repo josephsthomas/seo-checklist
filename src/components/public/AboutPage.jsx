@@ -116,7 +116,7 @@ export default function AboutPage() {
             <div className="bg-gradient-to-br from-primary-50 to-cyan-50 rounded-3xl p-8 lg:p-12">
               <div className="grid grid-cols-2 gap-8">
                 <div className="text-center">
-                  <div className="text-4xl font-bold text-primary-600">321</div>
+                  <div className="text-4xl font-bold text-primary-600">353</div>
                   <div className="mt-1 text-sm text-charcoal-600">Checklist Items</div>
                 </div>
                 <div className="text-center">
