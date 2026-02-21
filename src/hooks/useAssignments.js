@@ -170,6 +170,15 @@ export function useAssignments(projectId) {
         [itemId]: null
       });
 
+      // Log activity
+      await logActivity(
+        projectId,
+        currentUser.uid,
+        currentUser.displayName || currentUser.email,
+        'unassigned_task',
+        { itemId }
+      );
+
       toast.success('Task unassigned');
     } catch (error) {
       console.error('Error unassigning task:', error);

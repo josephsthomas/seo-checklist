@@ -372,13 +372,43 @@ RESPOND IN JSON FORMAT:
 }
 
 /**
+ * Extract the first balanced JSON object from a string
+ * Avoids greedy regex issues with nested braces
+ */
+function extractBalancedJson(text) {
+  const start = text.indexOf('{');
+  if (start === -1) return null;
+
+  let depth = 0;
+  let inString = false;
+  let escaped = false;
+
+  for (let i = start; i < text.length; i++) {
+    const ch = text[i];
+    if (escaped) { escaped = false; continue; }
+    if (ch === '\\') { escaped = true; continue; }
+    if (ch === '"') { inString = !inString; continue; }
+    if (inString) continue;
+    if (ch === '{') depth++;
+    if (ch === '}') {
+      depth--;
+      if (depth === 0) return text.slice(start, i + 1);
+    }
+  }
+  // Fallback to greedy regex if balanced extraction fails
+  const match = text.match(/\{[\s\S]*\}/);
+  return match ? match[0] : null;
+}
+
+/**
  * Parse the response from Claude
  */
 function parseSchemaResponse(content, htmlContent, options) {
   try {
-    const jsonMatch = content.match(/\{[\s\S]*\}/);
-    if (jsonMatch) {
-      const parsed = JSON.parse(jsonMatch[0]);
+    // Use brace-balanced extraction to avoid greedy regex matching too much
+    const jsonStr = extractBalancedJson(content);
+    if (jsonStr) {
+      const parsed = JSON.parse(jsonStr);
 
       return {
         schemas: parsed.schemas?.map(s => {

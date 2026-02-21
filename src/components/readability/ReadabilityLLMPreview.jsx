@@ -19,9 +19,9 @@ import ReadabilityLLMDiff from './ReadabilityLLMDiff';
 import EmptyState from '../shared/EmptyState';
 
 const LLM_OPTIONS = [
-  { key: 'claude', name: 'Claude', model: 'Claude 3.5 Sonnet' },
-  { key: 'openai', name: 'OpenAI', model: 'GPT-4o' },
-  { key: 'gemini', name: 'Gemini', model: 'Gemini 1.5 Pro' },
+  { key: 'claude', name: 'Claude', model: 'Claude (latest)' },
+  { key: 'openai', name: 'OpenAI', model: 'GPT (latest)' },
+  { key: 'gemini', name: 'Gemini', model: 'Gemini (latest)' },
 ];
 
 export default function ReadabilityLLMPreview({ llmExtractions, aiAssessment }) {

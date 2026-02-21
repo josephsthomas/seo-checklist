@@ -16,6 +16,7 @@ import {
 import { doc, setDoc, getDoc, deleteDoc, collection, query, where, getDocs, writeBatch } from 'firebase/firestore';
 import { ref, listAll, deleteObject } from 'firebase/storage';
 import { auth, db, storage } from '../lib/firebase';
+import { cascadeDeleteAccount } from '../utils/cascadeDelete';
 import toast from 'react-hot-toast';
 
 const AuthContext = createContext({});
@@ -206,6 +207,9 @@ export function AuthProvider({ children }) {
 
       // Execute batch delete
       await batch.commit();
+
+      // Clean up additional collections (schemas, feedback, analyses, audits)
+      await cascadeDeleteAccount(userId);
 
       // Delete user's files from storage
       try {

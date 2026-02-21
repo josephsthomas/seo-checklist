@@ -195,8 +195,10 @@ function AddDueDateModal({ isOpen, onClose, onSave }) {
 export default function DueDatesWidget({ className = '' }) {
   const { overdue, dueToday, dueThisWeek, loading, addDueDate, markComplete, deleteDueDate } = useDueDates();
   const [showAddModal, setShowAddModal] = useState(false);
+  const [showAll, setShowAll] = useState(false);
 
-  const allItems = [...overdue, ...dueToday, ...dueThisWeek].slice(0, 5);
+  const allItemsFull = [...overdue, ...dueToday, ...dueThisWeek];
+  const allItems = showAll ? allItemsFull : allItemsFull.slice(0, 5);
   const hasOverdue = overdue.length > 0;
 
   if (loading) {
@@ -258,9 +260,20 @@ export default function DueDatesWidget({ className = '' }) {
             />
           ))}
 
-          {(overdue.length + dueToday.length + dueThisWeek.length) > 5 && (
-            <button className="w-full text-center text-sm text-primary-600 hover:text-primary-700 font-medium py-2">
-              View all ({overdue.length + dueToday.length + dueThisWeek.length})
+          {!showAll && allItemsFull.length > 5 && (
+            <button
+              onClick={() => setShowAll(true)}
+              className="w-full text-center text-sm text-primary-600 hover:text-primary-700 font-medium py-2"
+            >
+              View all ({allItemsFull.length})
+            </button>
+          )}
+          {showAll && allItemsFull.length > 5 && (
+            <button
+              onClick={() => setShowAll(false)}
+              className="w-full text-center text-sm text-primary-600 hover:text-primary-700 font-medium py-2"
+            >
+              Show less
             </button>
           )}
         </div>

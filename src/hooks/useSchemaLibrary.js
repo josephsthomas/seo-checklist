@@ -15,10 +15,11 @@ import {
 } from 'firebase/firestore';
 import { db } from '../lib/firebase';
 import { useAuth } from '../contexts/AuthContext';
+import { hasPermission } from '../utils/roles';
 import toast from 'react-hot-toast';
 
 export function useSchemaLibrary() {
-  const { currentUser } = useAuth();
+  const { currentUser, userProfile } = useAuth();
   const [schemas, setSchemas] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -69,6 +70,10 @@ export function useSchemaLibrary() {
     }
 
     try {
+      // Only admins/PMs can create public schemas (R11-C-013)
+      const userRole = userProfile?.role;
+      const isPublic = schemaData.isPublic && hasPermission(userRole, 'canEditAllItems') ? true : false;
+
       const schemasRef = collection(db, 'schemaLibrary');
       const docRef = await addDoc(schemasRef, {
         userId: currentUser.uid,
@@ -77,7 +82,7 @@ export function useSchemaLibrary() {
         schemaType: schemaData.schemaType,
         schema: schemaData.schema,
         tags: schemaData.tags || [],
-        isPublic: schemaData.isPublic || false,
+        isPublic,
         usageCount: 0,
         createdAt: serverTimestamp(),
         updatedAt: serverTimestamp(),
@@ -90,15 +95,21 @@ export function useSchemaLibrary() {
       toast.error('Failed to save schema');
       return null;
     }
-  }, [currentUser]);
+  }, [currentUser, userProfile]);
 
   // Update schema
   const updateSchema = useCallback(async (schemaId, updates) => {
     try {
       const schemaRef = doc(db, 'schemaLibrary', schemaId);
       const schemaSnap = await getDoc(schemaRef);
-      if (!schemaSnap.exists() || schemaSnap.data().userId !== currentUser?.uid) {
+      const userRole = userProfile?.role;
+      if (!schemaSnap.exists() || (schemaSnap.data().userId !== currentUser?.uid && !hasPermission(userRole, 'canEditAllItems'))) {
         toast.error('You can only update your own schemas');
+        return false;
+      }
+      // Only admins/PMs can mark schemas as public (R11-C-013)
+      if (updates.isPublic && !schemaSnap.data().isPublic && !hasPermission(userRole, 'canEditAllItems')) {
+        toast.error('Only administrators can make schemas public');
         return false;
       }
       await updateDoc(schemaRef, {
@@ -112,14 +123,15 @@ export function useSchemaLibrary() {
       toast.error('Failed to update schema');
       return false;
     }
-  }, [currentUser]);
+  }, [currentUser, userProfile]);
 
-  // Delete schema (with confirmation)
+  // Delete schema (with confirmation and admin bypass)
   const deleteSchema = useCallback(async (schemaId) => {
     try {
       const schemaRef = doc(db, 'schemaLibrary', schemaId);
       const schemaSnap = await getDoc(schemaRef);
-      if (!schemaSnap.exists() || schemaSnap.data().userId !== currentUser?.uid) {
+      const userRole = userProfile?.role;
+      if (!schemaSnap.exists() || (schemaSnap.data().userId !== currentUser?.uid && !hasPermission(userRole, 'canEditAllItems'))) {
         toast.error('You can only delete your own schemas');
         return false;
       }
@@ -134,7 +146,7 @@ export function useSchemaLibrary() {
       toast.error('Failed to delete schema');
       return false;
     }
-  }, [currentUser]);
+  }, [currentUser, userProfile]);
 
   // Increment usage count
   const incrementUsage = useCallback(async (schemaId) => {

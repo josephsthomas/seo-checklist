@@ -104,13 +104,15 @@ export async function suggestViolationFix(violation, options = {}) {
   const prompt = `You are a web accessibility expert specializing in WCAG 2.2 compliance.
 Provide a fix for this accessibility violation.
 
+<violation_details>
 Violation: ${truncate(name, 200)}
 Rule ID: ${ruleId}
 Impact: ${impact}
 WCAG Criteria: ${criteriaDetails}
 ${help ? `Description: ${truncate(help, 300)}` : ''}
-${htmlElement ? `HTML Element: ${truncate(htmlElement, 500)}` : ''}
-${selector ? `CSS Selector: ${truncate(selector, 200)}` : ''}
+</violation_details>
+${htmlElement ? `<html_element>\n${truncate(htmlElement, 500)}\n</html_element>` : ''}
+${selector ? `<css_selector>\n${truncate(selector, 200)}\n</css_selector>` : ''}
 ${url ? `Page URL: ${truncate(url, 200)}` : ''}
 
 Provide a practical, specific fix with code examples where applicable.
@@ -164,7 +166,9 @@ export async function suggestBulkFixes(violations) {
 
   const prompt = `You are a web accessibility expert. Provide prioritized fix recommendations for these violations:
 
+<violations>
 ${violationSummary}
+</violations>
 
 For each violation, provide a brief fix strategy.
 

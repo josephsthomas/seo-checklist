@@ -193,8 +193,11 @@ async function enforceStorageLimit(userId, role) {
 
     if (docsToDelete.length > 0) {
       console.info(`Auto-archived ${docsToDelete.length} oldest analyses to stay within storage limit (${storageLimit}).`);
+      // Return count so caller can notify user
+      return docsToDelete.length;
     }
   }
+  return 0;
 }
 
 /**
@@ -346,7 +349,10 @@ export function useReadabilityAnalysis() {
       });
 
       // Enforce storage limits before saving
-      await enforceStorageLimit(currentUser.uid, userRole);
+      const deletedCount = await enforceStorageLimit(currentUser.uid, userRole);
+      if (deletedCount > 0) {
+        toast(`${deletedCount} oldest analysis${deletedCount > 1 ? 'es' : ''} removed to stay within storage limit.`, { icon: 'ℹ️', duration: 5000 });
+      }
 
       // Check for previous analysis of same URL (trend tracking)
       let previousAnalysisId = null;

@@ -7,6 +7,14 @@
 import React, { useState, useCallback, useMemo } from 'react';
 import { Tag, X, Plus } from 'lucide-react';
 
+// Controlled vocabulary of suggested tags for consistency
+const SUGGESTED_TAGS = [
+  'blog', 'landing-page', 'product', 'documentation', 'support',
+  'marketing', 'technical', 'editorial', 'legal', 'announcement',
+  'case-study', 'whitepaper', 'tutorial', 'faq', 'press-release',
+  'social-media', 'email', 'newsletter', 'internal', 'external'
+];
+
 export default function ReadabilityProjectTagger({ value = {}, onChange, recentTags = [] }) {
   const [showTagInput, setShowTagInput] = useState(false);
   const [newTag, setNewTag] = useState('');
@@ -62,6 +70,13 @@ export default function ReadabilityProjectTagger({ value = {}, onChange, recentT
   const suggestions = useMemo(() => {
     return recentTags.filter(t => !tags.includes(t)).slice(0, 5);
   }, [recentTags, tags]);
+
+  // Controlled vocabulary suggestions filtered by current input
+  const vocabularySuggestions = useMemo(() => {
+    if (!newTag.trim()) return SUGGESTED_TAGS.filter(t => !tags.includes(t)).slice(0, 5);
+    const lower = newTag.trim().toLowerCase();
+    return SUGGESTED_TAGS.filter(t => t.includes(lower) && !tags.includes(t)).slice(0, 5);
+  }, [newTag, tags]);
 
   return (
     <div className="space-y-3">
@@ -120,16 +135,39 @@ export default function ReadabilityProjectTagger({ value = {}, onChange, recentT
           ))}
 
           {showTagInput ? (
-            <input
-              type="text"
-              value={newTag}
-              onChange={(e) => setNewTag(e.target.value)}
-              onKeyDown={handleKeyDown}
-              onBlur={handleAddTag}
-              placeholder="Add tag..."
-              className="px-2 py-0.5 text-xs border border-gray-300 dark:border-charcoal-600 rounded bg-white dark:bg-charcoal-800 text-gray-900 dark:text-white w-24 focus:ring-1 focus:ring-teal-500"
-              autoFocus
-            />
+            <div className="relative">
+              <input
+                type="text"
+                value={newTag}
+                onChange={(e) => setNewTag(e.target.value)}
+                onKeyDown={handleKeyDown}
+                onBlur={() => setTimeout(handleAddTag, 150)}
+                placeholder="Add tag..."
+                className="px-2 py-0.5 text-xs border border-gray-300 dark:border-charcoal-600 rounded bg-white dark:bg-charcoal-800 text-gray-900 dark:text-white w-32 focus:ring-1 focus:ring-teal-500"
+                autoFocus
+              />
+              {vocabularySuggestions.length > 0 && (
+                <div className="absolute top-full left-0 mt-1 w-40 bg-white dark:bg-charcoal-800 border border-gray-200 dark:border-charcoal-600 rounded shadow-lg z-10 max-h-32 overflow-y-auto">
+                  {vocabularySuggestions.map(suggestion => (
+                    <button
+                      key={suggestion}
+                      type="button"
+                      onMouseDown={(e) => {
+                        e.preventDefault();
+                        if (!tags.includes(suggestion) && tags.length < MAX_TAGS) {
+                          handleFieldChange('tags', [...tags, suggestion]);
+                        }
+                        setNewTag('');
+                        setShowTagInput(false);
+                      }}
+                      className="w-full text-left px-2 py-1 text-xs text-gray-700 dark:text-gray-300 hover:bg-teal-50 dark:hover:bg-teal-900/30 transition-colors"
+                    >
+                      {suggestion}
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
           ) : (
             <button
               onClick={() => setShowTagInput(true)}

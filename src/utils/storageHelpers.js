@@ -66,11 +66,31 @@ export const setStorageItem = (key, value) => {
     logError('storageHelpers', error, { action: 'setStorageItem', key });
 
     // Check if quota exceeded
-    if (error.name === 'QuotaExceededError') {
+    if (error.name === 'QuotaExceededError' || error.code === 22) {
       logError('storageHelpers', 'LocalStorage quota exceeded', { action: 'setStorageItem', key });
-      // Attempt to free up space by removing old activity logs
+      // Attempt to free up space by removing expendable keys in priority order
+      const expendableKeys = [
+        STORAGE_KEYS.RECENT_ACTIVITY,
+        STORAGE_KEYS.TIME_ENTRIES,
+        STORAGE_KEYS.FILTER_PRESETS
+      ];
       try {
-        localStorage.removeItem(STORAGE_KEYS.RECENT_ACTIVITY);
+        for (const expendableKey of expendableKeys) {
+          if (expendableKey !== key) {
+            localStorage.removeItem(expendableKey);
+          }
+        }
+        // Also remove any readability cache entries
+        const cacheKeysToRemove = [];
+        for (let i = 0; i < localStorage.length; i++) {
+          const k = localStorage.key(i);
+          if (k?.startsWith('readability_cache_')) {
+            cacheKeysToRemove.push(k);
+          }
+        }
+        for (const k of cacheKeysToRemove) {
+          localStorage.removeItem(k);
+        }
         localStorage.setItem(key, JSON.stringify(value));
         return true;
       } catch (retryError) {

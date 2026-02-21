@@ -29,7 +29,7 @@ const onboardingSteps = [
   {
     id: 2,
     title: "Content Planner",
-    description: "Create projects with our comprehensive 321-item SEO checklist. Track progress across Discovery, Design, Development, and Launch phases.",
+    description: "Create projects with our comprehensive SEO checklist. Track progress across Discovery, Strategy, Build, Pre-Launch, Launch, and Post-Launch phases.",
     icon: ClipboardList,
     color: 'from-primary-500 to-primary-600',
     target: "#projects-page"
@@ -37,7 +37,7 @@ const onboardingSteps = [
   {
     id: 3,
     title: "Technical Audit",
-    description: "Upload site crawl exports (e.g., from Screaming Frog) to run comprehensive technical SEO audits. Get AI-powered recommendations for fixing issues.",
+    description: "Upload site crawl exports (e.g., from Screaming Frog) to run comprehensive technical SEO audits. Get AI-assisted recommendations for fixing issues (suggestions require professional review).",
     icon: Search,
     color: 'from-cyan-500 to-cyan-600',
     target: "#audit-tool"

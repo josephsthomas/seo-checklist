@@ -81,8 +81,8 @@ const FEATURE_DATA = {
     tagline: 'Analyze Screaming Frog Exports',
     icon: Search,
     color: 'blue',
-    description: 'Upload your Screaming Frog exports and get AI-powered recommendations for fixing technical SEO issues. Prioritized by impact, actionable, and client-ready.',
-    longDescription: 'Stop spending hours manually analyzing crawl data. Our Technical Audit tool processes Screaming Frog exports and delivers actionable insights in minutes, complete with AI-generated fix suggestions.',
+    description: 'Upload your Screaming Frog exports and get AI-assisted recommendations for fixing technical SEO issues. Prioritized by impact, actionable, and client-ready. AI suggestions require human review.',
+    longDescription: 'Stop spending hours manually analyzing crawl data. Our Technical Audit tool processes Screaming Frog exports and delivers actionable insights, with optional AI-assisted fix suggestions that should be verified by an SEO professional.',
     features: [
       {
         title: 'Large File Support',
@@ -95,8 +95,8 @@ const FEATURE_DATA = {
         icon: Target
       },
       {
-        title: 'AI-Powered Suggestions',
-        description: 'Get contextual fix recommendations powered by Claude AI.',
+        title: 'AI-Assisted Suggestions',
+        description: 'Get contextual fix recommendations via Claude AI. Suggestions are advisory and require professional review.',
         icon: Sparkles
       },
       {
@@ -132,7 +132,7 @@ const FEATURE_DATA = {
     tagline: 'WCAG 2.2 Compliance Scanning',
     icon: Eye,
     color: 'emerald',
-    description: 'Scan any URL for accessibility issues using 93 Axe-core rules. Get WCAG 2.2 compliance scores and AI-powered remediation suggestions.',
+    description: 'Scan any URL for accessibility issues using 93 Axe-core rules. Get WCAG 2.2 compliance scores and AI-assisted remediation suggestions (requires professional review).',
     longDescription: 'Accessibility isn\'t just the right thing to do—it\'s increasingly a legal requirement. Our Accessibility Analyzer makes it easy to identify and fix issues, with clear guidance on WCAG compliance levels.',
     features: [
       {
@@ -180,11 +180,11 @@ const FEATURE_DATA = {
   },
   'meta-generator': {
     name: 'Meta Data Generator',
-    tagline: 'AI-Powered Meta Optimization',
+    tagline: 'AI-Assisted Meta Optimization',
     icon: FileText,
     color: 'violet',
-    description: 'Generate optimized title tags and meta descriptions using AI. Preview how your pages will appear in search results and on social media.',
-    longDescription: 'Writing compelling meta data at scale is time-consuming. Our Meta Data Generator uses AI to create optimized titles and descriptions that drive clicks while staying within character limits.',
+    description: 'Generate optimized title tags and meta descriptions using AI. Preview how your pages will appear in search results and on social media. AI suggestions should be reviewed before use.',
+    longDescription: 'Writing compelling meta data at scale is time-consuming. Our Meta Data Generator uses AI to draft optimized titles and descriptions as starting points. Always review and refine AI-generated suggestions before publishing.',
     features: [
       {
         title: 'AI Generation',

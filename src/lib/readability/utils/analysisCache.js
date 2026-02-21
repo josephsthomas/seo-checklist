@@ -16,11 +16,14 @@ const MAX_CACHE_ENTRY_SIZE = 512 * 1024; // 512KB max per cache entry
  */
 function hashContent(content) {
   let hash = 5381;
-  for (let i = 0; i < Math.min(content.length, 50000); i++) {
+  const len = Math.min(content.length, 50000);
+  for (let i = 0; i < len; i++) {
     hash = ((hash << 5) + hash) + content.charCodeAt(i);
     hash = hash & hash; // Convert to 32bit integer
   }
-  return Math.abs(hash).toString(36);
+  // Include total content length to reduce collision risk for large documents
+  // that share the same first 50K chars but differ afterwards
+  return `${Math.abs(hash).toString(36)}_${content.length}`;
 }
 
 /**

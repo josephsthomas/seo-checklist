@@ -9,6 +9,7 @@ import { useDropzone } from 'react-dropzone';
 import { Upload, File, FileText, Image, Table, Trash2, Download, Loader, AlertTriangle } from 'lucide-react';
 import { useFileAttachments } from '../../hooks/useFileAttachments';
 import { useAuth } from '../../contexts/AuthContext';
+import { hasPermission } from '../../utils/roles';
 import { format } from 'date-fns';
 import toast from 'react-hot-toast';
 
@@ -24,7 +25,7 @@ export default function FileUpload({ projectId, itemId }) {
     MAX_FILE_SIZE
   } = useFileAttachments(projectId, itemId);
 
-  const { currentUser } = useAuth();
+  const { currentUser, userProfile } = useAuth();
   const [description, setDescription] = useState('');
   const [deleteConfirm, setDeleteConfirm] = useState(null);
 
@@ -206,7 +207,7 @@ export default function FileUpload({ projectId, itemId }) {
                   >
                     <Download className="w-4 h-4" aria-hidden="true" />
                   </a>
-                  {attachment.uploadedBy === currentUser?.uid && (
+                  {(attachment.uploadedBy === currentUser?.uid || hasPermission(userProfile?.role, 'canEditAllItems')) && (
                     <button
                       onClick={() => handleDelete(attachment.id)}
                       className="p-2 text-charcoal-400 hover:text-red-600 hover:bg-red-50 rounded"
