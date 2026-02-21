@@ -20,7 +20,7 @@ import { isAfter, isBefore, addDays, startOfDay, differenceInDays } from 'date-f
 /**
  * Supported due date types
  */
-export const DUE_DATE_TYPES = ['task', 'project', 'reminder', 'content_review'];
+export const DUE_DATE_TYPES = ['task', 'project', 'reminder', 'content_review', 'content_publish', 'content_archive', 'content_expire'];
 
 /**
  * Hook for managing due dates and reminders

@@ -1,6 +1,6 @@
 /**
- * Audit Log Retention Policy Configuration
- * Defines available retention periods and related utilities
+ * Content Retention Policy Configuration
+ * Defines available retention periods and related utilities for all content types
  */
 
 export const RETENTION_OPTIONS = [
@@ -67,6 +67,42 @@ export function isWithinRetention(date, retentionValue) {
   }
 
   return date >= cutoff;
+}
+
+/**
+ * Content type-specific retention policies
+ * Each content type has a default retention period and description
+ */
+export const CONTENT_RETENTION_POLICIES = {
+  audit_logs: { default: '90', description: 'Audit log entries' },
+  readability_analyses: { default: '180', description: 'Readability analysis results' },
+  schemas: { default: 'unlimited', description: 'Schema markup library items' },
+  reports: { default: '365', description: 'Generated reports' },
+  projects: { default: 'unlimited', description: 'Project data' },
+  time_entries: { default: '365', description: 'Time tracking entries' },
+  file_attachments: { default: '365', description: 'Uploaded file attachments' }
+};
+
+/**
+ * Get retention policy for a content type
+ * @param {string} contentType - The content type key
+ * @returns {object} The retention policy with default period and description
+ */
+export function getContentRetentionPolicy(contentType) {
+  return CONTENT_RETENTION_POLICIES[contentType] || { default: 'unlimited', description: 'Unknown content type' };
+}
+
+/**
+ * Check if a date is within the retention period for a content type
+ * @param {Date} date - The date to check
+ * @param {string} contentType - The content type key
+ * @param {string} [overrideValue] - Optional override retention value
+ * @returns {boolean} True if within retention period
+ */
+export function isContentWithinRetention(date, contentType, overrideValue) {
+  const policy = getContentRetentionPolicy(contentType);
+  const retentionValue = overrideValue || policy.default;
+  return isWithinRetention(date, retentionValue);
 }
 
 /**

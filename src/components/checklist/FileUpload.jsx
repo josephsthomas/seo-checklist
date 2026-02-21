@@ -12,6 +12,7 @@ import { useAuth } from '../../contexts/AuthContext';
 import { hasPermission } from '../../utils/roles';
 import { format } from 'date-fns';
 import toast from 'react-hot-toast';
+import { logActivity } from '../../hooks/useActivityLog';
 
 export default function FileUpload({ projectId, itemId }) {
   const {
@@ -35,6 +36,15 @@ export default function FileUpload({ projectId, itemId }) {
     const file = acceptedFiles[0]; // Handle one file at a time
     try {
       await uploadFile(file, description);
+      // Log file upload to audit trail
+      if (projectId && currentUser) {
+        await logActivity(projectId, currentUser.uid, userProfile?.name || currentUser.email, 'file_upload', {
+          fileName: file.name,
+          fileSize: file.size,
+          fileType: file.type,
+          itemId
+        });
+      }
       setDescription('');
     } catch (error) {
       toast.error('Failed to upload file. Please try again.');
@@ -72,7 +82,15 @@ export default function FileUpload({ projectId, itemId }) {
 
   const confirmDelete = async () => {
     if (deleteConfirm) {
+      const attachment = attachments.find(a => a.id === deleteConfirm);
       await deleteFile(deleteConfirm);
+      // Log file deletion to audit trail
+      if (projectId && currentUser) {
+        await logActivity(projectId, currentUser.uid, userProfile?.name || currentUser.email, 'file_delete', {
+          fileName: attachment?.filename || 'unknown',
+          itemId
+        });
+      }
       setDeleteConfirm(null);
     }
   };

@@ -163,7 +163,7 @@ export function useTimeTracking(projectId, itemId = null) {
     }
   };
 
-  // Delete time entry (with ownership check, admin bypass, and confirmation)
+  // Delete time entry with soft-delete and undo support
   const deleteEntry = async (entryId) => {
     const entry = timeEntries.find(e => e.id === entryId);
     const userRole = userProfile?.role;
@@ -171,12 +171,28 @@ export function useTimeTracking(projectId, itemId = null) {
       toast.error('You can only delete your own time entries');
       return;
     }
-    if (!window.confirm('Delete this time entry? This cannot be undone.')) {
-      return;
-    }
     try {
       await deleteDoc(doc(db, 'time_entries', entryId));
-      toast.success('Time entry deleted');
+      // Show undo toast with 5s window to restore
+      const toastId = toast.success('Time entry deleted. Click to undo.', {
+        duration: 5000,
+        onClick: async () => {
+          try {
+            const { id: _id, ...entryData } = entry;
+            await addDoc(collection(db, 'time_entries'), {
+              ...entryData,
+              startTime: entryData.startTime || new Date(),
+              endTime: entryData.endTime || null,
+              createdAt: serverTimestamp()
+            });
+            toast.dismiss(toastId);
+            toast.success('Time entry restored');
+          } catch (err) {
+            console.error('Error restoring entry:', err);
+            toast.error('Failed to restore entry');
+          }
+        }
+      });
     } catch (error) {
       console.error('Error deleting entry:', error);
       toast.error('Failed to delete entry');

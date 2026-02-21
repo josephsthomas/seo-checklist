@@ -31,6 +31,9 @@ import {
 import { format, formatDistanceToNow, addDays, addWeeks, addMonths } from 'date-fns';
 import toast from 'react-hot-toast';
 import InfoTooltip from '../common/InfoTooltip';
+import { collection, doc, addDoc, updateDoc, deleteDoc, onSnapshot, query, where, serverTimestamp } from 'firebase/firestore';
+import { db } from '../../lib/firebase';
+import { useAuth } from '../../contexts/AuthContext';
 
 /**
  * Scheduled Reports Panel
@@ -187,9 +190,41 @@ export default function ScheduledReportsPanel() {
   const [editingSchedule, setEditingSchedule] = useState(null);
   const [expandedId, setExpandedId] = useState(null);
   const [filter, setFilter] = useState('all'); // all, active, paused
+  const { currentUser } = useAuth();
+  const [firestoreLoading, setFirestoreLoading] = useState(true);
 
-  // TODO: Load scheduled reports from Firestore
-  // Reports will be populated when users create scheduled reports
+  // Load scheduled reports from Firestore
+  useEffect(() => {
+    if (!currentUser?.uid) {
+      setFirestoreLoading(false);
+      return;
+    }
+
+    const q = query(
+      collection(db, 'scheduled_reports'),
+      where('userId', '==', currentUser.uid)
+    );
+
+    const unsubscribe = onSnapshot(q, (snapshot) => {
+      const loaded = snapshot.docs.map(doc => {
+        const data = doc.data();
+        return {
+          id: doc.id,
+          ...data,
+          createdAt: data.createdAt?.toDate?.() || new Date(),
+          lastRun: data.lastRun?.toDate?.() || null,
+          nextRun: data.nextRun?.toDate?.() || null,
+        };
+      });
+      setSchedules(loaded);
+      setFirestoreLoading(false);
+    }, (error) => {
+      console.error('Error loading scheduled reports:', error);
+      setFirestoreLoading(false);
+    });
+
+    return () => unsubscribe();
+  }, [currentUser]);
 
   // Filter schedules
   const filteredSchedules = schedules.filter(schedule => {
@@ -199,13 +234,19 @@ export default function ScheduledReportsPanel() {
   });
 
   // Toggle schedule active status
-  const toggleSchedule = (id) => {
+  const toggleSchedule = async (id) => {
     const schedule = schedules.find(s => s.id === id);
     const wasActive = schedule?.isActive;
-    setSchedules(prev => prev.map(s =>
-      s.id === id ? { ...s, isActive: !s.isActive, lastStatus: !s.isActive ? 'active' : 'paused' } : s
-    ));
-    toast.success(wasActive ? 'Schedule paused' : 'Schedule activated');
+    try {
+      await updateDoc(doc(db, 'scheduled_reports', id), {
+        isActive: !wasActive,
+        lastStatus: !wasActive ? 'active' : 'paused'
+      });
+      toast.success(wasActive ? 'Schedule paused' : 'Schedule activated');
+    } catch (error) {
+      console.error('Error toggling schedule:', error);
+      toast.error('Failed to update schedule');
+    }
   };
 
   // State for delete confirmation
@@ -220,54 +261,78 @@ export default function ScheduledReportsPanel() {
     });
   };
 
-  const confirmDelete = () => {
+  const confirmDelete = async () => {
     if (!deleteConfirm) return;
 
     const deletedSchedule = schedules.find(s => s.id === deleteConfirm.id);
-    setSchedules(prev => prev.filter(s => s.id !== deleteConfirm.id));
     setDeleteConfirm(null);
 
-    // Show toast with undo option
-    toast((t) => (
-      <div className="flex items-center gap-3">
-        <span>Schedule deleted</span>
-        <button
-          onClick={() => {
-            setSchedules(prev => [...prev, deletedSchedule]);
-            toast.dismiss(t.id);
-            toast.success('Schedule restored');
-          }}
-          className="px-2 py-1 bg-primary-500 text-white rounded text-sm font-medium hover:bg-primary-600"
-        >
-          Undo
-        </button>
-      </div>
-    ), { duration: 5000 });
+    try {
+      await deleteDoc(doc(db, 'scheduled_reports', deleteConfirm.id));
+      toast((t) => (
+        <div className="flex items-center gap-3">
+          <span>Schedule deleted</span>
+          <button
+            onClick={async () => {
+              try {
+                const { id: _id, ...scheduleData } = deletedSchedule;
+                await addDoc(collection(db, 'scheduled_reports'), {
+                  ...scheduleData,
+                  userId: currentUser.uid,
+                  createdAt: serverTimestamp()
+                });
+                toast.dismiss(t.id);
+                toast.success('Schedule restored');
+              } catch (err) {
+                console.error('Error restoring schedule:', err);
+                toast.error('Failed to restore schedule');
+              }
+            }}
+            className="px-2 py-1 bg-primary-500 text-white rounded text-sm font-medium hover:bg-primary-600"
+          >
+            Undo
+          </button>
+        </div>
+      ), { duration: 5000 });
+    } catch (error) {
+      console.error('Error deleting schedule:', error);
+      toast.error('Failed to delete schedule');
+    }
   };
 
   // Toggle all schedules (maintenance mode)
-  const toggleAllSchedules = (activate) => {
+  const toggleAllSchedules = async (activate) => {
     const activeCount = schedules.filter(s => s.isActive).length;
-
-    if (activate) {
-      setSchedules(prev => prev.map(s => ({ ...s, isActive: true })));
-      toast.success(`All ${schedules.length} schedules activated`);
-    } else {
-      setSchedules(prev => prev.map(s => ({ ...s, isActive: false })));
-      toast.success(`All ${activeCount} schedules paused (maintenance mode)`);
+    try {
+      const updatePromises = schedules.map(s =>
+        updateDoc(doc(db, 'scheduled_reports', s.id), { isActive: activate })
+      );
+      await Promise.all(updatePromises);
+      toast.success(activate
+        ? `All ${schedules.length} schedules activated`
+        : `All ${activeCount} schedules paused (maintenance mode)`
+      );
+    } catch (error) {
+      console.error('Error toggling all schedules:', error);
+      toast.error('Failed to update schedules');
     }
   };
 
   // Run now
-  const runNow = (id) => {
+  const runNow = async (id) => {
     const schedule = schedules.find(s => s.id === id);
     toast.success(`Running "${schedule?.name}"...`);
-    // Simulate running
-    setTimeout(() => {
-      setSchedules(prev => prev.map(s =>
-        s.id === id ? { ...s, lastRun: new Date(), runCount: s.runCount + 1, lastStatus: 'success' } : s
-      ));
-      toast.success('Report generated and sent!');
+    setTimeout(async () => {
+      try {
+        await updateDoc(doc(db, 'scheduled_reports', id), {
+          lastRun: serverTimestamp(),
+          runCount: (schedule?.runCount || 0) + 1,
+          lastStatus: 'success'
+        });
+        toast.success('Report generated and sent!');
+      } catch (error) {
+        console.error('Error updating run status:', error);
+      }
     }, 2000);
   };
 
@@ -600,13 +665,23 @@ export default function ScheduledReportsPanel() {
       {(showCreateModal || editingSchedule) && (
         <ScheduleFormModal
           schedule={editingSchedule}
-          onSave={(newSchedule) => {
-            if (editingSchedule) {
-              setSchedules(prev => prev.map(s => s.id === editingSchedule.id ? { ...s, ...newSchedule } : s));
-              toast.success('Schedule updated');
-            } else {
-              setSchedules(prev => [...prev, { ...newSchedule, id: Date.now().toString(), createdAt: new Date(), runCount: 0 }]);
-              toast.success('Schedule created');
+          onSave={async (newSchedule) => {
+            try {
+              if (editingSchedule) {
+                await updateDoc(doc(db, 'scheduled_reports', editingSchedule.id), newSchedule);
+                toast.success('Schedule updated');
+              } else {
+                await addDoc(collection(db, 'scheduled_reports'), {
+                  ...newSchedule,
+                  userId: currentUser.uid,
+                  createdAt: serverTimestamp(),
+                  runCount: 0
+                });
+                toast.success('Schedule created');
+              }
+            } catch (error) {
+              console.error('Error saving schedule:', error);
+              toast.error('Failed to save schedule');
             }
             setShowCreateModal(false);
             setEditingSchedule(null);

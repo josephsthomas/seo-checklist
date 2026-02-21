@@ -68,29 +68,29 @@ export const setStorageItem = (key, value) => {
     // Check if quota exceeded
     if (error.name === 'QuotaExceededError' || error.code === 22) {
       logError('storageHelpers', 'LocalStorage quota exceeded', { action: 'setStorageItem', key });
-      // Attempt to free up space by removing expendable keys in priority order
-      const expendableKeys = [
-        STORAGE_KEYS.RECENT_ACTIVITY,
-        STORAGE_KEYS.TIME_ENTRIES,
-        STORAGE_KEYS.FILTER_PRESETS
-      ];
       try {
-        for (const expendableKey of expendableKeys) {
-          if (expendableKey !== key) {
+        // Smart eviction: use checkStorageUsage to find largest items
+        const usage = checkStorageUsage();
+        const sortedBySize = Object.entries(usage.sizes)
+          .filter(([k]) => k !== key) // don't evict the key we're trying to write
+          .sort(([, a], [, b]) => b - a); // largest first
+
+        // Evict largest expendable items first
+        const expendableKeys = [
+          STORAGE_KEYS.RECENT_ACTIVITY,
+          STORAGE_KEYS.TIME_ENTRIES,
+          STORAGE_KEYS.FILTER_PRESETS
+        ];
+
+        for (const [expendableKey] of sortedBySize) {
+          if (expendableKeys.includes(expendableKey)) {
             localStorage.removeItem(expendableKey);
           }
         }
-        // Also remove any readability cache entries
-        const cacheKeysToRemove = [];
-        for (let i = 0; i < localStorage.length; i++) {
-          const k = localStorage.key(i);
-          if (k?.startsWith('readability_cache_')) {
-            cacheKeysToRemove.push(k);
-          }
-        }
-        for (const k of cacheKeysToRemove) {
-          localStorage.removeItem(k);
-        }
+
+        // Evict oldest readability cache entries (LRU)
+        evictReadabilityCacheLRU();
+
         localStorage.setItem(key, JSON.stringify(value));
         return true;
       } catch (retryError) {
@@ -320,12 +320,15 @@ export const getRecentActivities = (limit = 20) => {
 
 /**
  * Check storage usage and warn if approaching limit
+ * Includes all localStorage keys, not just STORAGE_KEYS
  * @returns {Object} Storage usage info
  */
 export const checkStorageUsage = () => {
   let totalSize = 0;
+  let cacheSize = 0;
   const sizes = {};
 
+  // Check known STORAGE_KEYS
   for (const key of Object.values(STORAGE_KEYS)) {
     try {
       const item = localStorage.getItem(key);
@@ -337,17 +340,130 @@ export const checkStorageUsage = () => {
     }
   }
 
+  // Also account for readability cache entries
+  try {
+    for (let i = 0; i < localStorage.length; i++) {
+      const key = localStorage.key(i);
+      if (key?.startsWith('readability_cache_')) {
+        const item = localStorage.getItem(key);
+        const size = item ? new Blob([item]).size : 0;
+        sizes[key] = size;
+        cacheSize += size;
+        totalSize += size;
+      }
+    }
+  } catch (error) {
+    logError('storageHelpers', error, { action: 'checkStorageUsage', phase: 'cache' });
+  }
+
   // Typical localStorage limit is 5-10MB
   const estimatedLimit = 5 * 1024 * 1024; // 5MB
   const percentUsed = (totalSize / estimatedLimit) * 100;
 
   return {
     totalSize,
+    cacheSize,
     sizes,
     estimatedLimit,
     percentUsed: Math.round(percentUsed),
     warningLevel: percentUsed > 80 ? 'critical' : percentUsed > 60 ? 'warning' : 'ok'
   };
+};
+
+/**
+ * Evict oldest readability cache entries (LRU strategy)
+ * Removes the oldest half of cache entries when called
+ */
+export const evictReadabilityCacheLRU = () => {
+  try {
+    const cacheEntries = [];
+    for (let i = 0; i < localStorage.length; i++) {
+      const key = localStorage.key(i);
+      if (key?.startsWith('readability_cache_')) {
+        try {
+          const data = JSON.parse(localStorage.getItem(key));
+          cacheEntries.push({ key, cachedAt: data.cachedAt || 0 });
+        } catch {
+          // Invalid entry — remove it
+          cacheEntries.push({ key, cachedAt: 0 });
+        }
+      }
+    }
+
+    if (cacheEntries.length === 0) return 0;
+
+    // Sort by age (oldest first) and remove oldest half
+    cacheEntries.sort((a, b) => a.cachedAt - b.cachedAt);
+    const toRemove = cacheEntries.slice(0, Math.ceil(cacheEntries.length / 2));
+    for (const entry of toRemove) {
+      localStorage.removeItem(entry.key);
+    }
+    return toRemove.length;
+  } catch (error) {
+    logError('storageHelpers', error, { action: 'evictReadabilityCacheLRU' });
+    return 0;
+  }
+};
+
+/**
+ * Clean orphaned storage entries
+ * Removes unknown keys and expired cache entries
+ * @returns {Object} Cleanup report
+ */
+export const cleanOrphanedStorage = () => {
+  const knownPrefixes = [
+    ...Object.values(STORAGE_KEYS),
+    'readability_cache_',
+    'session-data-warning-shown'
+  ];
+  const report = { removed: [], cacheExpired: 0, totalFreed: 0 };
+
+  try {
+    const keysToCheck = [];
+    for (let i = 0; i < localStorage.length; i++) {
+      keysToCheck.push(localStorage.key(i));
+    }
+
+    for (const key of keysToCheck) {
+      if (!key) continue;
+
+      // Check if key matches any known pattern
+      const isKnown = knownPrefixes.some(prefix =>
+        key === prefix || key.startsWith(prefix)
+      );
+
+      if (!isKnown) {
+        // Unknown key — check if it looks like an orphaned cache
+        const size = new Blob([localStorage.getItem(key) || '']).size;
+        report.totalFreed += size;
+        report.removed.push(key);
+        localStorage.removeItem(key);
+        continue;
+      }
+
+      // For readability cache entries, remove expired ones
+      if (key.startsWith('readability_cache_')) {
+        try {
+          const data = JSON.parse(localStorage.getItem(key));
+          const age = Date.now() - (data.cachedAt || 0);
+          const maxAge = 7 * 24 * 60 * 60 * 1000; // 7 days
+          if (age > maxAge) {
+            const size = new Blob([localStorage.getItem(key) || '']).size;
+            report.totalFreed += size;
+            report.cacheExpired++;
+            localStorage.removeItem(key);
+          }
+        } catch {
+          localStorage.removeItem(key);
+          report.cacheExpired++;
+        }
+      }
+    }
+  } catch (error) {
+    logError('storageHelpers', error, { action: 'cleanOrphanedStorage' });
+  }
+
+  return report;
 };
 
 /**
@@ -418,6 +534,8 @@ export default {
   logActivity,
   getRecentActivities,
   checkStorageUsage,
+  evictReadabilityCacheLRU,
+  cleanOrphanedStorage,
   exportAllData,
   importAllData,
   clearPhase9Data

@@ -104,6 +104,116 @@ const SCHEMA_FIELDS = {
     recommended: ['author', 'isbn', 'description', 'image'],
     optional: ['publisher', 'datePublished', 'numberOfPages'],
   },
+  TechArticle: {
+    required: ['headline', '@type'],
+    recommended: ['author', 'datePublished', 'dateModified', 'publisher', 'image', 'description'],
+    optional: ['proficiencyLevel', 'dependencies', 'mainEntityOfPage', 'wordCount', 'articleBody'],
+  },
+  Restaurant: {
+    required: ['@type', 'name'],
+    recommended: ['address', 'servesCuisine', 'telephone', 'url', 'image'],
+    optional: ['priceRange', 'openingHours', 'menu', 'geo', 'acceptsReservations'],
+  },
+  Store: {
+    required: ['@type', 'name'],
+    recommended: ['address', 'telephone', 'url', 'openingHours', 'image'],
+    optional: ['priceRange', 'geo', 'paymentAccepted', 'currenciesAccepted', 'sameAs'],
+  },
+  ProfessionalService: {
+    required: ['@type', 'name'],
+    recommended: ['address', 'telephone', 'url', 'openingHours', 'image'],
+    optional: ['priceRange', 'geo', 'sameAs', 'description', 'areaServed'],
+  },
+  FinancialService: {
+    required: ['@type', 'name'],
+    recommended: ['address', 'telephone', 'url', 'openingHours', 'image'],
+    optional: ['priceRange', 'geo', 'sameAs', 'description', 'feesAndCommissionsSpecification'],
+  },
+  MedicalBusiness: {
+    required: ['@type', 'name'],
+    recommended: ['address', 'telephone', 'url', 'openingHours', 'image'],
+    optional: ['medicalSpecialty', 'geo', 'sameAs', 'description', 'isAcceptingNewPatients'],
+  },
+  Offer: {
+    required: ['@type', 'price', 'priceCurrency'],
+    recommended: ['availability', 'url', 'itemOffered', 'validFrom'],
+    optional: ['priceValidUntil', 'seller', 'itemCondition', 'shippingDetails', 'hasMerchantReturnPolicy'],
+  },
+  AggregateOffer: {
+    required: ['@type', 'lowPrice', 'priceCurrency'],
+    recommended: ['highPrice', 'offerCount', 'offers', 'url'],
+    optional: ['availability', 'itemOffered', 'seller'],
+  },
+  AggregateRating: {
+    required: ['@type', 'ratingValue', 'reviewCount'],
+    recommended: ['bestRating', 'worstRating', 'ratingCount'],
+    optional: ['itemReviewed', 'name'],
+  },
+  ProfilePage: {
+    required: ['@type'],
+    recommended: ['mainEntity', 'dateCreated', 'dateModified', 'name'],
+    optional: ['description', 'url', 'breadcrumb'],
+  },
+  BusinessEvent: {
+    required: ['@type', 'name', 'startDate'],
+    recommended: ['location', 'description', 'endDate', 'image', 'offers', 'organizer'],
+    optional: ['performer', 'eventStatus', 'eventAttendanceMode', 'sponsor'],
+  },
+  MusicEvent: {
+    required: ['@type', 'name', 'startDate'],
+    recommended: ['location', 'description', 'endDate', 'image', 'offers', 'performer'],
+    optional: ['organizer', 'eventStatus', 'eventAttendanceMode', 'doorTime'],
+  },
+  SportsEvent: {
+    required: ['@type', 'name', 'startDate'],
+    recommended: ['location', 'description', 'endDate', 'image', 'offers', 'competitor'],
+    optional: ['organizer', 'eventStatus', 'eventAttendanceMode', 'sport'],
+  },
+  Question: {
+    required: ['@type', 'name', 'text'],
+    recommended: ['acceptedAnswer', 'suggestedAnswer', 'dateCreated'],
+    optional: ['author', 'upvoteCount', 'answerCount'],
+  },
+  Movie: {
+    required: ['@type', 'name'],
+    recommended: ['director', 'actor', 'dateCreated', 'duration', 'image', 'description'],
+    optional: ['genre', 'aggregateRating', 'review', 'contentRating', 'trailer'],
+  },
+  ImageObject: {
+    required: ['@type', 'contentUrl'],
+    recommended: ['caption', 'width', 'height', 'description'],
+    optional: ['author', 'datePublished', 'encodingFormat', 'thumbnail'],
+  },
+  SiteNavigationElement: {
+    required: ['@type', 'name'],
+    recommended: ['url', 'description'],
+    optional: ['position', 'identifier'],
+  },
+  Occupation: {
+    required: ['@type', 'name'],
+    recommended: ['estimatedSalary', 'occupationalCategory', 'description'],
+    optional: ['skills', 'qualifications', 'responsibilities', 'educationRequirements', 'experienceRequirements'],
+  },
+  MedicalCondition: {
+    required: ['@type', 'name'],
+    recommended: ['possibleTreatment', 'signOrSymptom', 'description'],
+    optional: ['riskFactor', 'stage', 'typicalTest', 'associatedAnatomy', 'differentialDiagnosis'],
+  },
+  Drug: {
+    required: ['@type', 'name'],
+    recommended: ['activeIngredient', 'dosageForm', 'description'],
+    optional: ['administrationRoute', 'prescriptionStatus', 'warning', 'drugClass', 'nonProprietaryName'],
+  },
+  MedicalClinic: {
+    required: ['@type', 'name'],
+    recommended: ['address', 'medicalSpecialty', 'telephone', 'url', 'image'],
+    optional: ['openingHours', 'geo', 'isAcceptingNewPatients', 'availableService', 'description'],
+  },
+  Physician: {
+    required: ['@type', 'name'],
+    recommended: ['medicalSpecialty', 'address', 'telephone', 'url', 'image'],
+    optional: ['hospitalAffiliation', 'availableService', 'description', 'sameAs', 'isAcceptingNewPatients'],
+  },
 };
 
 /**

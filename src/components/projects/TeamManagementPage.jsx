@@ -6,6 +6,7 @@ import { User, Mail, Calendar, Edit2, Shield, Users, Info, UserPlus } from 'luci
 import { USER_ROLES, ROLE_LABELS, hasPermission } from '../../utils/roles';
 import { format } from 'date-fns';
 import toast from 'react-hot-toast';
+import { logUserActivity } from '../../hooks/useActivityLog';
 
 export default function TeamManagementPage() {
   const [users, setUsers] = useState([]);
@@ -40,8 +41,21 @@ export default function TeamManagementPage() {
       return;
     }
     try {
+      const targetUser = users.find(u => u.id === userId);
+      const previousRole = targetUser?.role;
+
       const userRef = doc(db, 'users', userId);
       await updateDoc(userRef, { role: newRole });
+
+      // Log role change to audit trail
+      await logUserActivity(currentUser.uid, 'role_change', `Changed ${targetUser?.name || userId} role from ${ROLE_LABELS[previousRole] || previousRole} to ${ROLE_LABELS[newRole] || newRole}`, {
+        targetUserId: userId,
+        targetUserName: targetUser?.name || null,
+        oldRole: previousRole,
+        newRole,
+        changedBy: currentUser.uid,
+        changedByName: userProfile?.name || currentUser.email
+      });
 
       setUsers(prev => prev.map(u =>
         u.id === userId ? { ...u, role: newRole } : u
