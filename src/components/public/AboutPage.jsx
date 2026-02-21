@@ -98,18 +98,19 @@ export default function AboutPage() {
               </h2>
               <div className="mt-6 space-y-4 text-charcoal-600 leading-relaxed">
                 <p>
-                  Content Strategy Portal was born from a simple observation: content teams were
-                  using dozens of disconnected tools, spreadsheets, and manual processes to
-                  manage their content strategies.
+                  Content Strategy Portal was born from a simple observation: content strategists
+                  were spending more time on manual execution — auditing, checklist tracking,
+                  metadata writing, accessibility checks — than on actual strategy.
                 </p>
                 <p>
-                  We set out to create a unified platform that brings together project management,
-                  technical auditing, accessibility compliance, and AI-powered content optimization
-                  into one seamless experience.
+                  We set out to automate the minutiae. Seven integrated tools handle the
+                  technical busywork so content teams can focus on what they do best:
+                  planning, creating, and delivering content that drives results.
                 </p>
                 <p>
-                  Today, our platform helps agencies and enterprise teams streamline their workflows,
-                  deliver consistent results, and scale their content operations efficiently.
+                  Today, agencies and enterprise teams use our platform to reclaim hours
+                  every week, deliver consistent quality, and scale their content operations
+                  without scaling their headcount.
                 </p>
               </div>
             </div>
@@ -214,7 +215,7 @@ export default function AboutPage() {
               </h2>
               <p className="mt-6 text-charcoal-300 leading-relaxed">
                 Unlike point solutions that address a single need, Content Strategy Portal
-                provides an integrated experience where all your SEO workflows connect.
+                automates the entire content workflow so your team can focus on strategy, not execution.
               </p>
               <ul className="mt-8 space-y-4">
                 <li className="flex items-start gap-3">

@@ -14,7 +14,10 @@ import {
   Users,
   TrendingUp,
   Clock,
-  Award
+  Award,
+  Sparkles,
+  Target,
+  Layers
 } from 'lucide-react';
 import SEOHead from '../shared/SEOHead';
 import { organizationSchema, generateBreadcrumbSchema } from '../../config/seo';
@@ -131,9 +134,9 @@ export default function LandingPage() {
             </h1>
 
             <p className="mt-6 text-xl text-charcoal-600 max-w-2xl mx-auto leading-relaxed">
-              Plan projects with 353-item checklists. Run technical audits in minutes.
-              Ensure WCAG 2.2 accessibility. Analyze AI readability. Generate optimized metadata.
-              <span className="block mt-2 font-medium text-charcoal-700">One platform for teams managing content at scale.</span>
+              Automate the minutiae — audits, checklists, accessibility, metadata, structured data,
+              AI readability — so you can focus on what matters: being a content strategist.
+              <span className="block mt-2 font-medium text-charcoal-700">7 integrated tools. One platform. Zero busywork.</span>
             </p>
 
             <div className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-4">
@@ -248,6 +251,73 @@ export default function LandingPage() {
         </div>
       </section>
 
+      {/* Workflow Section — How Content Strategists Use CSP */}
+      <section className="py-20 lg:py-28 bg-charcoal-50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center max-w-3xl mx-auto mb-16">
+            <div className="inline-flex items-center gap-2 px-4 py-2 bg-primary-50 border border-primary-200 rounded-full text-primary-700 text-sm font-medium mb-4">
+              <Sparkles className="w-4 h-4" />
+              For Content Strategists
+            </div>
+            <h2 className="text-3xl lg:text-4xl font-bold text-charcoal-900">
+              Automate the Busywork. Focus on Strategy.
+            </h2>
+            <p className="mt-4 text-lg text-charcoal-600">
+              You became a content strategist to think big — not to manually audit meta tags,
+              check accessibility rules, or generate schema markup. We handle that.
+            </p>
+          </div>
+
+          <div className="grid lg:grid-cols-3 gap-8">
+            <div className="bg-white rounded-2xl p-8 shadow-sm border border-charcoal-100">
+              <div className="w-12 h-12 bg-primary-50 rounded-xl flex items-center justify-center mb-5">
+                <Target className="w-6 h-6 text-primary-600" />
+              </div>
+              <h3 className="text-lg font-semibold text-charcoal-900">Plan with Confidence</h3>
+              <p className="mt-3 text-charcoal-600 text-sm leading-relaxed">
+                Start every project with a 353-item checklist that covers discovery, planning, content creation,
+                technical implementation, launch, and post-launch. Nothing slips through the cracks so you
+                can focus on the creative strategy.
+              </p>
+            </div>
+
+            <div className="bg-white rounded-2xl p-8 shadow-sm border border-charcoal-100">
+              <div className="w-12 h-12 bg-cyan-50 rounded-xl flex items-center justify-center mb-5">
+                <Layers className="w-6 h-6 text-cyan-600" />
+              </div>
+              <h3 className="text-lg font-semibold text-charcoal-900">Automate the Technical Work</h3>
+              <p className="mt-3 text-charcoal-600 text-sm leading-relaxed">
+                Technical audits, accessibility scans, metadata generation, schema markup, alt text —
+                these are hours of repetitive work that AI handles in minutes. You review, approve,
+                and move on to higher-value work.
+              </p>
+            </div>
+
+            <div className="bg-white rounded-2xl p-8 shadow-sm border border-charcoal-100">
+              <div className="w-12 h-12 bg-emerald-50 rounded-xl flex items-center justify-center mb-5">
+                <TrendingUp className="w-6 h-6 text-emerald-600" />
+              </div>
+              <h3 className="text-lg font-semibold text-charcoal-900">Deliver Measurable Results</h3>
+              <p className="mt-3 text-charcoal-600 text-sm leading-relaxed">
+                Export client-ready reports, track project health, and demonstrate the impact of
+                your content strategy with data. Spend your time interpreting results and making
+                strategic recommendations — not compiling spreadsheets.
+              </p>
+            </div>
+          </div>
+
+          <div className="mt-12 text-center">
+            <Link
+              to="/register"
+              className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-primary-500 to-primary-600 hover:from-primary-600 hover:to-primary-700 text-white font-semibold rounded-xl shadow-lg shadow-primary-500/25 hover:shadow-primary-500/40 transition-all duration-200"
+            >
+              Start Automating Today
+              <ArrowRight className="w-5 h-5" />
+            </Link>
+          </div>
+        </div>
+      </section>
+
       {/* Benefits Section */}
       <section className="py-20 lg:py-28 bg-gradient-to-br from-charcoal-900 to-charcoal-800">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -256,7 +326,7 @@ export default function LandingPage() {
               Why Teams Choose Content Strategy Portal
             </h2>
             <p className="mt-4 text-lg text-charcoal-300">
-              Built by content professionals, for content professionals.
+              Spend less time on execution. More time on strategy.
             </p>
           </div>
 
@@ -280,7 +350,7 @@ export default function LandingPage() {
           <div className="text-center max-w-3xl mx-auto mb-16">
             <div className="inline-flex items-center gap-2 px-4 py-2 bg-emerald-50 rounded-full text-emerald-700 text-sm font-medium mb-4">
               <Award className="w-4 h-4" />
-              Trusted by SEO Professionals
+              Trusted by Content Professionals
             </div>
             <h2 className="text-3xl lg:text-4xl font-bold text-charcoal-900">
               Built for Agencies & Enterprise Teams
@@ -300,15 +370,15 @@ export default function LandingPage() {
                 ))}
               </div>
               <p className="text-charcoal-700 leading-relaxed">
-                "The technical audit tool alone has saved our team countless hours.
-                The AI recommendations are surprisingly accurate."
+                "We used to spend half our time on technical audits and metadata.
+                Now AI handles the grunt work and we focus on actual content strategy."
               </p>
               <div className="mt-6 flex items-center gap-3">
                 <div className="w-10 h-10 bg-primary-100 rounded-full flex items-center justify-center">
                   <span className="text-primary-600 font-semibold">JD</span>
                 </div>
                 <div>
-                  <div className="font-medium text-charcoal-900">SEO Director</div>
+                  <div className="font-medium text-charcoal-900">Content Director</div>
                   <div className="text-sm text-charcoal-500">Digital Agency</div>
                 </div>
               </div>
@@ -323,15 +393,15 @@ export default function LandingPage() {
                 ))}
               </div>
               <p className="text-charcoal-700 leading-relaxed">
-                "Finally, a platform that combines project management with actual SEO tools.
-                The checklist feature keeps our team aligned."
+                "The checklist keeps our content strategy organized across 10+ client sites.
+                We stopped dropping balls the day we started using it."
               </p>
               <div className="mt-6 flex items-center gap-3">
                 <div className="w-10 h-10 bg-emerald-100 rounded-full flex items-center justify-center">
                   <span className="text-emerald-600 font-semibold">MK</span>
                 </div>
                 <div>
-                  <div className="font-medium text-charcoal-900">Marketing Manager</div>
+                  <div className="font-medium text-charcoal-900">Content Strategist</div>
                   <div className="text-sm text-charcoal-500">E-commerce Brand</div>
                 </div>
               </div>
@@ -346,16 +416,16 @@ export default function LandingPage() {
                 ))}
               </div>
               <p className="text-charcoal-700 leading-relaxed">
-                "The accessibility analyzer helped us achieve WCAG compliance across
-                all our client sites. Essential for any serious agency."
+                "Accessibility used to be an afterthought. Now it's automated into
+                every project from day one. That's a better content strategy."
               </p>
               <div className="mt-6 flex items-center gap-3">
                 <div className="w-10 h-10 bg-violet-100 rounded-full flex items-center justify-center">
                   <span className="text-violet-600 font-semibold">AS</span>
                 </div>
                 <div>
-                  <div className="font-medium text-charcoal-900">Technical Lead</div>
-                  <div className="text-sm text-charcoal-500">Web Development Agency</div>
+                  <div className="font-medium text-charcoal-900">Head of Content</div>
+                  <div className="text-sm text-charcoal-500">SaaS Company</div>
                 </div>
               </div>
             </div>

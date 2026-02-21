@@ -272,7 +272,7 @@ export default function FeaturesPage() {
               All Tools Work Together
             </h2>
             <p className="mt-4 text-lg text-charcoal-600">
-              Unlike separate point solutions, all our tools are integrated into one cohesive platform.
+              One platform automates the technical busywork so you can focus on content strategy.
             </p>
           </div>
 
@@ -312,10 +312,10 @@ export default function FeaturesPage() {
       <section className="py-20 lg:py-28 bg-gradient-to-br from-primary-500 to-primary-700">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h2 className="text-3xl lg:text-4xl font-bold text-white">
-            Ready to Experience These Features?
+            Ready to Automate Your Content Workflow?
           </h2>
           <p className="mt-4 text-xl text-primary-100">
-            Start using all seven tools today with a free account.
+            Start using all seven tools today. Free account, no credit card required.
           </p>
           <div className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-4">
             <Link

@@ -32,7 +32,7 @@ const STEPS = [
   {
     number: '02',
     title: 'Create Your First Project',
-    description: 'Set up a project to organize your SEO work.',
+    description: 'Set up a project to organize your content workflow.',
     icon: FolderPlus,
     details: [
       'Click "New Project" from the dashboard',
