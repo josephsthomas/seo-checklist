@@ -227,18 +227,17 @@ Summary:
 Top Issues:
 ${issuesSummary}
 
-Create a phased remediation plan. Label all timelines and improvement percentages as rough estimates.
+Create a phased remediation plan. Do NOT provide specific timelines, percentages, or numeric estimates — instead use qualitative descriptions (e.g., "short-term", "moderate improvement"). All plans should be treated as rough guidance requiring validation against actual project resources.
 
 Respond in JSON format only:
 {
   "executiveSummary": "Brief summary of accessibility state",
-  "targetScore": 95,
   "phases": [
     {
       "name": "Phase 1: Critical Fixes",
-      "duration": "1-2 weeks",
+      "duration": "short-term",
       "focus": ["issue type 1", "issue type 2"],
-      "expectedImprovement": "+15% compliance"
+      "expectedImprovement": "significant improvement expected"
     }
   ],
   "quickWins": ["Easy fix 1", "Easy fix 2"],
