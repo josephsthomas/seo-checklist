@@ -1,16 +1,13 @@
-import { useState, useMemo, useDeferredValue, useEffect } from 'react';
+import { useState, useMemo, useDeferredValue } from 'react';
 import { Search, BookOpen, Tag, Link as LinkIcon } from 'lucide-react';
 import { glossaryTerms, glossaryCategories } from '../../data/glossary';
+import SEOHead from '../shared/SEOHead';
 
 export default function GlossaryPage() {
   const [searchQuery, setSearchQuery] = useState('');
   const deferredSearchQuery = useDeferredValue(searchQuery);
   const [selectedCategory, setSelectedCategory] = useState('All');
   const [selectedTerm, setSelectedTerm] = useState(null);
-
-  useEffect(() => {
-    document.title = 'SEO Glossary | Content Strategy Portal';
-  }, []);
 
   const filteredTerms = useMemo(() => {
     return glossaryTerms.filter(term => {
@@ -51,6 +48,7 @@ export default function GlossaryPage() {
 
   return (
     <div className="min-h-screen bg-charcoal-50">
+      <SEOHead pageKey="help/glossary" />
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Header */}
         <div className="mb-8">

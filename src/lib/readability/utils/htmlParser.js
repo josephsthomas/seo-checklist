@@ -96,7 +96,7 @@ function createEmptyResult() {
 
 function extractMetadata(doc) {
   const getMeta = (name) => {
-    const el = doc.querySelector(`meta[name="${name}"]`) || doc.querySelector(`meta[property="${name}"]`);
+    const el = doc.querySelector(`meta[name="${name}" i]`) || doc.querySelector(`meta[property="${name}" i]`);
     return el?.getAttribute('content') || '';
   };
 
@@ -213,7 +213,8 @@ function extractLinks(doc) {
   return Array.from(doc.querySelectorAll('a[href]')).map(a => {
     const href = a.getAttribute('href') || '';
     const isFragment = href.startsWith('#');
-    const isRelative = href.startsWith('/') || href.startsWith('./');
+    const isProtocolRelative = href.startsWith('//');
+    const isRelative = !isProtocolRelative && (href.startsWith('/') || href.startsWith('./'));
     let isInternal = isFragment || isRelative;
     // Absolute URLs: check if same origin as page
     if (!isInternal && !isFragment) {

@@ -90,7 +90,14 @@ export function validateReadabilityUrl(input) {
     return { valid: false, url: null, reason: 'Non-standard ports are not allowed. Only ports 80 and 443 are supported.' };
   }
 
-  return { valid: true, url: parsed.href, reason: null };
+  // Normalize trailing slash for consistent URL comparison
+  let normalizedHref = parsed.href;
+  if (parsed.pathname !== '/' && parsed.pathname.endsWith('/')) {
+    parsed.pathname = parsed.pathname.slice(0, -1);
+    normalizedHref = parsed.href;
+  }
+
+  return { valid: true, url: normalizedHref, reason: null };
 }
 
 /**

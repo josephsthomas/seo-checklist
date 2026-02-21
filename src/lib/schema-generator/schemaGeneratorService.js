@@ -539,6 +539,8 @@ export function validateSchema(jsonLd) {
   if (type === 'FAQPage') {
     if (!jsonLd.mainEntity || !Array.isArray(jsonLd.mainEntity)) {
       errors.push('FAQPage requires mainEntity array');
+    } else if (jsonLd.mainEntity.length === 0) {
+      errors.push('FAQPage mainEntity array must not be empty');
     }
   }
 
