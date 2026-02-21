@@ -300,7 +300,10 @@ export function downloadPDF(doc, filename = 'seo-checklist.pdf') {
 export function previewPDF(doc) {
   const blob = doc.output('blob');
   const url = URL.createObjectURL(blob);
-  const win = window.open(url, '_blank', 'noopener');
+  const win = window.open(url, '_blank', 'noopener,noreferrer');
+  if (win) {
+    win.document.title = 'Content Checklist Report — PDF Preview';
+  }
   // Revoke after a generous delay to ensure the browser has loaded the blob
   setTimeout(() => URL.revokeObjectURL(url), 60000);
 }
