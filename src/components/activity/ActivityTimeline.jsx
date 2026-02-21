@@ -82,7 +82,7 @@ const ACTIVITY_CATEGORIES = [
   { id: 'all', label: 'All Activity' },
   { id: 'projects', label: 'Projects', types: ['project.created', 'project.updated', 'project.completed'] },
   { id: 'checklist', label: 'Checklist', types: ['checklist.item_completed', 'checklist.item_uncompleted'] },
-  { id: 'tools', label: 'Tools', types: ['audit.created', 'audit.shared', 'accessibility.scan', 'imagealt.generated', 'meta.generated', 'schema.generated'] },
+  { id: 'tools', label: 'Tools', types: ['audit.created', 'audit.shared', 'accessibility.scan', 'imagealt.generated', 'meta.generated', 'schema.generated', 'readability.analyzed'] },
   { id: 'collaboration', label: 'Collaboration', types: ['comment.added', 'team.member_added', 'team.member_removed'] },
   { id: 'files', label: 'Files', types: ['file.uploaded', 'file.downloaded'] }
 ];

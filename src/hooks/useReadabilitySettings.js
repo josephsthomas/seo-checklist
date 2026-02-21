@@ -60,7 +60,9 @@ export function useReadabilitySettings() {
     if (!currentUser) return;
 
     let newSettings;
+    let previousSettings;
     setSettings(prev => {
+      previousSettings = prev;
       newSettings = { ...prev, ...updates };
       return newSettings;
     });
@@ -74,6 +76,10 @@ export function useReadabilitySettings() {
     } catch (err) {
       console.error('Could not save readability settings:', err);
       setError(err.message);
+      // Revert to previous settings on failure
+      if (previousSettings) {
+        setSettings(previousSettings);
+      }
       toast.error('Failed to save settings. Please try again.');
     }
   }, [currentUser]);

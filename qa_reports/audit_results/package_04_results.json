@@ -1,0 +1,17 @@
+{
+  "package": 4,
+  "total": 30,
+  "verified_fixed": 28,
+  "not_fixed": 1,
+  "partially_fixed": 1,
+  "fixed_now": 0,
+  "legitimately_skipped": 0,
+  "details": {
+    "NOT_FIXED": [
+      {"bug_id": "R04-208", "evidence": "createNotification in useNotifications.js still accepts raw type with no validation against NOTIFICATION_TYPES"}
+    ],
+    "PARTIALLY_FIXED": [
+      {"bug_id": "R08-C-010", "evidence": "createProject checks permissions but does not enforce initial status field"}
+    ]
+  }
+}

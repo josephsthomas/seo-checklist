@@ -6,7 +6,7 @@ import { lazy } from 'react';
 import { logError } from './logger';
 
 const MAX_RETRIES = 3;
-const RETRY_DELAY = 1000;
+const INITIAL_RETRY_DELAY = 1000;
 
 /**
  * Wrap React.lazy with retry logic for chunk loading failures
@@ -29,8 +29,10 @@ async function retryImport(importFn, moduleName, retriesLeft = MAX_RETRIES) {
       error.message?.includes('dynamically imported module');
 
     if (isChunkError && retriesLeft > 0) {
-      // Wait before retrying
-      await new Promise(resolve => setTimeout(resolve, RETRY_DELAY));
+      // Wait with exponential backoff before retrying
+      const attempt = MAX_RETRIES - retriesLeft;
+      const delay = INITIAL_RETRY_DELAY * Math.pow(2, attempt);
+      await new Promise(resolve => setTimeout(resolve, delay));
       return retryImport(importFn, moduleName, retriesLeft - 1);
     }
 
