@@ -4,14 +4,26 @@
  */
 
 const express = require('express');
+const admin = require('firebase-admin');
 const { getConfiguredProviders } = require('../utils/providers');
 
 const router = express.Router();
 const startTime = Date.now();
 
-router.get('/', (req, res) => {
+router.get('/', async (req, res) => {
   const providers = getConfiguredProviders();
   const memUsage = process.memoryUsage();
+
+  // Lightweight Firebase connectivity check
+  let firebaseStatus = 'not_configured';
+  if (admin.apps.length > 0) {
+    try {
+      await admin.auth().listUsers(1);
+      firebaseStatus = 'connected';
+    } catch {
+      firebaseStatus = 'error';
+    }
+  }
 
   res.json({
     status: 'ok',
@@ -22,7 +34,7 @@ router.get('/', (req, res) => {
       anthropic: providers.anthropic ? 'configured' : 'not_configured',
       openai: providers.openai ? 'configured' : 'not_configured',
       gemini: providers.gemini ? 'configured' : 'not_configured',
-      firebase: process.env.FIREBASE_SERVICE_ACCOUNT_KEY ? 'configured' : 'not_configured'
+      firebase: firebaseStatus
     },
     memory: {
       heapUsedMB: Math.round(memUsage.heapUsed / 1024 / 1024),
