@@ -711,8 +711,8 @@ export default function AccessibilityDashboard({ auditResults, domainInfo, onNew
                             </h4>
                             <div className="bg-white rounded-xl border border-charcoal-200 overflow-hidden">
                               <ul className="divide-y divide-charcoal-100 max-h-60 overflow-y-auto">
-                                {issue.urls.slice(0, 10).map((urlData, idx) => (
-                                  <li key={idx} className="px-4 py-2.5 hover:bg-charcoal-50 transition-colors">
+                                {issue.urls.slice(0, 10).map((urlData) => (
+                                  <li key={urlData.address} className="px-4 py-2.5 hover:bg-charcoal-50 transition-colors">
                                     <a
                                       href={urlData.address}
                                       target="_blank"
@@ -754,8 +754,8 @@ export default function AccessibilityDashboard({ auditResults, domainInfo, onNew
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-charcoal-100">
-                  {worstPages.map((page, idx) => (
-                    <tr key={idx} className="hover:bg-charcoal-50 transition-colors">
+                  {worstPages.map((page) => (
+                    <tr key={page.address} className="hover:bg-charcoal-50 transition-colors">
                       <td className="px-4 py-3">
                         <a
                           href={page.address}
