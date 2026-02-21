@@ -366,7 +366,7 @@ export default function HelpCenterPage() {
             See for yourself. It's free.
           </h2>
           <p className="mt-4 text-xl text-emerald-100">
-            Create your free account and start using all seven tools today.
+            Create your free account and start using every tool today.
           </p>
           <div className="mt-10">
             <Link

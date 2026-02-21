@@ -103,7 +103,7 @@ export default function AboutPage() {
                   metadata writing, accessibility checks — than on actual strategy.
                 </p>
                 <p>
-                  We set out to automate the minutiae. Seven integrated tools handle the
+                  We set out to automate the minutiae. Our integrated tools handle the
                   technical busywork so content teams can focus on what they do best:
                   planning, creating, and delivering content that drives results.
                 </p>
@@ -121,8 +121,8 @@ export default function AboutPage() {
                   <div className="mt-1 text-sm text-charcoal-600">Checklist Items</div>
                 </div>
                 <div className="text-center">
-                  <div className="text-4xl font-bold text-primary-600">7</div>
-                  <div className="mt-1 text-sm text-charcoal-600">Integrated Tools</div>
+                  <div className="text-4xl font-bold text-primary-600">40+</div>
+                  <div className="mt-1 text-sm text-charcoal-600">Schema Types</div>
                 </div>
                 <div className="text-center">
                   <div className="text-4xl font-bold text-primary-600">93</div>

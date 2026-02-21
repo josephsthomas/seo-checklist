@@ -265,6 +265,17 @@ export default function PublicNavigation() {
             >
               About
             </Link>
+
+            <Link
+              to="/contact"
+              className={`px-4 py-2 text-sm font-medium rounded-lg transition-colors ${
+                location.pathname === '/contact'
+                  ? 'text-primary-600 bg-primary-50'
+                  : 'text-charcoal-600 hover:text-charcoal-900 hover:bg-charcoal-50'
+              }`}
+            >
+              Contact
+            </Link>
           </div>
 
           {/* Auth Buttons */}
@@ -375,6 +386,15 @@ export default function PublicNavigation() {
                 }`}
               >
                 About
+              </Link>
+
+              <Link
+                to="/contact"
+                className={`block px-4 py-3 rounded-xl font-medium ${
+                  location.pathname === '/contact' ? 'bg-primary-50 text-primary-600' : 'text-charcoal-700 hover:bg-charcoal-50'
+                }`}
+              >
+                Contact
               </Link>
             </div>
 

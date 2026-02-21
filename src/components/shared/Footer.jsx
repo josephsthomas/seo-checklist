@@ -39,7 +39,7 @@ export default function Footer() {
               </div>
             </Link>
             <p className="text-charcoal-300 text-sm max-w-md leading-relaxed">
-              Seven tools for content teams who are done with spreadsheet wrangling.
+              Built for content teams who are done with spreadsheet wrangling.
             </p>
           </div>
 
@@ -112,6 +112,11 @@ export default function Footer() {
               <li>
                 <Link to="/about" className="text-charcoal-400 hover:text-white text-sm transition-colors duration-200">
                   About
+                </Link>
+              </li>
+              <li>
+                <Link to="/contact" className="text-charcoal-400 hover:text-white text-sm transition-colors duration-200">
+                  Contact
                 </Link>
               </li>
               <li>

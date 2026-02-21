@@ -334,7 +334,7 @@ export default function GettingStartedPage() {
             >
               <h3 className="text-lg font-semibold text-white">All Features</h3>
               <p className="mt-2 text-charcoal-400">
-                Discover all seven tools and how they work together.
+                Discover all our tools and how they work together.
               </p>
               <span className="mt-4 inline-flex items-center gap-1 text-primary-400 font-medium">
                 View features <ArrowRight className="w-4 h-4" />

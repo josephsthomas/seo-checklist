@@ -27,7 +27,7 @@ export const defaultMeta = {
 export const pageSEO = {
   home: {
     title: 'Content Strategy & SEO Tools for Agencies | Content Strategy Portal',
-    description: 'Plan projects with 353-item checklists, run technical audits in minutes, ensure WCAG accessibility compliance, and analyze AI readability. 7 integrated tools for teams managing content at scale.',
+    description: 'Plan projects with 353-item checklists, run technical audits in minutes, ensure WCAG accessibility compliance, and analyze AI readability. Integrated tools for teams managing content at scale.',
     canonical: '/',
     keywords: 'content strategy tools, SEO project management, technical SEO audit, content checklist, WCAG compliance, AI readability'
   },
@@ -40,7 +40,7 @@ export const pageSEO = {
   },
 
   features: {
-    title: '7 Content Strategy Tools: Planner, Audits, Accessibility & More | Content Strategy Portal',
+    title: 'Content Strategy Tools: Planner, Audits, Accessibility & More | Content Strategy Portal',
     description: 'Explore our integrated content strategy suite: Content Planner (353-item checklist), Technical Audit (31 categories), Accessibility Analyzer (WCAG 2.2), Meta Generator, Schema Generator, Image Alt Generator, and AI Readability Checker.',
     canonical: '/features',
     keywords: 'content strategy tools, content planner, technical audit tool, accessibility checker, meta generator, schema markup, AI readability'
@@ -128,6 +128,13 @@ export const pageSEO = {
     description: 'Sign in to your Content Strategy Portal account to access your SEO projects, audits, and tools.',
     canonical: '/login',
     noindex: true
+  },
+
+  contact: {
+    title: 'Contact Us | Content Strategy Portal',
+    description: 'Get in touch with the Content Strategy Portal team. Submit feature requests, report bugs, or ask questions about our content strategy tools.',
+    canonical: '/contact',
+    keywords: 'contact content strategy portal, support, feature request, bug report'
   },
 
   register: {

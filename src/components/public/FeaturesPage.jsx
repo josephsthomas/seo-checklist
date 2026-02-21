@@ -192,10 +192,10 @@ export default function FeaturesPage() {
           <div className="text-center max-w-3xl mx-auto">
             <div className="inline-flex items-center gap-2 px-4 py-2 bg-primary-50 border border-primary-200 rounded-full text-primary-700 text-sm font-medium mb-8">
               <Zap className="w-4 h-4" />
-              7 Powerful Tools
+              All Features
             </div>
             <h1 className="text-4xl sm:text-5xl font-bold text-charcoal-900 tracking-tight">
-              Seven Tools. One Platform. Zero Busywork.
+              Every Tool You Need. Zero Busywork.
             </h1>
             <p className="mt-6 text-xl text-charcoal-600 leading-relaxed">
               Planning, auditing, accessibility, metadata, schema, alt text, and AI readability —
@@ -321,7 +321,7 @@ export default function FeaturesPage() {
       <section className="py-20 lg:py-28 bg-gradient-to-br from-primary-500 to-primary-700">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h2 className="text-3xl lg:text-4xl font-bold text-white">
-            Try all seven tools free. Right now.
+            Try every tool free. Right now.
           </h2>
           <p className="mt-4 text-xl text-primary-100">
             No credit card. No sales calls. No commitment.

@@ -85,7 +85,7 @@ const STATS = [
   { value: '10+', label: 'Hours Saved Weekly' },
   { value: '353', label: 'Points of Quality Assurance' },
   { value: '93', label: 'Accessibility Checks Automated' },
-  { value: '7', label: 'Tools, One Login' },
+  { value: '40+', label: 'Schema Types Supported' },
 ];
 
 export default function LandingPage() {
@@ -123,7 +123,7 @@ export default function LandingPage() {
           <div className="text-center max-w-4xl mx-auto">
             <div className="inline-flex items-center gap-2 px-4 py-2 bg-primary-50 border border-primary-200 rounded-full text-primary-700 text-sm font-medium mb-8">
               <Zap className="w-4 h-4" aria-hidden="true" />
-              7 tools. One content strategy platform.
+              Your complete content strategy platform.
             </div>
 
             <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-charcoal-900 tracking-tight leading-tight">
@@ -150,7 +150,7 @@ export default function LandingPage() {
                 to="/features"
                 className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-8 py-4 bg-white hover:bg-charcoal-50 text-charcoal-700 font-semibold rounded-xl border border-charcoal-200 transition-colors"
               >
-                See What 7 Tools Replace
+                Explore Our Tools
               </Link>
             </div>
 
@@ -192,7 +192,7 @@ export default function LandingPage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center max-w-3xl mx-auto mb-16">
             <h2 className="text-3xl lg:text-4xl font-bold text-charcoal-900">
-              Seven Tools That Replace Your Spreadsheet Stack
+              The Tools That Replace Your Spreadsheet Stack
             </h2>
             <p className="mt-4 text-lg text-charcoal-600">
               Planning, auditing, accessibility, metadata, schema, alt text, and AI readability — integrated in one platform.
