@@ -36,6 +36,10 @@ function getApiConfig() {
   }
 
   if (apiKey) {
+    if (import.meta.env.PROD) {
+      console.error('Direct API key usage is not allowed in production. Configure VITE_AI_PROXY_URL instead.');
+      return null;
+    }
     return { useProxy: false, apiKey };
   }
 
@@ -119,8 +123,8 @@ async function extractFromDocx(file) {
 async function extractFromPdf(file) {
   const pdfjsLib = await import('pdfjs-dist');
 
-  // Set worker source
-  pdfjsLib.GlobalWorkerOptions.workerSrc = `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjsLib.version}/pdf.worker.min.js`;
+  // Set worker source — self-hosted to avoid external CDN dependency
+  pdfjsLib.GlobalWorkerOptions.workerSrc = new URL('pdfjs-dist/build/pdf.worker.min.mjs', import.meta.url).toString();
 
   const arrayBuffer = await file.arrayBuffer();
   const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
