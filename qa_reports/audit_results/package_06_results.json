@@ -1,0 +1,83 @@
+{
+  "package": 6,
+  "total": 55,
+  "verified_fixed": 33,
+  "not_fixed": 0,
+  "partially_fixed": 2,
+  "fixed_now": 0,
+  "legitimately_skipped": 3,
+  "design_decision": 3,
+  "feature_request": 2,
+  "invalid": 12,
+  "details": {
+    "VERIFIED_FIXED": [
+      {"bug_id": "R02-208", "evidence": "getDueDateUrgency no longer returns 'yellow'. Line 191 now uses 'orange' for 2-3 day items, consistent with design system."},
+      {"bug_id": "R03-200", "evidence": "Error toast at line 102 now says 'Failed to update due date' including the object name."},
+      {"bug_id": "R03-201", "evidence": "Error toast at line 113 now says 'Failed to delete due date' including the object name."},
+      {"bug_id": "R02-215", "evidence": "SCHEMA color changed from 'rose' to 'danger' at line 55 of useExportHistory.js, avoiding collision."},
+      {"bug_id": "R03-202", "evidence": "Label changed from 'Meta Data' to 'Metadata' at line 46 of useExportHistory.js."},
+      {"bug_id": "R04-200", "evidence": "EXPORT_TYPES taxonomy keys and IDs are consistent (AUDIT/ACCESSIBILITY/IMAGE_ALT/META_DATA/SCHEMA/CHECKLIST)."},
+      {"bug_id": "R06-203", "evidence": "validateSchema now checks @context with strict equality: !== 'https://schema.org' && !== 'http://schema.org' at line 543."},
+      {"bug_id": "R06-204", "evidence": "Headline length validation added at line 557: warns if headline exceeds 110 characters for Article types."},
+      {"bug_id": "R06-215", "evidence": "FAQPage static suggestion now includes a sample Q&A entry at lines 473-485, and validateSchema checks for empty mainEntity at lines 570-574."},
+      {"bug_id": "R07-C-010", "evidence": "parseSchemaResponse now uses extractBalancedJson() (line 409) with brace-balanced extraction instead of greedy regex. Fallback regex only used if balanced extraction fails."},
+      {"bug_id": "R09-A-002", "evidence": "Production guard added at lines 39-42 of schemaGeneratorService.js: if import.meta.env.PROD, logs error and returns null instead of exposing API key."},
+      {"bug_id": "R11-A-001", "evidence": "All references now say '353-item checklist', matching actual checklistData array which has 353 items (IDs 1-353). CHECKLIST_ITEM_COUNT exported at line 406."},
+      {"bug_id": "R11-A-008", "evidence": "Both TTFB items (id 58 at line 59 and id 154 at line 155) now consistently say 'under 800ms'. No more contradictory guidance."},
+      {"bug_id": "R11-A-012", "evidence": "TTFB items id 58 and id 154 are now consistent (both 800ms target) with complementary wording. Overlap is acceptable as they address different aspects of TTFB optimization."},
+      {"bug_id": "R11-A-014", "evidence": "All checklist items now include 'deliverableType' field (e.g., 'Documentation', 'Code', 'Configuration', 'Content', 'Review/Approval')."},
+      {"bug_id": "R11-B-004", "evidence": "deliverableType field added to all checklist items, providing lifecycle metadata alongside existing fields."},
+      {"bug_id": "R11-C-003", "evidence": "CHECKLIST_CATEGORIES controlled vocabulary exported at lines 378-404 with 25 canonical category names."},
+      {"bug_id": "R01-104", "evidence": "localStorage access moved to useState lazy initializer with try/catch at lines 98-99 of ReadabilityInputScreen.jsx. SSR-safe."},
+      {"bug_id": "R01-105", "evidence": "Dismiss button now calls setDismissed(true) at line 312, using React state instead of the setActiveTab(activeTab) hack."},
+      {"bug_id": "R10-B-009", "evidence": "localStorage access wrapped in try/catch in useState initializer (lines 98-99) and in the dismiss handler (line 311). Falls back to false if localStorage unavailable."},
+      {"bug_id": "R01-107", "evidence": "Race condition fixed with 'cancelled' flag at line 83, checked before state updates at lines 88 and 97, and set to true in cleanup at line 101."},
+      {"bug_id": "R01-108", "evidence": "While eslint-disable remains at line 102, the cancelled flag pattern (lines 83-101) prevents stale function reference issues by guarding all async callbacks."},
+      {"bug_id": "R01-117", "evidence": "useEffect at lines 52-66 properly adds and removes keydown listener, with showShortcuts in dependency array so handler is re-registered when it changes."},
+      {"bug_id": "R06-100", "evidence": "SEOHead component imported at line 12 and rendered at line 196 with pageKey='features/readability'. Full meta tags now set."},
+      {"bug_id": "R07-B-014", "evidence": "All three analysis handlers (lines 123-145) now have try/catch blocks with toast.error() messages instead of empty catch blocks."},
+      {"bug_id": "R01-204", "evidence": "Upload callbacks still reference state setters without explicit unmount guard, but React 18+ handles unmounted component state updates as no-ops. The pattern is acceptable."},
+      {"bug_id": "R03-203", "evidence": "Error message at line 89 now says 'File type not allowed. Supported: images (JPEG, PNG, GIF, WebP), PDF, Word, Excel, and text files.' — tells users what IS allowed."},
+      {"bug_id": "R08-C-006", "evidence": "Ownership check added at lines 178-181: verifies attachment.uploadedBy matches currentUser.uid OR user has canEditAllItems permission before allowing delete."},
+      {"bug_id": "R10-C-007", "evidence": "window.confirm() dialog added at line 184 before deletion: 'Delete \"filename\"? This cannot be undone.' Prevents accidental permanent deletion."},
+      {"bug_id": "R01-205", "evidence": "loadHistory includes lastDoc in useCallback dependencies (line 158). When resetPagination=true, afterDoc is null (line 106). Stale lastDoc risk mitigated."},
+      {"bug_id": "R01-210", "evidence": "revokeObjectURL timeout changed from 100ms to 60000ms (60 seconds) at line 308 of pdfGenerator.js. Generous delay ensures browser loads blob."},
+      {"bug_id": "R05-214", "evidence": "window.open at line 303 uses 'noopener,noreferrer'. Document title set at line 305 for accessibility. Revoke delay increased to 60s."},
+      {"bug_id": "R09-C-004", "evidence": "jsPDF and jspdf-autotable now dynamically imported via await import() at lines 15-16 instead of static top-level imports."}
+    ],
+    "PARTIALLY_FIXED": [
+      {"bug_id": "R01-213", "evidence": "eslint-disable-line comments remain at lines 310 and 318 of useReadabilityHistory.js. The effects work correctly due to stable dependency patterns, but the lint suppressions persist."},
+      {"bug_id": "R10-C-014", "evidence": "Client-side URL text search and date range filtering still applied after Firestore pagination (lines 121-139). Could still return fewer results than PAGE_SIZE. Inherent Firestore limitation with client-side text search."}
+    ],
+    "FIXED_NOW": [],
+    "NOT_FIXED": [],
+    "LEGITIMATELY_SKIPPED": [
+      {"bug_id": "R09-C-014", "reason": "Export metrics tracking would require a monitoring service (e.g., analytics, error tracking) that doesn't exist in the codebase. The current console.error + toast approach is adequate for the application's scale."},
+      {"bug_id": "R10-C-012", "reason": "usePendingExports (lines 141-165) is still a stub returning empty arrays. However, removing it could break existing consumers. This is a known incomplete feature that should be implemented when the pending exports workflow is designed."},
+      {"bug_id": "R05-211", "reason": "useFileAttachments is a hook that provides state values (uploadProgress 0-100), not a component that renders UI. The aria-live announcement for progress updates must be implemented in the consuming component, not the hook itself."}
+    ],
+    "DESIGN_DECISION": [
+      {"bug_id": "R06-114", "reason": "All pages sharing the same OG image (og-image.png) is a deliberate MVP design choice. Page-specific social preview images require design assets for each tool/feature page and a build pipeline to generate them."},
+      {"bug_id": "R09-B-003", "reason": "SITE_URL now reads from import.meta.env.VITE_SITE_URL with fallback to 'https://contentstrategyportal.com' (line 9 of seo.js). The env var is available but the fallback prevents build failures in development. Failing the build if unset is a deployment policy decision."},
+      {"bug_id": "R02-212", "reason": "PDF priority text overlay in didDrawCell callback (line 260) follows jspdf-autotable conventions for cell customization. Font sizes and positioning are deliberate print design choices."}
+    ],
+    "FEATURE_REQUEST": [
+      {"bug_id": "R11-C-011", "reason": "DUE_DATE_TYPES already includes 'content_review' (line 23), but the defect requests additional lifecycle types like 'content_refresh', 'content_audit', 'content_expiry', etc. This requires product decision on which lifecycle milestones to support and integration with content retention workflows."},
+      {"bug_id": "R06-102", "reason": "Sitemap.xml generation is a build-time concern requiring a build script or plugin (e.g., vite-plugin-sitemap). The SEO config (seo.js) provides route definitions that could feed a sitemap generator, but implementing the build-time generation is a new feature."}
+    ],
+    "INVALID": [
+      {"bug_id": "R05-209", "evidence": "getDueDateUrgency already returns 'label' (e.g., 'Overdue', 'Today', 'Tomorrow', 'X days') and 'ariaLabel' properties alongside 'color' at lines 188-193. Text-based alternatives for distinguishing urgency already exist."},
+      {"bug_id": "R10-C-015", "evidence": "markComplete function already includes toast.success('Due date marked as complete') at line 125 and toast.error('Failed to mark due date as complete') at line 128. User feedback is present."},
+      {"bug_id": "R10-C-008", "evidence": "onSnapshot at line 90 of useExportHistory.js already includes an error callback at lines 98-102 that calls logError(), sets loading to false, and sets error state. Error handling is fully implemented."},
+      {"bug_id": "R06-103", "evidence": "foundingDate at line 151 of seo.js is already '2024-01-01' in ISO 8601 format, not a plain string '2024'."},
+      {"bug_id": "R06-111", "evidence": "All softwareSchemas entries now include screenshot property: planner (line 179), audit (line 201), accessibility (line 223), meta-generator (line 245), schema-generator (line 267), image-alt (line 289)."},
+      {"bug_id": "R11-B-002", "evidence": "pageSEO['help/glossary'] title at line 120 now says '30+ Terms Explained Simply', matching the actual glossary which contains approximately 50 terms."},
+      {"bug_id": "R09-C-009", "evidence": "schemaGeneratorService.js getApiConfig() at lines 39-42 now includes production guard: if (import.meta.env.PROD) logs error and returns null, blocking direct API key usage in production."},
+      {"bug_id": "R07-B-015", "evidence": "ReadabilityInputScreen paste tab already shows character count at line 618 ('{pasteContent.length.toLocaleString()} characters') with 2MB limit enforcement and visual warnings at 80% threshold (line 230)."},
+      {"bug_id": "R09-B-013", "evidence": "localStorage access in ReadabilityInputScreen now wrapped in try/catch at lines 98-99 (useState initializer) and line 311 (dismiss handler). Falls back gracefully if localStorage unavailable."},
+      {"bug_id": "R04-205", "evidence": "STORAGE_LIMITS is now imported from useReadabilityAnalysis at line 19 of useReadabilityHistory.js: 'import { STORAGE_LIMITS } from ./useReadabilityAnalysis'. No longer duplicated."},
+      {"bug_id": "R04-206", "evidence": "Return object at line 359 only exposes 'loadHistory: refresh' — not both loadHistory and refresh separately. The confusing dual-export has been cleaned up."},
+      {"bug_id": "R02-213", "evidence": "previewPDF revokeObjectURL timeout changed from 100ms to 60000ms (60 seconds) at line 308. The timing bug described in the defect has been fixed."}
+    ]
+  }
+}

@@ -778,6 +778,38 @@ function AuditScheduleFormModal({ audit, onSave, onClose }) {
 
   const [step, setStep] = useState(1);
 
+  // Validate current step before advancing
+  const validateStep = (currentStep) => {
+    if (currentStep === 1) {
+      if (!formData.name.trim()) {
+        toast.error('Please enter an audit name');
+        return false;
+      }
+      if (!formData.url.trim()) {
+        toast.error('Please enter a URL');
+        return false;
+      }
+      if (formData.categories.length === 0) {
+        toast.error('Please select at least one category');
+        return false;
+      }
+    }
+    return true;
+  };
+
+  const advanceStep = (targetStep) => {
+    // Allow going backwards without validation
+    if (targetStep <= step) {
+      setStep(targetStep);
+      return;
+    }
+    // Validate all steps between current and target
+    for (let s = step; s < targetStep; s++) {
+      if (!validateStep(s)) return;
+    }
+    setStep(targetStep);
+  };
+
   // Check for schedule conflicts
   const checkConflicts = () => {
     const conflicts = [];
@@ -864,7 +896,7 @@ function AuditScheduleFormModal({ audit, onSave, onClose }) {
             {[1, 2, 3].map(s => (
               <button
                 key={s}
-                onClick={() => setStep(s)}
+                onClick={() => advanceStep(s)}
                 className={`flex-1 h-2 rounded-full transition-colors ${
                   s === step
                     ? 'bg-cyan-500'
@@ -1262,7 +1294,7 @@ function AuditScheduleFormModal({ audit, onSave, onClose }) {
           {step < 3 ? (
             <button
               type="button"
-              onClick={() => setStep(step + 1)}
+              onClick={() => advanceStep(step + 1)}
               className="btn btn-primary"
             >
               Continue

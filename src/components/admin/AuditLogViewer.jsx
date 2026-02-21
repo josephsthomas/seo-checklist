@@ -19,7 +19,7 @@ import {
   X
 } from 'lucide-react';
 import { format, subDays } from 'date-fns';
-import { collection, query, where, orderBy, limit as fbLimit, getDocs, Timestamp } from 'firebase/firestore';
+import { collection, query, where, orderBy, limit as fbLimit, getDocs, Timestamp, doc, getDoc, setDoc } from 'firebase/firestore';
 import { db } from '../../lib/firebase';
 import toast from 'react-hot-toast';
 import InfoTooltip from '../common/InfoTooltip';
@@ -73,8 +73,24 @@ export default function AuditLogViewer() {
   // Retention settings
   const [showRetentionSettings, setShowRetentionSettings] = useState(false);
   const [retentionPeriod, setRetentionPeriod] = useState('90');
+  const [savingRetention, setSavingRetention] = useState(false);
 
   const ITEMS_PER_PAGE = 25;
+
+  // Load retention policy from Firestore on mount
+  useEffect(() => {
+    const loadRetention = async () => {
+      try {
+        const snap = await getDoc(doc(db, 'app_settings', 'audit_retention'));
+        if (snap.exists()) {
+          setRetentionPeriod(snap.data().period || '90');
+        }
+      } catch (err) {
+        console.error('Failed to load retention policy:', err);
+      }
+    };
+    loadRetention();
+  }, []);
 
   // Calculate date range
   const dateRangeConfig = useMemo(() => {
@@ -710,13 +726,26 @@ export default function AuditLogViewer() {
                   Cancel
                 </button>
                 <button
-                  onClick={() => {
-                    toast.success(`Retention policy updated to ${RETENTION_OPTIONS.find(o => o.value === retentionPeriod)?.label}`);
-                    setShowRetentionSettings(false);
+                  disabled={savingRetention}
+                  onClick={async () => {
+                    setSavingRetention(true);
+                    try {
+                      await setDoc(doc(db, 'app_settings', 'audit_retention'), {
+                        period: retentionPeriod,
+                        updatedAt: new Date()
+                      });
+                      toast.success(`Retention policy updated to ${RETENTION_OPTIONS.find(o => o.value === retentionPeriod)?.label}`);
+                      setShowRetentionSettings(false);
+                    } catch (err) {
+                      console.error('Failed to save retention policy:', err);
+                      toast.error('Failed to save retention policy');
+                    } finally {
+                      setSavingRetention(false);
+                    }
                   }}
                   className="btn btn-primary"
                 >
-                  Save Policy
+                  {savingRetention ? 'Saving...' : 'Save Policy'}
                 </button>
               </div>
             </div>

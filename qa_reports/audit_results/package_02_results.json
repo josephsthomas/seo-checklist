@@ -1,0 +1,23 @@
+{
+  "package": 2,
+  "total": 32,
+  "verified_fixed": 27,
+  "not_fixed": 0,
+  "partially_fixed": 0,
+  "fixed_now": 1,
+  "legitimately_skipped": 1,
+  "design_decision": 0,
+  "feature_request": 0,
+  "invalid": 1,
+  "details": {
+    "FIXED_NOW": [
+      {"bug_id": "R10-A-007", "evidence": "Retention Save Policy button now persists to Firestore app_settings/audit_retention with loading state and error handling"}
+    ],
+    "LEGITIMATELY_SKIPPED": [
+      {"bug_id": "R01-004", "reason": "Export handlers are leaf-node onClick handlers, useCallback adds complexity with negligible perf benefit"}
+    ],
+    "INVALID": [
+      {"bug_id": "R08-A-006", "evidence": "Defect claims TODO placeholder but audit logging is fully implemented with Firestore queries and logAuditEvent utility"}
+    ]
+  }
+}

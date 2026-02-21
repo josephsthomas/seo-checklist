@@ -63,6 +63,7 @@ export function useProjects() {
     try {
       const docRef = await addDoc(collection(db, 'projects'), {
         ...projectData,
+        status: projectData.status || 'active',
         ownerId: currentUser.uid,
         createdAt: serverTimestamp(),
         updatedAt: serverTimestamp()

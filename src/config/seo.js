@@ -48,7 +48,7 @@ export const pageSEO = {
 
   'features/planner': {
     title: 'Content Planner - 353-Item SEO Checklist & Project Management | CSP',
-    description: 'Manage SEO projects with our comprehensive 353-item checklist. Track progress across 8 phases, collaborate with teams, and export branded PDF/Excel reports. Free tier available.',
+    description: 'Manage SEO projects with our comprehensive 353-item checklist. Track progress across 6 phases, collaborate with teams, and export branded PDF/Excel reports. Free tier available.',
     canonical: '/features/planner',
     keywords: 'SEO checklist, content planner, SEO project management, website launch checklist'
   },
@@ -241,13 +241,14 @@ export const softwareSchemas = {
       'Social card preview',
       'Bulk generation',
       'Character validation'
-    ]
+    ],
+    screenshot: `${SITE_URL}/screenshots/meta-generator.png`
   },
 
   'schema-generator': {
     '@context': 'https://schema.org',
     '@type': 'SoftwareApplication',
-    name: 'Schema Markup Generator',
+    name: 'Structured Data Generator',
     description: 'Generate valid JSON-LD structured data for 40+ schema types.',
     applicationCategory: 'BusinessApplication',
     operatingSystem: 'Web',
@@ -262,7 +263,8 @@ export const softwareSchemas = {
       'Real-time validation',
       'Rich snippet preview',
       'Copy-ready output'
-    ]
+    ],
+    screenshot: `${SITE_URL}/screenshots/schema-generator.png`
   },
 
   'image-alt': {
@@ -283,7 +285,8 @@ export const softwareSchemas = {
       'WCAG compliance',
       'SEO optimization',
       'EXIF embedding'
-    ]
+    ],
+    screenshot: `${SITE_URL}/screenshots/image-alt.png`
   }
 };
 

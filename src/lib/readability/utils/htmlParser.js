@@ -113,6 +113,7 @@ function extractMetadata(doc) {
     twitterCard: getMeta('twitter:card'),
     twitterTitle: getMeta('twitter:title'),
     twitterDescription: getMeta('twitter:description'),
+    twitterImage: getMeta('twitter:image'),
     author: getMeta('author'),
     datePublished: getMeta('article:published_time') || getMeta('date'),
     dateModified: getMeta('article:modified_time'),

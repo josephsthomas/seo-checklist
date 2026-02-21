@@ -1,0 +1,82 @@
+{
+  "package": 10,
+  "total": 53,
+  "verified_fixed": 39,
+  "not_fixed": 2,
+  "partially_fixed": 1,
+  "fixed_now": 1,
+  "legitimately_skipped": 4,
+  "design_decision": 0,
+  "feature_request": 4,
+  "invalid": 2,
+  "details": {
+    "VERIFIED_FIXED": [
+      {"bug_id": "R02-015", "evidence": "LoginForm.jsx line 42 has dark:from-charcoal-900 dark:to-charcoal-800; line 46 dark:text-primary-400; line 50 dark:bg-charcoal-800 dark:border-charcoal-700; line 128 dark:border-charcoal-600; line 131 dark:bg-charcoal-800 dark:text-charcoal-400"},
+      {"bug_id": "R06-006", "evidence": "LoginForm.jsx line 5 imports SEOHead; line 43 renders <SEOHead pageKey='login' />"},
+      {"bug_id": "R02-104", "evidence": "ReadabilityPDFPreview.jsx backdrop z-[60] (line 153), modal z-[70] (line 165) - different z-index levels resolve stacking conflict"},
+      {"bug_id": "R03-112", "evidence": "ReadabilityPDFPreview.jsx line 519 now reads 'GEO Strategic Brief (Generative Engine Optimization)' - acronym explained in parentheses"},
+      {"bug_id": "R07-B-008", "evidence": "ReadabilityPDFPreview.jsx lines 355-356 contain comprehensive AI disclaimer: 'AI-generated analysis: These LLM previews are approximations of how AI models may interpret this content and do not guarantee actual search engine rankings...'"},
+      {"bug_id": "R02-118", "evidence": "UserSettingsPage.jsx line 300 dark:from-charcoal-900 dark:to-charcoal-800; line 318 dark:bg-charcoal-800 dark:border-charcoal-700; line 363 dark:bg-charcoal-800 dark:border-charcoal-700; sidebar buttons have dark: variants throughout"},
+      {"bug_id": "R10-B-002", "evidence": "UserSettingsPage.jsx lines 183-186 validate profileForm.name.trim() with toast.error('Full Name is required'); input also has required and minLength={2} attributes"},
+      {"bug_id": "R03-013", "evidence": "OnboardingWalkthrough.jsx line 40 now says 'Upload site crawl exports (e.g., from Screaming Frog)' - Screaming Frog presented as example, not requirement"},
+      {"bug_id": "R06-011", "evidence": "GlossaryPage.jsx line 4 imports SEOHead; line 51 renders <SEOHead pageKey='help/glossary' />"},
+      {"bug_id": "R04-101", "evidence": "ReadabilityBenchmarkWidget.jsx line 97 now reads 'Average Score' instead of abbreviated 'Avg Score'"},
+      {"bug_id": "R05-100", "evidence": "ReadabilityBenchmarkWidget.jsx line 86 has role='region' aria-label='Score benchmarks'"},
+      {"bug_id": "R05-101", "evidence": "ReadabilityBenchmarkWidget.jsx lines 104-106 have aria-label with semantic trend direction: 'Trend: up/down/stable +/-N points'"},
+      {"bug_id": "R05-016", "evidence": "AuditHistoryPanel.jsx ComparisonModal close button (line 129) has aria-label='Close comparison'"},
+      {"bug_id": "R06-001", "evidence": "FeatureDetailPage.jsx SCHEMA_KEY_MAP (lines 391-398) maps slugs to keys matching softwareSchemas in seo.js: planner->planner, audit->audit, accessibility->accessibility, meta-generator->meta-generator, schema-generator->schema-generator, image-alt->image-alt"},
+      {"bug_id": "R06-013", "evidence": "SEOHead.jsx lines 25-26: pageCanonical defaults to null (not '/') when no canonical prop or pageKey match; fullCanonicalUrl is null when pageCanonical is null"},
+      {"bug_id": "R06-104", "evidence": "Same as R06-013 - SEOHead.jsx canonical defaults to null, not root URL"},
+      {"bug_id": "R06-113", "evidence": "tools.js line 173 path '/app/schema-generator' matches ReadabilityCrossToolLinks.jsx line 31 path '/app/schema-generator'"},
+      {"bug_id": "R11-B-007", "evidence": "tools.js line 179 says '40+ schema types'; FeatureDetailPage.jsx line 237 says '40+ schema types'; seo.js line 252 says '40+ schema types' - all consistent"},
+      {"bug_id": "R08-A-003", "evidence": "FileUpload.jsx line 210 checks (attachment.uploadedBy === currentUser?.uid || hasPermission(userProfile?.role, 'canEditAllItems')) before showing delete button"},
+      {"bug_id": "R10-A-015", "evidence": "FileUpload.jsx lines 36-41 wrap uploadFile call in try/catch with toast.error('Failed to upload file. Please try again.')"},
+      {"bug_id": "R10-A-001", "evidence": "ProjectCreationWizard.jsx line 172 shows toast.error('Failed to create project. Please try again.') in catch block"},
+      {"bug_id": "R10-A-005", "evidence": "ProjectCreationWizard.jsx lines 124-132 validate targetLaunchDate > startDate and targetLaunchDate > today"},
+      {"bug_id": "R09-A-006", "evidence": "lazyWithRetry.js line 40 uses logError() unconditionally (no import.meta.env.DEV guard) - errors logged in all environments"},
+      {"bug_id": "R09-C-006", "evidence": "Same as R09-A-006 - logError() called without environment check at line 40"},
+      {"bug_id": "R09-A-009", "evidence": "analysisCache.js line 10 MAX_CACHE_ENTRIES=20, line 11 MAX_CACHE_ENTRY_SIZE=512KB; lines 112-115 check size before write; lines 126-147 prune excess entries"},
+      {"bug_id": "R09-C-007", "evidence": "analysisCache.js line 26 now includes content length in hash: `${Math.abs(hash).toString(36)}_${content.length}` - reduces collision risk for large pages sharing first 50K chars"},
+      {"bug_id": "R01-007", "evidence": "UsageAnalyticsDashboard.jsx line 44 refreshKey state; line 128 useEffect depends on refreshKey; line 261 button sets refreshKey(k => k + 1) triggering re-fetch"},
+      {"bug_id": "R05-011", "evidence": "UsageAnalyticsDashboard.jsx line 252 has aria-label='Select date range' on the date range select element"},
+      {"bug_id": "R01-113", "evidence": "useCustomChecklistItems.js lines 25-26 use ref (customItemsRef) to track current items; line 115 reads from customItemsRef.current instead of stale closure"},
+      {"bug_id": "R11-A-007", "evidence": "FeatureDetailPage.jsx line 75 now shows { value: '6', label: 'Project Phases' } - corrected from 8 to 6; seo.js no longer references '8 phases'"},
+      {"bug_id": "R11-B-012", "evidence": "SEOHead.jsx no longer renders keywords meta tag - the seo.keywords line was removed from the component"},
+      {"bug_id": "R08-A-009", "evidence": "ProjectCreationWizard.jsx lines 124-132 validate targetLaunchDate > startDate with error message; skip was incorrect as fix was implemented"},
+      {"bug_id": "R09-B-010", "evidence": "lazyWithRetry.js lines 9, 33-34: INITIAL_RETRY_DELAY=1000; delay=INITIAL_RETRY_DELAY * Math.pow(2, attempt) - exponential backoff implemented"},
+      {"bug_id": "R01-206", "evidence": "useReadabilitySettings.js lines 64-68 use functional updater setSettings(prev => { previousSettings = prev; newSettings = { ...prev, ...updates }; return newSettings }) - eliminates stale closure"},
+      {"bug_id": "R02-009", "evidence": "AccessibilityProcessingScreen.jsx has dark: variants throughout: line 27 dark:from-charcoal-900 dark:to-charcoal-950; line 50 dark:text-white; line 53 dark:text-charcoal-400; line 63 dark:bg-charcoal-700; etc."},
+      {"bug_id": "R05-008", "evidence": "AccessibilityProcessingScreen.jsx lines 65-69 have role='progressbar' aria-valuenow={progress} aria-valuemin={0} aria-valuemax={100} aria-label='Processing progress'"},
+      {"bug_id": "R08-A-016", "evidence": "AuditHistoryPanel.jsx line 230 displayLimit state; line 328 slices to displayLimit; lines 338-344 'Load more' button with remaining count"},
+      {"bug_id": "R09-C-010", "evidence": "storageHelpers.js now uses logError() from centralized logger (lines 50, 66, 70, 97, 112, 336, 384) instead of console.error"},
+      {"bug_id": "R09-B-014", "evidence": "useCustomChecklistItems.js lines 49-53: onSnapshot error callback present with console.error and toast.error for user feedback"}
+    ],
+    "NOT_FIXED": [
+      {"bug_id": "R04-015", "evidence": "GlossaryPage.jsx lines 87-124 still render 3 stat cards (Total Terms, Categories, Filtered Results) above glossary content. The defect requested removal of these meta-statistics that push actual content below the fold."},
+      {"bug_id": "R11-B-010", "evidence": "Schema generator naming still inconsistent: tools.js line 169 says 'Structured Data Generator', FeatureDetailPage.jsx line 233 says 'Schema Generator', seo.js line 251 says 'Schema Markup Generator'. Three different names across three files."}
+    ],
+    "PARTIALLY_FIXED": [
+      {"bug_id": "R05-012", "evidence": "ComparisonModal (AuditHistoryPanel.jsx line 115) now has role='dialog', aria-modal='true', and aria-labelledby='comparison-modal-title'. However, there is still no focus trap implementation and no Escape key handler to close the modal."}
+    ],
+    "FIXED_NOW": [
+      {"bug_id": "R10-C-009", "evidence": "Added toast.success('Settings saved') to useReadabilitySettings.js after successful Firestore write in updateSettings function. Now provides both success confirmation and error feedback with state rollback."}
+    ],
+    "LEGITIMATELY_SKIPPED": [
+      {"bug_id": "R10-A-013", "reason": "LoginForm is intentionally minimal - it handles authentication only. Onboarding is handled by OnboardingWalkthrough component which displays after first login. Adding inline feedback or onboarding to the login form would add unnecessary complexity."},
+      {"bug_id": "R07-A-016", "reason": "OnboardingWalkthrough describes tool features factually ('Get AI-assisted recommendations', 'Get AI-generated fix suggestions'). These are accurate feature descriptions, not AI-generated content claims. The descriptions also include appropriate qualifiers like 'suggestions require professional review'."},
+      {"bug_id": "R11-A-006", "reason": "OnboardingWalkthrough is designed for one-time display on first login. localStorage flag hasCompletedOnboarding controls this. Users can replay from Help menu. Phase names are simplified for onboarding context."},
+      {"bug_id": "R07-A-011", "reason": "FeatureDetailPage content is entirely static/hardcoded, not AI-generated. The feature descriptions now include appropriate disclaimers like 'Suggestions are advisory and require professional review' (line 99) and 'requires professional review' (line 135)."}
+    ],
+    "FEATURE_REQUEST": [
+      {"bug_id": "R08-A-007", "reason": "File upload/deletion audit trail requires new infrastructure for tracking file operations with user, timestamp, and action metadata. Would need a Firestore subcollection or centralized audit log service, which is beyond the scope of the FileUpload component."},
+      {"bug_id": "R08-C-014", "reason": "Detecting and cleaning up orphaned Storage files requires a background process or Cloud Function that cross-references Firestore records with Storage contents. This is an infrastructure feature, not a component fix."},
+      {"bug_id": "R09-B-012", "reason": "Full LRU cache eviction with per-feature storage budgets requires significant rearchitecture of localStorage strategy. The current improved eviction (removing multiple expendable keys + readability cache on quota error) is a reasonable intermediate solution."},
+      {"bug_id": "R09-C-013", "reason": "Analysis cache already has 24-hour TTL (CACHE_DURATION_MS), MAX_CACHE_ENTRIES limit of 20, and MAX_CACHE_ENTRY_SIZE of 512KB. The defect asks for additional size pre-checks which are now implemented. Remaining ask for invalidation on data model changes would require event system integration."}
+    ],
+    "DESIGN_DECISION": [],
+    "INVALID": [
+      {"bug_id": "R06-107", "evidence": "UserSettingsPage heading hierarchy IS correct: h1 'Settings' (line 309), h2 for each section including 'Danger Zone' (line 745), and h3 'Delete Account' (line 754). The h1 > h2 > h3 progression follows proper semantic hierarchy. The defect incorrectly claimed this was wrong."},
+      {"bug_id": "R11-B-014", "evidence": "GlossaryPage relatedTerms work correctly. Lines 187-188 use case-insensitive matching: glossaryTerms.find(t => t.term.toLowerCase() === related.toLowerCase()). When a match is found, lines 192-199 set the selected term and scroll to it. The defect's concern about string mismatch is not valid given the current implementation."}
+    ]
+  }
+}

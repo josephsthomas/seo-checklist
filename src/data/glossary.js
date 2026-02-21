@@ -207,7 +207,7 @@ export const glossaryTerms = [
     definition: "HTML element specifying page title. Shows in search results and browser tabs. Major ranking factor.",
     category: "On-Page SEO",
     relatedTerms: ["Meta Description", "H1 Tag"],
-    example: "<title>Best Running Shoes 2025 - Reviews & Buying Guide</title>"
+    example: "<title>Best Running Shoes - Expert Reviews & Buying Guide</title>"
   },
   {
     id: 27,

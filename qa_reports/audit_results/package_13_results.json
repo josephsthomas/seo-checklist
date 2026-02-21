@@ -1,0 +1,21 @@
+{
+  "package": 13,
+  "total": 27,
+  "verified_fixed": 22,
+  "not_fixed": 0,
+  "partially_fixed": 0,
+  "fixed_now": 0,
+  "legitimately_skipped": 5,
+  "design_decision": 0,
+  "feature_request": 0,
+  "invalid": 0,
+  "details": {
+    "LEGITIMATELY_SKIPPED": [
+      {"bug_id": "R06-116", "reason": "Footer links point to valid routes; adding SEO metadata for legal pages is content decision"},
+      {"bug_id": "R06-214", "reason": "Skip reason accurate — htmlParser fix transitively fixes aiSignals isInternal classification"},
+      {"bug_id": "R07-C-014", "reason": "scoreConfidence already calculates confidence intervals/margin; defect asks for UI feature enhancement"},
+      {"bug_id": "R09-A-019", "reason": "Already resolved — vercel.json with SPA fallback routing has been added"},
+      {"bug_id": "R11-A-011", "reason": "Resource categories cleaned up — empty placeholder categories no longer exist"}
+    ]
+  }
+}

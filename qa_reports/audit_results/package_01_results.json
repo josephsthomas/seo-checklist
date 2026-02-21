@@ -1,0 +1,26 @@
+{
+  "package": 1,
+  "total": 34,
+  "verified_fixed": 20,
+  "not_fixed": 0,
+  "partially_fixed": 0,
+  "fixed_now": 1,
+  "legitimately_skipped": 7,
+  "design_decision": 0,
+  "feature_request": 0,
+  "invalid": 0,
+  "details": {
+    "FIXED_NOW": [
+      {"bug_id": "R09-B-005", "evidence": "Converted 5 eagerly imported components to lazyWithRetry with Suspense wrappers in ReadabilityDashboard.jsx"}
+    ],
+    "LEGITIMATELY_SKIPPED": [
+      {"bug_id": "R05-203", "reason": "CSS cannot enforce ARIA - tablist roles applied in JSX"},
+      {"bug_id": "R05-204", "reason": "CSS cannot enforce ARIA - menu roles applied in JSX"},
+      {"bug_id": "R05-205", "reason": "CSS cannot implement focus trapping - JS behavior"},
+      {"bug_id": "R05-207", "reason": "CSS cannot set aria-label attributes"},
+      {"bug_id": "R05-213", "reason": "CSS cannot enforce nav landmarks or aria-current"},
+      {"bug_id": "R02-201", "reason": "CSS specificity override pattern works correctly for dark mode"},
+      {"bug_id": "R02-209", "reason": "Skip-link positioning follows standard a11y patterns"}
+    ]
+  }
+}

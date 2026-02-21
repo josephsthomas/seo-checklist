@@ -7,6 +7,8 @@ import React, { useState, useCallback, useMemo } from 'react';
 import { Sliders, RotateCcw } from 'lucide-react';
 import toast from 'react-hot-toast';
 
+const WEIGHTS_STORAGE_KEY = 'readability-weight-config';
+
 const DEFAULT_WEIGHTS = {
   contentStructure: 20,
   contentClarity: 25,
@@ -14,6 +16,31 @@ const DEFAULT_WEIGHTS = {
   metadataSchema: 15,
   aiSignals: 20,
 };
+
+function loadPersistedWeights() {
+  try {
+    const stored = localStorage.getItem(WEIGHTS_STORAGE_KEY);
+    if (stored) {
+      const parsed = JSON.parse(stored);
+      // Validate structure matches expected keys
+      const keys = Object.keys(DEFAULT_WEIGHTS);
+      if (keys.every(k => typeof parsed[k] === 'number')) {
+        return parsed;
+      }
+    }
+  } catch {
+    // Ignore parse errors
+  }
+  return null;
+}
+
+function persistWeights(weights) {
+  try {
+    localStorage.setItem(WEIGHTS_STORAGE_KEY, JSON.stringify(weights));
+  } catch {
+    // Ignore storage errors
+  }
+}
 
 const CATEGORY_LABELS = {
   contentStructure: 'Content Structure',
@@ -24,7 +51,9 @@ const CATEGORY_LABELS = {
 };
 
 export default function ReadabilityWeightConfig({ weights, onChange }) {
-  const [localWeights, setLocalWeights] = useState(weights || DEFAULT_WEIGHTS);
+  const [localWeights, setLocalWeights] = useState(
+    weights || loadPersistedWeights() || DEFAULT_WEIGHTS
+  );
 
   const total = useMemo(
     () => Object.values(localWeights).reduce((sum, v) => sum + v, 0),
@@ -40,6 +69,7 @@ export default function ReadabilityWeightConfig({ weights, onChange }) {
   const handleApply = useCallback(() => {
     if (isValid) {
       onChange?.(localWeights);
+      persistWeights(localWeights);
       toast.success('Weights applied successfully');
     }
   }, [localWeights, isValid, onChange]);
@@ -47,6 +77,7 @@ export default function ReadabilityWeightConfig({ weights, onChange }) {
   const handleReset = useCallback(() => {
     setLocalWeights(DEFAULT_WEIGHTS);
     onChange?.(DEFAULT_WEIGHTS);
+    try { localStorage.removeItem(WEIGHTS_STORAGE_KEY); } catch { /* ignore */ }
   }, [onChange]);
 
   return (

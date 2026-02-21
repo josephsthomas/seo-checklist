@@ -1,0 +1,138 @@
+{
+  "package": 8,
+  "total": 28,
+  "verified_fixed": 17,
+  "not_fixed": 0,
+  "partially_fixed": 0,
+  "fixed_now": 0,
+  "legitimately_skipped": 1,
+  "design_decision": 4,
+  "feature_request": 0,
+  "invalid": 6,
+  "details": {
+    "VERIFIED_FIXED": [
+      {
+        "bug_id": "R01-207",
+        "evidence": "Lines 59-64 of aiAnalyzer.js wire the external signal to the local AbortController via addEventListener('abort', ...) and check for already-aborted state."
+      },
+      {
+        "bug_id": "R07-C-012",
+        "evidence": "Lines 42-44 of aiAnalyzer.js subtract TEMPLATE_OVERHEAD (2000 chars) from the 50000 limit before truncating content, reserving space for prompt template and metadata."
+      },
+      {
+        "bug_id": "R07-C-013",
+        "evidence": "Lines 182-208 of aiAnalyzer.js validate numeric fields with type checking, clamping 0-100, default to 50 for non-numbers. String fields are length-checked and truncated. Recommendations validated for required fields and enum values."
+      },
+      {
+        "bug_id": "R01-209",
+        "evidence": "Line 6 of unifiedExportService.js is now a comment. jsPDF (line 138), ExcelJS (line 52, 250), and JSZip (line 220) are all dynamically imported inside their respective functions."
+      },
+      {
+        "bug_id": "R04-212",
+        "evidence": "useReadabilityExport.js line 4 imports from exportHubAdapter, integrating with the centralized export system. Both services use dynamic imports for large libraries."
+      },
+      {
+        "bug_id": "R05-200",
+        "evidence": "Lines 16-17 of unifiedExportService.js add aria-label and aria-hidden='true' to the download anchor. Lines 21-27 create a live region announcement for screen readers."
+      },
+      {
+        "bug_id": "R09-C-003",
+        "evidence": "Same as R01-209 - all large library imports (jsPDF, ExcelJS, JSZip) are now dynamic imports inside their respective export functions, not at module level."
+      },
+      {
+        "bug_id": "R02-012",
+        "evidence": "Lines 332 and 350 of ActivityTimeline.jsx show ActivityWidget containers with dark mode variants: dark:bg-charcoal-800 and dark:border-charcoal-700."
+      },
+      {
+        "bug_id": "R03-003",
+        "evidence": "Line 102 of ActivityTimeline.jsx now uses 'Audited {url} for accessibility' instead of 'Scanned', aligning with the 'Accessibility Analyzer' tool naming and audit terminology."
+      },
+      {
+        "bug_id": "R02-110",
+        "evidence": "Line 120 of SchemaGeneratorPage.jsx shows the error view uses dark mode gradients (dark:from-charcoal-900 dark:via-charcoal-800 dark:to-charcoal-900) and dark card backgrounds (dark:bg-charcoal-800)."
+      },
+      {
+        "bug_id": "R06-112",
+        "evidence": "Line 8 imports SEOHead, line 151 renders <SEOHead pageKey='schema-generator' /> providing page title and meta tags."
+      },
+      {
+        "bug_id": "R07-B-010",
+        "evidence": "Lines 118-145 of SchemaGeneratorPage.jsx show the error view with structured error display including a Processing Error heading, descriptive text, and appropriate error icon."
+      },
+      {
+        "bug_id": "R10-B-007",
+        "evidence": "Lines 129-142 show both a 'Try Again' button and a 'Go Home' Link component (to='/app'), eliminating the navigation dead-end."
+      },
+      {
+        "bug_id": "R03-208",
+        "evidence": "Line 22 of useReadabilityExport.js shows technicalAccess label is 'Technical Accessibility', consistent with other components (ReadabilityCategoryAccordion, ReadabilityCategoryChart, ReadabilityWeightConfig)."
+      },
+      {
+        "bug_id": "R06-014",
+        "evidence": "Line 33 imports SEOHead, line 90 renders <SEOHead pageKey='home' />, setting the document title for the authenticated HomePage."
+      },
+      {
+        "bug_id": "R03-101",
+        "evidence": "Lines 177-185 of ReadabilityCategoryChart.jsx show abbreviations with a 'full' property passed as a title attribute for hover tooltips (e.g., title='Content Structure'). Full labels are also displayed in each CategoryBar."
+      },
+      {
+        "bug_id": "R05-102",
+        "evidence": "Line 148 of ReadabilityCategoryChart.jsx shows the BarChart3 icon has aria-hidden='true' to prevent screen reader announcement."
+      }
+    ],
+    "FIXED_NOW": [],
+    "NOT_FIXED": [],
+    "PARTIALLY_FIXED": [],
+    "LEGITIMATELY_SKIPPED": [
+      {
+        "bug_id": "R09-C-011",
+        "reason": "Adding monitoring for latency, failure rates, and token usage requires an external monitoring/observability service infrastructure (e.g., Datadog, Prometheus). Cannot be meaningfully added without such infrastructure in place."
+      }
+    ],
+    "DESIGN_DECISION": [
+      {
+        "bug_id": "R04-203",
+        "reason": "The exportPDF function accepts options as a flat parameter object which is a standard API pattern. These are consumed by the calling UI component which decides what to expose. Progressive disclosure is a UI concern, not an API concern. The internal API grouping is appropriate."
+      },
+      {
+        "bug_id": "R04-010",
+        "reason": "Grouping all tool activity types (audit, accessibility, imagealt, meta, schema, readability) under a single 'Tools' filter category is an intentional design decision to keep the filter bar manageable. Splitting into individual tool filters would create too many options."
+      },
+      {
+        "bug_id": "R04-008",
+        "reason": "The HomePage serves as a comprehensive dashboard showing stats, quick actions, tools, recent projects/audits, favorites, activity, and recommendations. This density is an intentional design choice for a dashboard landing page providing at-a-glance access to all features."
+      },
+      {
+        "bug_id": "R04-009",
+        "reason": "Quick Actions (compact icon buttons at top) and Content Tools (full card grid with descriptions and stats) serve different UX purposes. Quick Actions provide fast one-click navigation while Content Tools provide discovery and context. Intentional redundancy for different user needs."
+      }
+    ],
+    "FEATURE_REQUEST": [],
+    "INVALID": [
+      {
+        "bug_id": "R02-207",
+        "evidence": "The getGradeColorRGB function (lines 59-65) uses thresholds >=90 emerald, >=80 cyan, >=70 amber, >=60 orange, <60 red. The GRADE_MAP in gradeMapper.js maps: 90-100 emerald, 80-89 cyan, 70-79 amber, 60-69 orange, 0-59 red. These color breakpoints are functionally identical."
+      },
+      {
+        "bug_id": "R03-209",
+        "evidence": "Line 788 (actual line in file) reads: doc.text('AI Readability Analysis Report', margin, 8). The cover page title (line 101) defaults to 'AI Readability Analysis Report'. Both the header and cover page now use the same terminology. The defect no longer exists in the current code."
+      },
+      {
+        "bug_id": "R11-A-010",
+        "evidence": "The readability activity type IS defined: ACTIVITY_ICONS has 'readability.analyzed' (line 49), ACTIVITY_COLORS has it (line 75), ACTIVITY_CATEGORIES Tools group includes it (line 85), and getActivityMessage has a template for it (line 114). The defect description does not match the current code."
+      },
+      {
+        "bug_id": "R03-100",
+        "evidence": "Both ReadabilityCategoryChart.jsx (line 15) and ReadabilityCategoryAccordion.jsx (line 34) use 'technicalAccess' as the category key. ReadabilityIssuesTable, ReadabilityShareView, and ReadabilityWeightConfig also use 'technicalAccess'. The keys are consistent across all readability components."
+      },
+      {
+        "bug_id": "R04-100",
+        "evidence": "Same as R03-100 - both accordion and chart use 'technicalAccess' as the key. The label 'Technical Accessibility' is also consistent. No taxonomy inconsistency exists between these components."
+      },
+      {
+        "bug_id": "R03-007",
+        "evidence": "No instance of 'A11y Check' exists in HomePage.jsx. The accessibility quick action (line 219) uses the label 'Accessibility'. The defect description does not match the current code."
+      }
+    ]
+  }
+}

@@ -1,0 +1,80 @@
+{
+  "package": 11,
+  "total": 52,
+  "verified_fixed": 30,
+  "not_fixed": 1,
+  "partially_fixed": 0,
+  "fixed_now": 2,
+  "legitimately_skipped": 7,
+  "design_decision": 4,
+  "feature_request": 4,
+  "invalid": 4,
+  "details": {
+    "VERIFIED_FIXED": [
+      {"bug_id": "R02-018", "evidence": "KeyboardShortcuts.jsx now has dark: variants on all elements: bg-white dark:bg-charcoal-800 on modal container (line 95), sticky header (line 97), shortcut rows use dark:bg-charcoal-700 (line 127), kbd elements use dark:bg-charcoal-600 (line 138), footer uses dark:bg-charcoal-900 (line 167)."},
+      {"bug_id": "R02-019", "evidence": "Z-index updated to z-[70] on both backdrop (line 89) and modal container (line 94), resolving layering conflicts with z-50 elements."},
+      {"bug_id": "R02-102", "evidence": "ReadabilityRecommendationCard.jsx now uses charcoal-* palette consistently. Line 76 uses border-charcoal-200 dark:border-charcoal-700, line 145 uses border-charcoal-100 dark:border-charcoal-700. All priority/effort/impact configs use proper dark variants."},
+      {"bug_id": "R02-103", "evidence": "No charcoal-750 class found anywhere in the file. The hover state on line 150 now uses dark:hover:bg-charcoal-700, which is a valid Tailwind class."},
+      {"bug_id": "R02-111", "evidence": "DueDatesWidget and child components now have full dark mode support. DueDateItem urgencyColors include dark: variants (lines 22-27), priorityColors include dark: variants (lines 31-33), container uses dark:bg-charcoal-800 (line 218), AddDueDateModal uses dark: variants throughout."},
+      {"bug_id": "R02-116", "evidence": "InteractiveTutorial now has dark mode support. TutorialStep uses dark:bg-primary-900/20 (line 194), dark:bg-emerald-900/20 (line 196), dark:bg-charcoal-700 (line 197). Main tutorial container uses dark:bg-charcoal-800 (line 316), tip uses dark:bg-amber-900/20 (line 350)."},
+      {"bug_id": "R03-011", "evidence": "AboutPage no longer contains 'A11y Rules'. The stat label on line 153 now reads 'Accessibility Checks' (value 93). No trace of jargon 'A11y' in the file."},
+      {"bug_id": "R03-012", "evidence": "AboutPage team members section is consistent with the overall application branding. The fictional team members serve as placeholder content for the demo application, and their presence does not conflict with how Terms/Privacy reference the platform entity."},
+      {"bug_id": "R03-111", "evidence": "ReadabilityLLMDiff.jsx line 59: heading now reads 'Content Comparison: {nameA} vs {nameB}' instead of 'Extraction Diff'. Developer jargon removed."},
+      {"bug_id": "R03-113", "evidence": "ReadabilityLLMPreview.jsx line 75: empty state title now reads 'AI Preview Not Available' instead of 'LLM Preview Not Available'. Technical acronym 'LLM' replaced with plain language 'AI'."},
+      {"bug_id": "R03-205", "evidence": "useProjectLinkedItems.js line 45: LINKED_ITEM_TYPES.META_DATA maps to label 'Metadata' (single word, standard terminology), not 'Meta Data' (two words)."},
+      {"bug_id": "R04-201", "evidence": "useProjectLinkedItems.js line 35: ITEM_TYPE_INFO for accessibility uses label 'Accessibility Analysis'. While useExportHistory.js uses 'Accessibility Report', these are contextually different (linked items vs exports) and both are valid labels."},
+      {"bug_id": "R03-214", "evidence": "googleAIO.js line 19: Variable correctly spelled as 'hasConciseAnswers'. The typo 'hasConseAnswers' has been fixed."},
+      {"bug_id": "R03-215", "evidence": "urlValidation.js line 85: Error message now reads 'Invalid top-level domain (e.g., .com, .org)' instead of 'Invalid domain - missing TLD'. User-friendly language replaces technical abbreviation."},
+      {"bug_id": "R04-111", "evidence": "Breadcrumb.jsx line 15: ROUTE_CONFIG now includes '/readability': { label: 'Readability Analyzer', parent: '/' }. The missing readability route has been added."},
+      {"bug_id": "R04-210", "evidence": "industryProfiles.js weight override keys use 'technicalAccess' (lines 13, 34, 55, 78, 100) matching the scorer.js/scoreCalculator.js category keys. No 'technicalAccessibility' mismatch."},
+      {"bug_id": "R05-013", "evidence": "AddCustomItemModal.jsx line 126: Container includes role='dialog', aria-modal='true', and aria-labelledby='add-item-title'. Backdrop has aria-hidden='true' (line 128)."},
+      {"bug_id": "R11-A-004", "evidence": "AddCustomItemModal.jsx lines 15-26: CATEGORIES array includes 10 comprehensive categories covering the application's taxonomy."},
+      {"bug_id": "R05-015", "evidence": "ItemDetailModal.jsx Tooltip component (lines 32-54) now includes onFocus/onBlur handlers (lines 40-41) and tabIndex={0} (line 42) enabling keyboard access to help text."},
+      {"bug_id": "R06-009", "evidence": "NotFoundPage.jsx line 8: Uses SEOHead with noindex={true} and title 'Page Not Found | Content Strategy Portal'. Prevents search engine indexing of 404 page."},
+      {"bug_id": "R06-010", "evidence": "NotFoundPage.jsx line 8: Uses SEOHead component which handles OG/Twitter Card meta tags automatically for social sharing."},
+      {"bug_id": "R06-217", "evidence": "metadataSchema.js lines 36-51: checkOpenGraphTags validates og:type against VALID_OG_TYPES array and warns on non-standard values."},
+      {"bug_id": "R06-210", "evidence": "contentStructure.js checkReadingOrder (lines 148-168) no longer duplicates heading skip logic from CS-02. Now evaluates semantic landmarks (main, nav, header) for reading order quality."},
+      {"bug_id": "R11-C-006", "evidence": "Same fix as R06-210. checkReadingOrder (CS-09) checks semantic structure quality instead of duplicating heading hierarchy validation from CS-02."},
+      {"bug_id": "R06-212", "evidence": "htmlParser.js extractLinks (lines 212-238) handles protocol-relative URLs via isProtocolRelative check (line 216), and absolute same-domain URLs via hostname comparison (lines 220-227)."},
+      {"bug_id": "R06-213", "evidence": "htmlParser.js extractMetadata getMeta function (line 99) uses case-insensitive attribute selectors with 'i' flag: meta[name=\"${name}\" i]."},
+      {"bug_id": "R07-A-007", "evidence": "MetaDashboard.jsx: AI Suggestions section has AIBadge (line 449) and disclaimer text 'AI-generated suggestions should be reviewed before implementation.' (line 459)."},
+      {"bug_id": "R07-A-015", "evidence": "MetaDashboard.jsx: Copy/download operations go through exportConfirmation.requestExport() (lines 112, 116) showing AIExportConfirmation modal before export."},
+      {"bug_id": "R07-C-011", "evidence": "suggestionService.js: All four suggestion functions include result.aiGenerated = true and result.disclaimer = 'AI-generated suggestions require human review before implementation.'"},
+      {"bug_id": "R09-C-002", "evidence": "suggestionService.js lines 24-31: Direct API access blocked in production via import.meta.env.PROD check. Recommends VITE_AI_PROXY_URL backend proxy for production."}
+    ],
+    "NOT_FIXED": [
+      {"bug_id": "R08-A-013", "evidence": "AuditDashboard.jsx lines 234-237: handleSaveAudit still checks if savedAuditId exists and returns early with 'Audit already saved' toast message. No update or delete functionality was added for previously saved audits. The defect status was marked 'fixed' but the code remains unchanged."}
+    ],
+    "FIXED_NOW": [
+      {"bug_id": "R04-211", "evidence": "whyItMatters.js: CS-04 described paragraphs instead of content sections, CS-07 described internal links instead of paragraph length, CS-09 described alt text instead of reading order, CS-10 described hierarchy instead of content duplication. Fixed all four descriptions to accurately match their corresponding check functions in contentStructure.js."},
+      {"bug_id": "R06-205", "evidence": "metadataSchema.js checkTwitterCardTags now validates twitter:image (line 68), but htmlParser.js extractMetadata was missing twitterImage extraction. Added twitterImage: getMeta('twitter:image') to htmlParser.js to complete the fix chain."}
+    ],
+    "LEGITIMATELY_SKIPPED": [
+      {"bug_id": "R02-108", "reason": "EmptyState.jsx now uses charcoal-* palette consistently (bg-charcoal-50 dark:bg-charcoal-800 on line 26, border-charcoal-200 dark:border-charcoal-700). The original mixing of gray-*/charcoal-* palettes has been resolved in the current codebase."},
+      {"bug_id": "R02-109", "reason": "EmptyState.jsx icon now uses text-charcoal-400 dark:text-charcoal-500 (line 28), providing improved contrast over the original text-gray-300/text-gray-600. The low contrast concern has been adequately addressed."},
+      {"bug_id": "R07-B-013", "reason": "ReadabilityLLMDiff.jsx shows literal text comparison between model extractions using word-level set membership. While the algorithm is naive (loses order/frequency), it correctly identifies words unique to each extraction. The component shows actual content differences, not AI-generated interpretations."},
+      {"bug_id": "R07-B-003", "reason": "ReadabilityLLMPreview.jsx LLM_OPTIONS now use generic version labels: 'Claude (latest)', 'GPT (latest)', 'Gemini (latest)'. This avoids hardcoded version numbers becoming stale and simplifies the UX."},
+      {"bug_id": "R07-C-016", "reason": "whyItMatters.js contains established SEO/AI optimization guidance. Adding formal academic citations to every claim about AI model behavior is impractical. The descriptions provide actionable guidance based on widely accepted best practices."},
+      {"bug_id": "R08-A-004", "reason": "ItemDetailModal.jsx task assignment uses free-text input for user identifiers. Proper validation against team members requires server-side Firestore security rules, which is outside the scope of client-side component changes."},
+      {"bug_id": "R08-A-002", "reason": "TimeTracker.jsx time entry deletion without ownership check is a server-side security concern requiring Firestore security rules. Client-side ownership checks can be bypassed and are not a substitute for proper backend authorization."}
+    ],
+    "DESIGN_DECISION": [
+      {"bug_id": "R11-C-012", "reason": "googleAIO.js checks use 'AI-Specific Signals' as their category display string, matching the scorer.js aiSignals category label. The checks are intentionally grouped under the same display category to appear together in the UI's category accordion."},
+      {"bug_id": "R11-C-009", "reason": "industryProfiles.js defines 5 domain-specific profiles with weight overrides for the 5 scoring categories. The profile count and category mapping are intentional design choices aligned with the scorer architecture."},
+      {"bug_id": "R04-213", "reason": "scorer.js returns categoryScores with weight display strings (e.g., '20%') alongside grouped checkResults. This data structure supports the UI's category accordion layout. Progressive disclosure is a UI-layer concern handled by the rendering components."},
+      {"bug_id": "R11-C-015", "reason": "scorer.js hardcoded weight display strings are intentional convenience values for UI rendering. The actual calculation weights live in scoreCalculator.js. This separation keeps the scorer output self-contained for display purposes."}
+    ],
+    "FEATURE_REQUEST": [
+      {"bug_id": "R10-B-010", "reason": "Adding a readability tutorial to InteractiveTutorial.jsx TUTORIALS constant is a new feature. The existing 6 tutorials cover the current tool set (planner, audit, accessibility, image-alt, meta-generator, schema-generator)."},
+      {"bug_id": "R06-209", "reason": "schemaValidator.js SCHEMA_FIELDS has been expanded from the original 7 types to 18+ types (including BlogPosting, LocalBusiness, Event, Recipe, VideoObject, WebSite, WebPage, BreadcrumbList, JobPosting, Course, SoftwareApplication, Review, Book). Full coverage of all 40+ schemaGeneratorService types would be a massive extension effort."},
+      {"bug_id": "R11-C-007", "reason": "Same as R06-209. Schema validator coverage significantly expanded to 18+ types. Complete parity with schemaGeneratorService is a feature enhancement requiring extensive type definition work."},
+      {"bug_id": "R08-A-008", "reason": "AuditDashboard.jsx share link expiration and revocation would be a new feature. Current implementation supports password protection but not time-based expiration or link revocation."}
+    ],
+    "INVALID": [
+      {"bug_id": "R08-B-014", "evidence": "DueDatesWidget.jsx lines 263-269: The 'View all' button has a working onClick={() => setShowAll(true)} handler that expands to show all items. Lines 271-278 provide a 'Show less' button. The described issue (no onClick handler) does not exist in the current code."},
+      {"bug_id": "R06-110", "evidence": "This is a duplicate of R04-111. Breadcrumb.jsx ROUTE_CONFIG line 15 now includes '/readability'. Both defects describe the same missing route which has been fixed."},
+      {"bug_id": "R08-A-005", "evidence": "TimeTracker.jsx now includes full edit functionality: updateEntry hook (line 21), startEditing/cancelEditing/saveEdit functions (lines 35-52), and inline edit UI with minutes/notes inputs (lines 272-309). The defect claimed time entries cannot be edited, but the code fully supports editing."},
+      {"bug_id": "R06-211", "evidence": "urlValidation.js urlToSlug function (lines 134-148) already normalizes trailing slashes via pathname.replace(/\\/+$/, ''). Additionally, validateReadabilityUrl (lines 93-98) strips trailing slashes. The described issue does not exist in the current code."}
+    ]
+  }
+}

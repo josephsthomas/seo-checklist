@@ -134,7 +134,9 @@ export function extractDomain(url) {
 export function urlToSlug(url) {
   try {
     const parsed = new URL(url);
-    const slug = (parsed.hostname + parsed.pathname)
+    // Normalize trailing slashes so /page and /page/ produce the same slug
+    const pathname = parsed.pathname.replace(/\/+$/, '') || '/';
+    const slug = (parsed.hostname + pathname)
       .replace(/^www\./, '')
       .replace(/[^a-z0-9]+/gi, '-')
       .replace(/^-+|-+$/g, '')

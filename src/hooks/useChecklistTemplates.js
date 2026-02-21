@@ -154,7 +154,7 @@ export function useChecklistTemplates() {
   const incrementUsage = useCallback(async (templateId) => {
     try {
       const templateRef = doc(db, 'checklistTemplates', templateId);
-      setTemplates(prev => prev.map(t =>
+      setOwnTemplates(prev => prev.map(t =>
         t.id === templateId ? { ...t, usageCount: (t.usageCount || 0) + 1 } : t
       ));
       await updateDoc(templateRef, {

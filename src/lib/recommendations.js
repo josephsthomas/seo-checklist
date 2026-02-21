@@ -58,6 +58,15 @@ export const TOOLS = {
     icon: 'Code2',
     color: 'rose',
     keywords: ['schema', 'json-ld', 'structured data', 'rich snippets']
+  },
+  readability: {
+    id: 'readability',
+    name: 'AI Readability Checker',
+    description: 'AI-powered content readability analysis',
+    path: '/readability',
+    icon: 'BookOpen',
+    color: 'indigo',
+    keywords: ['readability', 'content', 'ai', 'llm', 'score', 'grade']
   }
 };
 
@@ -111,8 +120,22 @@ const RECOMMENDATION_RULES = [
   {
     context: 'schema-generator',
     condition: () => true,
-    recommend: ['audit'],
+    recommend: ['audit', 'readability'],
     reason: 'Validate your changes with a technical audit'
+  },
+
+  // After Readability Analysis
+  {
+    context: 'readability',
+    condition: (data) => data?.score < 70,
+    recommend: ['meta-generator', 'accessibility'],
+    reason: 'Improve your content optimization'
+  },
+  {
+    context: 'readability',
+    condition: () => true,
+    recommend: ['meta-generator', 'schema-generator'],
+    reason: 'Enhance your content with metadata and structured data'
   },
 
   // Project Planner - Phase-based

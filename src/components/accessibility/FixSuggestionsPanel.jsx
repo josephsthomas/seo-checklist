@@ -783,7 +783,7 @@ export default function FixSuggestionsPanel({ issue, onClose }) {
           <p className="text-charcoal-600 dark:text-charcoal-300">
             No specific fix suggestion available for this issue.
           </p>
-          <p className="text-sm text-charcoal-500 dark:text-charcoal-500 mt-1">
+          <p className="text-sm text-charcoal-500 dark:text-charcoal-400 mt-1">
             {issue?.message || 'Check WCAG guidelines for remediation steps.'}
           </p>
         </div>

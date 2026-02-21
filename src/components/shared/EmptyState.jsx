@@ -23,20 +23,20 @@ export default function EmptyState({
 }) {
   return (
     <div
-      className={`text-center ${compact ? 'py-8' : 'py-12'} bg-gray-50 dark:bg-charcoal-800 rounded-xl border border-gray-200 dark:border-charcoal-700 ${className}`}
+      className={`text-center ${compact ? 'py-8' : 'py-12'} bg-charcoal-50 dark:bg-charcoal-800 rounded-xl border border-charcoal-200 dark:border-charcoal-700 ${className}`}
     >
-      <Icon className="w-10 h-10 text-gray-300 dark:text-gray-600 mx-auto mb-3" aria-hidden="true" />
+      <Icon className="w-10 h-10 text-charcoal-400 dark:text-charcoal-500 mx-auto mb-3" aria-hidden="true" />
       {large ? (
-        <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
+        <h3 className="text-lg font-semibold text-charcoal-900 dark:text-white mb-2">
           {title}
         </h3>
       ) : (
-        <p className="text-sm font-medium text-gray-500 dark:text-gray-400">
+        <p className="text-sm font-medium text-charcoal-500 dark:text-charcoal-400">
           {title}
         </p>
       )}
       {description && (
-        <p className={`text-xs text-gray-400 dark:text-gray-500 ${large ? '' : 'mt-1'} max-w-md mx-auto`}>
+        <p className={`text-xs text-charcoal-400 dark:text-charcoal-500 ${large ? '' : 'mt-1'} max-w-md mx-auto`}>
           {description}
         </p>
       )}

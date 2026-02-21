@@ -785,7 +785,7 @@ export function useReadabilityExport() {
         if (i > 1) {
           doc.setFontSize(7);
           doc.setTextColor(...LIGHT_GRAY);
-          doc.text('AI Readability Analyzer', margin, 8);
+          doc.text('AI Readability Analysis Report', margin, 8);
           doc.text(reportDate, pageWidth - margin, 8, { align: 'right' });
           doc.setDrawColor(...LIGHT_GRAY);
           doc.line(margin, 10, pageWidth - margin, 10);
