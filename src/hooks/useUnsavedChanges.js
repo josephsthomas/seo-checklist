@@ -5,8 +5,8 @@ import { useState, useEffect, useCallback } from 'react';
  *
  * Features:
  * - Browser beforeunload warning for page refresh/close
+ * - In-app route change interception via beforeunload + popstate
  * - Tracks dirty state for forms/editors
- * - Can be used with React Router for navigation warnings
  *
  * @param {boolean} initialDirty - Initial dirty state
  * @returns {Object} - { isDirty, setDirty, markClean, markDirty }
@@ -14,13 +14,11 @@ import { useState, useEffect, useCallback } from 'react';
 export function useUnsavedChanges(initialDirty = false) {
   const [isDirty, setIsDirty] = useState(initialDirty);
 
-  // Handle browser beforeunload event
+  // Handle browser beforeunload event (page refresh/close)
   useEffect(() => {
     const handleBeforeUnload = (e) => {
       if (isDirty) {
-        // Standard way to trigger the browser's "are you sure" dialog
         e.preventDefault();
-        // For older browsers
         e.returnValue = '';
         return '';
       }
@@ -28,6 +26,26 @@ export function useUnsavedChanges(initialDirty = false) {
 
     window.addEventListener('beforeunload', handleBeforeUnload);
     return () => window.removeEventListener('beforeunload', handleBeforeUnload);
+  }, [isDirty]);
+
+  // Intercept browser back/forward navigation
+  useEffect(() => {
+    if (!isDirty) return;
+
+    const handlePopState = (e) => {
+      if (isDirty) {
+        const leave = window.confirm('You have unsaved changes. Are you sure you want to leave?');
+        if (!leave) {
+          // Push state back to prevent navigation
+          window.history.pushState(null, '', window.location.href);
+        }
+      }
+    };
+
+    // Push a sentinel state so we can intercept back button
+    window.history.pushState(null, '', window.location.href);
+    window.addEventListener('popstate', handlePopState);
+    return () => window.removeEventListener('popstate', handlePopState);
   }, [isDirty]);
 
   const markDirty = useCallback(() => setIsDirty(true), []);
@@ -53,9 +71,16 @@ export function useFormWithUnsavedChanges(initialValues = {}) {
   const [originalValues, setOriginalValues] = useState(initialValues);
   const [isDirty, setIsDirty] = useState(false);
 
-  // Check if values have changed from original
+  // Shallow comparison — avoids JSON.stringify fragility with Date, undefined, NaN
   useEffect(() => {
-    const hasChanges = JSON.stringify(values) !== JSON.stringify(originalValues);
+    const keys = new Set([...Object.keys(values), ...Object.keys(originalValues)]);
+    let hasChanges = false;
+    for (const key of keys) {
+      if (values[key] !== originalValues[key]) {
+        hasChanges = true;
+        break;
+      }
+    }
     setIsDirty(hasChanges);
   }, [values, originalValues]);
 

@@ -117,6 +117,16 @@ export default function FeedbackForm({ isOpen, onClose }) {
   const [feedbackType, setFeedbackType] = useState('bug');
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
+
+  // Track whether the form has unsaved content
+  const hasUnsavedContent = title.trim() !== '' || description.trim() !== '';
+
+  const handleClose = useCallback(() => {
+    if (hasUnsavedContent && !window.confirm('Discard unsaved feedback?')) {
+      return;
+    }
+    onClose();
+  }, [hasUnsavedContent, onClose]);
   const [priority, setPriority] = useState('medium');
   const [stepsToReproduce, setStepsToReproduce] = useState('');
   const [expectedBehavior, setExpectedBehavior] = useState('');
@@ -163,12 +173,12 @@ export default function FeedbackForm({ isOpen, onClose }) {
   useEffect(() => {
     const handleEscape = (e) => {
       if (e.key === 'Escape' && isOpen) {
-        onClose();
+        handleClose();
       }
     };
     document.addEventListener('keydown', handleEscape);
     return () => document.removeEventListener('keydown', handleEscape);
-  }, [isOpen, onClose]);
+  }, [isOpen, handleClose]);
 
   // Handle screenshot upload
   const handleScreenshotChange = useCallback((e) => {
@@ -283,7 +293,7 @@ export default function FeedbackForm({ isOpen, onClose }) {
       {/* Backdrop */}
       <div
         className="fixed inset-0 bg-black/50 transition-opacity"
-        onClick={onClose}
+        onClick={handleClose}
         aria-hidden="true"
       />
 
@@ -306,7 +316,7 @@ export default function FeedbackForm({ isOpen, onClose }) {
               </p>
             </div>
             <button
-              onClick={onClose}
+              onClick={handleClose}
               className="p-2 hover:bg-charcoal-100 rounded-lg transition-colors"
               aria-label="Close feedback form"
             >
@@ -589,7 +599,7 @@ export default function FeedbackForm({ isOpen, onClose }) {
               <div className="flex items-center gap-4 pt-2">
                 <button
                   type="button"
-                  onClick={onClose}
+                  onClick={handleClose}
                   className="flex-1 btn btn-secondary"
                   disabled={isSubmitting}
                 >
