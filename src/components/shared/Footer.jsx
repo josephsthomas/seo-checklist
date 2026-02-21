@@ -39,8 +39,7 @@ export default function Footer() {
               </div>
             </Link>
             <p className="text-charcoal-300 text-sm max-w-md leading-relaxed">
-              Your all-in-one content and SEO suite for organic health & visibility.
-              Streamline your workflow with powerful tools designed for modern content professionals.
+              Built for content teams who are done with spreadsheet wrangling.
             </p>
           </div>
 
@@ -78,6 +77,11 @@ export default function Footer() {
                   Image Alt Generator
                 </Link>
               </li>
+              <li>
+                <Link to="/features/readability" className="text-charcoal-400 hover:text-white text-sm transition-colors duration-200">
+                  AI Readability Checker
+                </Link>
+              </li>
             </ul>
           </div>
 
@@ -108,6 +112,11 @@ export default function Footer() {
               <li>
                 <Link to="/about" className="text-charcoal-400 hover:text-white text-sm transition-colors duration-200">
                   About
+                </Link>
+              </li>
+              <li>
+                <Link to="/contact" className="text-charcoal-400 hover:text-white text-sm transition-colors duration-200">
+                  Contact
                 </Link>
               </li>
               <li>
@@ -152,7 +161,7 @@ export default function Footer() {
             </p>
           </div>
           <p className="text-charcoal-600 text-xs">
-            Content Strategy Portal v3.0
+            Content Strategy Portal
           </p>
         </div>
       </div>

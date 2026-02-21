@@ -25,14 +25,13 @@ const STEPS = [
     details: [
       'Enter your email and create a password',
       'Verify your email address',
-      'Accept our terms of service and policies',
-      'You\'re ready to go!'
+      'Choose your first project type or explore the tools'
     ]
   },
   {
     number: '02',
     title: 'Create Your First Project',
-    description: 'Set up a project to organize your SEO work.',
+    description: 'Set up a project to organize your content workflow.',
     icon: FolderPlus,
     details: [
       'Click "New Project" from the dashboard',
@@ -56,13 +55,13 @@ const STEPS = [
   {
     number: '04',
     title: 'Track Your Progress',
-    description: 'Use the checklist to manage your SEO tasks.',
+    description: 'Use the checklist to manage your content strategy tasks.',
     icon: BarChart3,
     details: [
-      'Work through the 321-item checklist',
+      'Work through the 353-item checklist',
       'Mark items complete as you go',
       'Track progress with visual dashboards',
-      'Never miss an SEO best practice'
+      'Never miss a content best practice'
     ]
   },
   {
@@ -98,7 +97,7 @@ const QUICK_TIPS = [
   },
   {
     title: 'Use the Checklist',
-    description: 'The 321-item checklist ensures you never miss important SEO elements.'
+    description: 'The 353-item checklist ensures you never miss important content strategy elements.'
   },
   {
     title: 'Leverage AI Features',
@@ -335,7 +334,7 @@ export default function GettingStartedPage() {
             >
               <h3 className="text-lg font-semibold text-white">All Features</h3>
               <p className="mt-2 text-charcoal-400">
-                Discover all six tools and how they work together.
+                Discover all our tools and how they work together.
               </p>
               <span className="mt-4 inline-flex items-center gap-1 text-primary-400 font-medium">
                 View features <ArrowRight className="w-4 h-4" />
@@ -349,10 +348,10 @@ export default function GettingStartedPage() {
       <section className="py-20 lg:py-28 bg-gradient-to-br from-primary-500 to-primary-700">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h2 className="text-3xl lg:text-4xl font-bold text-white">
-            Ready to Get Started?
+            Your first audit takes under 2 minutes.
           </h2>
           <p className="mt-4 text-xl text-primary-100">
-            Create your free account and start optimizing in minutes.
+            Create your free account and see the difference immediately.
           </p>
           <div className="mt-10">
             <Link

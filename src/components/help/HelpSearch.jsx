@@ -17,7 +17,7 @@ import { getActiveTools } from '../../config/tools';
 const quickActions = [
   { id: 'keyboard', label: 'Keyboard Shortcuts', icon: Command, action: 'keyboard' },
   { id: 'resources', label: 'Resource Library', icon: BookOpen, path: '/help/resources' },
-  { id: 'glossary', label: 'SEO Glossary', icon: Book, path: '/help/glossary' },
+  { id: 'glossary', label: 'Content & SEO Glossary', icon: Book, path: '/help/glossary' },
   { id: 'feedback', label: 'Send Feedback', icon: HelpCircle, action: 'feedback' }
 ];
 

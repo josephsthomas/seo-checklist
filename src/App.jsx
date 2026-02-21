@@ -28,6 +28,7 @@ const FeaturesPage = lazyWithRetry(() => import('./components/public/FeaturesPag
 const FeatureDetailPage = lazyWithRetry(() => import('./components/public/FeatureDetailPage'), 'FeatureDetailPage');
 const HelpCenterPage = lazyWithRetry(() => import('./components/public/HelpCenterPage'), 'HelpCenterPage');
 const GettingStartedPage = lazyWithRetry(() => import('./components/public/GettingStartedPage'), 'GettingStartedPage');
+const ContactPage = lazyWithRetry(() => import('./components/public/ContactPage'), 'ContactPage');
 const PublicNotFoundPage = lazyWithRetry(() => import('./components/public/NotFoundPage'), 'NotFoundPage');
 
 // Lazy loaded components for code splitting (with retry logic)
@@ -163,8 +164,9 @@ function AppContent() {
               {/* Home - Smart routing based on auth state */}
               <Route path="/" element={<SmartHome />} />
 
-              {/* About */}
+              {/* About & Contact */}
               <Route path="/about" element={<AboutPage />} />
+              <Route path="/contact" element={<ContactPage />} />
 
               {/* Features */}
               <Route path="/features" element={<FeaturesPage />} />

@@ -7,9 +7,7 @@ import {
   ArrowRight,
   Shield,
   Zap,
-  Globe,
-  Linkedin,
-  Twitter
+  Globe
 } from 'lucide-react';
 import SEOHead from '../shared/SEOHead';
 import { organizationSchema } from '../../config/seo';
@@ -17,23 +15,23 @@ import { organizationSchema } from '../../config/seo';
 const VALUES = [
   {
     icon: Target,
-    title: 'Results-Driven',
-    description: 'Every feature is designed to deliver measurable improvements in your SEO performance.'
+    title: 'Automate the Boring Parts',
+    description: 'Content strategists should strategize, not wrangle spreadsheets. We automate the technical work so you can focus on what matters.'
   },
   {
-    icon: Users,
-    title: 'Team-First',
-    description: 'Built for collaboration with role-based permissions and seamless team workflows.'
-  },
-  {
-    icon: Lightbulb,
-    title: 'Innovation',
-    description: 'Leveraging AI and modern technology to solve real SEO challenges efficiently.'
+    icon: Shield,
+    title: 'Accuracy Over Speed',
+    description: 'Our AI labels every suggestion as a suggestion. We never pretend AI output is finished work — you review, you decide.'
   },
   {
     icon: Heart,
-    title: 'User-Centric',
-    description: 'Designed with SEO professionals in mind, based on real-world workflows and needs.'
+    title: 'Practitioner-Built',
+    description: 'Every feature was designed by someone who has done the work, not just studied it. Real workflows, real pain points, real solutions.'
+  },
+  {
+    icon: Lightbulb,
+    title: 'Transparent Tooling',
+    description: 'You always see how scores are calculated, why issues are flagged, and what our AI is doing. No black boxes.'
   },
 ];
 
@@ -58,29 +56,6 @@ const PRINCIPLES = [
   },
 ];
 
-const TEAM_MEMBERS = [
-  {
-    name: 'Sarah Chen',
-    role: 'Founder & CEO',
-    bio: 'Former SEO Director at a Fortune 500 company with 15+ years in digital marketing.',
-    linkedin: '#',
-    twitter: '#'
-  },
-  {
-    name: 'Marcus Rodriguez',
-    role: 'CTO',
-    bio: 'Full-stack engineer passionate about building tools that simplify complex workflows.',
-    linkedin: '#',
-    twitter: '#'
-  },
-  {
-    name: 'Emily Watson',
-    role: 'Head of Product',
-    bio: 'UX specialist who has led product teams at multiple SaaS startups.',
-    linkedin: '#',
-    twitter: '#'
-  }
-];
 
 export default function AboutPage() {
   return (
@@ -103,11 +78,11 @@ export default function AboutPage() {
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center max-w-3xl mx-auto">
             <h1 className="text-4xl sm:text-5xl font-bold text-charcoal-900 tracking-tight">
-              About Content Strategy Portal
+              We Built the Platform We Wished Existed
             </h1>
             <p className="mt-6 text-xl text-charcoal-600 leading-relaxed">
-              We're on a mission to make professional SEO tools accessible to agencies
-              and enterprise teams of all sizes.
+              Content strategists deserve tools as sophisticated as the strategies they build.
+              We're making that happen.
             </p>
           </div>
         </div>
@@ -119,34 +94,35 @@ export default function AboutPage() {
           <div className="grid lg:grid-cols-2 gap-12 lg:gap-20 items-center">
             <div>
               <h2 className="text-3xl font-bold text-charcoal-900">
-                Built by SEO Professionals, For SEO Professionals
+                Built by Content Professionals, For Content Professionals
               </h2>
               <div className="mt-6 space-y-4 text-charcoal-600 leading-relaxed">
                 <p>
-                  Content Strategy Portal was born from a simple observation: SEO teams were
-                  using dozens of disconnected tools, spreadsheets, and manual processes to
-                  manage their content strategies.
+                  Content Strategy Portal was born from a simple observation: content strategists
+                  were spending more time on manual execution — auditing, checklist tracking,
+                  metadata writing, accessibility checks — than on actual strategy.
                 </p>
                 <p>
-                  We set out to create a unified platform that brings together project management,
-                  technical auditing, accessibility compliance, and AI-powered content optimization
-                  into one seamless experience.
+                  We set out to automate the minutiae. Our integrated tools handle the
+                  technical busywork so content teams can focus on what they do best:
+                  planning, creating, and delivering content that drives results.
                 </p>
                 <p>
-                  Today, our platform helps agencies and enterprise teams streamline their workflows,
-                  deliver consistent results, and scale their SEO operations efficiently.
+                  Today, agencies and enterprise teams use our platform to reclaim hours
+                  every week, deliver consistent quality, and scale their content operations
+                  without scaling their headcount.
                 </p>
               </div>
             </div>
             <div className="bg-gradient-to-br from-primary-50 to-cyan-50 rounded-3xl p-8 lg:p-12">
               <div className="grid grid-cols-2 gap-8">
                 <div className="text-center">
-                  <div className="text-4xl font-bold text-primary-600">321</div>
+                  <div className="text-4xl font-bold text-primary-600">353</div>
                   <div className="mt-1 text-sm text-charcoal-600">Checklist Items</div>
                 </div>
                 <div className="text-center">
-                  <div className="text-4xl font-bold text-primary-600">6</div>
-                  <div className="mt-1 text-sm text-charcoal-600">Integrated Tools</div>
+                  <div className="text-4xl font-bold text-primary-600">40+</div>
+                  <div className="mt-1 text-sm text-charcoal-600">Schema Types</div>
                 </div>
                 <div className="text-center">
                   <div className="text-4xl font-bold text-primary-600">93</div>
@@ -229,62 +205,17 @@ export default function AboutPage() {
         </div>
       </section>
 
-      {/* Team Section */}
-      <section className="py-20 lg:py-28 bg-charcoal-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center max-w-3xl mx-auto mb-16">
-            <h2 className="text-3xl font-bold text-charcoal-900">Meet the Team</h2>
-            <p className="mt-4 text-lg text-charcoal-600">
-              The people behind Content Strategy Portal.
-            </p>
-          </div>
-
-          <div className="grid md:grid-cols-3 gap-8">
-            {TEAM_MEMBERS.map((member, index) => (
-              <div key={index} className="bg-white rounded-2xl p-8 shadow-sm text-center">
-                <div className="w-24 h-24 bg-gradient-to-br from-primary-100 to-cyan-100 rounded-full mx-auto mb-6 flex items-center justify-center">
-                  <span className="text-3xl font-bold text-primary-600">
-                    {member.name.split(' ').map(n => n[0]).join('')}
-                  </span>
-                </div>
-                <h3 className="text-xl font-semibold text-charcoal-900">{member.name}</h3>
-                <p className="text-primary-600 font-medium mt-1">{member.role}</p>
-                <p className="mt-4 text-charcoal-600 text-sm leading-relaxed">
-                  {member.bio}
-                </p>
-                <div className="mt-6 flex items-center justify-center gap-3">
-                  <a
-                    href={member.linkedin}
-                    className="p-2 text-charcoal-400 hover:text-primary-600 hover:bg-primary-50 rounded-lg transition-colors"
-                    aria-label={`${member.name} on LinkedIn`}
-                  >
-                    <Linkedin className="w-5 h-5" />
-                  </a>
-                  <a
-                    href={member.twitter}
-                    className="p-2 text-charcoal-400 hover:text-primary-600 hover:bg-primary-50 rounded-lg transition-colors"
-                    aria-label={`${member.name} on Twitter`}
-                  >
-                    <Twitter className="w-5 h-5" />
-                  </a>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
       {/* Platform Overview */}
       <section className="py-20 lg:py-28 bg-gradient-to-br from-charcoal-900 to-charcoal-800">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid lg:grid-cols-2 gap-12 items-center">
             <div>
               <h2 className="text-3xl font-bold text-white">
-                A Complete Platform, Not Just Another Tool
+                Every Tool a Content Strategist Needs — in One Tab
               </h2>
               <p className="mt-6 text-charcoal-300 leading-relaxed">
                 Unlike point solutions that address a single need, Content Strategy Portal
-                provides an integrated experience where all your SEO workflows connect.
+                automates the entire content workflow so your team can focus on strategy, not execution.
               </p>
               <ul className="mt-8 space-y-4">
                 <li className="flex items-start gap-3">
@@ -293,7 +224,7 @@ export default function AboutPage() {
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                     </svg>
                   </div>
-                  <span className="text-charcoal-200">Unified dashboard for all SEO activities</span>
+                  <span className="text-charcoal-200">Unified dashboard for all content activities</span>
                 </li>
                 <li className="flex items-start gap-3">
                   <div className="w-6 h-6 bg-primary-500 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
@@ -323,11 +254,12 @@ export default function AboutPage() {
             </div>
             <div className="bg-charcoal-800/50 rounded-2xl p-8 border border-charcoal-700">
               <div className="text-center">
-                <div className="text-5xl font-bold text-primary-400">6</div>
+                <div className="text-5xl font-bold text-primary-400">7</div>
                 <div className="mt-2 text-xl text-white">Integrated Tools</div>
                 <p className="mt-4 text-charcoal-400">
                   Content Planner, Technical Audit, Accessibility Analyzer,
-                  Meta Generator, Schema Generator, and Image Alt Generator.
+                  Meta Generator, Schema Generator, Image Alt Generator,
+                  and AI Readability Checker.
                 </p>
                 <Link
                   to="/features"
@@ -346,10 +278,10 @@ export default function AboutPage() {
       <section className="py-20 lg:py-28 bg-gradient-to-br from-primary-500 to-primary-700">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h2 className="text-3xl lg:text-4xl font-bold text-white">
-            Ready to Get Started?
+            See for yourself. It's free.
           </h2>
           <p className="mt-4 text-xl text-primary-100">
-            Join the growing community of SEO professionals using Content Strategy Portal.
+            No credit card. No sales calls. Just better content strategy.
           </p>
           <div className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-4">
             <Link

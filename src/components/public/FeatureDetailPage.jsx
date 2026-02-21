@@ -6,6 +6,7 @@ import {
   FileText,
   Code,
   Image,
+  ScanEye,
   ArrowRight,
   ArrowLeft,
   CheckCircle2,
@@ -27,15 +28,15 @@ import { softwareSchemas } from '../../config/seo';
 const FEATURE_DATA = {
   planner: {
     name: 'Content Planner',
-    tagline: 'Project Management & SEO Checklists',
+    tagline: 'Project Management & Content Strategy Checklists',
     icon: LayoutDashboard,
     color: 'primary',
-    description: 'Comprehensive project management designed specifically for SEO teams. Track multiple projects, manage team members, and ensure nothing falls through the cracks with our 353-item checklist.',
-    longDescription: 'The Content Planner is the command center for your SEO projects. Whether you\'re managing a single website or juggling dozens of client projects, our platform provides the structure and visibility you need to deliver consistent results.',
+    description: 'Comprehensive project management designed specifically for content teams. Track multiple projects, manage team members, and ensure nothing falls through the cracks with our 353-item checklist.',
+    longDescription: 'The Content Planner is the command center for your content projects. Whether you\'re managing a single website or juggling dozens of client projects, our platform provides the structure and visibility you need to deliver consistent results.',
     features: [
       {
-        title: '353-Item SEO Checklist',
-        description: 'A comprehensive checklist covering all phases of SEO projects, from initial audit to ongoing optimization.',
+        title: '353-Item Content Strategy Checklist',
+        description: 'A comprehensive checklist covering all phases of content projects, from initial audit to ongoing optimization.',
         icon: CheckCircle2
       },
       {
@@ -65,8 +66,8 @@ const FEATURE_DATA = {
       }
     ],
     useCases: [
-      'Agency teams managing multiple client SEO projects',
-      'In-house teams coordinating SEO initiatives',
+      'Agency teams managing multiple client content projects',
+      'In-house teams coordinating content initiatives',
       'Consultants tracking deliverables and progress',
       'Enterprise teams with complex approval workflows'
     ],
@@ -74,7 +75,9 @@ const FEATURE_DATA = {
       { value: '353', label: 'Checklist Items' },
       { value: '6', label: 'Project Phases' },
       { value: '∞', label: 'Projects' }
-    ]
+    ],
+    proTip: 'Run a Technical Audit first, then use the results to prioritize your checklist items. Most teams save 3+ hours on project scoping this way.',
+    overviewHeader: 'Why Teams Outgrow Spreadsheets'
   },
   audit: {
     name: 'Technical Audit',
@@ -125,7 +128,9 @@ const FEATURE_DATA = {
       { value: '31', label: 'Audit Categories' },
       { value: '5GB', label: 'Max File Size' },
       { value: 'AI', label: 'Powered Insights' }
-    ]
+    ],
+    proTip: 'After your audit, use the Meta Generator to fix the title and description issues it flagged. One-click fixes, done in minutes.',
+    overviewHeader: 'Stop Reading Crawl Data. Start Fixing Issues.'
   },
   accessibility: {
     name: 'Accessibility Analyzer',
@@ -176,7 +181,9 @@ const FEATURE_DATA = {
       { value: '93', label: 'A11y Rules' },
       { value: 'WCAG', label: '2.2 Compliant' },
       { value: 'VPAT', label: 'Generation' }
-    ]
+    ],
+    proTip: 'Generate a VPAT report, then use Image Alt Generator to fix the missing alt text issues in bulk. Two tools, one workflow.',
+    overviewHeader: 'Accessibility Shouldn\'t Be an Afterthought'
   },
   'meta-generator': {
     name: 'Meta Data Generator',
@@ -227,7 +234,9 @@ const FEATURE_DATA = {
       { value: 'AI', label: 'Powered' },
       { value: '60', label: 'Char Title' },
       { value: '160', label: 'Char Desc' }
-    ]
+    ],
+    proTip: 'Pair with Schema Generator to add structured data alongside your optimized meta. Better SERP presence with both in place.',
+    overviewHeader: 'Meta Data at Scale, Without the Tedium'
   },
   'schema-generator': {
     name: 'Structured Data Generator',
@@ -235,7 +244,7 @@ const FEATURE_DATA = {
     icon: Code,
     color: 'orange',
     description: 'Generate valid JSON-LD structured data for 40+ schema types. Improve rich snippet eligibility and help search engines understand your content.',
-    longDescription: 'Structured data is essential for modern SEO, but writing valid JSON-LD is tedious and error-prone. Our Schema Generator makes it easy to create properly formatted schema markup for any content type.',
+    longDescription: 'Structured data is essential for modern search visibility, but writing valid JSON-LD is tedious and error-prone. Our Schema Generator makes it easy to create properly formatted schema markup for any content type.',
     features: [
       {
         title: '40+ Schema Types',
@@ -278,7 +287,9 @@ const FEATURE_DATA = {
       { value: '40+', label: 'Schema Types' },
       { value: 'JSON', label: '-LD Format' },
       { value: '100%', label: 'Valid Output' }
-    ]
+    ],
+    proTip: 'Add FAQ schema to your help pages, then use the AI Readability Checker to ensure your content structure is AI-friendly. Double the search visibility.',
+    overviewHeader: 'Structured Data Without the Syntax Headaches'
   },
   'image-alt': {
     name: 'Image Alt Generator',
@@ -329,7 +340,62 @@ const FEATURE_DATA = {
       { value: 'AI', label: 'Powered' },
       { value: 'Bulk', label: 'Processing' },
       { value: 'A11y', label: 'Compliant' }
-    ]
+    ],
+    proTip: 'Run an Accessibility Analyzer scan first to find every image missing alt text, then use Image Alt Generator to fix them all at once.',
+    overviewHeader: 'Every Image Deserves a Description'
+  },
+  readability: {
+    name: 'AI Readability Checker',
+    tagline: 'AI Readability Scoring',
+    icon: ScanEye,
+    color: 'teal',
+    description: 'Analyze how AI models read and interpret your content. Get actionable recommendations to improve visibility in AI-generated answers.',
+    longDescription: 'As AI-powered search and assistants become the primary way people discover content, ensuring your pages are readable by AI models is critical. The AI Readability Checker scores your content and provides specific recommendations to improve how AI systems understand and cite your work.',
+    features: [
+      {
+        title: 'AI Readability Scoring',
+        description: 'Get a comprehensive score for how well AI models can parse and understand your content.',
+        icon: BarChart3
+      },
+      {
+        title: 'Content Interpretation View',
+        description: 'See exactly how AI models read and interpret your page content.',
+        icon: ScanEye
+      },
+      {
+        title: 'Actionable Recommendations',
+        description: 'Receive specific, prioritized suggestions to improve AI readability.',
+        icon: Target
+      },
+      {
+        title: 'URL Analysis',
+        description: 'Analyze any live URL to check its AI readability in real time.',
+        icon: Globe
+      },
+      {
+        title: 'HTML Analysis',
+        description: 'Paste raw HTML to analyze content structure and readability.',
+        icon: Code
+      },
+      {
+        title: 'Optimization Insights',
+        description: 'Understand which content patterns improve AI visibility.',
+        icon: Sparkles
+      }
+    ],
+    useCases: [
+      'Optimizing content for AI-powered search engines',
+      'Improving visibility in AI-generated answers',
+      'Auditing existing content for AI readability',
+      'Preparing content strategies for the AI era'
+    ],
+    stats: [
+      { value: 'AI', label: 'Powered' },
+      { value: 'URL', label: 'Analysis' },
+      { value: 'HTML', label: 'Analysis' }
+    ],
+    proTip: 'Check your highest-traffic pages first. Improving AI readability on pages that already rank well compounds your visibility gains.',
+    overviewHeader: 'Your Content Needs to Speak AI\'s Language'
   }
 };
 
@@ -382,6 +448,14 @@ const getColorClasses = (color) => {
       border: 'border-pink-200',
       gradient: 'from-pink-500 to-pink-700',
       light: 'text-pink-100'
+    },
+    teal: {
+      bg: 'bg-teal-50',
+      bgDark: 'bg-teal-100',
+      icon: 'text-teal-600',
+      border: 'border-teal-200',
+      gradient: 'from-teal-500 to-teal-700',
+      light: 'text-teal-100'
     }
   };
   return colors[color] || colors.primary;
@@ -394,7 +468,8 @@ const SCHEMA_KEY_MAP = {
   'accessibility': 'accessibility',
   'meta-generator': 'meta-generator',
   'schema-generator': 'schema-generator',
-  'image-alt': 'image-alt'
+  'image-alt': 'image-alt',
+  'readability': 'readability'
 };
 
 export default function FeatureDetailPage() {
@@ -503,7 +578,7 @@ export default function FeatureDetailPage() {
       <section className="py-20 lg:py-28">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="max-w-3xl">
-            <h2 className="text-3xl font-bold text-charcoal-900">Overview</h2>
+            <h2 className="text-3xl font-bold text-charcoal-900">{feature.overviewHeader || 'Overview'}</h2>
             <p className="mt-6 text-lg text-charcoal-600 leading-relaxed">
               {feature.longDescription}
             </p>
@@ -542,9 +617,9 @@ export default function FeatureDetailPage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid lg:grid-cols-2 gap-12 items-center">
             <div>
-              <h2 className="text-3xl font-bold text-charcoal-900">Perfect For</h2>
+              <h2 className="text-3xl font-bold text-charcoal-900">Who Gets the Most Out of {feature.name}?</h2>
               <p className="mt-4 text-lg text-charcoal-600">
-                {feature.name} is designed for a variety of SEO workflows and team needs.
+                Teams and workflows where {feature.name} makes the biggest difference.
               </p>
               <ul className="mt-8 space-y-4">
                 {feature.useCases.map((useCase, index) => (
@@ -561,8 +636,7 @@ export default function FeatureDetailPage() {
                 <span className={`font-medium ${colors.icon}`}>Pro Tip</span>
               </div>
               <p className="text-charcoal-700 leading-relaxed">
-                Get the most out of {feature.name} by combining it with other tools in Content Strategy Portal.
-                Your projects, audits, and optimizations all work together seamlessly.
+                {feature.proTip}
               </p>
               <Link
                 to="/features"
@@ -580,10 +654,10 @@ export default function FeatureDetailPage() {
       <section className={`py-20 lg:py-28 bg-gradient-to-br ${colors.gradient}`}>
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h2 className="text-3xl lg:text-4xl font-bold text-white">
-            Ready to Try {feature.name}?
+            Try {feature.name} free. Right now.
           </h2>
           <p className={`mt-4 text-xl ${colors.light}`}>
-            Start using {feature.name} today with a free account. No credit card required.
+            No credit card. No sales calls. Start using {feature.name} in under 2 minutes.
           </p>
           <div className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-4">
             <Link

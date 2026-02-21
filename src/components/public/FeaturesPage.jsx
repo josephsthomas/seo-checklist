@@ -6,6 +6,7 @@ import {
   FileText,
   Code,
   Image,
+  ScanEye,
   ArrowRight,
   CheckCircle2,
   Zap
@@ -18,10 +19,10 @@ const FEATURES = [
     name: 'Content Planner',
     slug: 'planner',
     icon: LayoutDashboard,
-    description: 'Comprehensive project management with a 321-item SEO checklist covering all project phases.',
+    description: 'Comprehensive project management with a 353-item checklist covering all content and SEO phases.',
     highlights: [
       'Multi-project dashboard with progress tracking',
-      '321-item checklist across all SEO phases',
+      '353-item checklist across all content phases',
       'Team collaboration with role-based permissions',
       'Timeline management with due dates',
       'Professional Excel and PDF exports'
@@ -74,9 +75,9 @@ const FEATURES = [
     name: 'Schema Generator',
     slug: 'schema-generator',
     icon: Code,
-    description: 'Generate valid JSON-LD structured data for 15+ schema types with one click.',
+    description: 'Generate valid JSON-LD structured data for 40+ schema types with one click.',
     highlights: [
-      'Support for 15+ schema types',
+      'Support for 40+ schema types',
       'JSON-LD structured data format',
       'Real-time validation',
       'Copy-ready code output',
@@ -98,6 +99,20 @@ const FEATURES = [
     ],
     color: 'pink'
   },
+  {
+    name: 'AI Readability Checker',
+    slug: 'readability',
+    icon: ScanEye,
+    description: 'Analyze how AI models read and interpret your content. Get actionable recommendations to improve visibility in AI-generated answers.',
+    highlights: [
+      'AI readability scoring',
+      'See how AI interprets your content',
+      'Actionable improvement recommendations',
+      'URL and HTML analysis',
+      'Content optimization insights'
+    ],
+    color: 'teal'
+  },
 ];
 
 const getColorClasses = (color) => {
@@ -106,37 +121,50 @@ const getColorClasses = (color) => {
       bg: 'bg-primary-50',
       icon: 'text-primary-600',
       border: 'border-primary-200',
-      accent: 'bg-primary-100'
+      accent: 'bg-primary-100',
+      button: 'bg-primary-600 hover:bg-primary-700'
     },
     blue: {
       bg: 'bg-blue-50',
       icon: 'text-blue-600',
       border: 'border-blue-200',
-      accent: 'bg-blue-100'
+      accent: 'bg-blue-100',
+      button: 'bg-blue-600 hover:bg-blue-700'
     },
     emerald: {
       bg: 'bg-emerald-50',
       icon: 'text-emerald-600',
       border: 'border-emerald-200',
-      accent: 'bg-emerald-100'
+      accent: 'bg-emerald-100',
+      button: 'bg-emerald-600 hover:bg-emerald-700'
     },
     violet: {
       bg: 'bg-violet-50',
       icon: 'text-violet-600',
       border: 'border-violet-200',
-      accent: 'bg-violet-100'
+      accent: 'bg-violet-100',
+      button: 'bg-violet-600 hover:bg-violet-700'
     },
     orange: {
       bg: 'bg-orange-50',
       icon: 'text-orange-600',
       border: 'border-orange-200',
-      accent: 'bg-orange-100'
+      accent: 'bg-orange-100',
+      button: 'bg-orange-600 hover:bg-orange-700'
     },
     pink: {
       bg: 'bg-pink-50',
       icon: 'text-pink-600',
       border: 'border-pink-200',
-      accent: 'bg-pink-100'
+      accent: 'bg-pink-100',
+      button: 'bg-pink-600 hover:bg-pink-700'
+    },
+    teal: {
+      bg: 'bg-teal-50',
+      icon: 'text-teal-600',
+      border: 'border-teal-200',
+      accent: 'bg-teal-100',
+      button: 'bg-teal-600 hover:bg-teal-700'
     }
   };
   return colors[color] || colors.primary;
@@ -164,14 +192,14 @@ export default function FeaturesPage() {
           <div className="text-center max-w-3xl mx-auto">
             <div className="inline-flex items-center gap-2 px-4 py-2 bg-primary-50 border border-primary-200 rounded-full text-primary-700 text-sm font-medium mb-8">
               <Zap className="w-4 h-4" />
-              6 Powerful Tools
+              All Features
             </div>
             <h1 className="text-4xl sm:text-5xl font-bold text-charcoal-900 tracking-tight">
-              Features Built for SEO Success
+              Every Tool You Need. Zero Busywork.
             </h1>
             <p className="mt-6 text-xl text-charcoal-600 leading-relaxed">
-              From project planning to technical audits, accessibility compliance to AI-powered
-              content optimization. Everything you need in one platform.
+              Planning, auditing, accessibility, metadata, schema, alt text, and AI readability —
+              integrated so you can stop tab-switching and start strategizing.
             </p>
           </div>
         </div>
@@ -208,13 +236,15 @@ export default function FeaturesPage() {
                         </li>
                       ))}
                     </ul>
-                    <Link
-                      to={`/features/${feature.slug}`}
-                      className={`mt-8 inline-flex items-center gap-2 font-medium ${colors.icon} hover:opacity-80 transition-opacity`}
-                    >
-                      Learn more about {feature.name}
-                      <ArrowRight className="w-4 h-4" />
-                    </Link>
+                    <div className="mt-8 flex flex-col sm:flex-row items-start gap-3">
+                      <Link
+                        to={`/features/${feature.slug}`}
+                        className={`inline-flex items-center gap-2 px-5 py-2.5 ${colors.button} text-white font-medium rounded-xl shadow-sm transition-colors text-sm`}
+                      >
+                        Explore {feature.name}
+                        <ArrowRight className="w-4 h-4" />
+                      </Link>
+                    </div>
                   </div>
                   <div className={`${colors.bg} rounded-3xl p-8 lg:p-12 ${isEven ? '' : 'lg:col-start-1'}`}>
                     <div className={`${colors.accent} rounded-2xl p-6 border ${colors.border}`}>
@@ -248,10 +278,10 @@ export default function FeaturesPage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center max-w-3xl mx-auto mb-16">
             <h2 className="text-3xl font-bold text-charcoal-900">
-              All Tools Work Together
+              One Platform Means One Source of Truth
             </h2>
             <p className="mt-4 text-lg text-charcoal-600">
-              Unlike separate point solutions, all our tools are integrated into one cohesive platform.
+              No more tab-switching between separate tools. Everything your content team needs, integrated.
             </p>
           </div>
 
@@ -291,10 +321,10 @@ export default function FeaturesPage() {
       <section className="py-20 lg:py-28 bg-gradient-to-br from-primary-500 to-primary-700">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h2 className="text-3xl lg:text-4xl font-bold text-white">
-            Ready to Experience These Features?
+            Try every tool free. Right now.
           </h2>
           <p className="mt-4 text-xl text-primary-100">
-            Start using all six tools today with a free account.
+            No credit card. No sales calls. No commitment.
           </p>
           <div className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-4">
             <Link

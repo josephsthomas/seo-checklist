@@ -13,25 +13,57 @@ import {
   BookOpen,
   HelpCircle,
   Sparkles,
-  ScanEye
+  ScanEye,
+  ArrowRight
 } from 'lucide-react';
 
-const FEATURES = [
-  { name: 'Content Planner', href: '/features/planner', icon: LayoutDashboard, description: 'Project management & SEO checklists' },
-  { name: 'Technical Audit', href: '/features/audit', icon: Search, description: 'Analyze Screaming Frog exports' },
-  { name: 'Accessibility Analyzer', href: '/features/accessibility', icon: Eye, description: 'WCAG compliance scanning' },
-  { name: 'Meta Data Generator', href: '/features/meta-generator', icon: FileText, description: 'AI-powered meta optimization' },
-  { name: 'Schema Generator', href: '/features/schema-generator', icon: Code, description: 'JSON-LD structured data' },
-  { name: 'Image Alt Generator', href: '/features/image-alt', icon: Image, description: 'Bulk alt text generation' },
-  { name: 'AI Readability Checker', href: '/features/readability', icon: ScanEye, description: 'AI readability scoring' },
+const FEATURE_CATEGORIES = [
+  {
+    label: 'Plan & Manage',
+    tools: [
+      { name: 'Content Planner', href: '/features/planner', icon: LayoutDashboard, description: '353-item checklist & project management', color: 'primary' },
+    ]
+  },
+  {
+    label: 'Audit & Analyze',
+    tools: [
+      { name: 'Technical Audit', href: '/features/audit', icon: Search, description: 'Screaming Frog analysis with AI recommendations', color: 'blue' },
+      { name: 'Accessibility Analyzer', href: '/features/accessibility', icon: Eye, description: 'WCAG 2.2 compliance scanning & VPAT reports', color: 'emerald' },
+      { name: 'AI Readability Checker', href: '/features/readability', icon: ScanEye, description: 'Optimize content for AI-powered search', color: 'teal' },
+    ]
+  },
+  {
+    label: 'Generate & Optimize',
+    tools: [
+      { name: 'Meta Data Generator', href: '/features/meta-generator', icon: FileText, description: 'AI-powered title & description optimization', color: 'violet' },
+      { name: 'Schema Generator', href: '/features/schema-generator', icon: Code, description: 'JSON-LD structured data for 40+ types', color: 'orange' },
+      { name: 'Image Alt Generator', href: '/features/image-alt', icon: Image, description: 'Bulk accessible alt text generation', color: 'pink' },
+    ]
+  }
 ];
+
+// Flat list for mobile
+const ALL_FEATURES = FEATURE_CATEGORIES.flatMap(cat => cat.tools);
 
 const HELP_LINKS = [
   { name: 'Help Center', href: '/help', icon: HelpCircle, description: 'Documentation & guides' },
   { name: 'Getting Started', href: '/help/getting-started', icon: Sparkles, description: 'Quick start guide' },
-  { name: 'Resource Library', href: '/help/resources', icon: BookOpen, description: '200+ SEO resources' },
-  { name: 'Glossary', href: '/help/glossary', icon: FileText, description: 'SEO terminology' },
+  { name: 'Resource Library', href: '/help/resources', icon: BookOpen, description: '200+ content strategy resources' },
+  { name: 'Glossary', href: '/help/glossary', icon: FileText, description: 'Content & SEO terminology' },
 ];
+
+const getIconColors = (color) => {
+  const map = {
+    primary: { bg: 'bg-primary-50', text: 'text-primary-600' },
+    blue: { bg: 'bg-blue-50', text: 'text-blue-600' },
+    emerald: { bg: 'bg-emerald-50', text: 'text-emerald-600' },
+    teal: { bg: 'bg-teal-50', text: 'text-teal-600' },
+    violet: { bg: 'bg-violet-50', text: 'text-violet-600' },
+    orange: { bg: 'bg-orange-50', text: 'text-orange-600' },
+    pink: { bg: 'bg-pink-50', text: 'text-pink-600' },
+  };
+  return map[color] || map.primary;
+};
 
 export default function PublicNavigation() {
   const location = useLocation();
@@ -99,7 +131,7 @@ export default function PublicNavigation() {
               Home
             </Link>
 
-            {/* Features Dropdown */}
+            {/* Features Mega Nav */}
             <div ref={featuresRef} className="relative">
               <button
                 onClick={() => {
@@ -121,33 +153,58 @@ export default function PublicNavigation() {
 
               {featuresOpen && (
                 <div
-                  className="absolute top-full left-0 mt-2 w-80 bg-white rounded-2xl shadow-xl border border-charcoal-100 p-2 animate-in fade-in slide-in-from-top-2 duration-200"
+                  className="absolute top-full -left-32 mt-2 w-[720px] bg-white rounded-2xl shadow-xl border border-charcoal-100 p-6 animate-in fade-in slide-in-from-top-2 duration-200"
                   role="menu"
                   aria-orientation="vertical"
                   aria-labelledby="features-menu"
                 >
-                  <Link
-                    to="/features"
-                    className="block px-4 py-3 rounded-xl hover:bg-charcoal-50 transition-colors border-b border-charcoal-100 mb-2"
-                  >
-                    <span className="font-medium text-charcoal-900">All Features</span>
-                    <p className="text-xs text-charcoal-500 mt-0.5">Overview of all tools</p>
-                  </Link>
-                  {FEATURES.map((feature) => (
+                  <div className="grid grid-cols-3 gap-6">
+                    {FEATURE_CATEGORIES.map((category) => (
+                      <div key={category.label}>
+                        <div className="text-xs font-semibold text-charcoal-400 uppercase tracking-wider mb-3 px-1">
+                          {category.label}
+                        </div>
+                        <div className="space-y-1">
+                          {category.tools.map((tool) => {
+                            const colors = getIconColors(tool.color);
+                            return (
+                              <Link
+                                key={tool.href}
+                                to={tool.href}
+                                className="flex items-start gap-3 px-3 py-2.5 rounded-xl hover:bg-charcoal-50 transition-colors group/item"
+                              >
+                                <div className={`w-9 h-9 ${colors.bg} rounded-lg flex items-center justify-center flex-shrink-0`}>
+                                  <tool.icon className={`w-5 h-5 ${colors.text}`} />
+                                </div>
+                                <div className="min-w-0">
+                                  <span className="font-medium text-charcoal-900 text-sm group-hover/item:text-primary-600 transition-colors">{tool.name}</span>
+                                  <p className="text-xs text-charcoal-500 mt-0.5 leading-relaxed">{tool.description}</p>
+                                </div>
+                              </Link>
+                            );
+                          })}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+
+                  {/* Footer CTA */}
+                  <div className="mt-5 pt-4 border-t border-charcoal-100 flex items-center justify-between">
                     <Link
-                      key={feature.href}
-                      to={feature.href}
-                      className="flex items-start gap-3 px-4 py-3 rounded-xl hover:bg-charcoal-50 transition-colors"
+                      to="/features"
+                      className="text-sm font-medium text-charcoal-600 hover:text-primary-600 transition-colors flex items-center gap-1"
                     >
-                      <div className="w-9 h-9 bg-primary-50 rounded-lg flex items-center justify-center flex-shrink-0">
-                        <feature.icon className="w-5 h-5 text-primary-600" />
-                      </div>
-                      <div>
-                        <span className="font-medium text-charcoal-900 text-sm">{feature.name}</span>
-                        <p className="text-xs text-charcoal-500 mt-0.5">{feature.description}</p>
-                      </div>
+                      View all features
+                      <ArrowRight className="w-3.5 h-3.5" />
                     </Link>
-                  ))}
+                    <Link
+                      to="/register"
+                      className="text-sm font-medium text-primary-600 hover:text-primary-700 transition-colors flex items-center gap-1"
+                    >
+                      Start free
+                      <ArrowRight className="w-3.5 h-3.5" />
+                    </Link>
+                  </div>
                 </div>
               )}
             </div>
@@ -208,6 +265,17 @@ export default function PublicNavigation() {
             >
               About
             </Link>
+
+            <Link
+              to="/contact"
+              className={`px-4 py-2 text-sm font-medium rounded-lg transition-colors ${
+                location.pathname === '/contact'
+                  ? 'text-primary-600 bg-primary-50'
+                  : 'text-charcoal-600 hover:text-charcoal-900 hover:bg-charcoal-50'
+              }`}
+            >
+              Contact
+            </Link>
           </div>
 
           {/* Auth Buttons */}
@@ -222,7 +290,7 @@ export default function PublicNavigation() {
               to="/register"
               className="px-5 py-2.5 bg-gradient-to-r from-primary-500 to-primary-600 hover:from-primary-600 hover:to-primary-700 text-white text-sm font-medium rounded-xl shadow-lg shadow-primary-500/25 hover:shadow-primary-500/40 transition-all duration-200"
             >
-              Sign Up Free
+              Start Free
             </Link>
           </div>
 
@@ -261,19 +329,26 @@ export default function PublicNavigation() {
                   <ChevronDown className={`w-5 h-5 transition-transform ${featuresOpen ? 'rotate-180' : ''}`} aria-hidden="true" />
                 </button>
                 {featuresOpen && (
-                  <div className="pl-4 space-y-1 mt-1">
-                    <Link to="/features" className="block px-4 py-2 text-sm text-charcoal-600 hover:text-primary-600">
-                      All Features
-                    </Link>
-                    {FEATURES.map((feature) => (
-                      <Link
-                        key={feature.href}
-                        to={feature.href}
-                        className="block px-4 py-2 text-sm text-charcoal-600 hover:text-primary-600"
-                      >
-                        {feature.name}
-                      </Link>
+                  <div className="pl-4 mt-1 space-y-3">
+                    {FEATURE_CATEGORIES.map((category) => (
+                      <div key={category.label}>
+                        <div className="px-4 py-1 text-xs font-semibold text-charcoal-400 uppercase tracking-wider">
+                          {category.label}
+                        </div>
+                        {category.tools.map((tool) => (
+                          <Link
+                            key={tool.href}
+                            to={tool.href}
+                            className="block px-4 py-2 text-sm text-charcoal-600 hover:text-primary-600"
+                          >
+                            {tool.name}
+                          </Link>
+                        ))}
+                      </div>
                     ))}
+                    <Link to="/features" className="block px-4 py-2 text-sm font-medium text-primary-600">
+                      View all features
+                    </Link>
                   </div>
                 )}
               </div>
@@ -312,6 +387,15 @@ export default function PublicNavigation() {
               >
                 About
               </Link>
+
+              <Link
+                to="/contact"
+                className={`block px-4 py-3 rounded-xl font-medium ${
+                  location.pathname === '/contact' ? 'bg-primary-50 text-primary-600' : 'text-charcoal-700 hover:bg-charcoal-50'
+                }`}
+              >
+                Contact
+              </Link>
             </div>
 
             {/* Mobile Auth Buttons */}
@@ -326,7 +410,7 @@ export default function PublicNavigation() {
                 to="/register"
                 className="block w-full px-4 py-3 text-center font-medium text-white bg-gradient-to-r from-primary-500 to-primary-600 rounded-xl"
               >
-                Sign Up Free
+                Start Free
               </Link>
             </div>
           </div>

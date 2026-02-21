@@ -52,9 +52,9 @@ export default function GlossaryPage() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Header */}
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-charcoal-900 mb-2">SEO Glossary</h1>
+          <h1 className="text-3xl font-bold text-charcoal-900 mb-2">Content Strategy & SEO Glossary</h1>
           <p className="text-charcoal-600">
-            Comprehensive definitions of SEO terms and concepts
+            Comprehensive definitions of content strategy and SEO terms
           </p>
         </div>
 

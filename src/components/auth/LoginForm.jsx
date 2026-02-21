@@ -44,7 +44,7 @@ export default function LoginForm() {
       <div className="max-w-md w-full">
         <div className="text-center mb-8">
           <h1 className="text-4xl font-bold text-primary-600 dark:text-primary-400 mb-2">Content Strategy Portal</h1>
-          <p className="text-charcoal-600 dark:text-charcoal-400">All-in-one content and SEO suite for organic health & visibility</p>
+          <p className="text-charcoal-600 dark:text-charcoal-400">Your complete content strategy platform.</p>
         </div>
 
         <div className="card dark:bg-charcoal-800 dark:border-charcoal-700 p-8">
