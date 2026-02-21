@@ -39,8 +39,8 @@ export default function Footer() {
               </div>
             </Link>
             <p className="text-charcoal-300 text-sm max-w-md leading-relaxed">
-              Your all-in-one content and SEO suite for organic health & visibility.
-              Streamline your workflow with powerful tools designed for modern content professionals.
+              Your complete content strategy PowerSuite. Plan, audit, optimize,
+              and ensure accessibility — all in one platform.
             </p>
           </div>
 
@@ -76,6 +76,11 @@ export default function Footer() {
               <li>
                 <Link to="/features/image-alt" className="text-charcoal-400 hover:text-white text-sm transition-colors duration-200">
                   Image Alt Generator
+                </Link>
+              </li>
+              <li>
+                <Link to="/features/readability" className="text-charcoal-400 hover:text-white text-sm transition-colors duration-200">
+                  AI Readability Checker
                 </Link>
               </li>
             </ul>

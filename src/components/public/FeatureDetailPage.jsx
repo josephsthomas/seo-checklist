@@ -6,6 +6,7 @@ import {
   FileText,
   Code,
   Image,
+  ScanEye,
   ArrowRight,
   ArrowLeft,
   CheckCircle2,
@@ -330,6 +331,57 @@ const FEATURE_DATA = {
       { value: 'Bulk', label: 'Processing' },
       { value: 'A11y', label: 'Compliant' }
     ]
+  },
+  readability: {
+    name: 'AI Readability Checker',
+    tagline: 'AI Readability Scoring',
+    icon: ScanEye,
+    color: 'teal',
+    description: 'Analyze how AI models read and interpret your content. Get actionable recommendations to improve visibility in AI-generated answers.',
+    longDescription: 'As AI-powered search and assistants become the primary way people discover content, ensuring your pages are readable by AI models is critical. The AI Readability Checker scores your content and provides specific recommendations to improve how AI systems understand and cite your work.',
+    features: [
+      {
+        title: 'AI Readability Scoring',
+        description: 'Get a comprehensive score for how well AI models can parse and understand your content.',
+        icon: BarChart3
+      },
+      {
+        title: 'Content Interpretation View',
+        description: 'See exactly how AI models read and interpret your page content.',
+        icon: ScanEye
+      },
+      {
+        title: 'Actionable Recommendations',
+        description: 'Receive specific, prioritized suggestions to improve AI readability.',
+        icon: Target
+      },
+      {
+        title: 'URL Analysis',
+        description: 'Analyze any live URL to check its AI readability in real time.',
+        icon: Globe
+      },
+      {
+        title: 'HTML Analysis',
+        description: 'Paste raw HTML to analyze content structure and readability.',
+        icon: Code
+      },
+      {
+        title: 'Optimization Insights',
+        description: 'Understand which content patterns improve AI visibility.',
+        icon: Sparkles
+      }
+    ],
+    useCases: [
+      'Optimizing content for AI-powered search engines',
+      'Improving visibility in AI-generated answers',
+      'Auditing existing content for AI readability',
+      'Preparing content strategies for the AI era'
+    ],
+    stats: [
+      { value: 'AI', label: 'Powered' },
+      { value: 'URL', label: 'Analysis' },
+      { value: 'HTML', label: 'Analysis' }
+    ]
   }
 };
 
@@ -382,6 +434,14 @@ const getColorClasses = (color) => {
       border: 'border-pink-200',
       gradient: 'from-pink-500 to-pink-700',
       light: 'text-pink-100'
+    },
+    teal: {
+      bg: 'bg-teal-50',
+      bgDark: 'bg-teal-100',
+      icon: 'text-teal-600',
+      border: 'border-teal-200',
+      gradient: 'from-teal-500 to-teal-700',
+      light: 'text-teal-100'
     }
   };
   return colors[color] || colors.primary;
@@ -394,7 +454,8 @@ const SCHEMA_KEY_MAP = {
   'accessibility': 'accessibility',
   'meta-generator': 'meta-generator',
   'schema-generator': 'schema-generator',
-  'image-alt': 'image-alt'
+  'image-alt': 'image-alt',
+  'readability': 'readability'
 };
 
 export default function FeatureDetailPage() {
@@ -544,7 +605,7 @@ export default function FeatureDetailPage() {
             <div>
               <h2 className="text-3xl font-bold text-charcoal-900">Perfect For</h2>
               <p className="mt-4 text-lg text-charcoal-600">
-                {feature.name} is designed for a variety of SEO workflows and team needs.
+                {feature.name} is designed for a variety of content workflows and team needs.
               </p>
               <ul className="mt-8 space-y-4">
                 {feature.useCases.map((useCase, index) => (

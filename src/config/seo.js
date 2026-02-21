@@ -7,7 +7,7 @@
 
 const SITE_NAME = 'Content Strategy Portal';
 const SITE_URL = import.meta.env.VITE_SITE_URL || 'https://contentstrategyportal.com';
-const SITE_DESCRIPTION = 'AI-powered SEO management platform with project planning, technical audits, accessibility compliance, and content optimization tools for agencies and enterprise teams.';
+const SITE_DESCRIPTION = 'AI-powered content strategy platform with project planning, technical audits, accessibility compliance, AI readability analysis, and content optimization tools for agencies and enterprise teams.';
 
 /**
  * Default meta tags applied to all pages
@@ -26,31 +26,31 @@ export const defaultMeta = {
  */
 export const pageSEO = {
   home: {
-    title: 'SEO Project Management & Technical Audits for Agencies | Content Strategy Portal',
-    description: 'Manage SEO projects with 353-item checklists, run technical audits in minutes, ensure WCAG accessibility compliance. Free tier available for agencies managing multiple client sites.',
+    title: 'Content Strategy & SEO Tools for Agencies | Content Strategy Portal',
+    description: 'Plan projects with 353-item checklists, run technical audits in minutes, ensure WCAG accessibility compliance, and analyze AI readability. 7 integrated tools for teams managing content at scale.',
     canonical: '/',
-    keywords: 'SEO project management, technical SEO audit, content checklist, SEO agency tools, WCAG compliance'
+    keywords: 'content strategy tools, SEO project management, technical SEO audit, content checklist, WCAG compliance, AI readability'
   },
 
   about: {
-    title: 'About Us - AI-Powered SEO Tools for Modern Agencies | Content Strategy Portal',
-    description: 'Content Strategy Portal unifies SEO project management, technical audits, accessibility analysis, and AI-powered content tools in one platform. Built for agencies and enterprise teams.',
+    title: 'About Us - AI-Powered Content Strategy Tools | Content Strategy Portal',
+    description: 'Content Strategy Portal unifies project management, technical audits, accessibility analysis, AI readability, and content optimization tools in one platform. Built for agencies and enterprise teams.',
     canonical: '/about',
-    keywords: 'about content strategy portal, SEO platform, agency SEO tools'
+    keywords: 'about content strategy portal, content strategy platform, agency content tools'
   },
 
   features: {
-    title: '6 SEO Tools: Content Planner, Audits, Accessibility & More | Content Strategy Portal',
-    description: 'Explore our integrated SEO suite: Content Planner (353-item checklist), Technical Audit (31 categories), Accessibility Analyzer (WCAG 2.2), Meta Generator, Schema Generator, and Image Alt Generator.',
+    title: '7 Content Strategy Tools: Planner, Audits, Accessibility & More | Content Strategy Portal',
+    description: 'Explore our integrated content strategy suite: Content Planner (353-item checklist), Technical Audit (31 categories), Accessibility Analyzer (WCAG 2.2), Meta Generator, Schema Generator, Image Alt Generator, and AI Readability Checker.',
     canonical: '/features',
-    keywords: 'SEO tools, content planner, technical audit tool, accessibility checker, meta generator, schema markup'
+    keywords: 'content strategy tools, content planner, technical audit tool, accessibility checker, meta generator, schema markup, AI readability'
   },
 
   'features/planner': {
-    title: 'Content Planner - 353-Item SEO Checklist & Project Management | CSP',
-    description: 'Manage SEO projects with our comprehensive 353-item checklist. Track progress across 6 phases, collaborate with teams, and export branded PDF/Excel reports. Free tier available.',
+    title: 'Content Planner - 353-Item Checklist & Project Management | CSP',
+    description: 'Manage content projects with our comprehensive 353-item checklist. Track progress across 6 phases, collaborate with teams, and export branded PDF/Excel reports. Free tier available.',
     canonical: '/features/planner',
-    keywords: 'SEO checklist, content planner, SEO project management, website launch checklist'
+    keywords: 'content checklist, content planner, project management, website launch checklist'
   },
 
   'features/audit': {
@@ -132,9 +132,9 @@ export const pageSEO = {
 
   register: {
     title: 'Create Free Account | Content Strategy Portal',
-    description: 'Create your free Content Strategy Portal account. Access SEO project management, technical audits, accessibility tools, and AI-powered content optimization.',
+    description: 'Create your free Content Strategy Portal account. Access project management, technical audits, accessibility tools, AI readability analysis, and content optimization.',
     canonical: '/register',
-    keywords: 'sign up, create account, free SEO tools'
+    keywords: 'sign up, create account, free content strategy tools'
   }
 };
 
@@ -287,6 +287,28 @@ export const softwareSchemas = {
       'EXIF embedding'
     ],
     screenshot: `${SITE_URL}/screenshots/image-alt.png`
+  },
+
+  readability: {
+    '@context': 'https://schema.org',
+    '@type': 'SoftwareApplication',
+    name: 'AI Readability Checker',
+    description: 'Analyze how AI models read and interpret your content. Get actionable recommendations to improve visibility in AI-generated answers.',
+    applicationCategory: 'BusinessApplication',
+    operatingSystem: 'Web',
+    offers: {
+      '@type': 'Offer',
+      price: '0',
+      priceCurrency: 'USD'
+    },
+    featureList: [
+      'AI readability scoring',
+      'Content interpretation analysis',
+      'Actionable recommendations',
+      'URL and HTML analysis',
+      'Optimization insights'
+    ],
+    screenshot: `${SITE_URL}/screenshots/readability.png`
   }
 };
 

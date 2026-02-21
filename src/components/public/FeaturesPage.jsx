@@ -6,6 +6,7 @@ import {
   FileText,
   Code,
   Image,
+  ScanEye,
   ArrowRight,
   CheckCircle2,
   Zap
@@ -98,6 +99,20 @@ const FEATURES = [
     ],
     color: 'pink'
   },
+  {
+    name: 'AI Readability Checker',
+    slug: 'readability',
+    icon: ScanEye,
+    description: 'Analyze how AI models read and interpret your content. Get actionable recommendations to improve visibility in AI-generated answers.',
+    highlights: [
+      'AI readability scoring',
+      'See how AI interprets your content',
+      'Actionable improvement recommendations',
+      'URL and HTML analysis',
+      'Content optimization insights'
+    ],
+    color: 'teal'
+  },
 ];
 
 const getColorClasses = (color) => {
@@ -137,6 +152,12 @@ const getColorClasses = (color) => {
       icon: 'text-pink-600',
       border: 'border-pink-200',
       accent: 'bg-pink-100'
+    },
+    teal: {
+      bg: 'bg-teal-50',
+      icon: 'text-teal-600',
+      border: 'border-teal-200',
+      accent: 'bg-teal-100'
     }
   };
   return colors[color] || colors.primary;
@@ -164,14 +185,14 @@ export default function FeaturesPage() {
           <div className="text-center max-w-3xl mx-auto">
             <div className="inline-flex items-center gap-2 px-4 py-2 bg-primary-50 border border-primary-200 rounded-full text-primary-700 text-sm font-medium mb-8">
               <Zap className="w-4 h-4" />
-              6 Powerful Tools
+              7 Powerful Tools
             </div>
             <h1 className="text-4xl sm:text-5xl font-bold text-charcoal-900 tracking-tight">
-              Features Built for SEO Success
+              Features Built for Content Excellence
             </h1>
             <p className="mt-6 text-xl text-charcoal-600 leading-relaxed">
-              From project planning to technical audits, accessibility compliance to AI-powered
-              content optimization. Everything you need in one platform.
+              From project planning to technical audits, accessibility compliance to AI readability
+              analysis. Everything you need in one platform.
             </p>
           </div>
         </div>
@@ -294,7 +315,7 @@ export default function FeaturesPage() {
             Ready to Experience These Features?
           </h2>
           <p className="mt-4 text-xl text-primary-100">
-            Start using all six tools today with a free account.
+            Start using all seven tools today with a free account.
           </p>
           <div className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-4">
             <Link

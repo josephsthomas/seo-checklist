@@ -7,9 +7,7 @@ import {
   ArrowRight,
   Shield,
   Zap,
-  Globe,
-  Linkedin,
-  Twitter
+  Globe
 } from 'lucide-react';
 import SEOHead from '../shared/SEOHead';
 import { organizationSchema } from '../../config/seo';
@@ -18,7 +16,7 @@ const VALUES = [
   {
     icon: Target,
     title: 'Results-Driven',
-    description: 'Every feature is designed to deliver measurable improvements in your SEO performance.'
+    description: 'Every feature is designed to deliver measurable improvements in your content performance.'
   },
   {
     icon: Users,
@@ -28,12 +26,12 @@ const VALUES = [
   {
     icon: Lightbulb,
     title: 'Innovation',
-    description: 'Leveraging AI and modern technology to solve real SEO challenges efficiently.'
+    description: 'Leveraging AI and modern technology to solve real content challenges efficiently.'
   },
   {
     icon: Heart,
     title: 'User-Centric',
-    description: 'Designed with SEO professionals in mind, based on real-world workflows and needs.'
+    description: 'Designed with content professionals in mind, based on real-world workflows and needs.'
   },
 ];
 
@@ -58,29 +56,6 @@ const PRINCIPLES = [
   },
 ];
 
-const TEAM_MEMBERS = [
-  {
-    name: 'Sarah Chen',
-    role: 'Founder & CEO',
-    bio: 'Former SEO Director at a Fortune 500 company with 15+ years in digital marketing.',
-    linkedin: '#',
-    twitter: '#'
-  },
-  {
-    name: 'Marcus Rodriguez',
-    role: 'CTO',
-    bio: 'Full-stack engineer passionate about building tools that simplify complex workflows.',
-    linkedin: '#',
-    twitter: '#'
-  },
-  {
-    name: 'Emily Watson',
-    role: 'Head of Product',
-    bio: 'UX specialist who has led product teams at multiple SaaS startups.',
-    linkedin: '#',
-    twitter: '#'
-  }
-];
 
 export default function AboutPage() {
   return (
@@ -106,7 +81,7 @@ export default function AboutPage() {
               About Content Strategy Portal
             </h1>
             <p className="mt-6 text-xl text-charcoal-600 leading-relaxed">
-              We're on a mission to make professional SEO tools accessible to agencies
+              We're on a mission to make professional content strategy tools accessible to agencies
               and enterprise teams of all sizes.
             </p>
           </div>
@@ -119,11 +94,11 @@ export default function AboutPage() {
           <div className="grid lg:grid-cols-2 gap-12 lg:gap-20 items-center">
             <div>
               <h2 className="text-3xl font-bold text-charcoal-900">
-                Built by SEO Professionals, For SEO Professionals
+                Built by Content Professionals, For Content Professionals
               </h2>
               <div className="mt-6 space-y-4 text-charcoal-600 leading-relaxed">
                 <p>
-                  Content Strategy Portal was born from a simple observation: SEO teams were
+                  Content Strategy Portal was born from a simple observation: content teams were
                   using dozens of disconnected tools, spreadsheets, and manual processes to
                   manage their content strategies.
                 </p>
@@ -134,7 +109,7 @@ export default function AboutPage() {
                 </p>
                 <p>
                   Today, our platform helps agencies and enterprise teams streamline their workflows,
-                  deliver consistent results, and scale their SEO operations efficiently.
+                  deliver consistent results, and scale their content operations efficiently.
                 </p>
               </div>
             </div>
@@ -145,7 +120,7 @@ export default function AboutPage() {
                   <div className="mt-1 text-sm text-charcoal-600">Checklist Items</div>
                 </div>
                 <div className="text-center">
-                  <div className="text-4xl font-bold text-primary-600">6</div>
+                  <div className="text-4xl font-bold text-primary-600">7</div>
                   <div className="mt-1 text-sm text-charcoal-600">Integrated Tools</div>
                 </div>
                 <div className="text-center">
@@ -229,51 +204,6 @@ export default function AboutPage() {
         </div>
       </section>
 
-      {/* Team Section */}
-      <section className="py-20 lg:py-28 bg-charcoal-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center max-w-3xl mx-auto mb-16">
-            <h2 className="text-3xl font-bold text-charcoal-900">Meet the Team</h2>
-            <p className="mt-4 text-lg text-charcoal-600">
-              The people behind Content Strategy Portal.
-            </p>
-          </div>
-
-          <div className="grid md:grid-cols-3 gap-8">
-            {TEAM_MEMBERS.map((member, index) => (
-              <div key={index} className="bg-white rounded-2xl p-8 shadow-sm text-center">
-                <div className="w-24 h-24 bg-gradient-to-br from-primary-100 to-cyan-100 rounded-full mx-auto mb-6 flex items-center justify-center">
-                  <span className="text-3xl font-bold text-primary-600">
-                    {member.name.split(' ').map(n => n[0]).join('')}
-                  </span>
-                </div>
-                <h3 className="text-xl font-semibold text-charcoal-900">{member.name}</h3>
-                <p className="text-primary-600 font-medium mt-1">{member.role}</p>
-                <p className="mt-4 text-charcoal-600 text-sm leading-relaxed">
-                  {member.bio}
-                </p>
-                <div className="mt-6 flex items-center justify-center gap-3">
-                  <a
-                    href={member.linkedin}
-                    className="p-2 text-charcoal-400 hover:text-primary-600 hover:bg-primary-50 rounded-lg transition-colors"
-                    aria-label={`${member.name} on LinkedIn`}
-                  >
-                    <Linkedin className="w-5 h-5" />
-                  </a>
-                  <a
-                    href={member.twitter}
-                    className="p-2 text-charcoal-400 hover:text-primary-600 hover:bg-primary-50 rounded-lg transition-colors"
-                    aria-label={`${member.name} on Twitter`}
-                  >
-                    <Twitter className="w-5 h-5" />
-                  </a>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
       {/* Platform Overview */}
       <section className="py-20 lg:py-28 bg-gradient-to-br from-charcoal-900 to-charcoal-800">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -293,7 +223,7 @@ export default function AboutPage() {
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                     </svg>
                   </div>
-                  <span className="text-charcoal-200">Unified dashboard for all SEO activities</span>
+                  <span className="text-charcoal-200">Unified dashboard for all content activities</span>
                 </li>
                 <li className="flex items-start gap-3">
                   <div className="w-6 h-6 bg-primary-500 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
@@ -323,11 +253,12 @@ export default function AboutPage() {
             </div>
             <div className="bg-charcoal-800/50 rounded-2xl p-8 border border-charcoal-700">
               <div className="text-center">
-                <div className="text-5xl font-bold text-primary-400">6</div>
+                <div className="text-5xl font-bold text-primary-400">7</div>
                 <div className="mt-2 text-xl text-white">Integrated Tools</div>
                 <p className="mt-4 text-charcoal-400">
                   Content Planner, Technical Audit, Accessibility Analyzer,
-                  Meta Generator, Schema Generator, and Image Alt Generator.
+                  Meta Generator, Schema Generator, Image Alt Generator,
+                  and AI Readability Checker.
                 </p>
                 <Link
                   to="/features"
@@ -349,7 +280,7 @@ export default function AboutPage() {
             Ready to Get Started?
           </h2>
           <p className="mt-4 text-xl text-primary-100">
-            Join the growing community of SEO professionals using Content Strategy Portal.
+            Join the growing community of content professionals using Content Strategy Portal.
           </p>
           <div className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-4">
             <Link

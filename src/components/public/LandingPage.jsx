@@ -6,6 +6,7 @@ import {
   FileText,
   Code,
   Image,
+  ScanEye,
   ArrowRight,
   CheckCircle2,
   Zap,
@@ -61,20 +62,27 @@ const FEATURES = [
     description: 'Bulk alt text generation to improve accessibility and image SEO.',
     color: 'pink'
   },
+  {
+    name: 'AI Readability Checker',
+    href: '/features/readability',
+    icon: ScanEye,
+    description: 'Analyze how AI models read your content. Get recommendations to improve visibility in AI-generated answers.',
+    color: 'teal'
+  },
 ];
 
 const BENEFITS = [
-  { icon: Clock, title: 'Save 10+ Hours Weekly', description: 'Automate repetitive SEO tasks and focus on strategy' },
-  { icon: TrendingUp, title: 'Improve Rankings', description: 'Data-driven recommendations that actually work' },
-  { icon: Shield, title: 'Ensure Compliance', description: 'Stay ahead of accessibility and SEO best practices' },
+  { icon: Clock, title: 'Save 10+ Hours Weekly', description: 'Automate repetitive content tasks and focus on strategy' },
+  { icon: TrendingUp, title: 'Improve Visibility', description: 'Data-driven recommendations that actually work' },
+  { icon: Shield, title: 'Ensure Compliance', description: 'Stay ahead of accessibility and content best practices' },
   { icon: Users, title: 'Team Collaboration', description: 'Work together with role-based permissions' },
 ];
 
 const STATS = [
-  { value: '321', label: 'SEO Checklist Items' },
+  { value: '353', label: 'Checklist Items' },
   { value: '31', label: 'Audit Categories' },
   { value: '93', label: 'Accessibility Rules' },
-  { value: '200+', label: 'Learning Resources' },
+  { value: '7', label: 'Integrated Tools' },
 ];
 
 export default function LandingPage() {
@@ -84,7 +92,7 @@ export default function LandingPage() {
     '@type': 'WebSite',
     name: 'Content Strategy Portal',
     url: 'https://contentstrategyportal.com',
-    description: 'AI-powered SEO management platform for agencies and enterprise teams.',
+    description: 'AI-powered content strategy platform for agencies and enterprise teams.',
     potentialAction: {
       '@type': 'SearchAction',
       target: 'https://contentstrategyportal.com/search?q={search_term_string}',
@@ -112,20 +120,20 @@ export default function LandingPage() {
           <div className="text-center max-w-4xl mx-auto">
             <div className="inline-flex items-center gap-2 px-4 py-2 bg-primary-50 border border-primary-200 rounded-full text-primary-700 text-sm font-medium mb-8">
               <Zap className="w-4 h-4" aria-hidden="true" />
-              Built for SEO Agencies & In-House Teams
+              The Content Strategy PowerSuite
             </div>
 
             <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-charcoal-900 tracking-tight leading-tight">
-              SEO Project Management{' '}
+              The Content Strategy Platform{' '}
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary-500 to-primary-700">
-                That Actually Works
+                That Delivers
               </span>
             </h1>
 
             <p className="mt-6 text-xl text-charcoal-600 max-w-2xl mx-auto leading-relaxed">
-              Run technical audits in 5 minutes. Track 321 SEO checklist items per project.
-              Ensure WCAG 2.2 accessibility. Generate AI-optimized metadata.
-              <span className="block mt-2 font-medium text-charcoal-700">One platform for agencies managing 10+ client sites.</span>
+              Plan projects with 353-item checklists. Run technical audits in minutes.
+              Ensure WCAG 2.2 accessibility. Analyze AI readability. Generate optimized metadata.
+              <span className="block mt-2 font-medium text-charcoal-700">One platform for teams managing content at scale.</span>
             </p>
 
             <div className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-4">
@@ -140,7 +148,7 @@ export default function LandingPage() {
                 to="/features"
                 className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-8 py-4 bg-white hover:bg-charcoal-50 text-charcoal-700 font-semibold rounded-xl border border-charcoal-200 transition-colors"
               >
-                Explore All 6 Tools
+                Explore All 7 Tools
               </Link>
             </div>
 
@@ -182,10 +190,10 @@ export default function LandingPage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center max-w-3xl mx-auto mb-16">
             <h2 className="text-3xl lg:text-4xl font-bold text-charcoal-900">
-              Everything You Need for SEO Success
+              Everything You Need for Content Excellence
             </h2>
             <p className="mt-4 text-lg text-charcoal-600">
-              Six powerful tools working together to streamline your content strategy workflow.
+              Seven powerful tools working together to streamline your content strategy workflow.
             </p>
           </div>
 
@@ -202,6 +210,7 @@ export default function LandingPage() {
                   feature.color === 'emerald' ? 'bg-emerald-50' :
                   feature.color === 'violet' ? 'bg-violet-50' :
                   feature.color === 'orange' ? 'bg-orange-50' :
+                  feature.color === 'teal' ? 'bg-teal-50' :
                   'bg-pink-50'
                 }`}>
                   <feature.icon className={`w-6 h-6 ${
@@ -210,6 +219,7 @@ export default function LandingPage() {
                     feature.color === 'emerald' ? 'text-emerald-600' :
                     feature.color === 'violet' ? 'text-violet-600' :
                     feature.color === 'orange' ? 'text-orange-600' :
+                    feature.color === 'teal' ? 'text-teal-600' :
                     'text-pink-600'
                   }`} />
                 </div>
@@ -246,7 +256,7 @@ export default function LandingPage() {
               Why Teams Choose Content Strategy Portal
             </h2>
             <p className="mt-4 text-lg text-charcoal-300">
-              Built by SEO professionals, for SEO professionals.
+              Built by content professionals, for content professionals.
             </p>
           </div>
 
@@ -360,7 +370,7 @@ export default function LandingPage() {
             Ready to Transform Your Content Strategy?
           </h2>
           <p className="mt-4 text-xl text-primary-100">
-            Join thousands of SEO professionals using Content Strategy Portal to deliver better results.
+            Join thousands of content professionals using Content Strategy Portal to deliver better results.
           </p>
           <div className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-4">
             <Link
