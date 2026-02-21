@@ -5,7 +5,7 @@
  */
 
 import { useState, useEffect } from 'react';
-import { Play, Square, Clock, Plus, Trash2 } from 'lucide-react';
+import { Play, Square, Clock, Plus, Trash2, Pencil, Check, X } from 'lucide-react';
 import { useTimeTracking } from '../../hooks/useTimeTracking';
 import { format } from 'date-fns';
 
@@ -18,6 +18,7 @@ export default function TimeTracker({ projectId, itemId, estimatedHours }) {
     stopTimer,
     addManualEntry,
     deleteEntry,
+    updateEntry,
     getTotalMinutes,
     formatDuration
   } = useTimeTracking(projectId, itemId);
@@ -27,6 +28,28 @@ export default function TimeTracker({ projectId, itemId, estimatedHours }) {
   const [manualNotes, setManualNotes] = useState('');
   const [timerNotes, setTimerNotes] = useState('');
   const [elapsedTime, setElapsedTime] = useState('00:00:00');
+  const [editingEntryId, setEditingEntryId] = useState(null);
+  const [editMinutes, setEditMinutes] = useState('');
+  const [editNotes, setEditNotes] = useState('');
+
+  const startEditing = (entry) => {
+    setEditingEntryId(entry.id);
+    setEditMinutes(String(entry.minutes || ''));
+    setEditNotes(entry.notes || '');
+  };
+
+  const cancelEditing = () => {
+    setEditingEntryId(null);
+    setEditMinutes('');
+    setEditNotes('');
+  };
+
+  const saveEdit = async (entryId) => {
+    const minutes = parseInt(editMinutes, 10);
+    if (!minutes || minutes <= 0) return;
+    await updateEntry(entryId, { minutes, notes: editNotes });
+    setEditingEntryId(null);
+  };
 
   // Update elapsed time for active timer
   useEffect(() => {
@@ -246,31 +269,80 @@ export default function TimeTracker({ projectId, itemId, estimatedHours }) {
                   key={entry.id}
                   className="p-3 bg-charcoal-50 rounded text-sm"
                 >
-                  <div className="flex items-start justify-between">
-                    <div className="flex-1">
-                      <div className="flex items-center gap-2 mb-1">
-                        <span className="font-medium text-charcoal-900">
-                          {formatDuration(entry.minutes)}
-                        </span>
-                        {entry.isManual && (
-                          <span className="text-xs px-2 py-0.5 bg-yellow-100 text-yellow-800 rounded">
-                            Manual
-                          </span>
-                        )}
+                  {editingEntryId === entry.id ? (
+                    <div className="space-y-2">
+                      <div className="flex gap-2">
+                        <input
+                          type="number"
+                          value={editMinutes}
+                          onChange={(e) => setEditMinutes(e.target.value)}
+                          className="input w-20 text-sm"
+                          min="1"
+                          placeholder="Min"
+                          aria-label="Minutes"
+                        />
+                        <input
+                          type="text"
+                          value={editNotes}
+                          onChange={(e) => setEditNotes(e.target.value)}
+                          className="input flex-1 text-sm"
+                          placeholder="Notes"
+                          aria-label="Notes"
+                        />
                       </div>
-                      <div className="text-xs text-charcoal-600">
-                        {format(entry.startTime, 'MMM d, h:mm a')}
-                        {entry.notes && ` - ${entry.notes}`}
+                      <div className="flex gap-1 justify-end">
+                        <button
+                          onClick={() => saveEdit(entry.id)}
+                          className="p-1 text-emerald-600 hover:text-emerald-700"
+                          aria-label="Save edit"
+                        >
+                          <Check className="w-4 h-4" />
+                        </button>
+                        <button
+                          onClick={cancelEditing}
+                          className="p-1 text-charcoal-400 hover:text-charcoal-600"
+                          aria-label="Cancel edit"
+                        >
+                          <X className="w-4 h-4" />
+                        </button>
                       </div>
                     </div>
-                    <button
-                      onClick={() => deleteEntry(entry.id)}
-                      className="p-1 text-charcoal-400 hover:text-red-600"
-                      aria-label="Delete time entry"
-                    >
-                      <Trash2 className="w-4 h-4" aria-hidden="true" />
-                    </button>
-                  </div>
+                  ) : (
+                    <div className="flex items-start justify-between">
+                      <div className="flex-1">
+                        <div className="flex items-center gap-2 mb-1">
+                          <span className="font-medium text-charcoal-900">
+                            {formatDuration(entry.minutes)}
+                          </span>
+                          {entry.isManual && (
+                            <span className="text-xs px-2 py-0.5 bg-yellow-100 text-yellow-800 rounded">
+                              Manual
+                            </span>
+                          )}
+                        </div>
+                        <div className="text-xs text-charcoal-600">
+                          {format(entry.startTime, 'MMM d, h:mm a')}
+                          {entry.notes && ` - ${entry.notes}`}
+                        </div>
+                      </div>
+                      <div className="flex gap-1">
+                        <button
+                          onClick={() => startEditing(entry)}
+                          className="p-1 text-charcoal-400 hover:text-blue-600"
+                          aria-label="Edit time entry"
+                        >
+                          <Pencil className="w-4 h-4" aria-hidden="true" />
+                        </button>
+                        <button
+                          onClick={() => deleteEntry(entry.id)}
+                          className="p-1 text-charcoal-400 hover:text-red-600"
+                          aria-label="Delete time entry"
+                        >
+                          <Trash2 className="w-4 h-4" aria-hidden="true" />
+                        </button>
+                      </div>
+                    </div>
+                  )}
                 </div>
               ))}
           </div>

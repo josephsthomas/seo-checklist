@@ -199,6 +199,26 @@ export function useTimeTracking(projectId, itemId = null) {
     return `${hours}h ${mins}m`;
   };
 
+  // Update a time entry (minutes and/or notes)
+  const updateEntry = async (entryId, updates) => {
+    const entry = timeEntries.find(e => e.id === entryId);
+    if (entry && entry.userId !== currentUser?.uid) {
+      toast.error('You can only edit your own time entries');
+      return;
+    }
+    try {
+      await updateDoc(doc(db, 'time_entries', entryId), {
+        ...updates,
+        updatedAt: serverTimestamp()
+      });
+      toast.success('Time entry updated');
+    } catch (error) {
+      console.error('Error updating entry:', error);
+      toast.error('Failed to update entry');
+      throw error;
+    }
+  };
+
   return {
     timeEntries,
     activeTimer,
@@ -207,6 +227,7 @@ export function useTimeTracking(projectId, itemId = null) {
     stopTimer,
     addManualEntry,
     deleteEntry,
+    updateEntry,
     getTotalMinutes,
     formatDuration
   };
