@@ -117,8 +117,8 @@ export const pageSEO = {
   },
 
   'help/glossary': {
-    title: 'SEO Glossary - 30+ Terms Explained Simply | Content Strategy Portal',
-    description: 'Comprehensive SEO glossary with 30+ terms explained in plain language. From anchor text to XML sitemaps, understand the terminology that matters.',
+    title: 'SEO Glossary - 100+ Terms Explained Simply | Content Strategy Portal',
+    description: 'Comprehensive SEO glossary with 100+ terms explained in plain language. From anchor text to XML sitemaps, understand the terminology that matters.',
     canonical: '/help/glossary',
     keywords: 'SEO glossary, SEO terms, SEO definitions, SEO terminology'
   },

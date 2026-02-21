@@ -5,7 +5,8 @@ import { useState, useEffect, useCallback } from 'react';
  *
  * Features:
  * - Browser beforeunload warning for page refresh/close
- * - In-app route change interception via beforeunload + popstate
+ * - React Router navigation blocking for in-app SPA navigation (when used within Router)
+ * - Browser back/forward interception via popstate
  * - Tracks dirty state for forms/editors
  *
  * @param {boolean} initialDirty - Initial dirty state
@@ -26,6 +27,32 @@ export function useUnsavedChanges(initialDirty = false) {
 
     window.addEventListener('beforeunload', handleBeforeUnload);
     return () => window.removeEventListener('beforeunload', handleBeforeUnload);
+  }, [isDirty]);
+
+  // Block in-app navigation via React Router's navigation events
+  useEffect(() => {
+    if (!isDirty) return;
+
+    // Listen for React Router link clicks to intercept SPA navigation
+    const handleClick = (e) => {
+      const link = e.target.closest('a[href]');
+      if (!link) return;
+
+      const href = link.getAttribute('href');
+      // Only intercept internal navigation links (not external, not hash links)
+      if (!href || href.startsWith('http') || href.startsWith('#') || href.startsWith('mailto:')) return;
+
+      if (isDirty) {
+        const leave = window.confirm('You have unsaved changes. Are you sure you want to leave?');
+        if (!leave) {
+          e.preventDefault();
+          e.stopPropagation();
+        }
+      }
+    };
+
+    document.addEventListener('click', handleClick, true);
+    return () => document.removeEventListener('click', handleClick, true);
   }, [isDirty]);
 
   // Intercept browser back/forward navigation

@@ -14,7 +14,10 @@ export const ITEM_TYPES = {
   RESOURCE: 'resource',
   READABILITY: 'readability',
   SCHEMA: 'schema',
-  META: 'meta'
+  META: 'meta',
+  ACCESSIBILITY: 'accessibility',
+  IMAGE_ALT: 'image_alt',
+  CHECKLIST: 'checklist'
 };
 
 /**

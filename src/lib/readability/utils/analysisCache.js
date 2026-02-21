@@ -4,6 +4,7 @@
  * Returns cached results instantly if content hasn't changed
  */
 
+const CACHE_VERSION = 1;
 const CACHE_DURATION_MS = 24 * 60 * 60 * 1000; // 24 hours
 const CACHE_KEY_PREFIX = 'readability_cache_';
 const MAX_CACHE_ENTRIES = 20;
@@ -50,6 +51,13 @@ export function getCachedAnalysis(url, htmlContent) {
     if (!cached) return null;
 
     const parsed = JSON.parse(cached);
+
+    // Invalidate entries from different cache versions
+    if (parsed.cacheVersion !== CACHE_VERSION) {
+      localStorage.removeItem(key);
+      return null;
+    }
+
     const age = Date.now() - parsed.cachedAt;
 
     if (age > CACHE_DURATION_MS) {
@@ -85,6 +93,7 @@ export function setCachedAnalysis(url, htmlContent, result) {
     if (result.overallScore === 0 && result.grade === 'F') return;
 
     const cacheEntry = {
+      cacheVersion: CACHE_VERSION,
       cachedAt: Date.now(),
       contentHash,
       result: {
@@ -123,7 +132,7 @@ export function setCachedAnalysis(url, htmlContent, result) {
 /**
  * Prune old cache entries if we exceed MAX_CACHE_ENTRIES
  */
-function pruneCache() {
+export function pruneCache() {
   try {
     const cacheKeys = [];
     for (let i = 0; i < localStorage.length; i++) {
@@ -166,5 +175,29 @@ export function clearAnalysisCache() {
   }
 }
 
+/**
+ * Get total size of all analysis cache entries in bytes
+ * @returns {Object} Cache size info
+ */
+export function getCacheSize() {
+  let totalBytes = 0;
+  let entryCount = 0;
+
+  try {
+    for (let i = 0; i < localStorage.length; i++) {
+      const key = localStorage.key(i);
+      if (key?.startsWith(CACHE_KEY_PREFIX)) {
+        const item = localStorage.getItem(key);
+        totalBytes += item ? new Blob([item]).size : 0;
+        entryCount++;
+      }
+    }
+  } catch {
+    // Non-fatal
+  }
+
+  return { totalBytes, entryCount, maxEntries: MAX_CACHE_ENTRIES };
+}
+
 export { hashContent };
-export default { getCachedAnalysis, setCachedAnalysis, clearAnalysisCache };
+export default { getCachedAnalysis, setCachedAnalysis, clearAnalysisCache, getCacheSize, pruneCache };

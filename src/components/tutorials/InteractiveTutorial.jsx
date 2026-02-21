@@ -179,6 +179,53 @@ const TUTORIALS = {
         tip: 'Use Google Rich Results Test to verify your schema works.'
       }
     ]
+  },
+  readability: {
+    id: 'readability',
+    name: 'AI Readability Checker Tutorial',
+    description: 'Learn how to analyze content readability with AI-powered insights',
+    path: '/readability',
+    steps: [
+      {
+        id: 1,
+        title: 'Welcome to AI Readability Checker',
+        description: 'This tool uses AI to analyze your content for readability, SEO, and user experience. Get actionable scores and recommendations.',
+        tip: 'The readability checker supports three different input methods for flexibility.'
+      },
+      {
+        id: 2,
+        title: 'Choose Your Input Method',
+        description: 'Enter a URL to analyze a live page, upload an HTML file, or paste your content directly. Each method works slightly differently.',
+        tip: 'URL analysis is best for live pages. Paste is great for drafts before publishing.',
+        action: 'Select your preferred input method and provide your content.'
+      },
+      {
+        id: 3,
+        title: 'Configure Advanced Options',
+        description: 'Set the content type, target audience, and industry profile to get tailored scoring and recommendations.',
+        tip: 'Selecting the right industry profile adjusts scoring thresholds for your niche.'
+      },
+      {
+        id: 4,
+        title: 'Run the Analysis',
+        description: 'Click Analyze to start the AI-powered readability assessment. The tool checks reading level, sentence structure, vocabulary, and more.',
+        tip: 'Analysis typically includes Flesch-Kincaid scoring, sentence complexity, and SEO metadata checks.',
+        action: 'Click the Analyze button to process your content.'
+      },
+      {
+        id: 5,
+        title: 'Explore Results Tabs',
+        description: 'Review your results across multiple tabs: Overview for your grade and score, Details for category breakdowns, Issues for specific problems, and Recommendations for improvement steps.',
+        tip: 'Focus on the Issues tab to find quick wins that improve your readability score.'
+      },
+      {
+        id: 6,
+        title: 'Cross-Tool Links',
+        description: 'From results, jump to related tools like the Meta Generator for title/description improvements, or the Schema Generator for structured data.',
+        tip: 'Use cross-tool links to build a complete SEO optimization workflow.',
+        action: 'Explore linked tools for a comprehensive SEO approach.'
+      }
+    ]
   }
 };
 

@@ -13,7 +13,8 @@ import {
   FileText,
   BarChart2,
   ChevronDown,
-  Loader2
+  Loader2,
+  Calendar
 } from 'lucide-react';
 import { format } from 'date-fns';
 import toast from 'react-hot-toast';
@@ -23,6 +24,14 @@ import 'jspdf-autotable';
 
 // Local storage key for persisting batch audit results
 const STORAGE_KEY = 'batchAuditResults';
+const SCHEDULE_STORAGE_KEY = 'batchAuditSchedule';
+
+// Schedule frequency options
+const SCHEDULE_FREQUENCIES = [
+  { id: 'daily', label: 'Daily' },
+  { id: 'weekly', label: 'Weekly' },
+  { id: 'monthly', label: 'Monthly' }
+];
 
 export default function BatchAuditPanel({ onClose, onStartBatch }) {
   const [urls, setUrls] = useState([]);
@@ -33,8 +42,15 @@ export default function BatchAuditPanel({ onClose, onStartBatch }) {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [showResults, setShowResults] = useState(false);
   const [, setSavedBatches] = useState([]);
+  const [showScheduleForm, setShowScheduleForm] = useState(false);
+  const [schedule, setSchedule] = useState(null);
+  const [scheduleForm, setScheduleForm] = useState({
+    frequency: 'weekly',
+    dayOfWeek: 1,
+    time: '09:00'
+  });
 
-  // Load saved batch results from localStorage
+  // Load saved batch results and schedule from localStorage
   useEffect(() => {
     try {
       const saved = localStorage.getItem(STORAGE_KEY);
@@ -42,10 +58,39 @@ export default function BatchAuditPanel({ onClose, onStartBatch }) {
         const parsed = JSON.parse(saved);
         setSavedBatches(parsed);
       }
+      const savedSchedule = localStorage.getItem(SCHEDULE_STORAGE_KEY);
+      if (savedSchedule) {
+        setSchedule(JSON.parse(savedSchedule));
+      }
     } catch (err) {
       console.error('Error loading saved batches:', err);
     }
   }, []);
+
+  // Save schedule
+  const saveSchedule = () => {
+    if (urls.length === 0) {
+      toast.error('Add URLs before scheduling');
+      return;
+    }
+    const newSchedule = {
+      ...scheduleForm,
+      urls: [...urls],
+      createdAt: new Date().toISOString(),
+      isActive: true
+    };
+    setSchedule(newSchedule);
+    localStorage.setItem(SCHEDULE_STORAGE_KEY, JSON.stringify(newSchedule));
+    setShowScheduleForm(false);
+    toast.success(`Batch audit scheduled ${scheduleForm.frequency} at ${scheduleForm.time}`);
+  };
+
+  // Cancel schedule
+  const cancelSchedule = () => {
+    setSchedule(null);
+    localStorage.removeItem(SCHEDULE_STORAGE_KEY);
+    toast.success('Schedule cancelled');
+  };
 
 
   // Export results as CSV
@@ -631,20 +676,110 @@ export default function BatchAuditPanel({ onClose, onStartBatch }) {
       )}
 
       {/* Footer Actions */}
-      <div className="px-6 py-4 border-t border-charcoal-100 dark:border-charcoal-700 flex items-center justify-between">
+      <div className="px-6 py-4 border-t border-charcoal-100 dark:border-charcoal-700 flex items-center justify-between relative">
         {!showResults ? (
           <>
-            <p className="text-sm text-charcoal-500 dark:text-charcoal-400">
-              {urls.length} URLs ready to audit
-            </p>
-            <button
-              onClick={runBatchAudit}
-              disabled={urls.length === 0}
-              className="btn btn-primary flex items-center gap-2"
-            >
-              <Play className="w-4 h-4" />
-              Start Batch Audit
-            </button>
+            <div className="flex items-center gap-2">
+              <p className="text-sm text-charcoal-500 dark:text-charcoal-400">
+                {urls.length} URLs ready to audit
+              </p>
+              {schedule && (
+                <span className="inline-flex items-center gap-1 px-2 py-1 bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-300 text-xs font-medium rounded-full">
+                  <Calendar className="w-3 h-3" />
+                  Scheduled {schedule.frequency}
+                </span>
+              )}
+            </div>
+            <div className="flex items-center gap-2">
+              {schedule ? (
+                <button
+                  onClick={cancelSchedule}
+                  className="btn btn-secondary flex items-center gap-2 text-sm"
+                >
+                  <X className="w-4 h-4" />
+                  Cancel Schedule
+                </button>
+              ) : (
+                <button
+                  onClick={() => setShowScheduleForm(!showScheduleForm)}
+                  disabled={urls.length === 0}
+                  className="btn btn-secondary flex items-center gap-2"
+                >
+                  <Calendar className="w-4 h-4" />
+                  Schedule
+                </button>
+              )}
+              <button
+                onClick={runBatchAudit}
+                disabled={urls.length === 0}
+                className="btn btn-primary flex items-center gap-2"
+              >
+                <Play className="w-4 h-4" />
+                Run Now
+              </button>
+            </div>
+            {showScheduleForm && (
+              <div className="absolute bottom-full right-0 mb-2 w-80 bg-white dark:bg-charcoal-800 border border-charcoal-200 dark:border-charcoal-700 rounded-xl shadow-xl p-4 z-10">
+                <h4 className="text-sm font-semibold text-charcoal-900 dark:text-white mb-3 flex items-center gap-2">
+                  <Calendar className="w-4 h-4 text-primary-500" />
+                  Schedule Batch Audit
+                </h4>
+                <div className="space-y-3">
+                  <div>
+                    <label className="block text-xs font-medium text-charcoal-600 dark:text-charcoal-400 mb-1">Frequency</label>
+                    <select
+                      value={scheduleForm.frequency}
+                      onChange={(e) => setScheduleForm(prev => ({ ...prev, frequency: e.target.value }))}
+                      className="input text-sm w-full"
+                    >
+                      {SCHEDULE_FREQUENCIES.map(f => (
+                        <option key={f.id} value={f.id}>{f.label}</option>
+                      ))}
+                    </select>
+                  </div>
+                  {scheduleForm.frequency === 'weekly' && (
+                    <div>
+                      <label className="block text-xs font-medium text-charcoal-600 dark:text-charcoal-400 mb-1">Day of Week</label>
+                      <select
+                        value={scheduleForm.dayOfWeek}
+                        onChange={(e) => setScheduleForm(prev => ({ ...prev, dayOfWeek: parseInt(e.target.value, 10) }))}
+                        className="input text-sm w-full"
+                      >
+                        {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map((day, i) => (
+                          <option key={i} value={i}>{day}</option>
+                        ))}
+                      </select>
+                    </div>
+                  )}
+                  <div>
+                    <label className="block text-xs font-medium text-charcoal-600 dark:text-charcoal-400 mb-1">Time</label>
+                    <input
+                      type="time"
+                      value={scheduleForm.time}
+                      onChange={(e) => setScheduleForm(prev => ({ ...prev, time: e.target.value }))}
+                      className="input text-sm w-full"
+                    />
+                  </div>
+                  <p className="text-xs text-charcoal-400 dark:text-charcoal-500">
+                    Scheduled audits require Cloud Functions for automated execution. This saves your schedule configuration.
+                  </p>
+                  <div className="flex gap-2">
+                    <button
+                      onClick={() => setShowScheduleForm(false)}
+                      className="btn btn-secondary flex-1 text-sm"
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      onClick={saveSchedule}
+                      className="btn btn-primary flex-1 text-sm"
+                    >
+                      Save Schedule
+                    </button>
+                  </div>
+                </div>
+              </div>
+            )}
           </>
         ) : (
           <>
