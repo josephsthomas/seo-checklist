@@ -76,7 +76,8 @@ const FEATURE_DATA = {
       { value: '6', label: 'Project Phases' },
       { value: '∞', label: 'Projects' }
     ],
-    proTip: 'Run a Technical Audit first, then use the results to prioritize your checklist items. Most teams save 3+ hours on project scoping this way.'
+    proTip: 'Run a Technical Audit first, then use the results to prioritize your checklist items. Most teams save 3+ hours on project scoping this way.',
+    overviewHeader: 'Why Teams Outgrow Spreadsheets'
   },
   audit: {
     name: 'Technical Audit',
@@ -128,7 +129,8 @@ const FEATURE_DATA = {
       { value: '5GB', label: 'Max File Size' },
       { value: 'AI', label: 'Powered Insights' }
     ],
-    proTip: 'After your audit, use the Meta Generator to fix the title and description issues it flagged. One-click fixes, done in minutes.'
+    proTip: 'After your audit, use the Meta Generator to fix the title and description issues it flagged. One-click fixes, done in minutes.',
+    overviewHeader: 'Stop Reading Crawl Data. Start Fixing Issues.'
   },
   accessibility: {
     name: 'Accessibility Analyzer',
@@ -180,7 +182,8 @@ const FEATURE_DATA = {
       { value: 'WCAG', label: '2.2 Compliant' },
       { value: 'VPAT', label: 'Generation' }
     ],
-    proTip: 'Generate a VPAT report, then use Image Alt Generator to fix the missing alt text issues in bulk. Two tools, one workflow.'
+    proTip: 'Generate a VPAT report, then use Image Alt Generator to fix the missing alt text issues in bulk. Two tools, one workflow.',
+    overviewHeader: 'Accessibility Shouldn\'t Be an Afterthought'
   },
   'meta-generator': {
     name: 'Meta Data Generator',
@@ -232,7 +235,8 @@ const FEATURE_DATA = {
       { value: '60', label: 'Char Title' },
       { value: '160', label: 'Char Desc' }
     ],
-    proTip: 'Pair with Schema Generator to add structured data alongside your optimized meta. Better SERP presence with both in place.'
+    proTip: 'Pair with Schema Generator to add structured data alongside your optimized meta. Better SERP presence with both in place.',
+    overviewHeader: 'Meta Data at Scale, Without the Tedium'
   },
   'schema-generator': {
     name: 'Structured Data Generator',
@@ -240,7 +244,7 @@ const FEATURE_DATA = {
     icon: Code,
     color: 'orange',
     description: 'Generate valid JSON-LD structured data for 40+ schema types. Improve rich snippet eligibility and help search engines understand your content.',
-    longDescription: 'Structured data is essential for modern SEO, but writing valid JSON-LD is tedious and error-prone. Our Schema Generator makes it easy to create properly formatted schema markup for any content type.',
+    longDescription: 'Structured data is essential for modern search visibility, but writing valid JSON-LD is tedious and error-prone. Our Schema Generator makes it easy to create properly formatted schema markup for any content type.',
     features: [
       {
         title: '40+ Schema Types',
@@ -284,7 +288,8 @@ const FEATURE_DATA = {
       { value: 'JSON', label: '-LD Format' },
       { value: '100%', label: 'Valid Output' }
     ],
-    proTip: 'Add FAQ schema to your help pages, then use the AI Readability Checker to ensure your content structure is AI-friendly. Double the search visibility.'
+    proTip: 'Add FAQ schema to your help pages, then use the AI Readability Checker to ensure your content structure is AI-friendly. Double the search visibility.',
+    overviewHeader: 'Structured Data Without the Syntax Headaches'
   },
   'image-alt': {
     name: 'Image Alt Generator',
@@ -336,7 +341,8 @@ const FEATURE_DATA = {
       { value: 'Bulk', label: 'Processing' },
       { value: 'A11y', label: 'Compliant' }
     ],
-    proTip: 'Run an Accessibility Analyzer scan first to find every image missing alt text, then use Image Alt Generator to fix them all at once.'
+    proTip: 'Run an Accessibility Analyzer scan first to find every image missing alt text, then use Image Alt Generator to fix them all at once.',
+    overviewHeader: 'Every Image Deserves a Description'
   },
   readability: {
     name: 'AI Readability Checker',
@@ -388,7 +394,8 @@ const FEATURE_DATA = {
       { value: 'URL', label: 'Analysis' },
       { value: 'HTML', label: 'Analysis' }
     ],
-    proTip: 'Check your highest-traffic pages first. Improving AI readability on pages that already rank well compounds your visibility gains.'
+    proTip: 'Check your highest-traffic pages first. Improving AI readability on pages that already rank well compounds your visibility gains.',
+    overviewHeader: 'Your Content Needs to Speak AI\'s Language'
   }
 };
 
@@ -571,7 +578,7 @@ export default function FeatureDetailPage() {
       <section className="py-20 lg:py-28">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="max-w-3xl">
-            <h2 className="text-3xl font-bold text-charcoal-900">Overview</h2>
+            <h2 className="text-3xl font-bold text-charcoal-900">{feature.overviewHeader || 'Overview'}</h2>
             <p className="mt-6 text-lg text-charcoal-600 leading-relaxed">
               {feature.longDescription}
             </p>

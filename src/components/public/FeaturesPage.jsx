@@ -121,43 +121,50 @@ const getColorClasses = (color) => {
       bg: 'bg-primary-50',
       icon: 'text-primary-600',
       border: 'border-primary-200',
-      accent: 'bg-primary-100'
+      accent: 'bg-primary-100',
+      button: 'bg-primary-600 hover:bg-primary-700'
     },
     blue: {
       bg: 'bg-blue-50',
       icon: 'text-blue-600',
       border: 'border-blue-200',
-      accent: 'bg-blue-100'
+      accent: 'bg-blue-100',
+      button: 'bg-blue-600 hover:bg-blue-700'
     },
     emerald: {
       bg: 'bg-emerald-50',
       icon: 'text-emerald-600',
       border: 'border-emerald-200',
-      accent: 'bg-emerald-100'
+      accent: 'bg-emerald-100',
+      button: 'bg-emerald-600 hover:bg-emerald-700'
     },
     violet: {
       bg: 'bg-violet-50',
       icon: 'text-violet-600',
       border: 'border-violet-200',
-      accent: 'bg-violet-100'
+      accent: 'bg-violet-100',
+      button: 'bg-violet-600 hover:bg-violet-700'
     },
     orange: {
       bg: 'bg-orange-50',
       icon: 'text-orange-600',
       border: 'border-orange-200',
-      accent: 'bg-orange-100'
+      accent: 'bg-orange-100',
+      button: 'bg-orange-600 hover:bg-orange-700'
     },
     pink: {
       bg: 'bg-pink-50',
       icon: 'text-pink-600',
       border: 'border-pink-200',
-      accent: 'bg-pink-100'
+      accent: 'bg-pink-100',
+      button: 'bg-pink-600 hover:bg-pink-700'
     },
     teal: {
       bg: 'bg-teal-50',
       icon: 'text-teal-600',
       border: 'border-teal-200',
-      accent: 'bg-teal-100'
+      accent: 'bg-teal-100',
+      button: 'bg-teal-600 hover:bg-teal-700'
     }
   };
   return colors[color] || colors.primary;
@@ -229,13 +236,15 @@ export default function FeaturesPage() {
                         </li>
                       ))}
                     </ul>
-                    <Link
-                      to={`/features/${feature.slug}`}
-                      className={`mt-8 inline-flex items-center gap-2 font-medium ${colors.icon} hover:opacity-80 transition-opacity`}
-                    >
-                      Learn more about {feature.name}
-                      <ArrowRight className="w-4 h-4" />
-                    </Link>
+                    <div className="mt-8 flex flex-col sm:flex-row items-start gap-3">
+                      <Link
+                        to={`/features/${feature.slug}`}
+                        className={`inline-flex items-center gap-2 px-5 py-2.5 ${colors.button} text-white font-medium rounded-xl shadow-sm transition-colors text-sm`}
+                      >
+                        Explore {feature.name}
+                        <ArrowRight className="w-4 h-4" />
+                      </Link>
+                    </div>
                   </div>
                   <div className={`${colors.bg} rounded-3xl p-8 lg:p-12 ${isEven ? '' : 'lg:col-start-1'}`}>
                     <div className={`${colors.accent} rounded-2xl p-6 border ${colors.border}`}>
