@@ -6,7 +6,7 @@ export const glossaryTerms = [
     term: "Alt Text",
     definition: "Alternative text that describes an image for screen readers and search engines. Essential for accessibility and image SEO.",
     category: "On-Page SEO",
-    relatedTerms: ["Image Optimization", "Accessibility"],
+    relatedTerms: ["Meta Description", "Schema Markup"],
     example: '<img src="blue-widget.jpg" alt="Blue widget product with chrome finish">'
   },
   {
@@ -14,7 +14,7 @@ export const glossaryTerms = [
     term: "Backlink",
     definition: "A link from another website to your site. High-quality backlinks are a major ranking factor.",
     category: "Off-Page SEO",
-    relatedTerms: ["Link Building", "Domain Authority"],
+    relatedTerms: ["Nofollow Link", "Domain Authority (DA)"],
     example: "When Site A links to Site B, Site B has a backlink from Site A."
   },
   {
@@ -22,7 +22,7 @@ export const glossaryTerms = [
     term: "Canonical URL",
     definition: "The preferred version of a web page when multiple URLs have similar or duplicate content.",
     category: "Technical SEO",
-    relatedTerms: ["Duplicate Content", "URL Structure"],
+    relatedTerms: ["Redirect (301)", "URL Structure"],
     example: '<link rel="canonical" href="https://example.com/page" />'
   },
   {
@@ -30,7 +30,7 @@ export const glossaryTerms = [
     term: "Core Web Vitals",
     definition: "Google's metrics for page experience: LCP (loading), INP (interactivity), and CLS (visual stability).",
     category: "Performance",
-    relatedTerms: ["Page Speed", "User Experience"],
+    relatedTerms: ["Page Speed", "User Experience (UX)"],
     example: "LCP should be under 2.5 seconds for good user experience."
   },
   {
@@ -46,7 +46,7 @@ export const glossaryTerms = [
     term: "Domain Authority (DA)",
     definition: "Moz's score (1-100) predicting how well a website will rank. Based on backlinks and other factors.",
     category: "Metrics",
-    relatedTerms: ["Backlinks", "Page Authority"],
+    relatedTerms: ["Backlink", "Organic Search"],
     example: "A site with DA 60 typically ranks better than a site with DA 30."
   },
   {
@@ -54,7 +54,7 @@ export const glossaryTerms = [
     term: "E-E-A-T",
     definition: "Experience, Expertise, Authoritativeness, Trustworthiness. Google's quality guidelines for content.",
     category: "Content Quality",
-    relatedTerms: ["Content Strategy", "Author Authority"],
+    relatedTerms: ["YMYL (Your Money Your Life)", "White Hat SEO"],
     example: "Medical advice should be written by healthcare professionals (Expertise)."
   },
   {
@@ -62,7 +62,7 @@ export const glossaryTerms = [
     term: "Featured Snippet",
     definition: "A highlighted answer box that appears above organic search results. Also called 'Position Zero'.",
     category: "SERP Features",
-    relatedTerms: ["Rich Results", "Schema Markup"],
+    relatedTerms: ["SERP (Search Engine Results Page)", "Schema Markup"],
     example: "A featured snippet might show a definition, list, or table extracted from a page."
   },
   {
@@ -70,7 +70,7 @@ export const glossaryTerms = [
     term: "H1 Tag",
     definition: "The main heading tag that should contain the primary keyword and describe the page topic.",
     category: "On-Page SEO",
-    relatedTerms: ["Heading Hierarchy", "Keywords"],
+    relatedTerms: ["Title Tag", "Internal Linking"],
     example: "<h1>Complete Guide to SEO for Beginners</h1>"
   },
   {
@@ -78,7 +78,7 @@ export const glossaryTerms = [
     term: "Hreflang",
     definition: "HTML attribute that tells search engines which language and region a page targets.",
     category: "International SEO",
-    relatedTerms: ["Internationalization", "Language Targeting"],
+    relatedTerms: ["Canonical URL", "Sitemap (XML)"],
     example: '<link rel="alternate" hreflang="es" href="https://example.com/es/" />'
   },
   {
@@ -86,7 +86,7 @@ export const glossaryTerms = [
     term: "Indexability",
     definition: "Whether a page can be added to a search engine's index and appear in search results.",
     category: "Technical SEO",
-    relatedTerms: ["Crawlability", "Noindex"],
+    relatedTerms: ["Crawlability", "Robots.txt"],
     example: "Pages with noindex meta tags won't appear in search results."
   },
   {
@@ -94,7 +94,7 @@ export const glossaryTerms = [
     term: "Internal Linking",
     definition: "Links from one page to another page on the same website. Distributes page authority and helps navigation.",
     category: "On-Page SEO",
-    relatedTerms: ["Link Architecture", "Site Structure"],
+    relatedTerms: ["Pillar Page", "H1 Tag"],
     example: "Linking from your homepage to important category pages."
   },
   {
@@ -102,7 +102,7 @@ export const glossaryTerms = [
     term: "Keyword Cannibalization",
     definition: "When multiple pages target the same keyword, causing them to compete against each other.",
     category: "Content Strategy",
-    relatedTerms: ["Keyword Mapping", "Content Strategy"],
+    relatedTerms: ["Search Intent", "Pillar Page"],
     example: "Having three blog posts all targeting 'best running shoes' can split ranking power."
   },
   {
@@ -118,7 +118,7 @@ export const glossaryTerms = [
     term: "Meta Description",
     definition: "HTML meta tag providing a summary of page content. Appears in search results below the title.",
     category: "On-Page SEO",
-    relatedTerms: ["Title Tag", "SERP"],
+    relatedTerms: ["Title Tag", "SERP (Search Engine Results Page)"],
     example: '<meta name="description" content="Learn SEO basics in this comprehensive guide..." />'
   },
   {
@@ -126,7 +126,7 @@ export const glossaryTerms = [
     term: "Nofollow Link",
     definition: "A link with rel='nofollow' attribute that tells search engines not to pass authority.",
     category: "Link Building",
-    relatedTerms: ["Backlinks", "Link Attributes"],
+    relatedTerms: ["Backlink", "Domain Authority (DA)"],
     example: '<a href="..." rel="nofollow">Link</a>'
   },
   {
@@ -134,7 +134,7 @@ export const glossaryTerms = [
     term: "Organic Search",
     definition: "Unpaid search engine results, as opposed to paid ads. The primary focus of SEO.",
     category: "Fundamentals",
-    relatedTerms: ["SERP", "Rankings"],
+    relatedTerms: ["SERP (Search Engine Results Page)", "Featured Snippet"],
     example: "Ranking #1 organically for 'best coffee maker' brings free traffic."
   },
   {
@@ -142,7 +142,7 @@ export const glossaryTerms = [
     term: "Page Speed",
     definition: "How quickly a page loads. A ranking factor and critical for user experience.",
     category: "Performance",
-    relatedTerms: ["Core Web Vitals", "Loading Time"],
+    relatedTerms: ["Core Web Vitals", "LCP (Largest Contentful Paint)"],
     example: "Pages should load in under 3 seconds on mobile."
   },
   {
@@ -150,7 +150,7 @@ export const glossaryTerms = [
     term: "Pillar Page",
     definition: "A comprehensive page covering a broad topic in depth, linking to related cluster content.",
     category: "Content Strategy",
-    relatedTerms: ["Content Clusters", "Internal Linking"],
+    relatedTerms: ["Internal Linking", "Keyword Cannibalization"],
     example: "A 3000-word 'Complete SEO Guide' linking to specific SEO technique pages."
   },
   {
@@ -158,7 +158,7 @@ export const glossaryTerms = [
     term: "Redirect (301)",
     definition: "Permanent redirect sending users and search engines from one URL to another. Preserves SEO value.",
     category: "Technical SEO",
-    relatedTerms: ["URL Migration", "Link Equity"],
+    relatedTerms: ["Canonical URL", "URL Structure"],
     example: "Redirecting old-page.html to new-page.html with a 301."
   },
   {
@@ -166,7 +166,7 @@ export const glossaryTerms = [
     term: "Robots.txt",
     definition: "File in site root telling search engines which pages to crawl or ignore.",
     category: "Technical SEO",
-    relatedTerms: ["Crawling", "Indexing"],
+    relatedTerms: ["Crawlability", "Indexability"],
     example: "User-agent: *\nDisallow: /admin/"
   },
   {
@@ -174,7 +174,7 @@ export const glossaryTerms = [
     term: "Schema Markup",
     definition: "Structured data vocabulary that helps search engines understand page content. Enables rich results.",
     category: "Technical SEO",
-    relatedTerms: ["Rich Snippets", "JSON-LD"],
+    relatedTerms: ["Featured Snippet", "SERP (Search Engine Results Page)"],
     example: "Adding Article schema to blog posts for enhanced SERP display."
   },
   {
@@ -182,7 +182,7 @@ export const glossaryTerms = [
     term: "Search Intent",
     definition: "The goal behind a user's search query: informational, navigational, commercial, or transactional.",
     category: "Content Strategy",
-    relatedTerms: ["Keyword Research", "User Intent"],
+    relatedTerms: ["Keyword Cannibalization", "Organic Search"],
     example: "'How to bake bread' = informational, 'Buy KitchenAid mixer' = transactional."
   },
   {
@@ -190,7 +190,7 @@ export const glossaryTerms = [
     term: "SERP (Search Engine Results Page)",
     definition: "The page showing results after a search query. Includes organic results, ads, and features.",
     category: "Fundamentals",
-    relatedTerms: ["Organic Search", "Featured Snippets"],
+    relatedTerms: ["Organic Search", "Featured Snippet"],
     example: "When you search on Google, the results page is the SERP."
   },
   {
@@ -198,7 +198,7 @@ export const glossaryTerms = [
     term: "Sitemap (XML)",
     definition: "A file listing all pages on your site, helping search engines discover and crawl content.",
     category: "Technical SEO",
-    relatedTerms: ["Crawling", "Indexing"],
+    relatedTerms: ["Crawlability", "Indexability"],
     example: "Submit sitemap.xml to Google Search Console for faster indexing."
   },
   {
@@ -206,7 +206,7 @@ export const glossaryTerms = [
     term: "Title Tag",
     definition: "HTML element specifying page title. Shows in search results and browser tabs. Major ranking factor.",
     category: "On-Page SEO",
-    relatedTerms: ["Meta Description", "Keywords"],
+    relatedTerms: ["Meta Description", "H1 Tag"],
     example: "<title>Best Running Shoes 2025 - Reviews & Buying Guide</title>"
   },
   {
@@ -214,7 +214,7 @@ export const glossaryTerms = [
     term: "URL Structure",
     definition: "The format and organization of your site's URLs. Should be descriptive, readable, and SEO-friendly.",
     category: "Technical SEO",
-    relatedTerms: ["Permalinks", "Site Architecture"],
+    relatedTerms: ["Canonical URL", "Redirect (301)"],
     example: "Good: /seo-guide/keyword-research  Bad: /page?id=123"
   },
   {
@@ -222,7 +222,7 @@ export const glossaryTerms = [
     term: "User Experience (UX)",
     definition: "How users interact with your site. Affects rankings through metrics like bounce rate and time on page.",
     category: "Fundamentals",
-    relatedTerms: ["Core Web Vitals", "Engagement"],
+    relatedTerms: ["Core Web Vitals", "Page Speed"],
     example: "Easy navigation, fast loading, and mobile-friendly design improve UX."
   },
   {
@@ -230,7 +230,7 @@ export const glossaryTerms = [
     term: "White Hat SEO",
     definition: "Ethical SEO practices that follow search engine guidelines. Opposite of black hat SEO.",
     category: "Fundamentals",
-    relatedTerms: ["Best Practices", "Guidelines"],
+    relatedTerms: ["E-E-A-T", "YMYL (Your Money Your Life)"],
     example: "Creating quality content and earning natural backlinks is white hat SEO."
   },
   {
@@ -238,7 +238,7 @@ export const glossaryTerms = [
     term: "YMYL (Your Money Your Life)",
     definition: "Pages that can impact health, finances, or safety. Google holds these to higher quality standards.",
     category: "Content Quality",
-    relatedTerms: ["E-E-A-T", "Quality Guidelines"],
+    relatedTerms: ["E-E-A-T", "White Hat SEO"],
     example: "Medical advice, financial planning, and legal information are YMYL topics."
   }
 ];

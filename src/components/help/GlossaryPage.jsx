@@ -143,6 +143,7 @@ export default function GlossaryPage() {
                   {groupedTerms[letter].map(term => (
                     <div
                       key={term.id}
+                      id={`term-${term.id}`}
                       className="p-6 hover:bg-charcoal-50 transition-colors cursor-pointer"
                       onClick={() => setSelectedTerm(selectedTerm?.id === term.id ? null : term)}
                     >
@@ -185,7 +186,20 @@ export default function GlossaryPage() {
                                         className="px-3 py-1 bg-charcoal-100 text-charcoal-700 rounded-full text-sm hover:bg-charcoal-200 cursor-pointer"
                                         onClick={(e) => {
                                           e.stopPropagation();
+                                          const matchedTerm = glossaryTerms.find(t =>
+                                            t.term.toLowerCase() === related.toLowerCase()
+                                          );
                                           setSearchQuery(related);
+                                          setSelectedCategory('All');
+                                          if (matchedTerm) {
+                                            setSelectedTerm(matchedTerm);
+                                            setTimeout(() => {
+                                              document.getElementById(`term-${matchedTerm.id}`)?.scrollIntoView({
+                                                behavior: 'smooth',
+                                                block: 'center'
+                                              });
+                                            }, 150);
+                                          }
                                         }}
                                       >
                                         {related}

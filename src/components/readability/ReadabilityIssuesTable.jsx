@@ -34,7 +34,7 @@ const STATUS_ORDER = { fail: 0, warn: 1, na: 2, pass: 3 };
 const CATEGORY_LABELS = {
   contentStructure: 'Content Structure',
   contentClarity: 'Content Clarity',
-  technicalAccessibility: 'Technical Accessibility',
+  technicalAccess: 'Technical Accessibility',
   metadataSchema: 'Metadata & Schema',
   aiSignals: 'AI-Specific Signals',
 };

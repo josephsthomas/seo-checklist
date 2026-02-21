@@ -59,7 +59,7 @@ const mockAnalysis = {
   categoryScores: {
     contentStructure: { score: 80 },
     contentClarity: { score: 85 },
-    technicalAccessibility: { score: 78 },
+    technicalAccess: { score: 78 },
     metadataSchema: { score: 82 },
     aiSignals: { score: 84 },
   },
