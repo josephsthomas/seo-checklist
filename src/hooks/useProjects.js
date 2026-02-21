@@ -37,10 +37,9 @@ export function useProjects() {
     );
 
     const unsubscribe = onSnapshot(q, (snapshot) => {
-      const projectsData = snapshot.docs.map(d => ({
-        id: d.id,
-        ...d.data()
-      }));
+      const projectsData = snapshot.docs
+        .map(d => ({ id: d.id, ...d.data() }))
+        .filter(p => !p.deletedAt);
       setProjects(projectsData);
       setLoading(false);
       setError(null);
@@ -91,8 +90,32 @@ export function useProjects() {
       return;
     }
     try {
-      await deleteDoc(doc(db, 'projects', projectId));
-      toast.success('Project deleted successfully!');
+      // Soft-delete: mark with deletedAt timestamp
+      const projectRef = doc(db, 'projects', projectId);
+      await updateDoc(projectRef, { deletedAt: serverTimestamp() });
+
+      // Schedule permanent delete after 6 seconds if not undone
+      let undone = false;
+      const deleteTimeout = setTimeout(async () => {
+        if (!undone) {
+          try {
+            await deleteDoc(projectRef);
+          } catch {
+            // Already deleted or restored — ignore
+          }
+        }
+      }, 6000);
+
+      // Show undo toast using plain text (hooks are .js, not .jsx)
+      toast('Project deleted. Click to undo.', {
+        duration: 5000,
+        onClick: async () => {
+          undone = true;
+          clearTimeout(deleteTimeout);
+          await updateDoc(projectRef, { deletedAt: null });
+          toast.success('Project restored');
+        }
+      });
     } catch (err) {
       toast.error('Failed to delete project');
       throw err;

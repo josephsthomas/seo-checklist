@@ -167,7 +167,7 @@ export function useFileAttachments(projectId, itemId) {
     }
   };
 
-  // Delete file
+  // Delete file (with confirmation — files cannot be restored from Storage)
   const deleteFile = async (attachmentId) => {
     try {
       const attachment = attachments.find(a => a.id === attachmentId);
@@ -176,6 +176,10 @@ export function useFileAttachments(projectId, itemId) {
       // Ownership check: only the uploader can delete
       if (attachment.uploadedBy !== currentUser?.uid) {
         toast.error('You can only delete files you uploaded');
+        return;
+      }
+
+      if (!window.confirm(`Delete "${attachment.filename}"? This cannot be undone.`)) {
         return;
       }
 
