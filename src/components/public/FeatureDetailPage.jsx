@@ -28,15 +28,15 @@ import { softwareSchemas } from '../../config/seo';
 const FEATURE_DATA = {
   planner: {
     name: 'Content Planner',
-    tagline: 'Project Management & SEO Checklists',
+    tagline: 'Project Management & Content Strategy Checklists',
     icon: LayoutDashboard,
     color: 'primary',
-    description: 'Comprehensive project management designed specifically for SEO teams. Track multiple projects, manage team members, and ensure nothing falls through the cracks with our 353-item checklist.',
-    longDescription: 'The Content Planner is the command center for your SEO projects. Whether you\'re managing a single website or juggling dozens of client projects, our platform provides the structure and visibility you need to deliver consistent results.',
+    description: 'Comprehensive project management designed specifically for content teams. Track multiple projects, manage team members, and ensure nothing falls through the cracks with our 353-item checklist.',
+    longDescription: 'The Content Planner is the command center for your content projects. Whether you\'re managing a single website or juggling dozens of client projects, our platform provides the structure and visibility you need to deliver consistent results.',
     features: [
       {
-        title: '353-Item SEO Checklist',
-        description: 'A comprehensive checklist covering all phases of SEO projects, from initial audit to ongoing optimization.',
+        title: '353-Item Content Strategy Checklist',
+        description: 'A comprehensive checklist covering all phases of content projects, from initial audit to ongoing optimization.',
         icon: CheckCircle2
       },
       {
@@ -66,8 +66,8 @@ const FEATURE_DATA = {
       }
     ],
     useCases: [
-      'Agency teams managing multiple client SEO projects',
-      'In-house teams coordinating SEO initiatives',
+      'Agency teams managing multiple client content projects',
+      'In-house teams coordinating content initiatives',
       'Consultants tracking deliverables and progress',
       'Enterprise teams with complex approval workflows'
     ],
@@ -75,7 +75,8 @@ const FEATURE_DATA = {
       { value: '353', label: 'Checklist Items' },
       { value: '6', label: 'Project Phases' },
       { value: '∞', label: 'Projects' }
-    ]
+    ],
+    proTip: 'Run a Technical Audit first, then use the results to prioritize your checklist items. Most teams save 3+ hours on project scoping this way.'
   },
   audit: {
     name: 'Technical Audit',
@@ -126,7 +127,8 @@ const FEATURE_DATA = {
       { value: '31', label: 'Audit Categories' },
       { value: '5GB', label: 'Max File Size' },
       { value: 'AI', label: 'Powered Insights' }
-    ]
+    ],
+    proTip: 'After your audit, use the Meta Generator to fix the title and description issues it flagged. One-click fixes, done in minutes.'
   },
   accessibility: {
     name: 'Accessibility Analyzer',
@@ -177,7 +179,8 @@ const FEATURE_DATA = {
       { value: '93', label: 'A11y Rules' },
       { value: 'WCAG', label: '2.2 Compliant' },
       { value: 'VPAT', label: 'Generation' }
-    ]
+    ],
+    proTip: 'Generate a VPAT report, then use Image Alt Generator to fix the missing alt text issues in bulk. Two tools, one workflow.'
   },
   'meta-generator': {
     name: 'Meta Data Generator',
@@ -228,7 +231,8 @@ const FEATURE_DATA = {
       { value: 'AI', label: 'Powered' },
       { value: '60', label: 'Char Title' },
       { value: '160', label: 'Char Desc' }
-    ]
+    ],
+    proTip: 'Pair with Schema Generator to add structured data alongside your optimized meta. Better SERP presence with both in place.'
   },
   'schema-generator': {
     name: 'Structured Data Generator',
@@ -279,7 +283,8 @@ const FEATURE_DATA = {
       { value: '40+', label: 'Schema Types' },
       { value: 'JSON', label: '-LD Format' },
       { value: '100%', label: 'Valid Output' }
-    ]
+    ],
+    proTip: 'Add FAQ schema to your help pages, then use the AI Readability Checker to ensure your content structure is AI-friendly. Double the search visibility.'
   },
   'image-alt': {
     name: 'Image Alt Generator',
@@ -330,7 +335,8 @@ const FEATURE_DATA = {
       { value: 'AI', label: 'Powered' },
       { value: 'Bulk', label: 'Processing' },
       { value: 'A11y', label: 'Compliant' }
-    ]
+    ],
+    proTip: 'Run an Accessibility Analyzer scan first to find every image missing alt text, then use Image Alt Generator to fix them all at once.'
   },
   readability: {
     name: 'AI Readability Checker',
@@ -381,7 +387,8 @@ const FEATURE_DATA = {
       { value: 'AI', label: 'Powered' },
       { value: 'URL', label: 'Analysis' },
       { value: 'HTML', label: 'Analysis' }
-    ]
+    ],
+    proTip: 'Check your highest-traffic pages first. Improving AI readability on pages that already rank well compounds your visibility gains.'
   }
 };
 
@@ -603,9 +610,9 @@ export default function FeatureDetailPage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid lg:grid-cols-2 gap-12 items-center">
             <div>
-              <h2 className="text-3xl font-bold text-charcoal-900">Perfect For</h2>
+              <h2 className="text-3xl font-bold text-charcoal-900">Who Gets the Most Out of {feature.name}?</h2>
               <p className="mt-4 text-lg text-charcoal-600">
-                {feature.name} is designed for a variety of content workflows and team needs.
+                Teams and workflows where {feature.name} makes the biggest difference.
               </p>
               <ul className="mt-8 space-y-4">
                 {feature.useCases.map((useCase, index) => (
@@ -622,8 +629,7 @@ export default function FeatureDetailPage() {
                 <span className={`font-medium ${colors.icon}`}>Pro Tip</span>
               </div>
               <p className="text-charcoal-700 leading-relaxed">
-                Get the most out of {feature.name} by combining it with other tools in Content Strategy Portal.
-                Your projects, audits, and optimizations all work together seamlessly.
+                {feature.proTip}
               </p>
               <Link
                 to="/features"
@@ -641,10 +647,10 @@ export default function FeatureDetailPage() {
       <section className={`py-20 lg:py-28 bg-gradient-to-br ${colors.gradient}`}>
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h2 className="text-3xl lg:text-4xl font-bold text-white">
-            Ready to Try {feature.name}?
+            Try {feature.name} free. Right now.
           </h2>
           <p className={`mt-4 text-xl ${colors.light}`}>
-            Start using {feature.name} today with a free account. No credit card required.
+            No credit card. No sales calls. Start using {feature.name} in under 2 minutes.
           </p>
           <div className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-4">
             <Link

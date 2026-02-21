@@ -114,7 +114,7 @@ export default function ResourceLibrary() {
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-charcoal-900 mb-2">Resource Library</h1>
           <p className="text-charcoal-600">
-            Comprehensive guides, tutorials, and best practices for SEO success
+            Comprehensive guides, tutorials, and best practices for content strategy success
           </p>
         </div>
 

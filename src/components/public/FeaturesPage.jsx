@@ -75,9 +75,9 @@ const FEATURES = [
     name: 'Schema Generator',
     slug: 'schema-generator',
     icon: Code,
-    description: 'Generate valid JSON-LD structured data for 15+ schema types with one click.',
+    description: 'Generate valid JSON-LD structured data for 40+ schema types with one click.',
     highlights: [
-      'Support for 15+ schema types',
+      'Support for 40+ schema types',
       'JSON-LD structured data format',
       'Real-time validation',
       'Copy-ready code output',
@@ -188,11 +188,11 @@ export default function FeaturesPage() {
               7 Powerful Tools
             </div>
             <h1 className="text-4xl sm:text-5xl font-bold text-charcoal-900 tracking-tight">
-              Features Built for Content Excellence
+              Seven Tools. One Platform. Zero Busywork.
             </h1>
             <p className="mt-6 text-xl text-charcoal-600 leading-relaxed">
-              From project planning to technical audits, accessibility compliance to AI readability
-              analysis. Everything you need in one platform.
+              Planning, auditing, accessibility, metadata, schema, alt text, and AI readability —
+              integrated so you can stop tab-switching and start strategizing.
             </p>
           </div>
         </div>
@@ -269,10 +269,10 @@ export default function FeaturesPage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center max-w-3xl mx-auto mb-16">
             <h2 className="text-3xl font-bold text-charcoal-900">
-              All Tools Work Together
+              One Platform Means One Source of Truth
             </h2>
             <p className="mt-4 text-lg text-charcoal-600">
-              One platform automates the technical busywork so you can focus on content strategy.
+              No more tab-switching between separate tools. Everything your content team needs, integrated.
             </p>
           </div>
 
@@ -312,10 +312,10 @@ export default function FeaturesPage() {
       <section className="py-20 lg:py-28 bg-gradient-to-br from-primary-500 to-primary-700">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h2 className="text-3xl lg:text-4xl font-bold text-white">
-            Ready to Automate Your Content Workflow?
+            Try all seven tools free. Right now.
           </h2>
           <p className="mt-4 text-xl text-primary-100">
-            Start using all seven tools today. Free account, no credit card required.
+            No credit card. No sales calls. No commitment.
           </p>
           <div className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-4">
             <Link

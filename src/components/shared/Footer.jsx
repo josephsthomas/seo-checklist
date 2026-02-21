@@ -39,8 +39,7 @@ export default function Footer() {
               </div>
             </Link>
             <p className="text-charcoal-300 text-sm max-w-md leading-relaxed">
-              Your complete content strategy PowerSuite. Plan, audit, optimize,
-              and ensure accessibility — all in one platform.
+              Seven tools for content teams who are done with spreadsheet wrangling.
             </p>
           </div>
 
@@ -157,7 +156,7 @@ export default function Footer() {
             </p>
           </div>
           <p className="text-charcoal-600 text-xs">
-            Content Strategy Portal v3.0
+            Content Strategy Portal
           </p>
         </div>
       </div>

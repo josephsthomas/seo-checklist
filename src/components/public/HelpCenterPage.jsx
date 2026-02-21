@@ -10,6 +10,7 @@ import {
   Eye,
   Code,
   Image,
+  ScanEye,
   HelpCircle,
   MessageSquare,
   Video,
@@ -36,7 +37,7 @@ const HELP_SECTIONS = [
   },
   {
     title: 'Resource Library',
-    description: '200+ curated SEO resources and tutorials.',
+    description: '200+ curated content strategy resources and tutorials.',
     href: '/help/resources',
     icon: BookOpen,
     color: 'emerald',
@@ -49,12 +50,12 @@ const HELP_SECTIONS = [
   },
   {
     title: 'Glossary',
-    description: 'SEO terminology explained simply.',
+    description: 'Content strategy & SEO terminology explained simply.',
     href: '/help/glossary',
     icon: FileText,
     color: 'violet',
     articles: [
-      'Common SEO terms',
+      'Common content & SEO terms',
       'Technical terminology',
       'Metrics and KPIs',
       'Industry acronyms'
@@ -98,6 +99,12 @@ const TOOL_GUIDES = [
     description: 'Bulk alt text creation',
     icon: Image,
     href: '/features/image-alt'
+  },
+  {
+    name: 'AI Readability Checker',
+    description: 'AI readability scoring',
+    icon: ScanEye,
+    href: '/features/readability'
   }
 ];
 
@@ -115,8 +122,8 @@ const FAQ_ITEMS = [
     answer: 'Absolutely! Open any project and use the team management feature to invite collaborators. You can assign roles and permissions for each member.'
   },
   {
-    question: 'How does the AI feature work?',
-    answer: 'We use Claude AI to help provide recommendations, generate content suggestions, and analyze your data. AI-generated outputs should be reviewed for accuracy before use. AI features are available across all tools.'
+    question: 'How do the AI-powered features work across the platform?',
+    answer: 'We use Claude AI across multiple tools to provide recommendations, generate content suggestions, and analyze your data. AI powers the Technical Audit recommendations, Meta Generator, Image Alt Generator, and AI Readability Checker. AI-generated outputs should always be reviewed for accuracy before use.'
   },
   {
     question: 'Can I export reports for clients?',
@@ -345,7 +352,7 @@ export default function HelpCenterPage() {
                 to="/register"
                 className="mt-4 inline-flex items-center gap-1 text-violet-400 font-medium hover:text-violet-300"
               >
-                Get in touch <ArrowRight className="w-4 h-4" />
+                Create free account for support <ArrowRight className="w-4 h-4" />
               </Link>
             </div>
           </div>
@@ -356,10 +363,10 @@ export default function HelpCenterPage() {
       <section className="py-20 lg:py-28 bg-gradient-to-br from-emerald-500 to-emerald-700">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h2 className="text-3xl lg:text-4xl font-bold text-white">
-            Ready to Get Started?
+            See for yourself. It's free.
           </h2>
           <p className="mt-4 text-xl text-emerald-100">
-            Create your free account and start optimizing today.
+            Create your free account and start using all seven tools today.
           </p>
           <div className="mt-10">
             <Link

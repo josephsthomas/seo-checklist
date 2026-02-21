@@ -55,7 +55,7 @@ const FEATURES = [
     name: 'Schema Generator',
     href: '/features/schema-generator',
     icon: Code,
-    description: 'Generate JSON-LD structured data for 15+ schema types with one click.',
+    description: 'Generate JSON-LD structured data for 40+ schema types with one click.',
     color: 'orange'
   },
   {
@@ -75,17 +75,17 @@ const FEATURES = [
 ];
 
 const BENEFITS = [
-  { icon: Clock, title: 'Save 10+ Hours Weekly', description: 'Automate repetitive content tasks and focus on strategy' },
-  { icon: TrendingUp, title: 'Improve Visibility', description: 'Data-driven recommendations that actually work' },
-  { icon: Shield, title: 'Ensure Compliance', description: 'Stay ahead of accessibility and content best practices' },
-  { icon: Users, title: 'Team Collaboration', description: 'Work together with role-based permissions' },
+  { icon: Clock, title: 'Save 10+ Hours Weekly', description: 'Stop manually auditing. Start strategically advising.' },
+  { icon: TrendingUp, title: 'Rank-Ready Content', description: 'Every page optimized for search, accessibility, and AI discovery.' },
+  { icon: Shield, title: 'Compliance Without Anxiety', description: 'WCAG 2.2, structured data, and meta best practices — automated.' },
+  { icon: Users, title: 'Built for Teams', description: 'Assign, track, and deliver across every client project.' },
 ];
 
 const STATS = [
-  { value: '353', label: 'Checklist Items' },
-  { value: '31', label: 'Audit Categories' },
-  { value: '93', label: 'Accessibility Rules' },
-  { value: '7', label: 'Integrated Tools' },
+  { value: '10+', label: 'Hours Saved Weekly' },
+  { value: '353', label: 'Points of Quality Assurance' },
+  { value: '93', label: 'Accessibility Checks Automated' },
+  { value: '7', label: 'Tools, One Login' },
 ];
 
 export default function LandingPage() {
@@ -123,20 +123,19 @@ export default function LandingPage() {
           <div className="text-center max-w-4xl mx-auto">
             <div className="inline-flex items-center gap-2 px-4 py-2 bg-primary-50 border border-primary-200 rounded-full text-primary-700 text-sm font-medium mb-8">
               <Zap className="w-4 h-4" aria-hidden="true" />
-              The Content Strategy PowerSuite
+              7 tools. One content strategy platform.
             </div>
 
             <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-charcoal-900 tracking-tight leading-tight">
-              The Content Strategy Platform{' '}
+              Content Strategy Is Your Job.{' '}
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary-500 to-primary-700">
-                That Delivers
+                The Busywork Isn't.
               </span>
             </h1>
 
             <p className="mt-6 text-xl text-charcoal-600 max-w-2xl mx-auto leading-relaxed">
-              Automate the minutiae — audits, checklists, accessibility, metadata, structured data,
-              AI readability — so you can focus on what matters: being a content strategist.
-              <span className="block mt-2 font-medium text-charcoal-700">7 integrated tools. One platform. Zero busywork.</span>
+              Audits. Checklists. Metadata. Accessibility. Structured data. AI readability.
+              You shouldn't be doing any of this manually. Now you don't have to.
             </p>
 
             <div className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-4">
@@ -151,7 +150,7 @@ export default function LandingPage() {
                 to="/features"
                 className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-8 py-4 bg-white hover:bg-charcoal-50 text-charcoal-700 font-semibold rounded-xl border border-charcoal-200 transition-colors"
               >
-                Explore All 7 Tools
+                See What 7 Tools Replace
               </Link>
             </div>
 
@@ -193,10 +192,10 @@ export default function LandingPage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center max-w-3xl mx-auto mb-16">
             <h2 className="text-3xl lg:text-4xl font-bold text-charcoal-900">
-              Everything You Need for Content Excellence
+              Seven Tools That Replace Your Spreadsheet Stack
             </h2>
             <p className="mt-4 text-lg text-charcoal-600">
-              Seven powerful tools working together to streamline your content strategy workflow.
+              Planning, auditing, accessibility, metadata, schema, alt text, and AI readability — integrated in one platform.
             </p>
           </div>
 
@@ -260,11 +259,11 @@ export default function LandingPage() {
               For Content Strategists
             </div>
             <h2 className="text-3xl lg:text-4xl font-bold text-charcoal-900">
-              Automate the Busywork. Focus on Strategy.
+              What Your Week Looks Like After CSP
             </h2>
             <p className="mt-4 text-lg text-charcoal-600">
-              You became a content strategist to think big — not to manually audit meta tags,
-              check accessibility rules, or generate schema markup. We handle that.
+              You became a content strategist to think big — not to wrangle spreadsheets,
+              manually audit meta tags, or chase accessibility fixes. We handle all of that.
             </p>
           </div>
 
@@ -350,13 +349,13 @@ export default function LandingPage() {
           <div className="text-center max-w-3xl mx-auto mb-16">
             <div className="inline-flex items-center gap-2 px-4 py-2 bg-emerald-50 rounded-full text-emerald-700 text-sm font-medium mb-4">
               <Award className="w-4 h-4" />
-              Trusted by Content Professionals
+              Early Access Feedback
             </div>
             <h2 className="text-3xl lg:text-4xl font-bold text-charcoal-900">
               Built for Agencies & Enterprise Teams
             </h2>
             <p className="mt-4 text-lg text-charcoal-600">
-              From small agencies to enterprise marketing teams, our platform scales with your needs.
+              Here's what early users are telling us.
             </p>
           </div>
 
@@ -379,7 +378,7 @@ export default function LandingPage() {
                 </div>
                 <div>
                   <div className="font-medium text-charcoal-900">Content Director</div>
-                  <div className="text-sm text-charcoal-500">Digital Agency</div>
+                  <div className="text-sm text-charcoal-500">Agency, name withheld</div>
                 </div>
               </div>
             </div>
@@ -402,7 +401,7 @@ export default function LandingPage() {
                 </div>
                 <div>
                   <div className="font-medium text-charcoal-900">Content Strategist</div>
-                  <div className="text-sm text-charcoal-500">E-commerce Brand</div>
+                  <div className="text-sm text-charcoal-500">E-commerce, name withheld</div>
                 </div>
               </div>
             </div>
@@ -425,7 +424,7 @@ export default function LandingPage() {
                 </div>
                 <div>
                   <div className="font-medium text-charcoal-900">Head of Content</div>
-                  <div className="text-sm text-charcoal-500">SaaS Company</div>
+                  <div className="text-sm text-charcoal-500">SaaS, name withheld</div>
                 </div>
               </div>
             </div>
@@ -437,10 +436,11 @@ export default function LandingPage() {
       <section className="py-20 lg:py-28 bg-gradient-to-br from-primary-500 to-primary-700">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h2 className="text-3xl lg:text-4xl font-bold text-white">
-            Ready to Transform Your Content Strategy?
+            Your next project deserves better tools.
           </h2>
           <p className="mt-4 text-xl text-primary-100">
-            Join thousands of content professionals using Content Strategy Portal to deliver better results.
+            Create a free account. Run your first audit in under 2 minutes.
+            No credit card. No sales calls. Just better content strategy.
           </p>
           <div className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-4">
             <Link

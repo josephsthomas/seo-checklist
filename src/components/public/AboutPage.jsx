@@ -15,23 +15,23 @@ import { organizationSchema } from '../../config/seo';
 const VALUES = [
   {
     icon: Target,
-    title: 'Results-Driven',
-    description: 'Every feature is designed to deliver measurable improvements in your content performance.'
+    title: 'Automate the Boring Parts',
+    description: 'Content strategists should strategize, not wrangle spreadsheets. We automate the technical work so you can focus on what matters.'
   },
   {
-    icon: Users,
-    title: 'Team-First',
-    description: 'Built for collaboration with role-based permissions and seamless team workflows.'
-  },
-  {
-    icon: Lightbulb,
-    title: 'Innovation',
-    description: 'Leveraging AI and modern technology to solve real content challenges efficiently.'
+    icon: Shield,
+    title: 'Accuracy Over Speed',
+    description: 'Our AI labels every suggestion as a suggestion. We never pretend AI output is finished work — you review, you decide.'
   },
   {
     icon: Heart,
-    title: 'User-Centric',
-    description: 'Designed with content professionals in mind, based on real-world workflows and needs.'
+    title: 'Practitioner-Built',
+    description: 'Every feature was designed by someone who has done the work, not just studied it. Real workflows, real pain points, real solutions.'
+  },
+  {
+    icon: Lightbulb,
+    title: 'Transparent Tooling',
+    description: 'You always see how scores are calculated, why issues are flagged, and what our AI is doing. No black boxes.'
   },
 ];
 
@@ -78,11 +78,11 @@ export default function AboutPage() {
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center max-w-3xl mx-auto">
             <h1 className="text-4xl sm:text-5xl font-bold text-charcoal-900 tracking-tight">
-              About Content Strategy Portal
+              We Built the Platform We Wished Existed
             </h1>
             <p className="mt-6 text-xl text-charcoal-600 leading-relaxed">
-              We're on a mission to make professional content strategy tools accessible to agencies
-              and enterprise teams of all sizes.
+              Content strategists deserve tools as sophisticated as the strategies they build.
+              We're making that happen.
             </p>
           </div>
         </div>
@@ -211,7 +211,7 @@ export default function AboutPage() {
           <div className="grid lg:grid-cols-2 gap-12 items-center">
             <div>
               <h2 className="text-3xl font-bold text-white">
-                A Complete Platform, Not Just Another Tool
+                Every Tool a Content Strategist Needs — in One Tab
               </h2>
               <p className="mt-6 text-charcoal-300 leading-relaxed">
                 Unlike point solutions that address a single need, Content Strategy Portal
@@ -278,10 +278,10 @@ export default function AboutPage() {
       <section className="py-20 lg:py-28 bg-gradient-to-br from-primary-500 to-primary-700">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h2 className="text-3xl lg:text-4xl font-bold text-white">
-            Ready to Get Started?
+            See for yourself. It's free.
           </h2>
           <p className="mt-4 text-xl text-primary-100">
-            Join the growing community of content professionals using Content Strategy Portal.
+            No credit card. No sales calls. Just better content strategy.
           </p>
           <div className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-4">
             <Link

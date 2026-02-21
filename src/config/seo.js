@@ -89,10 +89,10 @@ export const pageSEO = {
   },
 
   'features/readability': {
-    title: 'Readability Analyzer - Content Scoring & Optimization | CSP',
-    description: 'Analyze content readability with Flesch-Kincaid, Gunning Fog, and other scoring algorithms. Get AI-powered suggestions to improve clarity and engagement.',
+    title: 'AI Readability Checker - Optimize Content for AI Search | CSP',
+    description: 'Analyze how AI models read and interpret your content. Get actionable recommendations to improve visibility in AI-generated answers and AI-powered search engines.',
     canonical: '/features/readability',
-    keywords: 'readability analyzer, content scoring, Flesch-Kincaid, readability checker, content optimization'
+    keywords: 'AI readability, AI content optimization, AI search visibility, AI readability checker, content for AI'
   },
 
   help: {

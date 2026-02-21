@@ -17,7 +17,7 @@ import {
 } from 'lucide-react';
 
 const FEATURES = [
-  { name: 'Content Planner', href: '/features/planner', icon: LayoutDashboard, description: 'Project management & SEO checklists' },
+  { name: 'Content Planner', href: '/features/planner', icon: LayoutDashboard, description: 'Project management & strategy checklists' },
   { name: 'Technical Audit', href: '/features/audit', icon: Search, description: 'Analyze Screaming Frog exports' },
   { name: 'Accessibility Analyzer', href: '/features/accessibility', icon: Eye, description: 'WCAG compliance scanning' },
   { name: 'Meta Data Generator', href: '/features/meta-generator', icon: FileText, description: 'AI-powered meta optimization' },
@@ -29,8 +29,8 @@ const FEATURES = [
 const HELP_LINKS = [
   { name: 'Help Center', href: '/help', icon: HelpCircle, description: 'Documentation & guides' },
   { name: 'Getting Started', href: '/help/getting-started', icon: Sparkles, description: 'Quick start guide' },
-  { name: 'Resource Library', href: '/help/resources', icon: BookOpen, description: '200+ SEO resources' },
-  { name: 'Glossary', href: '/help/glossary', icon: FileText, description: 'SEO terminology' },
+  { name: 'Resource Library', href: '/help/resources', icon: BookOpen, description: '200+ content strategy resources' },
+  { name: 'Glossary', href: '/help/glossary', icon: FileText, description: 'Content & SEO terminology' },
 ];
 
 export default function PublicNavigation() {
