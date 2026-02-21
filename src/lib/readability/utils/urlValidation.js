@@ -82,7 +82,7 @@ export function validateReadabilityUrl(input) {
 
   const tld = parts[parts.length - 1];
   if (tld.length < 2) {
-    return { valid: false, url: null, reason: 'Invalid top-level domain' };
+    return { valid: false, url: null, reason: 'Invalid top-level domain (e.g., .com, .org)' };
   }
 
   // Block non-standard ports (only allow 80, 443, or default no port)
