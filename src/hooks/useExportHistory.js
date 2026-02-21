@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
+import { logError } from '../utils/logger';
 import {
   collection,
   query,
@@ -95,7 +96,7 @@ export function useExportHistory(limit = 20) {
       setLoading(false);
       setError(null);
     }, (err) => {
-      console.error('Error listening to export history:', err);
+      logError('useExportHistory', err, { action: 'onSnapshot' });
       setLoading(false);
       setError(err.message || 'Failed to load export history');
     });
@@ -115,7 +116,7 @@ export function useExportHistory(limit = 20) {
       });
       return docRef.id;
     } catch (error) {
-      console.error('Error logging export:', error);
+      logError('useExportHistory', error, { action: 'logExport' });
       toast.error('Failed to log export');
       return null;
     }
@@ -126,7 +127,7 @@ export function useExportHistory(limit = 20) {
     try {
       await deleteDoc(doc(db, 'export_history', exportId));
     } catch (error) {
-      console.error('Error deleting export record:', error);
+      logError('useExportHistory', error, { action: 'deleteExport' });
       toast.error('Failed to delete export record');
     }
   }, []);

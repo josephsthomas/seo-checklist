@@ -26,6 +26,7 @@ import {
 import { useReadabilityShare } from '../../hooks/useReadabilityShare';
 import { useReadabilityExport } from '../../hooks/useReadabilityExport';
 import { AIDisclaimerInline } from '../shared/AIDisclaimer';
+import { logError } from '../../utils/logger';
 
 const CATEGORY_META = {
   contentStructure: { label: 'Content Structure', icon: Layers },
@@ -99,7 +100,7 @@ export default function ReadabilityShareView() {
     try {
       await exportPDF(sharedAnalysis);
     } catch (err) {
-      console.error('PDF export failed:', err);
+      logError('ReadabilityShareView', err, { action: 'exportPDF' });
       setExportError('PDF export failed. Please try again.');
     }
   };

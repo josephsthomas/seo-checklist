@@ -15,6 +15,7 @@ import { useAuth } from '../../contexts/AuthContext';
 import { db } from '../../lib/firebase';
 import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
 import toast from 'react-hot-toast';
+import { logError } from '../../utils/logger';
 
 const FEEDBACK_TYPES = [
   { id: 'bug', label: 'Report Bug', icon: Bug, color: 'text-red-500' },
@@ -81,7 +82,7 @@ export default function FeedbackWidget() {
       setIsSubmitted(true);
       toast.success('Thank you for your feedback!');
     } catch (error) {
-      console.warn('Feedback submission failed:', error);
+      logError('FeedbackWidget', error, { action: 'submitFeedback', feedbackType });
       toast.error('Failed to submit feedback. Please try again.');
     } finally {
       setIsSubmitting(false);

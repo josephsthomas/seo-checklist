@@ -3,6 +3,8 @@
  * Handles localStorage with compression, versioning, and data migration
  */
 
+import { logError } from './logger';
+
 /**
  * Storage keys for different data types
  */
@@ -45,7 +47,7 @@ export const getStorageItem = (key, defaultValue = null) => {
     const item = localStorage.getItem(key);
     return item ? JSON.parse(item) : defaultValue;
   } catch (error) {
-    console.error(`Error reading ${key} from localStorage:`, error);
+    logError('storageHelpers', error, { action: 'getStorageItem', key });
     return defaultValue;
   }
 };
@@ -61,18 +63,18 @@ export const setStorageItem = (key, value) => {
     localStorage.setItem(key, JSON.stringify(value));
     return true;
   } catch (error) {
-    console.error(`Error writing ${key} to localStorage:`, error);
+    logError('storageHelpers', error, { action: 'setStorageItem', key });
 
     // Check if quota exceeded
     if (error.name === 'QuotaExceededError') {
-      console.warn('LocalStorage quota exceeded. Consider clearing old data.');
+      logError('storageHelpers', 'LocalStorage quota exceeded', { action: 'setStorageItem', key });
       // Attempt to free up space by removing old activity logs
       try {
         localStorage.removeItem(STORAGE_KEYS.RECENT_ACTIVITY);
         localStorage.setItem(key, JSON.stringify(value));
         return true;
       } catch (retryError) {
-        console.error('Failed to free up storage space:', retryError);
+        logError('storageHelpers', retryError, { action: 'setStorageItem', key, retryAfterQuotaExceeded: true });
       }
     }
     return false;
@@ -87,7 +89,7 @@ export const removeStorageItem = (key) => {
   try {
     localStorage.removeItem(key);
   } catch (error) {
-    console.error(`Error removing ${key} from localStorage:`, error);
+    logError('storageHelpers', error, { action: 'removeStorageItem', key });
   }
 };
 
@@ -311,7 +313,7 @@ export const checkStorageUsage = () => {
       sizes[key] = size;
       totalSize += size;
     } catch (error) {
-      console.error(`Error checking size of ${key}:`, error);
+      logError('storageHelpers', error, { action: 'checkStorageUsage', key });
     }
   }
 
@@ -359,7 +361,7 @@ export const importAllData = (data) => {
     }
     return true;
   } catch (error) {
-    console.error('Error importing data:', error);
+    logError('storageHelpers', error, { action: 'importAllData' });
     return false;
   }
 };
