@@ -287,7 +287,7 @@ function handleFetchError(err, res, url, fetchTimeMs) {
     });
   }
 
-  console.error('[FETCH ERROR]', message, err.stack);
+  console.error(JSON.stringify({ level: 'error', correlationId: req.correlationId, source: 'fetch', error: message, stack: err.stack }));
   return res.status(500).json({
     success: false,
     error: { code: 'FETCH_ERROR', message: 'Failed to fetch URL content' }
