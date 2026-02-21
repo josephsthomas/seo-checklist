@@ -5,6 +5,7 @@
 
 import React, { useState, useCallback, useMemo } from 'react';
 import { Copy, Code, Image } from 'lucide-react';
+import DOMPurify from 'dompurify';
 import toast from 'react-hot-toast';
 
 function getGradeColor(score) {
@@ -82,7 +83,7 @@ export default function ReadabilityBadgeGenerator({ score, shareUrl }) {
       {/* Badge preview */}
       <div
         className="flex justify-center p-4 bg-gray-50 dark:bg-charcoal-700/50 rounded-lg"
-        dangerouslySetInnerHTML={{ __html: badgeSVG }}
+        dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(badgeSVG, { USE_PROFILES: { svg: true } }) }}
       />
 
       {/* Format toggle */}
