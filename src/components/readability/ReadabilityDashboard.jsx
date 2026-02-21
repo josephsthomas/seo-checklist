@@ -10,14 +10,14 @@ import { lazyWithRetry } from '../../utils/lazyWithRetry';
 import { AIDisclaimerInline } from '../shared/AIDisclaimer';
 import ReadabilityScoreCard from './ReadabilityScoreCard';
 const ReadabilityCategoryChart = lazyWithRetry(() => import('./ReadabilityCategoryChart'), 'ReadabilityCategoryChart');
-import ReadabilityCategoryAccordion from './ReadabilityCategoryAccordion';
+const ReadabilityCategoryAccordion = lazyWithRetry(() => import('./ReadabilityCategoryAccordion'), 'ReadabilityCategoryAccordion');
 const ReadabilityLLMPreview = lazyWithRetry(() => import('./ReadabilityLLMPreview'), 'ReadabilityLLMPreview');
-import ReadabilityRecommendations from './ReadabilityRecommendations';
-import ReadabilityIssuesTable from './ReadabilityIssuesTable';
+const ReadabilityRecommendations = lazyWithRetry(() => import('./ReadabilityRecommendations'), 'ReadabilityRecommendations');
+const ReadabilityIssuesTable = lazyWithRetry(() => import('./ReadabilityIssuesTable'), 'ReadabilityIssuesTable');
 import ReadabilityCrossToolLinks from './ReadabilityCrossToolLinks';
-import ReadabilityPDFPreview from './ReadabilityPDFPreview';
-import ReadabilityQuotableHighlighter from './ReadabilityQuotableHighlighter';
-import ReadabilityWeightConfig from './ReadabilityWeightConfig';
+const ReadabilityPDFPreview = lazyWithRetry(() => import('./ReadabilityPDFPreview'), 'ReadabilityPDFPreview');
+const ReadabilityQuotableHighlighter = lazyWithRetry(() => import('./ReadabilityQuotableHighlighter'), 'ReadabilityQuotableHighlighter');
+const ReadabilityWeightConfig = lazyWithRetry(() => import('./ReadabilityWeightConfig'), 'ReadabilityWeightConfig');
 import { ScoreCardSkeleton, CategoryChartSkeleton, LLMPreviewSkeleton } from './ReadabilitySkeletonLoader';
 
 /**
@@ -473,26 +473,32 @@ export default function ReadabilityDashboard({
             </button>
           </div>
           {showWeightConfig && (
-            <div className="bg-white dark:bg-charcoal-800 rounded-xl border border-charcoal-200 dark:border-charcoal-700 p-5 motion-safe:animate-fade-in">
-              <ReadabilityWeightConfig
-                weights={null}
-                onChange={() => {}}
-              />
-            </div>
+            <Suspense fallback={<div className="h-24 bg-charcoal-50 dark:bg-charcoal-800 rounded-xl animate-pulse" />}>
+              <div className="bg-white dark:bg-charcoal-800 rounded-xl border border-charcoal-200 dark:border-charcoal-700 p-5 motion-safe:animate-fade-in">
+                <ReadabilityWeightConfig
+                  weights={null}
+                  onChange={() => {}}
+                />
+              </div>
+            </Suspense>
           )}
 
-          <ReadabilityCategoryAccordion
-            categoryScores={analysis.categoryScores}
-            checkResults={analysis.checkResults}
-          />
+          <Suspense fallback={<div className="h-48 bg-charcoal-50 dark:bg-charcoal-800 rounded-xl animate-pulse" />}>
+            <ReadabilityCategoryAccordion
+              categoryScores={analysis.categoryScores}
+              checkResults={analysis.checkResults}
+            />
+          </Suspense>
 
           {/* Quotable Passages (E-013) */}
-          <div className="bg-white dark:bg-charcoal-800 rounded-xl border border-charcoal-200 dark:border-charcoal-700 p-5">
-            <ReadabilityQuotableHighlighter
-              bodyText={analysis.aiAssessment?.contentSummary || ''}
-              aiQuotables={analysis.aiAssessment?.quotablePassages}
-            />
-          </div>
+          <Suspense fallback={<div className="h-32 bg-charcoal-50 dark:bg-charcoal-800 rounded-xl animate-pulse" />}>
+            <div className="bg-white dark:bg-charcoal-800 rounded-xl border border-charcoal-200 dark:border-charcoal-700 p-5">
+              <ReadabilityQuotableHighlighter
+                bodyText={analysis.aiAssessment?.contentSummary || ''}
+                aiQuotables={analysis.aiAssessment?.quotablePassages}
+              />
+            </div>
+          </Suspense>
         </div>
       )}
 
@@ -518,9 +524,11 @@ export default function ReadabilityDashboard({
           aria-labelledby="results-tab-recommendations"
           className="motion-safe:animate-fade-in"
         >
-          <ReadabilityRecommendations
-            recommendations={analysis.recommendations}
-          />
+          <Suspense fallback={<div className="h-48 bg-charcoal-50 dark:bg-charcoal-800 rounded-xl animate-pulse" />}>
+            <ReadabilityRecommendations
+              recommendations={analysis.recommendations}
+            />
+          </Suspense>
         </div>
       )}
 
@@ -531,9 +539,11 @@ export default function ReadabilityDashboard({
           aria-labelledby="results-tab-issues"
           className="motion-safe:animate-fade-in"
         >
-          <ReadabilityIssuesTable
-            checkResults={analysis.checkResults}
-          />
+          <Suspense fallback={<div className="h-48 bg-charcoal-50 dark:bg-charcoal-800 rounded-xl animate-pulse" />}>
+            <ReadabilityIssuesTable
+              checkResults={analysis.checkResults}
+            />
+          </Suspense>
         </div>
       )}
 
@@ -545,16 +555,18 @@ export default function ReadabilityDashboard({
 
       {/* PDF Preview Modal */}
       {showPDFPreview && (
-        <ReadabilityPDFPreview
-          analysis={analysis}
-          onClose={() => setShowPDFPreview(false)}
-          onExport={(options) => {
-            exportHook.exportPDF(analysis, options);
-            setShowPDFPreview(false);
-          }}
-          isExporting={exportHook.isExporting}
-          getPreviewData={exportHook.getPreviewData}
-        />
+        <Suspense fallback={<div className="fixed inset-0 z-50 flex items-center justify-center bg-charcoal-900/60"><div className="text-white">Loading preview...</div></div>}>
+          <ReadabilityPDFPreview
+            analysis={analysis}
+            onClose={() => setShowPDFPreview(false)}
+            onExport={(options) => {
+              exportHook.exportPDF(analysis, options);
+              setShowPDFPreview(false);
+            }}
+            isExporting={exportHook.isExporting}
+            getPreviewData={exportHook.getPreviewData}
+          />
+        </Suspense>
       )}
 
       {/* Click-outside handler for dropdowns */}

@@ -19,7 +19,7 @@ import {
   X
 } from 'lucide-react';
 import { format, subDays } from 'date-fns';
-import { collection, query, where, orderBy, limit as fbLimit, getDocs, Timestamp } from 'firebase/firestore';
+import { collection, query, where, orderBy, limit as fbLimit, getDocs, Timestamp, doc, getDoc, setDoc } from 'firebase/firestore';
 import { db } from '../../lib/firebase';
 import toast from 'react-hot-toast';
 import InfoTooltip from '../common/InfoTooltip';
