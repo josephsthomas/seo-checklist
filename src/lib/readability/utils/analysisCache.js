@@ -4,6 +4,8 @@
  * Returns cached results instantly if content hasn't changed
  */
 
+import { logError } from '../../../utils/logger';
+
 const CACHE_VERSION = 1;
 const CACHE_DURATION_MS = 24 * 60 * 60 * 1000; // 24 hours
 const CACHE_KEY_PREFIX = 'readability_cache_';
@@ -71,7 +73,8 @@ export function getCachedAnalysis(url, htmlContent) {
       _cachedAt: new Date(parsed.cachedAt).toISOString(),
       _cacheAge: Math.round(age / (60 * 60 * 1000)) // hours
     };
-  } catch {
+  } catch (e) {
+    logError('analysisCache.getCachedAnalysis', e);
     return null;
   }
 }
@@ -124,8 +127,8 @@ export function setCachedAnalysis(url, htmlContent, result) {
     }
     localStorage.setItem(key, serialized);
     pruneCache();
-  } catch {
-    // localStorage full or quota exceeded — non-fatal
+  } catch (e) {
+    logError('analysisCache.setCachedAnalysis', e);
   }
 }
 
@@ -150,8 +153,8 @@ export function pruneCache() {
         localStorage.removeItem(entry.key);
       }
     }
-  } catch {
-    // Non-fatal
+  } catch (e) {
+    logError('analysisCache.pruneCache', e);
   }
 }
 
@@ -170,8 +173,8 @@ export function clearAnalysisCache() {
     for (const key of toRemove) {
       localStorage.removeItem(key);
     }
-  } catch {
-    // Non-fatal
+  } catch (e) {
+    logError('analysisCache.clearAnalysisCache', e);
   }
 }
 
@@ -192,8 +195,8 @@ export function getCacheSize() {
         entryCount++;
       }
     }
-  } catch {
-    // Non-fatal
+  } catch (e) {
+    logError('analysisCache.getCacheSize', e);
   }
 
   return { totalBytes, entryCount, maxEntries: MAX_CACHE_ENTRIES };
