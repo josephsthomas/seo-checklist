@@ -385,12 +385,8 @@ export const resourceCategories = [
   "Technical SEO",
   "On-Page Optimization",
   "Keyword Research",
-  "Content Strategy",
   "Schema Markup",
-  "Mobile Optimization",
-  "Performance",
-  "Link Building",
-  "Local SEO"
+  "Mobile Optimization"
 ];
 
 export const resourceTypes = ["All", "Guide", "Tutorial", "Best Practices", "Case Study"];

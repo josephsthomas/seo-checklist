@@ -30,11 +30,11 @@ const FEATURE_DATA = {
     tagline: 'Project Management & SEO Checklists',
     icon: LayoutDashboard,
     color: 'primary',
-    description: 'Comprehensive project management designed specifically for SEO teams. Track multiple projects, manage team members, and ensure nothing falls through the cracks with our 321-item checklist.',
+    description: 'Comprehensive project management designed specifically for SEO teams. Track multiple projects, manage team members, and ensure nothing falls through the cracks with our 353-item checklist.',
     longDescription: 'The Content Planner is the command center for your SEO projects. Whether you\'re managing a single website or juggling dozens of client projects, our platform provides the structure and visibility you need to deliver consistent results.',
     features: [
       {
-        title: '321-Item SEO Checklist',
+        title: '353-Item SEO Checklist',
         description: 'A comprehensive checklist covering all phases of SEO projects, from initial audit to ongoing optimization.',
         icon: CheckCircle2
       },
@@ -71,8 +71,8 @@ const FEATURE_DATA = {
       'Enterprise teams with complex approval workflows'
     ],
     stats: [
-      { value: '321', label: 'Checklist Items' },
-      { value: '4', label: 'Project Phases' },
+      { value: '353', label: 'Checklist Items' },
+      { value: '6', label: 'Project Phases' },
       { value: '∞', label: 'Projects' }
     ]
   },
@@ -234,11 +234,11 @@ const FEATURE_DATA = {
     tagline: 'JSON-LD Structured Data',
     icon: Code,
     color: 'orange',
-    description: 'Generate valid JSON-LD structured data for 15+ schema types. Improve rich snippet eligibility and help search engines understand your content.',
+    description: 'Generate valid JSON-LD structured data for 40+ schema types. Improve rich snippet eligibility and help search engines understand your content.',
     longDescription: 'Structured data is essential for modern SEO, but writing valid JSON-LD is tedious and error-prone. Our Schema Generator makes it easy to create properly formatted schema markup for any content type.',
     features: [
       {
-        title: '15+ Schema Types',
+        title: '40+ Schema Types',
         description: 'Support for Article, Product, FAQ, HowTo, Organization, and many more.',
         icon: Layers
       },
@@ -275,7 +275,7 @@ const FEATURE_DATA = {
       'Local business schema'
     ],
     stats: [
-      { value: '15+', label: 'Schema Types' },
+      { value: '40+', label: 'Schema Types' },
       { value: 'JSON', label: '-LD Format' },
       { value: '100%', label: 'Valid Output' }
     ]
