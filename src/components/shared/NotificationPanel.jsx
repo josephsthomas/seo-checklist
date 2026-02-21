@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Bell, CheckCheck, X, Settings } from 'lucide-react';
+import { Bell, CheckCheck, X, Settings, Trash2 } from 'lucide-react';
 import { useNotifications } from '../../hooks/useNotifications';
 import { useNavigate } from 'react-router-dom';
 import { format } from 'date-fns';
@@ -8,7 +8,7 @@ import NotificationPreferences from './NotificationPreferences';
 export default function NotificationPanel() {
   const [isOpen, setIsOpen] = useState(false);
   const [prefsOpen, setPrefsOpen] = useState(false);
-  const { notifications, unreadCount, markAsRead, markAllAsRead } = useNotifications();
+  const { notifications, unreadCount, markAsRead, markAllAsRead, deleteNotification } = useNotifications();
   const navigate = useNavigate();
 
   const handleNotificationClick = (notification) => {
@@ -129,37 +129,52 @@ export default function NotificationPanel() {
               ) : (
                 <div className="divide-y">
                   {notifications.map((notification) => (
-                    <button
+                    <div
                       key={notification.id}
-                      onClick={() => handleNotificationClick(notification)}
-                      className={`w-full text-left p-4 hover:bg-charcoal-50 transition-colors ${
+                      className={`group relative w-full text-left p-4 hover:bg-charcoal-50 transition-colors ${
                         !notification.read ? 'bg-primary-50' : ''
                       }`}
                     >
-                      <div className="flex gap-3">
-                        <div className="text-2xl flex-shrink-0">
-                          {getNotificationIcon(notification.type)}
-                        </div>
-                        <div className="flex-1 min-w-0">
-                          <div className="flex items-start justify-between">
-                            <p className={`text-sm ${
-                              !notification.read ? 'font-semibold text-charcoal-900' : 'font-medium text-charcoal-700'
-                            }`}>
-                              {notification.title}
-                            </p>
-                            {!notification.read && (
-                              <div className="w-2 h-2 bg-primary-600 rounded-full flex-shrink-0 ml-2 mt-1" />
-                            )}
+                      <button
+                        onClick={() => handleNotificationClick(notification)}
+                        className="w-full text-left"
+                      >
+                        <div className="flex gap-3">
+                          <div className="text-2xl flex-shrink-0">
+                            {getNotificationIcon(notification.type)}
                           </div>
-                          <p className="text-sm text-charcoal-600 mt-0.5 line-clamp-2">
-                            {notification.message}
-                          </p>
-                          <p className="text-xs text-charcoal-400 mt-1">
-                            {formatTimestamp(notification.createdAt)}
-                          </p>
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-start justify-between">
+                              <p className={`text-sm ${
+                                !notification.read ? 'font-semibold text-charcoal-900' : 'font-medium text-charcoal-700'
+                              }`}>
+                                {notification.title}
+                              </p>
+                              {!notification.read && (
+                                <div className="w-2 h-2 bg-primary-600 rounded-full flex-shrink-0 ml-2 mt-1" />
+                              )}
+                            </div>
+                            <p className="text-sm text-charcoal-600 mt-0.5 line-clamp-2">
+                              {notification.message}
+                            </p>
+                            <p className="text-xs text-charcoal-400 mt-1">
+                              {formatTimestamp(notification.createdAt)}
+                            </p>
+                          </div>
                         </div>
-                      </div>
-                    </button>
+                      </button>
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          deleteNotification(notification.id);
+                        }}
+                        className="absolute top-3 right-3 p-1.5 text-charcoal-400 hover:text-red-500 hover:bg-red-50 rounded-lg opacity-0 group-hover:opacity-100 transition-all"
+                        aria-label="Delete notification"
+                        title="Delete notification"
+                      >
+                        <Trash2 className="w-3.5 h-3.5" />
+                      </button>
+                    </div>
                   ))}
                 </div>
               )}

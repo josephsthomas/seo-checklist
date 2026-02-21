@@ -15,6 +15,8 @@ import {
 import { db } from '../lib/firebase';
 import { useAuth } from '../contexts/AuthContext';
 import { hasPermission } from '../utils/roles';
+import { logAuditEvent } from '../utils/auditLog';
+import { cascadeDeleteProject } from '../utils/cascadeDelete';
 import toast from 'react-hot-toast';
 
 export function useProjects() {
@@ -66,6 +68,7 @@ export function useProjects() {
         updatedAt: serverTimestamp()
       });
 
+      logAuditEvent({ action: 'CREATE', targetType: 'Project', targetId: docRef.id, targetName: projectData.name });
       toast.success('Project created successfully!');
       return docRef.id;
     } catch (error) {
@@ -95,6 +98,7 @@ export function useProjects() {
         ...updates,
         updatedAt: serverTimestamp()
       });
+      logAuditEvent({ action: 'UPDATE', targetType: 'Project', targetId: projectId, targetName: projectData.name, details: { changes: Object.keys(updates) } });
       toast.success('Project updated successfully!');
     } catch (error) {
       toast.error('Failed to update project');
@@ -113,11 +117,14 @@ export function useProjects() {
       const projectRef = doc(db, 'projects', projectId);
       await updateDoc(projectRef, { deletedAt: serverTimestamp() });
 
+      logAuditEvent({ action: 'DELETE', targetType: 'Project', targetId: projectId });
+
       // Schedule permanent delete after 6 seconds if not undone
       let undone = false;
       const deleteTimeout = setTimeout(async () => {
         if (!undone) {
           try {
+            await cascadeDeleteProject(projectId);
             await deleteDoc(projectRef);
           } catch {
             // Already deleted or restored — ignore

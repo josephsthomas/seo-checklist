@@ -86,16 +86,21 @@ export async function saveAudit(auditResults, urlData = [], domainInfo = {}) {
     updatedAt: serverTimestamp()
   };
 
+  const warnings = [];
   if (auditResults.issues?.length > 500) {
-    console.warn(`Audit saved with truncated issues: ${auditResults.issues.length} issues found, only 500 stored.`);
+    const msg = `Large audit: ${auditResults.issues.length} issues found, 500 stored. Export full results before saving for complete data.`;
+    console.warn(msg);
+    warnings.push(msg);
   }
   if (urlData.length > 100) {
-    console.warn(`Audit saved with truncated URL data: ${urlData.length} URLs found, only 100 stored.`);
+    const msg = `Large audit: ${urlData.length} URLs found, 100 stored. Export full results before saving for complete data.`;
+    console.warn(msg);
+    warnings.push(msg);
   }
 
   await setDoc(doc(db, AUDITS_COLLECTION, auditId), auditDoc);
 
-  return auditId;
+  return { auditId, warnings };
 }
 
 /**

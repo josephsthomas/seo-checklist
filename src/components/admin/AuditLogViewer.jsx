@@ -19,6 +19,8 @@ import {
   X
 } from 'lucide-react';
 import { format, subDays } from 'date-fns';
+import { collection, query, where, orderBy, limit as fbLimit, getDocs, Timestamp } from 'firebase/firestore';
+import { db } from '../../lib/firebase';
 import toast from 'react-hot-toast';
 import InfoTooltip from '../common/InfoTooltip';
 
@@ -97,10 +99,25 @@ export default function AuditLogViewer() {
       setLoading(true);
 
       try {
-        // TODO: Implement real Firestore query for audit logs
-        // For now, start with empty logs - real logging will be added when audit logging is implemented
-        setLogs([]);
-        setTotalPages(1);
+        const startDate = dateRangeConfig.start;
+        const auditRef = collection(db, 'audit_log');
+        const q = query(
+          auditRef,
+          where('timestamp', '>=', Timestamp.fromDate(startDate)),
+          orderBy('timestamp', 'desc'),
+          fbLimit(500)
+        );
+        const snapshot = await getDocs(q);
+        const logsData = snapshot.docs.map(d => {
+          const data = d.data();
+          return {
+            id: d.id,
+            ...data,
+            timestamp: data.timestamp?.toDate?.() || new Date()
+          };
+        });
+        setLogs(logsData);
+        setTotalPages(Math.ceil(logsData.length / ITEMS_PER_PAGE) || 1);
       } catch (err) {
         console.error('Error fetching logs:', err);
         toast.error('Failed to load audit logs');

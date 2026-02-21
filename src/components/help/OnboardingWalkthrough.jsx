@@ -29,7 +29,7 @@ const onboardingSteps = [
   {
     id: 2,
     title: "Content Planner",
-    description: "Create projects with our comprehensive 321-item SEO checklist. Track progress across Discovery, Design, Development, and Launch phases.",
+    description: "Create projects with our comprehensive SEO checklist. Track progress across Discovery, Strategy, Build, Pre-Launch, Launch, and Post-Launch phases.",
     icon: ClipboardList,
     color: 'from-primary-500 to-primary-600',
     target: "#projects-page"
