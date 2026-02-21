@@ -12,12 +12,12 @@ const PAGE_TYPES = {
   product: {
     label: 'Product Page',
     indicators: ['schema.org/Product', 'schema.org/Offer', 'add-to-cart', 'buy-now', 'price'],
-    weightAdjustments: { metadataSchema: 1.4, technicalAccessibility: 1.1 },
+    weightAdjustments: { metadataSchema: 1.4, technicalAccess: 1.1 },
   },
   homepage: {
     label: 'Homepage',
     indicators: ['<body class="home"', 'is-home', 'homepage'],
-    weightAdjustments: { technicalAccessibility: 1.2, metadataSchema: 1.2 },
+    weightAdjustments: { technicalAccess: 1.2, metadataSchema: 1.2 },
   },
   landing: {
     label: 'Landing Page',

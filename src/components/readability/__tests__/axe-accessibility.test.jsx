@@ -185,7 +185,7 @@ describe('axe-core Accessibility Audit', () => {
     it('has no violations', async () => {
       const results = await checkA11y(
         <ReadabilityWeightConfig
-          weights={{ contentStructure: 20, contentClarity: 25, technicalAccessibility: 20, metadataSchema: 15, aiSignals: 20 }}
+          weights={{ contentStructure: 20, contentClarity: 25, technicalAccess: 20, metadataSchema: 15, aiSignals: 20 }}
           onChange={vi.fn()}
         />
       );

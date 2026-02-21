@@ -14,7 +14,7 @@ const mockSharedData = {
   categoryScores: {
     contentStructure: { score: 75 },
     contentClarity: { score: 80 },
-    technicalAccessibility: { score: 77 },
+    technicalAccess: { score: 77 },
     metadataSchema: { score: 72 },
     aiSignals: { score: 86 },
   },

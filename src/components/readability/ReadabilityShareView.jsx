@@ -30,7 +30,7 @@ import { AIDisclaimerInline } from '../shared/AIDisclaimer';
 const CATEGORY_META = {
   contentStructure: { label: 'Content Structure', icon: Layers },
   contentClarity: { label: 'Content Clarity', icon: BookOpen },
-  technicalAccessibility: { label: 'Technical Accessibility', icon: Settings },
+  technicalAccess: { label: 'Technical Accessibility', icon: Settings },
   metadataSchema: { label: 'Metadata & Schema', icon: Database },
   aiSignals: { label: 'AI-Specific Signals', icon: Bot },
 };
@@ -264,7 +264,7 @@ export default function ReadabilityShareView() {
                   <div className="space-y-3">
                     {Object.entries(data.categoryScores)
                       .sort(([a], [b]) => {
-                        const order = ['contentStructure', 'contentClarity', 'technicalAccessibility', 'metadataSchema', 'aiSignals'];
+                        const order = ['contentStructure', 'contentClarity', 'technicalAccess', 'metadataSchema', 'aiSignals'];
                         return order.indexOf(a) - order.indexOf(b);
                       })
                       .map(([key, scoreData]) => {

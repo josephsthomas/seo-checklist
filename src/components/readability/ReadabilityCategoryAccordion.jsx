@@ -31,7 +31,7 @@ const CATEGORY_CONFIG = {
     description: 'Reading level, sentence length, passive voice, jargon',
     weight: '25%',
   },
-  technicalAccessibility: {
+  technicalAccess: {
     label: 'Technical Accessibility',
     short: 'TA',
     icon: Settings,
@@ -225,7 +225,7 @@ export default function ReadabilityCategoryAccordion({
   const categoryOrder = [
     'contentStructure',
     'contentClarity',
-    'technicalAccessibility',
+    'technicalAccess',
     'metadataSchema',
     'aiSignals',
   ];

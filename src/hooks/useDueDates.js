@@ -18,6 +18,11 @@ import toast from 'react-hot-toast';
 import { isAfter, isBefore, addDays, startOfDay, differenceInDays } from 'date-fns';
 
 /**
+ * Supported due date types
+ */
+export const DUE_DATE_TYPES = ['task', 'project', 'reminder', 'content_review'];
+
+/**
  * Hook for managing due dates and reminders
  */
 export function useDueDates() {
@@ -61,7 +66,7 @@ export function useDueDates() {
         title: data.title,
         description: data.description || '',
         dueDate: Timestamp.fromDate(new Date(data.dueDate)),
-        type: data.type || 'task', // task, project, reminder
+        type: data.type || 'task', // task, project, reminder, content_review
         priority: data.priority || 'medium',
         projectId: data.projectId || null,
         itemId: data.itemId || null,

@@ -57,9 +57,9 @@ function urlToSlug(url) {
  * Get grade color as RGB array for PDF
  */
 function getGradeColorRGB(score) {
-  if (score >= 85) return [16, 185, 129]; // emerald-500 (A-/A/A+)
-  if (score >= 75) return [20, 184, 166]; // teal-500 (B/B+)
-  if (score >= 65) return [245, 158, 11]; // amber-500 (C/C-)
+  if (score >= 90) return [16, 185, 129]; // emerald-500 (A/A+)
+  if (score >= 80) return [6, 182, 212];  // cyan-500 (B/B+)
+  if (score >= 70) return [245, 158, 11]; // amber-500 (C/C+)
   if (score >= 60) return [249, 115, 22]; // orange-500 (D)
   return [239, 68, 68]; // red-500 (F)
 }

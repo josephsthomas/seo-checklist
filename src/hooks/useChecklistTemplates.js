@@ -18,46 +18,78 @@ import toast from 'react-hot-toast';
 
 export function useChecklistTemplates() {
   const { currentUser } = useAuth();
-  const [templates, setTemplates] = useState([]);
+  const [ownTemplates, setOwnTemplates] = useState([]);
+  const [sharedTemplates, setSharedTemplates] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  // Fetch templates (user's own + shared templates)
+  // Fetch user's own templates
   useEffect(() => {
     if (!currentUser) {
-      setTemplates([]);
+      setOwnTemplates([]);
+      setSharedTemplates([]);
       setLoading(false);
       return;
     }
 
     const templatesRef = collection(db, 'checklistTemplates');
-    const q = query(
+
+    // Query for user's own templates
+    const ownQuery = query(
       templatesRef,
       where('createdBy', '==', currentUser.uid),
       orderBy('createdAt', 'desc')
     );
 
-    const unsubscribe = onSnapshot(
-      q,
+    // Query for shared templates from other users
+    const sharedQuery = query(
+      templatesRef,
+      where('isShared', '==', true),
+      orderBy('createdAt', 'desc')
+    );
+
+    const mapDoc = (doc) => ({
+      id: doc.id,
+      ...doc.data(),
+      createdAt: doc.data().createdAt?.toDate(),
+      updatedAt: doc.data().updatedAt?.toDate(),
+    });
+
+    const unsubOwn = onSnapshot(
+      ownQuery,
       (snapshot) => {
-        const templateList = snapshot.docs.map(doc => ({
-          id: doc.id,
-          ...doc.data(),
-          createdAt: doc.data().createdAt?.toDate(),
-          updatedAt: doc.data().updatedAt?.toDate(),
-        }));
-        setTemplates(templateList);
+        setOwnTemplates(snapshot.docs.map(mapDoc));
         setLoading(false);
       },
       (err) => {
-        console.error('Error fetching templates:', err);
+        console.error('Error fetching own templates:', err);
         setError(err.message);
         setLoading(false);
       }
     );
 
-    return () => unsubscribe();
+    const unsubShared = onSnapshot(
+      sharedQuery,
+      (snapshot) => {
+        // Exclude own templates from shared results
+        const shared = snapshot.docs
+          .map(mapDoc)
+          .filter(t => t.createdBy !== currentUser.uid);
+        setSharedTemplates(shared);
+      },
+      (err) => {
+        console.error('Error fetching shared templates:', err);
+      }
+    );
+
+    return () => {
+      unsubOwn();
+      unsubShared();
+    };
   }, [currentUser]);
+
+  // Merge own + shared templates
+  const templates = [...ownTemplates, ...sharedTemplates.map(t => ({ ...t, _isShared: true }))];
 
   // Create a new template
   const createTemplate = useCallback(async (templateData) => {
@@ -75,6 +107,7 @@ export function useChecklistTemplates() {
         createdAt: serverTimestamp(),
         updatedAt: serverTimestamp(),
         usageCount: 0,
+        isShared: templateData.isShared || false,
       });
 
       toast.success('Template created successfully');
@@ -146,8 +179,43 @@ export function useChecklistTemplates() {
     });
   }, [templates, createTemplate]);
 
+  // Share a template
+  const shareTemplate = useCallback(async (templateId) => {
+    try {
+      const templateRef = doc(db, 'checklistTemplates', templateId);
+      await updateDoc(templateRef, {
+        isShared: true,
+        updatedAt: serverTimestamp(),
+      });
+      toast.success('Template shared with team');
+      return true;
+    } catch (err) {
+      console.error('Error sharing template:', err);
+      toast.error('Failed to share template');
+      return false;
+    }
+  }, []);
+
+  // Unshare a template
+  const unshareTemplate = useCallback(async (templateId) => {
+    try {
+      const templateRef = doc(db, 'checklistTemplates', templateId);
+      await updateDoc(templateRef, {
+        isShared: false,
+        updatedAt: serverTimestamp(),
+      });
+      toast.success('Template is now private');
+      return true;
+    } catch (err) {
+      console.error('Error unsharing template:', err);
+      toast.error('Failed to unshare template');
+      return false;
+    }
+  }, []);
+
   return {
     templates,
+    sharedTemplates,
     loading,
     error,
     createTemplate,
@@ -155,6 +223,8 @@ export function useChecklistTemplates() {
     deleteTemplate,
     duplicateTemplate,
     incrementUsage,
+    shareTemplate,
+    unshareTemplate,
   };
 }
 
