@@ -31,7 +31,7 @@ import {
 import { format, formatDistanceToNow, addDays, addWeeks, addMonths } from 'date-fns';
 import toast from 'react-hot-toast';
 import InfoTooltip from '../common/InfoTooltip';
-import { collection, doc, addDoc, updateDoc, deleteDoc, onSnapshot, query, where, serverTimestamp } from 'firebase/firestore';
+import { collection, doc, addDoc, updateDoc, deleteDoc, onSnapshot, query, where, serverTimestamp, writeBatch } from 'firebase/firestore';
 import { db } from '../../lib/firebase';
 import { useAuth } from '../../contexts/AuthContext';
 
@@ -300,14 +300,18 @@ export default function ScheduledReportsPanel() {
     }
   };
 
-  // Toggle all schedules (maintenance mode)
+  // Toggle all schedules (maintenance mode) — uses writeBatch with 500-op chunking
   const toggleAllSchedules = async (activate) => {
     const activeCount = schedules.filter(s => s.isActive).length;
     try {
-      const updatePromises = schedules.map(s =>
-        updateDoc(doc(db, 'scheduled_reports', s.id), { isActive: activate })
-      );
-      await Promise.all(updatePromises);
+      const BATCH_SIZE = 500;
+      for (let i = 0; i < schedules.length; i += BATCH_SIZE) {
+        const batch = writeBatch(db);
+        schedules.slice(i, i + BATCH_SIZE).forEach(s => {
+          batch.update(doc(db, 'scheduled_reports', s.id), { isActive: activate });
+        });
+        await batch.commit();
+      }
       toast.success(activate
         ? `All ${schedules.length} schedules activated`
         : `All ${activeCount} schedules paused (maintenance mode)`
