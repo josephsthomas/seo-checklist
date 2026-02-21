@@ -1,0 +1,54 @@
+{
+  "package": 3,
+  "total": 27,
+  "verified_fixed": 17,
+  "not_fixed": 0,
+  "partially_fixed": 0,
+  "fixed_now": 3,
+  "legitimately_skipped": 1,
+  "design_decision": 3,
+  "feature_request": 3,
+  "invalid": 0,
+  "details": {
+    "VERIFIED_FIXED": [
+      {"bug_id": "R02-002", "evidence": "PageLoader at line 95 now includes dark:from-charcoal-900 dark:to-charcoal-800 variants, eliminating the bright flash in dark mode"},
+      {"bug_id": "R02-016", "evidence": "PageLoader gradient at line 95 now has dark mode variants (dark:from-charcoal-900 dark:to-charcoal-800). The defect referenced App.jsx line 94 which is the PageLoader component"},
+      {"bug_id": "R05-001", "evidence": "PageLoader at line 95 now has role='status' and aria-live='polite', plus sr-only text 'Loading page content' at line 104"},
+      {"bug_id": "R09-A-011", "evidence": "All seven public pages (lines 25-31) now use lazyWithRetry() instead of eager imports, properly code-splitting public marketing pages"},
+      {"bug_id": "R01-002", "evidence": "VPATReportGenerator line 98 now uses proper [showPreview, setShowPreview] without underscore prefix or eslint-disable. Preview button at line 430 has functional onClick handler"},
+      {"bug_id": "R02-008", "evidence": "VPATReportGenerator line 315 now uses responsive grid 'grid-cols-2 sm:grid-cols-3 md:grid-cols-5' instead of fixed grid-cols-5"},
+      {"bug_id": "R03-001", "evidence": "VPATReportGenerator line 288 subtitle now reads 'WCAG 2.2' matching the PDF export title at line 179"},
+      {"bug_id": "R03-002", "evidence": "VPATReportGenerator line 326 now shows 'Fails' instead of truncated 'Does Not', providing a clear and recognizable label"},
+      {"bug_id": "R03-005", "evidence": "VPATReportGenerator close button at line 304 now has aria-label='Close VPAT Report Generator'"},
+      {"bug_id": "R04-004", "evidence": "VPATReportGenerator line 99 initializes expandedPrinciples to ['Perceivable'] only, collapsing the other 3 principle sections by default to reduce cognitive overload"},
+      {"bug_id": "R04-005", "evidence": "VPATReportGenerator line 288 subtitle now consistently says 'WCAG 2.2' matching the criteria list and PDF export title"},
+      {"bug_id": "R05-004", "evidence": "VPATReportGenerator close button at line 304 now has aria-label='Close VPAT Report Generator' (same fix as R03-005)"},
+      {"bug_id": "R05-005", "evidence": "VPATReportGenerator select at line 391 has aria-label='Conformance level for {id} {title}' and textarea at line 409 has aria-label='Remarks for {id} {title}'"},
+      {"bug_id": "R01-110", "evidence": "ScheduledReportsPanel toggleSchedule at line 181 captures wasActive from schedule before calling setSchedules, then toast at line 186 uses the captured wasActive variable instead of stale state"},
+      {"bug_id": "R08-B-008", "evidence": "ScheduledReportsPanel handleSubmit at lines 673-679 now validates email format with regex, rejecting invalid emails with specific error messages"},
+      {"bug_id": "R10-B-005", "evidence": "Same email validation fix as R08-B-008 - the handleSubmit function at lines 673-679 validates all comma-separated emails against regex pattern"},
+      {"bug_id": "R10-B-013", "evidence": "ScheduledReportsPanel Continue button at lines 1030-1033 now validates step 1 by requiring a non-empty schedule name before advancing"}
+    ],
+    "FIXED_NOW": [
+      {"bug_id": "R02-001", "evidence": "Fixed inconsistent indentation in App.jsx main content area. The <main> tag, <ErrorBoundary>, <Suspense>, <Routes>, and all child Route elements now use consistent 2-space indentation increments. The </main> closing tag, <Footer>, <Toaster>, <FeedbackWidget>, and <CookieConsent> siblings are all at the correct 6-space indent level matching the <main> opening tag"},
+      {"bug_id": "R02-117", "evidence": "Fixed dynamic Tailwind class construction in ScheduleFormModal. Added borderClass, selectedBgClass, and selectedTextClass properties to each REPORT_TYPES entry. Updated the form modal button rendering (lines 806-844) to use these static class properties instead of template literals like border-${type.color}-500, ensuring Tailwind JIT compiler can detect all class names"},
+      {"bug_id": "R07-B-016", "evidence": "Added AI disclaimer rendering in ScheduleFormModal Step 1 (after report type selection grid). When a report type with aiDisclaimer property is selected (currently image-audit), an amber warning box with AlertTriangle icon displays the disclaimer text. Also added AlertTriangle to lucide-react imports"}
+    ],
+    "NOT_FIXED": [],
+    "PARTIALLY_FIXED": [],
+    "LEGITIMATELY_SKIPPED": [
+      {"bug_id": "R02-020", "reason": "react-hot-toast library requires inline style objects for toastOptions.style configuration. The library API does not support Tailwind utility classes for toast styling. The className property is set but core visual properties (background, color, borderRadius, padding, boxShadow, fontSize, fontWeight) must be inline CSS. This is a genuine library constraint that cannot be worked around without forking the library."}
+    ],
+    "DESIGN_DECISION": [
+      {"bug_id": "R04-001", "reason": "The /audit/shared/:shareId route intentionally sits outside the /app prefix because it is a public sharing route that does not require authentication (no <ProtectedRoute> wrapper). Moving it under /app would either break public access or require special auth handling. The comment on line 281 confirms this is intentional: 'keeps old path for sharing'. The readability share route similarly uses a non-/app path (/shared/readability/:shareToken). Changing would break existing shared links."},
+      {"bug_id": "R04-002", "reason": "The /accessibility (public legal page) and /app/accessibility (authenticated audit tool) use the same path segment but are clearly distinguished by the /app prefix namespace. This is standard practice in web applications where public informational pages and authenticated tools may share domain concepts. The /app prefix unambiguously separates the two contexts for developers and users alike."},
+      {"bug_id": "R04-003", "reason": "The route /app/planner/projects/:projectId renders SEOChecklist with toolName 'Content Checklist'. This reflects the product's evolution where the SEO Checklist component was rebranded as 'Content Checklist' in the user-facing UI while retaining its code-level component name. The toolName in the error boundary is the user-facing label. Renaming the component would be a larger refactor with no functional benefit."}
+    ],
+    "FEATURE_REQUEST": [
+      {"bug_id": "R06-008", "reason": "Creating a sitemap.xml for a React SPA requires build-time generation infrastructure (e.g., a build script that reads route config and outputs sitemap.xml to the public directory). This is not a bug in existing code but a missing SEO feature that requires new build tooling, potentially a plugin like vite-plugin-sitemap or a custom build step. The routes are all client-side rendered, so a static sitemap would need to be generated and maintained separately."},
+      {"bug_id": "R08-B-003", "reason": "The ScheduledReportsPanel stores all data in local React state with a TODO comment confirming Firestore persistence is not yet implemented. This requires: (1) Firestore collection schema design, (2) CRUD operations with Firebase SDK, (3) Real-time sync with onSnapshot listeners, (4) User-scoped data isolation. This is a significant backend integration feature, not a simple UI fix. The component currently functions as a UI prototype."},
+      {"bug_id": "R11-B-008", "reason": "Same underlying issue as R08-B-003 - scheduled report configurations are lost on component unmount because they exist only in local React state. Implementing Firestore persistence requires the same backend integration work described for R08-B-003. This is a feature request for data persistence infrastructure, not a bug in existing code logic."}
+    ],
+    "INVALID": []
+  }
+}

@@ -153,10 +153,12 @@ export function useAssignments(projectId) {
   };
 
   const unassignTask = async (itemId) => {
-    if (!projectId) return;
+    if (!projectId || !currentUser) return;
 
     try {
       const docRef = doc(db, 'checklist_assignments', `${projectId}_assignments`);
+      const currentAssignment = assignments[itemId];
+      const previouslyAssigned = currentAssignment?.assignedTo || [];
 
       // Update local state
       setAssignments(prev => {
@@ -170,13 +172,27 @@ export function useAssignments(projectId) {
         [itemId]: null
       });
 
+      // Notify previously assigned users
+      for (const userId of previouslyAssigned) {
+        if (userId !== currentUser.uid) {
+          await createNotification(
+            userId,
+            'task_unassigned',
+            'You have been unassigned from a task',
+            `A task in the project has been unassigned`,
+            `/projects/${projectId}?itemId=${itemId}`,
+            { projectId, itemId }
+          );
+        }
+      }
+
       // Log activity
       await logActivity(
         projectId,
         currentUser.uid,
         currentUser.displayName || currentUser.email,
         'unassigned_task',
-        { itemId }
+        { itemId, previouslyAssigned }
       );
 
       toast.success('Task unassigned');

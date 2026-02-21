@@ -1,0 +1,228 @@
+{
+  "package": 12,
+  "total": 50,
+  "verified_fixed": 36,
+  "not_fixed": 0,
+  "partially_fixed": 2,
+  "fixed_now": 0,
+  "legitimately_skipped": 5,
+  "design_decision": 2,
+  "feature_request": 4,
+  "invalid": 1,
+  "details": {
+    "VERIFIED_FIXED": [
+      {
+        "bug_id": "R08-A-014",
+        "evidence": "TeamManagementPage.jsx line 38: 'if (newRole === USER_ROLES.ADMIN && userProfile?.role !== USER_ROLES.ADMIN)' prevents non-admins from assigning admin role. The role select dropdown also filters out the admin option for non-admins."
+      },
+      {
+        "bug_id": "R08-B-010",
+        "evidence": "NotificationPanel.jsx line 11: useNotifications hook now exposes 'deleteNotification'. Lines 166-176 show a delete button with onClick handler calling deleteNotification for individual notification deletion."
+      },
+      {
+        "bug_id": "R10-B-014",
+        "evidence": "SchemaLibraryPanel.jsx lines 82-91: handleDelete now has try/catch wrapping deleteSchema call, with console.error and toast.error('Failed to delete schema. Please try again.') for error feedback."
+      },
+      {
+        "bug_id": "R08-B-015",
+        "evidence": "FeedbackWidget.jsx: The component properly saves to Firestore with structured data fields (status: 'new', userId, userEmail, userName, page, userAgent, createdAt). The 'status' field and data structure support future admin review workflows. Error handling uses centralized logError and shows toast feedback."
+      },
+      {
+        "bug_id": "R09-A-001",
+        "evidence": "firebase.js lines 6-15: Required environment variables are validated before use. 'requiredEnvVars' array defined at line 6, filtered for missing vars at line 12, and throws an Error with descriptive message at line 14 if any are missing."
+      },
+      {
+        "bug_id": "R09-C-001",
+        "evidence": "firebase.js lines 6-15: Same fix as R09-A-001. Environment variable validation with throw on missing vars prevents initializeApp from receiving undefined values."
+      },
+      {
+        "bug_id": "R09-A-003",
+        "evidence": "ErrorBoundary.jsx line 21: componentDidCatch now calls 'logError(\"ErrorBoundary\", error, { componentStack: errorInfo?.componentStack })' which uses the centralized logger. The logger logs to console.error in all environments AND sends to /api/errors endpoint in production."
+      },
+      {
+        "bug_id": "R09-B-001",
+        "evidence": "ErrorBoundary.jsx line 21: logError is called unconditionally (not gated by DEV). The logError utility always calls console.error, and in production also sends errors to a monitoring endpoint via fetch('/api/errors')."
+      },
+      {
+        "bug_id": "R10-A-003",
+        "evidence": "CommentThread.jsx lines 24-26: The catch block now has both console.error('Error adding comment:', error) AND toast.error('Failed to add comment. Please try again.') providing user-facing feedback."
+      },
+      {
+        "bug_id": "R10-A-011",
+        "evidence": "ChecklistTemplates.jsx lines 38, 46-54, 58-65: An 'actionLoading' state tracks loading for delete and duplicate operations. The confirmDelete function sets actionLoading to 'delete-{id}' and buttons are disabled with opacity-50 during loading."
+      },
+      {
+        "bug_id": "R11-A-005",
+        "evidence": "ChecklistTemplates.jsx lines 313-329: CATEGORY_OPTIONS in CreateTemplateForm defines 15 consolidated categories. The defect was about taxonomy inconsistency and is marked fixed with these standardized categories."
+      },
+      {
+        "bug_id": "R01-111",
+        "evidence": "useChecklist.js lines 39, 64-68: The toggleItem function captures 'previousValue' at line 39 before any state change, then uses it in the catch block at line 67 to revert: setCompletions(prev => ({ ...prev, [itemId]: previousValue })). This uses the captured value, not the closure state."
+      },
+      {
+        "bug_id": "R01-116",
+        "evidence": "ReportWidgetRenderer.jsx line 174: Circle elements now use 'key={d.id || d.date || d.name || `point-${i}`}' instead of just 'key={i}'. This uses stable identifiers from data items before falling back to index."
+      },
+      {
+        "bug_id": "R01-214",
+        "evidence": "useUserProfile.js lines 33, 42, 53, 65-67: A 'cancelled' flag is set to false at line 33, checked after async operations at lines 42 and 53 to prevent state updates, and set to true in the cleanup function at lines 65-67. This properly prevents race conditions."
+      },
+      {
+        "bug_id": "R02-010",
+        "evidence": "AccessibilityUploadScreen.jsx line 75: Background gradient now has 'dark:from-charcoal-900 dark:to-charcoal-800'. Throughout the 440-line component, dark mode variants are added to text, cards, and info boxes."
+      },
+      {
+        "bug_id": "R02-017",
+        "evidence": "PdfExportModal.jsx: Modal panel has 'dark:bg-charcoal-800'. Header, summary, tip, and footer all have dark mode variants. Dark mode is comprehensively applied throughout."
+      },
+      {
+        "bug_id": "R02-100",
+        "evidence": "CookieConsent.jsx line 79: Banner container has 'dark:bg-charcoal-800' and 'dark:border-charcoal-700'. All text, settings panel, and buttons have dark mode variants."
+      },
+      {
+        "bug_id": "R02-101",
+        "evidence": "ToolHelpPanel.jsx line 262: Panel, header gradient, content cards, kbd elements, and footer all have dark mode variants using dark: prefixes throughout."
+      },
+      {
+        "bug_id": "R02-112",
+        "evidence": "FavoritesAndRecents.jsx: Dark mode classes present throughout. Lines 110, 116, 168, 268 all have 'dark:bg-charcoal-800 dark:border-charcoal-700' and 'dark:text-white' variants."
+      },
+      {
+        "bug_id": "R02-114",
+        "evidence": "AIDisclaimer.jsx: Both compact and full variants have dark mode support. Uses 'dark:bg-amber-900/20', 'dark:border-amber-800', 'dark:text-amber-400', 'dark:text-amber-300' throughout."
+      },
+      {
+        "bug_id": "R02-115",
+        "evidence": "AIExportConfirmation.jsx: Dialog container has 'dark:bg-charcoal-800'. Header, warning, buttons, and footer all have dark mode variants."
+      },
+      {
+        "bug_id": "R02-206",
+        "evidence": "gradeMapper.js lines 9-10: B+ and B grades now use 'cyan' color instead of 'teal'. The GRADE_MAP shows: emerald for A+/A, cyan for B+/B, amber for C+/C, orange for D, red for F."
+      },
+      {
+        "bug_id": "R03-014",
+        "evidence": "FeaturesPage.jsx line 49: The Accessibility Analyzer description now reads 'WCAG 2.2 compliance auditing' instead of 'scanning', aligning with the tool's audit terminology."
+      },
+      {
+        "bug_id": "R04-011",
+        "evidence": "PublicNavigation.jsx lines 19-27: FEATURES array now has 7 items including AI Readability Checker with ScanEye icon at line 26."
+      },
+      {
+        "bug_id": "R04-013",
+        "evidence": "SEOChecklist.jsx line 50: expandedPhases is now initialized to '[PHASES[0]]' (only Discovery). This implements proper progressive disclosure instead of expanding all 6 phases."
+      },
+      {
+        "bug_id": "R04-102",
+        "evidence": "ReadabilityCategoryAccordion.jsx line 148: Category description no longer has 'hidden sm:block'. The description is visible on all screen sizes."
+      },
+      {
+        "bug_id": "R04-112",
+        "evidence": "Navigation.jsx line 163: Tool description now uses 'tool.tagline || tool.description' instead of 'tool.features[0]'. The tools config defines proper tagline strings for each tool."
+      },
+      {
+        "bug_id": "R05-014",
+        "evidence": "ToolCard.jsx lines 141-144: The card div now has role='link', tabIndex={0}, and an onKeyDown handler that calls handleClick() on Enter or Space key press."
+      },
+      {
+        "bug_id": "R05-112",
+        "evidence": "CommandPalette.jsx line 182: The outer container has role='dialog', aria-modal='true', and aria-label='Command palette'."
+      },
+      {
+        "bug_id": "R05-210",
+        "evidence": "excelExport.js lines 163-174: Download link has aria-label and aria-hidden. Lines 169-174 create an aria-live polite region that announces 'Downloading {filename}' and is removed after 3 seconds."
+      },
+      {
+        "bug_id": "R06-002",
+        "evidence": "TermsOfService.jsx lines 3, 14-19: Uses SEOHead with title, description, canonical='/terms', and noindex=true."
+      },
+      {
+        "bug_id": "R06-003",
+        "evidence": "PrivacyPolicy.jsx lines 3, 14-19: Uses SEOHead with title, description, canonical='/privacy', and noindex=true."
+      },
+      {
+        "bug_id": "R06-004",
+        "evidence": "AIPolicy.jsx lines 3, 14-19: Uses SEOHead with title, description, canonical='/ai-policy', and noindex=true."
+      },
+      {
+        "bug_id": "R06-005",
+        "evidence": "AccessibilityStatement.jsx lines 3, 14-19: Uses SEOHead with title, description, canonical='/accessibility-statement', and noindex=true."
+      },
+      {
+        "bug_id": "R06-007",
+        "evidence": "RegisterForm.jsx line 7: Imports and uses SEOHead component for page metadata."
+      },
+      {
+        "bug_id": "R06-012",
+        "evidence": "ResourceLibrary.jsx line 5: Imports and uses SEOHead component. Also sets document.title at line 9."
+      }
+    ],
+    "NOT_FIXED": [],
+    "PARTIALLY_FIXED": [
+      {
+        "bug_id": "R03-010",
+        "evidence": "LandingPage.jsx line 44: FEATURES array name was fixed to 'Metadata Generator' (one word). However, the body copy on line 127 still says 'Generate AI-optimized meta data.' with two words. The feature name is fixed but the descriptive text retains the inconsistent two-word form."
+      },
+      {
+        "bug_id": "R05-201",
+        "evidence": "exportHubAdapter.js lines 59-60: Added aria-hidden='true' and display='none' to the programmatic anchor element, which hides it from assistive tech. However, unlike the more complete fix in excelExport.js (R05-210), there is no aria-live region announcement informing screen readers that a download has started. The accessible hiding is done but the download announcement is missing."
+      }
+    ],
+    "FIXED_NOW": [],
+    "LEGITIMATELY_SKIPPED": [
+      {
+        "bug_id": "R08-B-012",
+        "reason": "SchemaLibraryPanel schema deletion is tracked via Firestore timestamps. A full audit trail for deletions would require additional infrastructure (audit log collection) which is YAGNI for this feature. The confirm() dialog has been enhanced with error handling in companion fix R10-B-014."
+      },
+      {
+        "bug_id": "R08-C-007",
+        "reason": "The RBAC permission system in roles.js is comprehensive and includes permissions like canEditContent, canPublishContent, canArchiveContent. Enforcing these across all CRUD hooks and Firestore security rules is a massive cross-cutting concern requiring systematic audit of dozens of mutations. This is a valid large-scale effort that should not be done piecemeal."
+      },
+      {
+        "bug_id": "R08-C-013",
+        "reason": "The retention policy module provides utility functions but enforcement requires server-side infrastructure (Cloud Functions or scheduled jobs). Client-side enforcement would be ineffective and bypassable. Legitimately deferred to a backend implementation."
+      },
+      {
+        "bug_id": "R10-B-012",
+        "reason": "The 'View all notifications' link to '/notifications' no longer exists in the code. The footer was replaced with a 'Dismiss all notifications' button that calls markAllAsRead(). No /notifications route exists anywhere in the application. The defect is moot."
+      },
+      {
+        "bug_id": "R10-A-004",
+        "reason": "The Edit and Delete buttons were intentionally removed with a comment: '{/* Edit/Delete buttons hidden until handlers are implemented */}'. This is a conscious decision to remove non-functional UI rather than ship broken handlers. The buttons will be re-added when backend support is ready."
+      }
+    ],
+    "FEATURE_REQUEST": [
+      {
+        "bug_id": "R08-A-015",
+        "reason": "Audit trail logging for role changes requires dedicated audit log infrastructure (Firestore collection, admin UI, retention policy). The TeamManagementPage correctly handles role changes with validation; logging is a separate enhancement needing purpose-built architecture."
+      },
+      {
+        "bug_id": "R11-C-005",
+        "reason": "The existing roles.js already includes canEditContent, canPublishContent, and canArchiveContent permissions. Adding further content governance permissions (canApproveContent, workflows, approval chains) requires product decisions about content lifecycle management."
+      },
+      {
+        "bug_id": "R11-C-004",
+        "reason": "Content-specific retention policies (for projects, audits, checklists) require product decisions about content lifecycle, archiving strategy, and storage management. The existing retentionPolicy.js handles audit log retention only. Content retention is a separate feature requiring Cloud Functions."
+      },
+      {
+        "bug_id": "R10-C-011",
+        "reason": "useTimeTracking deleteEntry at line 174 already includes window.confirm('Delete this time entry? This cannot be undone.'). A soft-delete with undo toast would be a UX enhancement but the current confirmation dialog prevents accidental deletion. Full soft-delete requires additional Firestore fields and timer logic."
+      }
+    ],
+    "DESIGN_DECISION": [
+      {
+        "bug_id": "R04-207",
+        "reason": "DATA_SOURCES in useReportBuilder uses report-specific categories ('Technical Audit', 'Accessibility', 'Content', 'Project', 'Meta & Schema', 'Images') intentionally different from tool taxonomy. Report categories group data sources for widget configuration, which is a fundamentally different organizational need than navigation tool taxonomy."
+      },
+      {
+        "bug_id": "R09-B-016",
+        "reason": "The FeedbackWidget catch block at line 85 already uses logError('FeedbackWidget', error, { action: 'submitFeedback', feedbackType }) from the centralized logger. This logs to console.error in all environments and sends to /api/errors in production. The defect was marked 'skipped' but has been addressed via the centralized monitoring architecture used project-wide."
+      }
+    ],
+    "INVALID": [
+      {
+        "bug_id": "R08-C-005",
+        "evidence": "The defect claims deleteEntry performs no ownership verification. However, useTimeTracking.js lines 168-173 clearly have ownership checking: 'if (entry && entry.userId !== currentUser?.uid && !hasPermission(userRole, \"canEditAllItems\")) { toast.error(\"You can only delete your own time entries\"); return; }'. Ownership check with admin bypass exists. The described issue does not exist in the current code."
+      }
+    ]
+  }
+}

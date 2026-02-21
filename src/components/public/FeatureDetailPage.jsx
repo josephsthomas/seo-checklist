@@ -230,7 +230,7 @@ const FEATURE_DATA = {
     ]
   },
   'schema-generator': {
-    name: 'Schema Generator',
+    name: 'Structured Data Generator',
     tagline: 'JSON-LD Structured Data',
     icon: Code,
     color: 'orange',

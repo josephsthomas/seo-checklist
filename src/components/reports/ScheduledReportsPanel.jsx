@@ -25,7 +25,8 @@ import {
   Download,
   RefreshCw,
   PauseCircle,
-  PlayCircle
+  PlayCircle,
+  AlertTriangle
 } from 'lucide-react';
 import { format, formatDistanceToNow, addDays, addWeeks, addMonths } from 'date-fns';
 import toast from 'react-hot-toast';
@@ -46,6 +47,9 @@ const REPORT_TYPES = [
     color: 'cyan',
     bgClass: 'bg-cyan-100 dark:bg-cyan-900/30',
     textClass: 'text-cyan-600 dark:text-cyan-400',
+    borderClass: 'border-cyan-500',
+    selectedBgClass: 'bg-cyan-50 dark:bg-cyan-900/20',
+    selectedTextClass: 'text-cyan-700 dark:text-cyan-300',
     fields: ['url', 'depth', 'includeScreenshots']
   },
   {
@@ -56,6 +60,9 @@ const REPORT_TYPES = [
     color: 'purple',
     bgClass: 'bg-purple-100 dark:bg-purple-900/30',
     textClass: 'text-purple-600 dark:text-purple-400',
+    borderClass: 'border-purple-500',
+    selectedBgClass: 'bg-purple-50 dark:bg-purple-900/20',
+    selectedTextClass: 'text-purple-700 dark:text-purple-300',
     fields: ['url', 'wcagLevel', 'includeFixSuggestions']
   },
   {
@@ -66,6 +73,9 @@ const REPORT_TYPES = [
     color: 'primary',
     bgClass: 'bg-primary-100 dark:bg-primary-900/30',
     textClass: 'text-primary-600 dark:text-primary-400',
+    borderClass: 'border-primary-500',
+    selectedBgClass: 'bg-primary-50 dark:bg-primary-900/20',
+    selectedTextClass: 'text-primary-700 dark:text-primary-300',
     fields: ['projectId', 'includeAssignments']
   },
   {
@@ -76,6 +86,9 @@ const REPORT_TYPES = [
     color: 'amber',
     bgClass: 'bg-amber-100 dark:bg-amber-900/30',
     textClass: 'text-amber-600 dark:text-amber-400',
+    borderClass: 'border-amber-500',
+    selectedBgClass: 'bg-amber-50 dark:bg-amber-900/20',
+    selectedTextClass: 'text-amber-700 dark:text-amber-300',
     fields: ['urls', 'includeCompetitors']
   },
   {
@@ -86,6 +99,9 @@ const REPORT_TYPES = [
     color: 'emerald',
     bgClass: 'bg-emerald-100 dark:bg-emerald-900/30',
     textClass: 'text-emerald-600 dark:text-emerald-400',
+    borderClass: 'border-emerald-500',
+    selectedBgClass: 'bg-emerald-50 dark:bg-emerald-900/20',
+    selectedTextClass: 'text-emerald-700 dark:text-emerald-300',
     fields: ['url', 'includeAIsuggestions'],
     aiDisclaimer: 'AI-generated alt text suggestions may contain inaccuracies. Review before publishing.'
   },
@@ -97,6 +113,9 @@ const REPORT_TYPES = [
     color: 'rose',
     bgClass: 'bg-rose-100 dark:bg-rose-900/30',
     textClass: 'text-rose-600 dark:text-rose-400',
+    borderClass: 'border-rose-500',
+    selectedBgClass: 'bg-rose-50 dark:bg-rose-900/20',
+    selectedTextClass: 'text-rose-700 dark:text-rose-300',
     fields: ['url', 'includeRecommendations']
   },
   {
@@ -107,6 +126,9 @@ const REPORT_TYPES = [
     color: 'indigo',
     bgClass: 'bg-indigo-100 dark:bg-indigo-900/30',
     textClass: 'text-indigo-600 dark:text-indigo-400',
+    borderClass: 'border-indigo-500',
+    selectedBgClass: 'bg-indigo-50 dark:bg-indigo-900/20',
+    selectedTextClass: 'text-indigo-700 dark:text-indigo-300',
     fields: ['dateRange', 'includeUserBreakdown']
   }
 ];
@@ -805,16 +827,16 @@ function ScheduleFormModal({ schedule, onSave, onClose }) {
                         onClick={() => setFormData(prev => ({ ...prev, reportType: type.id }))}
                         className={`p-4 rounded-xl border-2 text-left transition-all ${
                           isSelected
-                            ? `border-${type.color}-500 bg-${type.color}-50 dark:bg-${type.color}-900/20`
+                            ? `${type.borderClass} ${type.selectedBgClass}`
                             : 'border-charcoal-200 dark:border-charcoal-600 hover:border-charcoal-300 dark:hover:border-charcoal-500'
                         }`}
                       >
                         <div className="flex items-center gap-3">
-                          <div className={`p-2 rounded-lg bg-${type.color}-100 dark:bg-${type.color}-900/30`}>
-                            <Icon className={`w-5 h-5 text-${type.color}-600 dark:text-${type.color}-400`} />
+                          <div className={`p-2 rounded-lg ${type.bgClass}`}>
+                            <Icon className={`w-5 h-5 ${type.textClass}`} />
                           </div>
                           <div>
-                            <p className={`font-medium ${isSelected ? `text-${type.color}-700 dark:text-${type.color}-300` : 'text-charcoal-900 dark:text-white'}`}>
+                            <p className={`font-medium ${isSelected ? type.selectedTextClass : 'text-charcoal-900 dark:text-white'}`}>
                               {type.name}
                             </p>
                             <p className="text-xs text-charcoal-500 dark:text-charcoal-400">{type.description}</p>
@@ -825,6 +847,16 @@ function ScheduleFormModal({ schedule, onSave, onClose }) {
                   })}
                 </div>
               </div>
+
+              {/* AI Disclaimer for applicable report types */}
+              {reportType?.aiDisclaimer && (
+                <div className="flex items-start gap-3 p-4 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-lg">
+                  <AlertTriangle className="w-5 h-5 text-amber-600 dark:text-amber-400 flex-shrink-0 mt-0.5" />
+                  <p className="text-sm text-amber-800 dark:text-amber-300">
+                    {reportType.aiDisclaimer}
+                  </p>
+                </div>
+              )}
             </div>
           )}
 

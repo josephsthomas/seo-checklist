@@ -1,0 +1,84 @@
+{
+  "package": 9,
+  "total": 55,
+  "verified_fixed": 35,
+  "not_fixed": 2,
+  "partially_fixed": 1,
+  "fixed_now": 1,
+  "legitimately_skipped": 3,
+  "design_decision": 0,
+  "feature_request": 4,
+  "invalid": 9,
+  "details": {
+    "VERIFIED_FIXED": [
+      {"bug_id": "R03-109", "evidence": "ReadabilityLLMColumn.jsx line 246: section heading changed from 'Unprocessable Content' to 'Content Not Available'"},
+      {"bug_id": "R03-110", "evidence": "ReadabilityLLMColumn.jsx line 141-142: error heading changed from 'Extraction Failed' to 'Unable to Load Content'"},
+      {"bug_id": "R07-B-004", "evidence": "ReadabilityLLMColumn.jsx lines 265-307: usefulness score now has visual bar chart, qualitative labels (Excellent/Good/Fair/Needs Work) via getUsefulnessLabel(), and optional explanation text"},
+      {"bug_id": "R07-B-006", "evidence": "ReadabilityLLMColumn.jsx lines 23-29: sanitizeText() function added; all extraction data (title, description, primaryTopic, mainContent, entities) rendered through sanitizeText() calls"},
+      {"bug_id": "R03-212", "evidence": "recommendations.js line 46: 'Meta Data Generator' corrected to 'Metadata Generator'"},
+      {"bug_id": "R03-213", "evidence": "recommendations.js line 77: 'missing meta data' corrected to 'missing metadata'"},
+      {"bug_id": "R04-209", "evidence": "recommendations.js line 7: TOOLS is now exported (line 7: export const TOOLS) making it the canonical source for tool definitions that other modules can import"},
+      {"bug_id": "R04-012", "evidence": "ExportHubPage.jsx line 283: 'Back to Dashboard' Link now points to '/app' instead of '/'"},
+      {"bug_id": "R06-206", "evidence": "technicalAccess.js lines 82-116: checkCanonicalUrl now validates URL format using new URL() constructor and checks for http/https protocol, returning 'fail' for invalid URLs"},
+      {"bug_id": "R06-207", "evidence": "technicalAccess.js lines 158-192: checkHiddenContent now checks for display:none, visibility:hidden, aria-hidden, collapse/accordion, and <details> patterns in HTML, returning appropriate status"},
+      {"bug_id": "R06-208", "evidence": "technicalAccess.js lines 52-80: checkRobotsTxt now returns 'pass' by default, 'fail' for restrictive directives, and 'warn' for non-restrictive directives, fixing the always-warn bug"},
+      {"bug_id": "R08-B-001", "evidence": "AuthContext.jsx lines 162-212: deleteAccount now cleans up projects, assignments, time_entries, comments, notifications, notification_settings, user profile, calls cascadeDeleteAccount(), and cleans storage"},
+      {"bug_id": "R08-B-002", "evidence": "AuthContext.jsx lines 53 and 91: both email signup and Google OAuth now assign 'content_writer' role instead of 'project_manager'"},
+      {"bug_id": "R09-B-008", "evidence": "AuthContext.jsx line 249: fetchUserProfile catch block now logs 'console.warn(Failed to fetch user profile:, profileError)' instead of silent catch; storage cleanup catch at line 219 also logs warning"},
+      {"bug_id": "R08-B-004", "evidence": "useComments.js lines 100-107: updateComment now uses arrayUnion() to append {previousText, editedAt} to editHistory array"},
+      {"bug_id": "R08-B-005", "evidence": "useComments.js lines 118-130: deleteComment now fetches comment doc and verifies commentSnap.data().userId === currentUser.uid before deletion"},
+      {"bug_id": "R08-C-003", "evidence": "useComments.js lines 88-98 and 118-130: both updateComment and deleteComment now verify ownership before performing operations"},
+      {"bug_id": "R08-C-004", "evidence": "useComments.js lines 100-107: updateComment uses arrayUnion to append previous text to editHistory with editedAt timestamp"},
+      {"bug_id": "R01-008", "evidence": "BatchAuditPanel.jsx lines 30-31 and 316: uses isRunningRef (useRef) for the loop check instead of stale closure state, resolving the stale closure bug"},
+      {"bug_id": "R10-A-008", "evidence": "BatchAuditPanel.jsx line 316: 'if (!isRunningRef.current) break;' uses ref instead of state for reliable cancellation"},
+      {"bug_id": "R01-100", "evidence": "ReadabilityCheckItem.jsx lines 51-70: renderWithJargon() returns React elements (<abbr> components) instead of raw HTML. escapeHtml() function added at lines 34-42. No dangerouslySetInnerHTML usage"},
+      {"bug_id": "R04-103", "evidence": "ReadabilityCheckItem.jsx lines 123-126: isExpandable is based on hasDetails (description, details, recommendation, affectedElements, codeSnippet, whyItMatters) regardless of status, so pass items are expandable when they have details"},
+      {"bug_id": "R05-104", "evidence": "ReadabilityCheckItem.jsx lines 141-148: native <button type='button'> element used instead of div with role='button'"},
+      {"bug_id": "R01-112", "evidence": "useAssignments.js lines 46 and 104-105: assignTask saves previousAssignments before optimistic update and calls setAssignments(previousAssignments) in catch block for rollback"},
+      {"bug_id": "R11-B-003", "evidence": "useChecklistTemplates.js lines 232-287: DEFAULT_TEMPLATES categories now match actual checklistData categories (Technical SEO, Performance, Security, Content Strategy, On-Page Optimization, Keyword Research, etc.)"},
+      {"bug_id": "R01-200", "evidence": "useFavoritesAndRecents.js lines 71-157: all callbacks use functional setState (setFavorites(prevFavorites => ...), setRecents(prevRecents => ...)) to avoid stale closure values"},
+      {"bug_id": "R10-C-013", "evidence": "useFavoritesAndRecents.js line 66: saveData error handling now includes toast.error('Failed to save favorites/recents') in addition to console.error"},
+      {"bug_id": "R01-211", "evidence": "auditStorageService.js lines 312-314: getSharedAudit uses increment(1) from Firestore for atomic view count update instead of read-then-write"},
+      {"bug_id": "R08-C-009", "evidence": "auditStorageService.js lines 89-99: saveAudit now generates warning messages for truncation and returns them in the result object; console.warn also emitted"},
+      {"bug_id": "R02-003", "evidence": "AccessibilityAuditPage.jsx line 241: error view gradient has dark mode variants (dark:from-charcoal-900 dark:to-charcoal-800); error card and text elements all have dark: classes"},
+      {"bug_id": "R02-004", "evidence": "AccessibilityAuditPage.jsx line 258: 'How to fix this' card has dark:bg-charcoal-800 and dark:border-charcoal-700 classes"},
+      {"bug_id": "R06-017", "evidence": "AccessibilityAuditPage.jsx lines 247 and 259: heading hierarchy corrected to h1 (guidance title) -> h2 ('How to fix this'), proper nesting"},
+      {"bug_id": "R02-011", "evidence": "ActivityPage.jsx line 33: timeline container has dark:bg-charcoal-800 and dark:border-charcoal-700 classes"},
+      {"bug_id": "R04-007", "evidence": "ActivityPage.jsx line 15: 'Back to Dashboard' Link now points to '/app' instead of '/'"},
+      {"bug_id": "R06-018", "evidence": "ActivityPage.jsx line 15: same fix as R04-007 — Link to='/app' eliminates unnecessary redirect from / to /app"}
+    ],
+    "NOT_FIXED": [
+      {"bug_id": "R11-C-008", "evidence": "recommendations.js: TOOLS constant (lines 7-62) and RECOMMENDATION_RULES (lines 65-143) still have no 'readability' tool entry. The word 'readability' does not appear anywhere in the file. The readability tool is completely absent from the cross-tool recommendations engine."},
+      {"bug_id": "R08-B-013", "evidence": "useAssignments.js lines 254-256: useMyTasks still queries entire 'checklist_assignments' collection with no where clause — query(collection(db, 'checklist_assignments')). Client-side filter at line 266. Comment at line 253 acknowledges the issue. Data model (maps within documents) makes server-side filtering difficult but the defect remains."}
+    ],
+    "PARTIALLY_FIXED": [
+      {"bug_id": "R01-115", "evidence": "useChecklistTemplates.js lines 154-167: incrementUsage now uses Firestore increment(1) for atomic server-side update, fixing the race condition. However, line 157 calls setTemplates() which is undefined — the hook uses setOwnTemplates and setSharedTemplates, not setTemplates. The local state update is broken and will throw a ReferenceError at runtime."}
+    ],
+    "FIXED_NOW": [
+      {"bug_id": "R08-B-006", "evidence": "useAssignments.js unassignTask: added notification to previously assigned users via createNotification() when a task is unassigned, matching the behavior of assignTask. Activity logging was already present. Skip reason claimed no unassign capability existed, which was incorrect."}
+    ],
+    "LEGITIMATELY_SKIPPED": [
+      {"bug_id": "R11-C-014", "reason": "The always-warn bug in checkRobotsTxt was fixed separately (R06-208 verified fixed). The skip's concern about advanced robots.txt parsing (crawl-delay, sitemap refs, user-agent rules) is a feature enhancement beyond the scope of a client-side meta tag analyzer."},
+      {"bug_id": "R09-A-018", "reason": "The storage cleanup catch block now logs warnings (console.warn), which is sufficient for development. Production-grade structured logging and monitoring service integration requires infrastructure decisions outside the scope of a single component fix."},
+      {"bug_id": "R09-A-013", "reason": "Adding CI/CD pipeline configuration (GitHub Actions, security audit gates) is an infrastructure decision that requires team consensus on tooling and workflows, not a code fix."}
+    ],
+    "FEATURE_REQUEST": [
+      {"bug_id": "R08-A-012", "reason": "Adding scheduling capability to BatchAuditPanel and integrating with ScheduledAuditsPanel is a new feature requiring significant design work for scheduling UI, cron-like backend, and persistence."},
+      {"bug_id": "R04-204", "reason": "ITEM_TYPES was expanded from 4 to 7 types (adding READABILITY, SCHEMA, META). Adding filter tabs in the favorites UI is a feature enhancement for the dashboard, not a bug fix."},
+      {"bug_id": "R10-C-005", "reason": "useUnsavedChanges now handles both beforeunload and popstate events. Full React Router integration (useBlocker/usePrompt) requires React Router v6.4+ features and broader routing architecture changes."},
+      {"bug_id": "R08-C-016", "reason": "Adding a comprehensive audit trail (logging all operations with actor and timestamp to a separate auditLog collection) is a new cross-cutting feature requiring design decisions about retention, storage, and access control."}
+    ],
+    "DESIGN_DECISION": [],
+    "INVALID": [
+      {"bug_id": "R08-A-001", "evidence": "ExportHubPage.jsx lines 247-275: handleProjectExport now fetches real completion data from Firestore checklist_completions and builds items from checklistData. No empty mockItems array exists. The original defect (empty mockItems causing zero items) was fixed even though the defect was skipped."},
+      {"bug_id": "R08-A-011", "evidence": "ExportHubPage.jsx lines 226, 343-379: PROJECT_DISPLAY_LIMIT is now 12 (not 6), search input appears when projects exceed limit, and 'Show all N projects' button provides access to all projects. The original 6-project limit issue was resolved."},
+      {"bug_id": "R10-A-009", "evidence": "ExportHubPage.jsx lines 333-340 and 372-379: empty state shown when no projects exist, and 'Show all N projects' button shown when projects exceed display limit. Both empty state and overflow indication were added."},
+      {"bug_id": "R09-A-012", "evidence": "package.json lines 15-37: all 22 production dependencies now use exact version pins (no ^ caret). E.g., 'firebase': '12.7.0' not '^12.7.0'. The original defect about caret version ranges was resolved."},
+      {"bug_id": "R09-B-009", "evidence": "package.json line 23: lucide-react is pinned to exact '0.294.0' (no caret). The original concern about ^0.294.0 allowing breaking pre-1.0 changes is resolved by exact pinning."},
+      {"bug_id": "R09-C-012", "evidence": "package.json: all production dependencies use exact version pins without caret ranges. The semver drift concern is resolved for production deps."},
+      {"bug_id": "R11-B-011", "evidence": "useChecklistTemplates.js lines 44-83: shared templates are now queried via where('isShared', '==', true). Lines 182-214 provide shareTemplate() and unshareTemplate() functions. The skip reason 'Templates go live immediately without review' was a different concern; the original defect about no sharing mechanism is resolved."},
+      {"bug_id": "R01-208", "evidence": "useUnsavedChanges.js lines 75-84: useFormWithUnsavedChanges now uses shallow key comparison loop instead of JSON.stringify. Comment at line 74 confirms: 'Shallow comparison — avoids JSON.stringify fragility with Date, undefined, NaN'. The original performance concern was resolved."},
+      {"bug_id": "R10-C-006", "evidence": "useUnsavedChanges.js lines 75-84: dirty detection replaced JSON.stringify with shallow Object.keys comparison loop, addressing the unreliability concerns (property order, Date objects, undefined values). The original defect was resolved."}
+    ]
+  }
+}

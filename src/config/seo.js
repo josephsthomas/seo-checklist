@@ -248,7 +248,7 @@ export const softwareSchemas = {
   'schema-generator': {
     '@context': 'https://schema.org',
     '@type': 'SoftwareApplication',
-    name: 'Schema Markup Generator',
+    name: 'Structured Data Generator',
     description: 'Generate valid JSON-LD structured data for 40+ schema types.',
     applicationCategory: 'BusinessApplication',
     operatingSystem: 'Web',

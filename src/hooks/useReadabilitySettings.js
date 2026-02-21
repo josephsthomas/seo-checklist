@@ -73,6 +73,7 @@ export function useReadabilitySettings() {
         ...newSettings,
         updatedAt: serverTimestamp(),
       }, { merge: true });
+      toast.success('Settings saved');
     } catch (err) {
       console.error('Could not save readability settings:', err);
       setError(err.message);

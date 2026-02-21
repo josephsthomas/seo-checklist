@@ -232,16 +232,11 @@ export default function AuditDashboard({ auditResults, domainInfo, urlData = [],
 
   // Save audit to Firestore
   const handleSaveAudit = async () => {
-    if (savedAuditId) {
-      toast.success('Audit already saved');
-      return;
-    }
-
     setSaving(true);
     try {
-      const auditId = await saveAudit(auditResults, urlData, domainInfo);
-      setSavedAuditId(auditId);
-      toast.success('Audit saved successfully');
+      const result = await saveAudit(auditResults, urlData, domainInfo);
+      setSavedAuditId(result.auditId || result);
+      toast.success(savedAuditId ? 'Audit updated successfully' : 'Audit saved successfully');
     } catch (err) {
       console.error('Save failed:', err);
       toast.error(err.message || 'Failed to save audit');
@@ -373,9 +368,9 @@ export default function AuditDashboard({ auditResults, domainInfo, urlData = [],
               )}
               <button
                 onClick={handleSaveAudit}
-                disabled={saving || savedAuditId}
+                disabled={saving}
                 className="btn btn-primary flex items-center gap-2 disabled:opacity-70"
-                aria-label={saving ? 'Saving audit' : savedAuditId ? 'Audit saved' : 'Save audit'}
+                aria-label={saving ? 'Saving audit' : savedAuditId ? 'Update saved audit' : 'Save audit'}
               >
                 {saving ? (
                   <Loader2 className="w-4 h-4 animate-spin" />

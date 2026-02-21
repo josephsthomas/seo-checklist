@@ -115,7 +115,13 @@ export function useNotifications() {
   };
 }
 
+const NOTIFICATION_TYPES = ['info', 'success', 'warning', 'error', 'assignment', 'comment', 'mention', 'due_date', 'project', 'system'];
+
 export async function createNotification(userId, type, title, message, link, data = {}) {
+  if (!NOTIFICATION_TYPES.includes(type)) {
+    console.error(`Invalid notification type: "${type}". Must be one of: ${NOTIFICATION_TYPES.join(', ')}`);
+    return;
+  }
   try {
     await addDoc(collection(db, 'notifications'), {
       userId,

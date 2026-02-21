@@ -124,7 +124,7 @@ export default function LandingPage() {
 
             <p className="mt-6 text-xl text-charcoal-600 max-w-2xl mx-auto leading-relaxed">
               Run technical audits in 5 minutes. Track 321 SEO checklist items per project.
-              Ensure WCAG 2.2 accessibility. Generate AI-optimized meta data.
+              Ensure WCAG 2.2 accessibility. Generate AI-optimized metadata.
               <span className="block mt-2 font-medium text-charcoal-700">One platform for agencies managing 10+ client sites.</span>
             </p>
 

@@ -62,6 +62,15 @@ export function downloadBlob(blob, filename) {
   a.click();
   document.body.removeChild(a);
   URL.revokeObjectURL(url);
+
+  // Announce download to screen readers
+  const announcement = document.createElement('div');
+  announcement.setAttribute('role', 'status');
+  announcement.setAttribute('aria-live', 'polite');
+  announcement.className = 'sr-only';
+  announcement.textContent = `Downloading ${filename}`;
+  document.body.appendChild(announcement);
+  setTimeout(() => announcement.remove(), 3000);
 }
 
 export default { registerWithExportHub, createBatchZip, downloadBlob };
