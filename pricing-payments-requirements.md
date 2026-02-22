@@ -3816,4 +3816,1002 @@ The following modifications were made to existing sections as part of Wave 1 int
 
 ---
 
+<!-- ============================================================ -->
+<!-- WAVE 2 INTEGRATION — Sr. Express Developer, Frontend Dev Manager, Head of Technology -->
+<!-- ============================================================ -->
+
+---
+
+## Section 20: Backend API Enhancements — Wave 2 <!-- Added per Wave 2 expert review -->
+
+### 20.1 `processed_webhook_events` Collection Schema
+
+**Source**: Sr. Express Developer (REQ-03-C02), Head of Technology (REQ-12-M03)
+**Priority**: Critical — blocks webhook implementation
+
+Add `processed_webhook_events/{stripeEventId}` to Section 3 (Data Models):
+
+```javascript
+// Collection: processed_webhook_events/{stripeEventId}
+// Purpose: Idempotency store for Stripe webhook events — prevents double-processing on Stripe retries
+{
+  id: string,                      // Stripe event ID (e.g., 'evt_xxx') — document ID
+  eventType: string,               // e.g., 'checkout.session.completed'
+  handlerVersion: string,          // Semver of the handler code that processed this event
+  processedAt: Timestamp,          // When processing completed successfully
+  processingDurationMs: number,    // Latency observability
+  userId: string | null,           // Associated user (if determinable from event)
+  outcome: string,                 // 'success' | 'skipped' | 'ignored'
+  _expireAt: Timestamp,            // TTL: set to processedAt + 30 days — Firestore TTL policy
+}
+
+// Firestore Security Rules:
+// - No client read or write access
+// - Backend (Admin SDK) write-only via Admin SDK
+// - TTL: Firestore TTL policy on '_expireAt' field, 30-day expiry
+
+// Idempotency implementation (atomic create pattern):
+// db.runTransaction(async (txn) => {
+//   const ref = db.collection('processed_webhook_events').doc(event.id);
+//   const doc = await txn.get(ref);
+//   if (doc.exists) throw new AlreadyProcessedError();
+//   txn.create(ref, { id: event.id, eventType: event.type, ... });
+// })
+// Catch AlreadyProcessedError → return res.status(200).json({ received: true, status: 'already_processed' })
+```
+
+**Webhook Routing Update** (Section 4.4.6):
+
+Replace the `payment_intent.succeeded` credit pack handler with explicit session-mode routing in `checkout.session.completed`:
+
+```
+checkout.session.completed (mode='subscription') → subscription provisioning flow
+checkout.session.completed (mode='payment')      → credit pack fulfillment flow
+
+payment_intent.succeeded → RETAIN as no-op guard only:
+  Skip if payment_intent.invoice is set (subscription payment)
+  Skip if payment_intent is linked to a completed Checkout session
+  No credit pack fulfillment logic here — handled exclusively by checkout.session.completed
+```
+
+---
+
+### 20.2 Credit Refund Endpoint
+
+**Source**: Sr. Express Developer (NR-04, REQ-03-C04)
+**Priority**: Critical — required for AI call failure rollback
+
+Add to Section 4.4.3 (Credit Endpoints):
+
+```
+POST /api/v1/credits/refund
+
+Purpose: Reverses a credit debit transaction when the associated tool action fails after credits
+were already deducted. Called by the frontend on confirmed AI/tool API failure.
+
+Request Body:
+{
+  transactionId: string,    // credit_transactions document ID from /api/credits/consume response
+  reason: string            // 'ai_call_failed' | 'tool_error' | 'timeout'
+}
+
+Authorization: Bearer <firebase-id-token>
+Rate Limit: 5 per minute per user (prevent gaming)
+Idempotency: If transactionId already has a refund transaction, return 200 with existing record
+
+Validation:
+- credit_transactions/{transactionId}.userId must === req.user.uid
+- transactionId.createdAt must be > now - 15 minutes (refund window)
+- No existing 'refund' transaction with relatedTransactionId === transactionId
+
+Response (200):
+{
+  success: true,
+  refundTransactionId: string,
+  creditsRestored: number,
+  newBalance: { standardCreditsRemaining: number, aiCreditsRemaining: number }
+}
+
+Errors:
+- 400: transactionId not found or does not belong to authenticated user
+- 400: Transaction is older than 15 minutes (refund window expired)
+- 409: Refund already issued for this transactionId
+
+Implementation notes:
+- Create compensating credit_transactions record:
+    { type: 'refund', relatedTransactionId: transactionId, reason }
+- Restore credits inside Firestore transaction on credit_balances/{userId}
+- Do NOT create a usage_events record for refunds (avoid analytics double-counting)
+```
+
+---
+
+### 20.3 Overage Billing Mechanism
+
+**Source**: Sr. Express Developer (NR-05, REQ-03-C03)
+**Priority**: Critical — overages tracked but never charged without this
+
+Add as Section 4.4.7 — Overage Billing:
+
+```
+Overage billing uses Stripe Pending Invoice Items approach:
+
+TRIGGER: invoice.paid webhook for subscription renewal invoice
+BEFORE resetting credit counters, read:
+  credit_balances/{userId}.standardOverageUsed
+  credit_balances/{userId}.aiOverageUsed
+
+IF standardOverageUsed > 0 OR aiOverageUsed > 0:
+  Call stripe.invoiceItems.create() for each overage type with positive usage:
+    {
+      customer: stripeCustomerId,
+      subscription: subscriptionId,
+      amount: overageUsed * TIER_CONFIGS[tier].overageRates[type] * 100,  // cents
+      currency: 'usd',
+      description: `${type} credit overage: ${overageUsed} credits @ $${rate}/credit`,
+      metadata: { userId, billingPeriodStart, billingPeriodEnd, creditType: type }
+    }
+  // Items automatically attach to the NEXT open invoice for the customer
+
+THEN: Reset standardOverageUsed and aiOverageUsed to 0 in credit_balances
+
+Add to Section 4.4.6 webhook table:
+  invoice.created → Check for overage line items; log to reconciliation_log
+
+Overage Hard Cap (new requirement):
+  TIER_CONFIGS must define overageHardCap per tier (e.g., 2x monthly credit allocation).
+  When standardOverageUsed + aiOverageUsed reaches overageHardCap, block further overage
+  consumption and show an "Overage limit reached" warning requiring upgrade or pack purchase.
+
+Error handling:
+  If stripe.invoiceItems.create() fails:
+    - Do NOT reset overage counters (retry next billing cycle)
+    - Log to security_events with severity 'high'
+    - Alert admin
+    - Retry via exponential backoff (3 attempts)
+    - After 3 failures: reset credits (prevent access disruption), create manual billing action
+      record in admin_billing_actions/{id} for manual resolution
+```
+
+---
+
+### 20.4 API Versioning Strategy
+
+**Source**: Sr. Express Developer (NR-06, REQ-03-M07)
+**Priority**: Should-have before production launch
+
+Add as Section 4.7 — API Versioning:
+
+All API routes must be prefixed with `/api/v1/`. Update all route definitions in Sections 4.4.x accordingly. The frontend `src/lib/api.js` must configure `VITE_API_URL + '/v1'` as the base path.
+
+**Versioning policy:**
+- When breaking changes are introduced, `/api/v2/` routes are created alongside v1
+- v1 supported for minimum 6 months after v2 ships
+- Deprecated endpoints return `Deprecation: true` and `Sunset: <ISO-date>` response headers
+- The `GET /api/v1/health` endpoint must return `{ version: '1', status: 'ok', deprecatedAt: null }`
+
+**Breaking change definition** (requires version bump):
+- Removing a required request field
+- Changing a response field type
+- Removing a response field used by the frontend
+- Changing HTTP status codes
+
+**Non-breaking changes** (no version bump):
+- Adding optional request fields
+- Adding new response fields
+- Adding new endpoints
+
+---
+
+### 20.5 Background Jobs Specifications
+
+**Source**: Sr. Express Developer (NR-01, REQ-03-S01)
+**Priority**: Must-have before Batch 2
+
+Add as Section 4.8 — Background Jobs and Scheduled Tasks:
+
+The following background jobs must be formally implemented. Each is implemented as a Cloud Scheduler job triggering a dedicated authenticated Express endpoint:
+
+| Job | File | Schedule | Trigger |
+|-----|------|----------|---------|
+| Monthly credit reset | `jobs/resetMonthlyCredits.js` | Driven by `invoice.paid` webhook | Webhook event |
+| Credit reset catch-up | `jobs/creditResetCatchup.js` | Daily 02:00 UTC | Cloud Scheduler |
+| Data retention cleanup | `jobs/dataRetentionCleanup.js` | Daily 03:00 UTC | Cloud Scheduler |
+| Credit pack expiration | `jobs/expireCreditPacks.js` | Daily 00:05 UTC | Cloud Scheduler |
+| Nonprofit expiry warning | `jobs/nonprofitExpiryWarner.js` | Daily 08:00 UTC | Cloud Scheduler |
+| Trial expiration check | `jobs/trialExpiryChecker.js` | Daily 06:00 UTC | Cloud Scheduler |
+| `pending_price_change` apply | `jobs/applyPriceChanges.js` | Daily 00:01 UTC | Cloud Scheduler |
+| Auto-refill count reset | `jobs/resetAutoRefillCounts.js` | 1st of month 00:05 UTC | Cloud Scheduler |
+| Stripe reconciliation | `jobs/reconcileSubscriptions.js` | Daily 03:00 UTC | Cloud Scheduler + on-demand |
+
+**Required specification for each job:**
+- Trigger mechanism and schedule (cron expression)
+- Failure handling and retry policy (max 3 retries with exponential backoff)
+- Observability: structured log output (`requestId`, `jobName`, `recordsProcessed`, `errors`)
+- Alert condition (Cloud Monitoring alert on any job failure)
+- Idempotency guarantee (safe to run multiple times)
+- Max documents per run (prevent timeouts): 500 documents per batch, paginated
+
+**Auto-refill count reset specifics:**
+- Resets `autoRefillCount` to 0 on the 1st of each calendar month at 00:05 UTC
+- Stores `autoRefillCountResetAt: Timestamp` on `credit_balances/{userId}` for idempotency
+- Job is idempotent: skip users where `autoRefillCountResetAt` is already this month
+
+---
+
+### 20.6 Firestore Data Consistency Contracts
+
+**Source**: Sr. Express Developer (NR-02, REQ-03-C01), Head of Technology (REQ-12-C02)
+**Priority**: Critical — must be defined before Story 2.6 implementation
+
+Add as Section 4.9 — Data Consistency Contracts:
+
+#### 20.6.1 Credit Deduction Transaction Contract
+
+`creditService.consumeCredits()` MUST follow this exact transaction boundary:
+
+```
+ATOMIC UNIT (db.runTransaction()):
+  READ:  credit_balances/{userId}
+  VALIDATE: standardCreditsRemaining + bonusStandardCredits >= amount
+            (or aiCreditsRemaining + bonusAiCredits >= amount for AI actions)
+  IF insufficient: throw InsufficientCreditsError (auto-rollback)
+  WRITE: credit_balances/{userId}
+    - Decrement appropriate balance field
+    - Increment overageUsed if balance was 0 and overage allowed
+    - Set updatedAt: now
+  WRITE: credit_transactions/{newId}
+    - Immutable debit record: { type: 'debit', userId, amount, creditType, action,
+        balanceAfter, createdAt, stripeEventId: null, relatedTransactionId: null }
+
+OUTSIDE TRANSACTION (fire-and-forget):
+  WRITE: usage_events/{newId} — analytics record (eventual consistency acceptable)
+  UPDATE: users/{userId}.creditsRemaining (denormalized fast-read — best effort)
+
+ROLLBACK SCENARIO (AI call fails after transaction commits):
+  Frontend: POST /api/v1/credits/refund with { transactionId, reason: 'ai_call_failed' }
+  Backend: creditService.refundTransaction(transactionId)
+    - Creates compensating CREDIT transaction (type: 'refund')
+    - Uses Firestore transaction to restore balance atomically
+    - Idempotent by transactionId unique constraint
+```
+
+#### 20.6.2 Idempotency Key for Credit Consumption
+
+**Source**: Head of Technology (REQ-NEW-07, REQ-12-C02)
+
+`POST /api/v1/credits/consume` MUST accept and deduplicate on an idempotency key:
+
+```
+Request header: Idempotency-Key: <UUID-v4> (required for all consume calls)
+
+Backend:
+  1. Read credit_consume_idempotency/{key} from Firestore
+  2. If exists and not expired: return cached response (HTTP 200, no deduction)
+  3. If not exists: proceed with deduction, then write:
+     credit_consume_idempotency/{key} = { response, userId, _expireAt: now + 60s }
+
+Collection: credit_consume_idempotency/{key}
+  Fields: { key, response: object, userId: string, _expireAt: Timestamp }
+  TTL: Firestore TTL on '_expireAt' field, 60-second expiry
+
+Frontend (useCredits hook):
+  - Generates UUID v4 per consumeCredits() call via crypto.randomUUID()
+  - Attaches as Idempotency-Key header on every POST /api/v1/credits/consume request
+```
+
+#### 20.6.3 Auto-Refill Atomicity Contract
+
+**Source**: Sr. Express Developer (REQ-03-M05)
+
+Auto-refill MUST use a two-phase commit pattern to enforce the 3-pack monthly cap:
+
+```
+Phase 1 — Atomic reservation (inside Firestore transaction):
+  READ:  credit_balances/{userId} — check autoRefillCount < 3 AND autoRefillPending !== true
+  IF count >= 3 or pending: abort (no refill)
+  WRITE: credit_balances/{userId}.autoRefillCount += 1
+  WRITE: credit_balances/{userId}.autoRefillPending = true
+
+Phase 2 — Stripe API call (outside transaction):
+  CALL: stripe.paymentIntents.create() or stripe.subscriptions.createItem() for pack
+  IF Stripe SUCCESS:
+    WRITE: credit_balances/{userId}.autoRefillPending = false
+    WRITE: credit_balances/{userId} — grant pack credits
+  IF Stripe FAILURE:
+    COMPENSATE: credit_balances/{userId}.autoRefillCount -= 1 (inside new transaction)
+    WRITE: credit_balances/{userId}.autoRefillPending = false
+    LOG: auto_refill_failures/{userId}/{attemptId}
+```
+
+---
+
+### 20.7 Firestore Composite Index Definitions
+
+**Source**: Sr. Express Developer (NR-07, REQ-03-M01)
+**Priority**: Must-have before Batch 2 implementation
+
+Add as Section 3.12 — Firestore Composite Index Definitions:
+
+Commit `firestore.indexes.json` to repository root with the following composite indexes (in addition to Section 3.9 indexes for `usage_events`):
+
+```json
+{
+  "indexes": [
+    {
+      "collectionGroup": "credit_transactions",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "userId", "order": "ASCENDING" },
+        { "fieldPath": "creditType", "order": "ASCENDING" },
+        { "fieldPath": "createdAt", "order": "DESCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "credit_transactions",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "userId", "order": "ASCENDING" },
+        { "fieldPath": "createdAt", "order": "DESCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "subscriptions",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "tier", "order": "ASCENDING" },
+        { "fieldPath": "status", "order": "ASCENDING" },
+        { "fieldPath": "createdAt", "order": "DESCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "subscriptions",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "status", "order": "ASCENDING" },
+        { "fieldPath": "createdAt", "order": "DESCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "invoices",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "userId", "order": "ASCENDING" },
+        { "fieldPath": "status", "order": "ASCENDING" },
+        { "fieldPath": "createdAt", "order": "DESCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "nonprofit_verifications",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "status", "order": "ASCENDING" },
+        { "fieldPath": "createdAt", "order": "ASCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "credit_packs",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "userId", "order": "ASCENDING" },
+        { "fieldPath": "expiresAt", "order": "ASCENDING" }
+      ]
+    }
+  ]
+}
+```
+
+The `firestore.indexes.json` file must be committed to the repository root and deployed via `firebase deploy --only firestore:indexes` in the CI/CD pipeline.
+
+---
+
+### 20.8 Firebase Custom Claims for Auth Middleware
+
+**Source**: Sr. Express Developer (MOD-05, REQ-03-M02)
+**Priority**: Major — performance and availability improvement
+
+Update Section 4.3 (Authentication Middleware) as follows:
+
+```javascript
+// middleware/auth.js — Updated per Wave 2 review
+
+// 1. Extract and verify Firebase ID token: admin.auth().verifyIdToken(token)
+// 2. Read tier and role from CUSTOM CLAIMS in decoded token:
+//    req.user = { uid, email, tier: decodedToken.tier, role: decodedToken.role }
+// 3. If decodedToken.tier is undefined (pre-claims-sync legacy user):
+//    Fall back to Firestore read of users/{uid} to get tier and role
+//    Then call admin.auth().setCustomUserClaims(uid, { tier, role }) to backfill
+// 4. Returns 401 if token invalid/expired
+// 5. Returns 403 if user account is disabled
+
+// Custom claims are set by subscriptionService on EVERY tier change:
+//   admin.auth().setCustomUserClaims(uid, { tier: newTier, role: userRole })
+//
+// Claims propagate to client tokens within 1 hour (next token refresh).
+// Frontend must call user.getIdToken(true) after successful upgrade to force
+// immediate token refresh and pick up new tier claim.
+//
+// IMPORTANT: Never trust client-submitted role — always validate server-side via claims.
+```
+
+---
+
+## Section 21: Frontend Architecture Requirements — Wave 2 <!-- Added per Wave 2 expert review -->
+
+### 21.1 Skeleton Loading Components for Billing Dashboard
+
+**Source**: Frontend Dev Manager (REQ-NEW-01, REQ-11-C01)
+**Priority**: Critical — prerequisite for Batch 5 stories
+**Batch**: 5
+
+Create the following skeleton components before billing dashboard stories are implemented:
+
+**Files to create:**
+- `src/components/billing/skeletons/BillingDashboardSkeleton.jsx`
+- `src/components/billing/skeletons/InvoiceHistorySkeleton.jsx`
+- `src/components/billing/skeletons/CreditHistorySkeleton.jsx`
+
+**Acceptance Criteria:**
+- [ ] `BillingDashboardSkeleton`: shimmer placeholders matching Section 5.2.1 layout
+  - `CurrentPlanCard` skeleton: two-line text placeholder (tier name + price) + four button stubs
+  - `CreditUsageGauge` skeleton: two progress bar placeholders with label stubs
+  - `UsageActivityList` skeleton: 5 row placeholders with icon, text, amount columns
+- [ ] `InvoiceHistorySkeleton`: 5-row table skeleton with column width stubs
+- [ ] `CreditHistorySkeleton`: 5-row table skeleton with filter stubs
+- [ ] All skeletons use Tailwind `animate-pulse` or project's existing shimmer pattern
+- [ ] `BillingDashboard` renders skeleton when `SubscriptionContext.loading === true`
+- [ ] Transition from skeleton to content produces zero layout shift (CSS grid/flex dimensions pre-specified)
+- [ ] `InvoiceHistory` and `CreditHistory` each render their corresponding skeleton on initial load
+
+---
+
+### 21.2 `data-testid` Naming Convention
+
+**Source**: Frontend Dev Manager (REQ-NEW-02, REQ-11-M04)
+**Priority**: Major — must be defined before Batch 3
+**Batch**: Defined before Batch 3; enforced from Batch 3 onward
+
+Add to Section 10.1 (Code Conventions) as subsection 10.1.1:
+
+**Convention**: `{component-name}-{element-type}-{variant-or-context}` in kebab-case.
+
+**Required `data-testid` values (minimum set):**
+
+| Component | Element | `data-testid` Value |
+|-----------|---------|---------------------|
+| PricingPage | Tier card | `pricing-card-{tier}` |
+| PricingPage | CTA button | `pricing-cta-{tier}` |
+| PricingPage | Annual toggle | `pricing-interval-toggle` |
+| RegisterForm | Step indicator | `register-step-indicator` |
+| PlanConfirmationStep | Submit button | `plan-confirm-submit` |
+| PlanConfirmationStep | Auto-renewal checkbox | `plan-confirm-autorenewal-checkbox` |
+| BillingDashboard | Standard credit gauge | `credit-gauge-standard` |
+| BillingDashboard | AI credit gauge | `credit-gauge-ai` |
+| BillingDashboard | Buy pack button | `billing-buy-pack-btn` |
+| CreditPackModal | Pack option | `pack-option-{packType}` |
+| CreditPackModal | Buy now button | `pack-buy-now-{packType}` |
+| UpgradePrompt | Modal container | `upgrade-prompt-modal` |
+| UpgradePrompt | Upgrade CTA | `upgrade-prompt-cta` |
+| UpgradePrompt | Dismiss | `upgrade-prompt-dismiss` |
+| CancellationRetentionModal | Reason option | `cancel-reason-{reason}` |
+| CancellationRetentionModal | Confirm cancel | `cancel-confirm-btn` |
+| SubscriptionBanner | Banner container | `subscription-banner-{status}` |
+| Tool action buttons | Credit-gated button | `tool-action-{action}` |
+
+**Acceptance Criteria:**
+- [ ] Convention documented in `src/COMPONENT_CONVENTIONS.md`
+- [ ] `data-testid` identifiers must be stable and semantic — never index-based
+- [ ] All Stories in Batches 3–7 include `data-testid` requirements in acceptance criteria
+
+---
+
+### 21.3 React Error Boundary Architecture
+
+**Source**: Frontend Dev Manager (REQ-NEW-03, REQ-11-M02)
+**Priority**: Major — required before Stories 5.1–5.7
+**Batch**: 5
+
+Create billing-specific React Error Boundaries at three levels:
+
+**Files to create:**
+- `src/components/billing/BillingErrorBoundary.jsx`
+- `src/components/shared/CreditGatingErrorBoundary.jsx`
+
+**BillingErrorBoundary** (top-level):
+- Catches errors from `SubscriptionContext` Firestore listeners and billing page components
+- Fallback UI: "Billing information temporarily unavailable. Your access and credits are not affected. [Refresh page]"
+- Logs error to console + optionally to Firestore `error_logs` collection
+- Does NOT unmount the rest of the application
+- Wraps `SubscriptionProvider` in `src/App.jsx`
+- Each billing route (`BillingDashboard`, `InvoiceHistory`, `PlanManagement`, `CreditHistory`) is individually wrapped with a page-level `BillingErrorBoundary`
+
+**CreditGatingErrorBoundary** (tool component level):
+- Wraps `useCredits` call sites in tool components
+- On error: fails OPEN (allows the action) — never silently block tool usage due to billing errors
+- Shows non-blocking toast: "Credit tracking temporarily unavailable"
+- Used in each of the 15+ tool component integrations in Batch 6
+
+**SubscriptionContext error handling:**
+- If `onSnapshot` emits an error, context must catch it and set `connectionStatus: 'error'`
+- Context must NOT re-throw Firestore listener errors (would crash the app subtree)
+- Context exposes `connectionStatus: 'online' | 'offline' | 'reconnecting' | 'error'`
+
+---
+
+### 21.4 Stripe.js Initialization and Bundle Strategy
+
+**Source**: Frontend Dev Manager (REQ-NEW-04, REQ-11-C03)
+**Priority**: Critical — must be defined before Batch 4
+**Batch**: 4
+
+Add as Section 10.8 — Bundle and Performance Strategy:
+
+**Create `src/lib/stripe.js`:**
+```javascript
+// src/lib/stripe.js — Singleton Stripe initialization
+// IMPORTANT: This module must NOT be imported at app root level.
+// Import only within components that trigger checkout flows.
+
+import { loadStripe } from '@stripe/stripe-js';
+
+let stripePromise = null;
+
+export const getStripe = () => {
+  if (!stripePromise) {
+    stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY);
+  }
+  return stripePromise;
+};
+```
+
+**Bundle strategy requirements:**
+- [ ] `@stripe/stripe-js` must be a dynamic import — not in the app root bundle
+- [ ] `getStripe()` called only when user clicks a checkout CTA, not on page load
+- [ ] Add to `PricingPage` `SEOHead`: `<link rel="preconnect" href="https://js.stripe.com">` and `<link rel="dns-prefetch" href="https://js.stripe.com">`
+- [ ] Performance budgets defined in `vite.config.js`:
+  - `/app/billing` route chunk: max 150 KB gzipped
+  - `/pricing` route chunk: max 80 KB gzipped
+- [ ] Add `@stripe/stripe-js` to `vite.config.js` `optimizeDeps.include` to prevent double-loading in development
+- [ ] Bundle size validated in CI using `vite-bundle-visualizer` or equivalent
+
+---
+
+### 21.5 E2E Test Suite Specification
+
+**Source**: Frontend Dev Manager (REQ-NEW-05, REQ-11-M01)
+**Priority**: Major — required before production launch
+**Batch**: All (E2E tests run in CI after Batch 6 completion)
+
+Add as Section 10.2.1 — E2E Test Scenarios:
+
+**Tooling**: Playwright (preferred for Vite/React projects)
+
+**Required E2E scenarios (minimum):**
+
+| Test ID | Scenario | Key Assertions |
+|---------|----------|----------------|
+| E2E-01 | Free tier registration | Dashboard shows 50 standard / 10 AI credits; tier badge shows "Basic" |
+| E2E-02 | Paid tier checkout (Freelance, annual) | Stripe test checkout with card `4242 4242 4242 4242`; success modal on redirect; tier badge "Freelance" |
+| E2E-03 | Credit gate enforcement | Basic user, zero credits → audit upload blocked → `upgrade-prompt-modal` visible |
+| E2E-04 | Credit pack purchase | Paid user → billing page → pack purchase → balance increased post-webhook |
+| E2E-05 | Cancellation retention flow | Paid user → initiation → 3-step modal → pause offer → subscription shows "Paused" |
+
+**Acceptance Criteria:**
+- [ ] Playwright installed as devDependency in frontend project
+- [ ] E2E tests run in CI on every PR targeting `main`
+- [ ] Stripe test mode credentials and test card numbers only — no production API keys in CI
+- [ ] Stripe CLI webhook forwarding configured in CI test environment
+- [ ] All 5 scenarios must pass before Batch 7 is considered complete
+
+**Files:**
+- Create: `e2e/pricing.spec.ts`, `e2e/registration.spec.ts`, `e2e/credit-gating.spec.ts`, `e2e/billing.spec.ts`, `e2e/cancellation.spec.ts`, `playwright.config.ts`
+
+---
+
+### 21.6 Accessibility Testing Integration
+
+**Source**: Frontend Dev Manager (REQ-NEW-06, REQ-11-S03)
+**Priority**: Major — enforced from Batch 3 onward
+
+Add as Section 10.2.2 — Accessibility Testing Requirements:
+
+**Tooling**: `jest-axe` + `@axe-core/react`
+
+**Acceptance Criteria:**
+- [ ] Install `jest-axe` as devDependency; add `toHaveNoViolations` matcher to `src/setupTests.js`
+- [ ] Every component test file for new billing/pricing components includes at minimum one `axe` check
+- [ ] Pricing comparison table (`PricingComparisonTable.jsx`) must pass axe with `table` rule — proper `scope` on all `<th>` elements
+- [ ] All modals (`CreditPackModal`, `UpgradePrompt`, `CancellationRetentionModal`) must pass focus-trap rules
+- [ ] `CreditUsageGauge` color states (green/yellow/red) must meet WCAG AA contrast ratio (4.5:1)
+- [ ] `SubscriptionBanner` must include `role="alert"` and `aria-live="polite"` (or `"assertive"` for `past_due`/`incomplete`)
+- [ ] All modals must trap focus within modal on open; Escape key closes; focus returns to trigger on close
+
+---
+
+### 21.7 Registration State Machine — Updated for Wave 1 Complexity
+
+**Source**: Frontend Dev Manager (REQ-11-C04)
+**Priority**: Critical — update before Story 4.1 implementation
+
+Update Section 6.2.4 to replace the 4-state machine with the following full state × event table:
+
+**States**: `account_details` | `nonprofit_verification` | `plan_confirmation` | `checkout` | `success`
+
+**Variant paths:**
+| Registration Type | State Sequence |
+|-------------------|----------------|
+| Free (Basic) | `account_details` → `success` (no payment) |
+| Paid monthly | `account_details` → `plan_confirmation` (monthly pricing + disclosure checkbox) → `checkout` (Stripe) → `success` |
+| Paid annual | `account_details` → `plan_confirmation` (annual pricing + savings callout + disclosure checkbox) → `checkout` → `success` |
+| Free trial (Freelance) | `account_details` → `success` (no payment; credits provisioned; trial banner shown) |
+| Nonprofit | `account_details` → `nonprofit_verification` (EIN upload) → `plan_confirmation` → `checkout` → `success` |
+| Google OAuth paid | Google auth → `plan_confirmation` (pre-selected tier) → `checkout` → `success` |
+
+**Story 4.1 acceptance criteria additions:**
+- [ ] Annual interval: `PlanConfirmationStep` renders annual price (`TIER_CONFIGS[tier].annualMonthlyEquivalent`) with "Billed annually as $X" sub-text
+- [ ] Disclosure checkbox: separate from Terms/Privacy — "I authorize automatic renewal as described above" (Section 19.4)
+- [ ] Trial path: no payment step — `RegisterForm` redirects to `/app` with trial credits provisioned
+- [ ] Interval state threaded from `PricingPage` through URL params or router state to `RegisterForm`
+
+---
+
+### 21.8 Pricing Card CTA State Table
+
+**Source**: Frontend Dev Manager (MOD-04, REQ-11-m05)
+**Priority**: Major — update Section 5.1.2
+
+Replace the 3-state CTA logic with the following complete state table:
+
+| Auth Status | Subscription Status | Card = Current Tier | Card = Lower Tier | Card = Higher Tier |
+|-------------|--------------------|--------------------|-------------------|--------------------|
+| Unauthenticated | N/A | "Get Started" / "Start [Tier]" | "Get Started" | "Get Started" |
+| Authenticated | `active` | "Current Plan" (disabled) | "Downgrade" | "Upgrade to [Tier]" |
+| Authenticated | `trialing` | "[X] days left in trial" (disabled) | "Downgrade" | "Upgrade to [Tier]" |
+| Authenticated | `past_due` | "Update Payment" → `/app/billing` | (hide) | (hide) |
+| Authenticated | `paused` | "Resume Plan" → `/app/billing` | (hide) | "Upgrade to [Tier]" |
+| Authenticated | `canceled` / `cancelAtPeriodEnd` | "Reactivate" → `/app/billing` | (hide) | "Upgrade to [Tier]" |
+| Authenticated | `incomplete` | "Complete Payment" → `/app/billing` | (hide) | (hide) |
+
+---
+
+### 21.9 `SubscriptionContext` Single Responsibility for Credit Consumption
+
+**Source**: Frontend Dev Manager (MOD-03, REQ-11-C02)
+**Priority**: Critical — resolve before any Batch 6 work
+
+Update Section 6.3 (`SubscriptionContext`) as follows:
+
+- **REMOVE** `consumeCredits` from `SubscriptionContext` — credit consumption is exclusively owned by the `useCredits` hook
+- **ADD** `refreshCredits()` to `SubscriptionContext` — forces re-read of credit balance outside normal Firestore listener cadence; called by `useCredits` after a successful consume response
+- **RETAIN** `hasCredits(creditType, amount)` on `SubscriptionContext` for synchronous pre-flight checks
+- **ADD** `connectionStatus: 'online' | 'offline' | 'reconnecting' | 'error'` to context value
+
+`useCredits` hook is the single caller of `POST /api/v1/credits/consume`. It calls `SubscriptionContext.refreshCredits()` on success.
+
+**Race condition recovery UX** (Section 7.2 update):
+When `POST /api/v1/credits/consume` returns 402 (race condition — another tab consumed first):
+1. Show toast: "Action could not complete — your credit balance was updated. You have X credits remaining."
+2. Re-fetch credit balance via `refreshCredits()`
+3. Do NOT show the upgrade prompt (reserve upgrade prompt for cases where balance is structurally 0, not a race)
+
+---
+
+## Section 22: Infrastructure & Operations Requirements — Wave 2 <!-- Added per Wave 2 expert review -->
+
+### 22.1 CI/CD Pipeline and Environment Strategy
+
+**Source**: Head of Technology (REQ-NEW-02, REQ-12-C04)
+**Priority**: Critical — blocking before any code deployment
+
+**Three-environment strategy:**
+
+| Environment | Firebase Project | Stripe Mode | Secret Manager |
+|-------------|-----------------|-------------|----------------|
+| `dev` (local) | `csp-dev` | Test mode | `.env` file (local only) |
+| `staging` | `csp-staging` | Test mode | GCP Secret Manager |
+| `production` | `csp-prod` | Live mode | GCP Secret Manager |
+
+**CI/CD Pipeline requirements** (implement in `.github/workflows/`):
+
+**`ci.yml`** — runs on every pull request:
+- [ ] `npm test` for frontend (all Vitest tests must pass)
+- [ ] `npm test` for backend (all test suites must pass)
+- [ ] ESLint must pass (zero errors)
+- [ ] `npm audit --audit-level=high` must pass (zero high-severity vulnerabilities)
+- [ ] Frontend build must succeed (`npm run build`)
+- [ ] Backend build/typecheck must succeed
+
+**`deploy-staging.yml`** — runs on merge to `main`:
+- [ ] Runs full CI suite
+- [ ] Deploys frontend to staging Firebase Hosting
+- [ ] Deploys backend to staging Cloud Run
+- [ ] Deploys Firestore rules and indexes (`firebase deploy --only firestore`)
+- [ ] Updates Stripe webhook URL for staging via Stripe CLI
+- [ ] Runs smoke tests: `GET /health` → 200, `GET /api/v1/subscriptions/current` with test token → 200
+
+**`deploy-production.yml`** — manual trigger with required approvals:
+- [ ] Requires manual approval from a team member with `deployer` role
+- [ ] All CI checks must pass
+- [ ] Deployment uses rolling restart with health check probe on `GET /health`
+- [ ] Automatic rollback if health check fails within 5 minutes of deployment
+
+---
+
+### 22.2 Secrets Management
+
+**Source**: Head of Technology (REQ-12-C03)
+**Priority**: Critical — blocking before any server code is written
+
+Update Section 10.5 and Story 2.1 as follows:
+
+**Production secrets management:**
+- [ ] All secrets (Section 3.11) stored in GCP Secret Manager in staging and production
+- [ ] Node.js server retrieves secrets at startup via `@google-cloud/secret-manager` SDK
+- [ ] `.env` files acceptable for local development only — never deployed
+- [ ] Server startup validates all required secrets are present and non-empty; throws on missing secret
+- [ ] `server/.env`, `server/node_modules/`, `*.log` added to `server/.gitignore`
+- [ ] `STRIPE_SECRET_KEY` and `FIREBASE_PRIVATE_KEY` rotated on a minimum quarterly cadence
+
+**Create `server/src/config/secrets.js`:**
+```javascript
+// Wrapper that loads from GCP Secret Manager in production, process.env in development
+// All other config files import from this module, never directly from process.env
+// Provides validateSecrets() called at server startup
+```
+
+**Minimum quarterly rotation** applies to:
+- `STRIPE_SECRET_KEY`
+- `STRIPE_WEBHOOK_SECRET`
+- `FIREBASE_PRIVATE_KEY`
+
+---
+
+### 22.3 Distributed Rate Limiting
+
+**Source**: Head of Technology (MOD-03, REQ-12-M02)
+**Priority**: Major — required before multi-replica deployment
+
+Update Section 4.6 (Rate Limiting):
+
+Replace `express-rate-limit` (in-memory, single-instance) with Redis-backed distributed rate limiting:
+
+- **Package**: `rate-limit-redis` with `ioredis` client
+- **Redis**: Cloud Memorystore for Redis, minimum 1GB Basic tier in staging/production
+- **Add to Section 3.11**: `REDIS_URL` environment variable
+- **Key strategy**:
+  - Authenticated endpoints: Firebase UID (`keyGenerator: (req) => req.user.uid`)
+  - Unauthenticated endpoints: client IP from `X-Forwarded-For` (first IP only, sanitized)
+- **Development**: in-memory store acceptable (`NODE_ENV === 'development'`)
+- **Global IP-based rate limit**: 200 requests/minute per IP across all routes, applied before auth middleware
+
+**Updated rate limits:**
+
+| Endpoint | Limit | Key | Notes |
+|----------|-------|-----|-------|
+| `POST /api/v1/credits/consume` | 20/min | UID | Reduced from 60; action-aware |
+| `POST /api/v1/checkout/create-session` | 10/min | UID + IP | Idempotency key required |
+| `GET /api/v1/privacy/data-export` | 2/day | UID | Expensive cross-collection read |
+| `POST /api/v1/credits/refund` | 5/min | UID | Prevent abuse |
+| `POST /webhooks/stripe` | Load balancer level | IP | Not Express in-process |
+| All routes (global) | 200/min | IP | Unauthenticated protection |
+
+---
+
+### 22.4 Load Testing Gate
+
+**Source**: Head of Technology (REQ-NEW-03, REQ-12-M07)
+**Priority**: Major — required before accepting any paid subscriptions
+
+Add to Section 10.4 (Environment Setup Checklist) and create load test specs:
+
+**Files to create:**
+- `tests/load/k6-credit-consume.js`
+- `tests/load/k6-webhook-burst.js`
+- `tests/load/README.md`
+
+**Required load test scenarios:**
+
+| Scenario | Description | Pass Criteria |
+|----------|-------------|---------------|
+| A | 100 concurrent `POST /api/v1/credits/consume`, 1 req/sec, 5 minutes | p95 < 2,000ms, error rate < 0.1% |
+| B | 500 simultaneous `POST /webhooks/stripe` events over 60 seconds | p95 < 2,000ms, 0 duplicate processings |
+| C | 50 concurrent `POST /api/v1/checkout/create-session` | p95 < 3,000ms, error rate < 0.1% |
+| D | 1,000 concurrent `GET /api/v1/credits/balance` | p95 < 500ms, error rate < 0.1% |
+
+**Pre-launch gate**: Load test results must be documented in `tests/load/README.md` and signed off by Head of Technology before production deployment is approved.
+
+---
+
+### 22.5 Firestore Backup and Disaster Recovery
+
+**Source**: Head of Technology (REQ-NEW-04, REQ-12-C05)
+**Priority**: Major — required before production launch
+
+**Firestore backup requirements:**
+- [ ] Automated daily Firestore export to GCS bucket `csp-firestore-backups-{env}` via Cloud Scheduler
+- [ ] Backups retained for 30 days (configurable in IaC)
+- [ ] Point-in-time recovery (PITR) enabled on Firestore native mode database
+- [ ] Backup success/failure monitored via Cloud Monitoring with alert on failure
+
+**Disaster recovery runbook** (`docs/runbooks/firestore-recovery.md`):
+- [ ] How to identify the correct backup timestamp
+- [ ] How to import a collection from GCS export into staging for validation
+- [ ] How to promote a staging restore to production
+- [ ] Recovery procedure tested in staging at least once before production launch
+
+**Credit balance integrity check job** (`jobs/validateCreditIntegrity.js`):
+- [ ] Validates `standardCreditsRemaining >= 0` for all users
+- [ ] Checks `balanceAfter` consistency in `credit_transactions` ledger against `credit_balances` snapshot
+- [ ] Flags divergences as `WARNING` in Cloud Logging
+- [ ] Run on-demand via `POST /api/v1/admin/validate-credit-integrity` (admin only)
+
+**Stripe-to-Firestore divergence response:**
+- If Stripe reports `canceled` but Firestore shows `active`: auto-remediate subscription status
+- If Stripe reports `past_due` but Firestore shows `active`: auto-remediate and send `past_due` banner
+
+---
+
+### 22.6 Stripe-to-Firestore Reconciliation Job
+
+**Source**: Head of Technology (REQ-NEW-05)
+**Priority**: Major — required before production launch
+
+**Create `server/src/jobs/reconcileSubscriptions.js`:**
+
+- Iterates all active Stripe subscriptions via `stripe.subscriptions.list()` with pagination
+- For each Stripe subscription, compares: `status`, `current_period_end`, `cancel_at_period_end`, `amount` against Firestore `subscriptions/{subId}`
+- Divergences logged as `WARNING` to Cloud Logging
+- Auto-remediation: if `status` in Firestore is `active` but Stripe reports `canceled`, updates Firestore and `users` doc
+- Stores run results in `reconciliation_log/{runId}` collection
+- Admin on-demand trigger: `POST /api/v1/admin/reconcile` (admin-only)
+- Cloud Scheduler: daily at 03:00 UTC
+
+---
+
+### 22.7 Observability Stack
+
+**Source**: Head of Technology (REQ-12-M06)
+**Priority**: Major — required before production launch
+
+Add as mandatory observability requirements (new subsection under Section 10):
+
+**Structured logging** (all backend responses):
+```javascript
+{
+  requestId: string,    // UUID generated per request, propagated via X-Request-ID header
+  userId: string | null,
+  action: string,       // e.g., 'credits.consume', 'subscription.upgrade'
+  durationMs: number,
+  statusCode: number,
+  errorCode: string | null,
+  environment: 'staging' | 'production'
+}
+```
+
+**Error tracking**: Sentry integration required
+- Alert threshold: >10 errors/minute on any endpoint
+- All unhandled promise rejections in Express captured
+- All Firestore transaction failures logged as breadcrumbs
+
+**Uptime monitoring**: Cloud Monitoring uptime check on `GET /health`
+- Alert on 2 consecutive failures → PagerDuty (or equivalent) notification
+- Health check response must include `{ status: 'ok', version: string, timestamp: string }`
+
+**X-Request-ID header**: Frontend generates a UUID per request and attaches as `X-Request-ID` header. Backend logs this ID on every request. Enables distributed tracing across React SPA → Express → Firestore → Stripe.
+
+**LLM cost tracking** (Section 8.5 update): Every LLM API call must capture and store in `usage_events.metadata`:
+```javascript
+{
+  promptTokens: number,
+  completionTokens: number,
+  modelId: string,
+  estimatedCostUsd: number,
+  latencyMs: number
+}
+```
+Admin margin analysis must aggregate `estimatedCostUsd` from actual metadata, not static per-credit cost assumptions.
+
+---
+
+### 22.8 `usage_events` TTL Policy
+
+**Source**: Head of Technology (MOD-05, REQ-12-M01)
+**Priority**: Major — prevent unbounded Firestore cost
+
+Update Section 3.9 (`usage_events` collection):
+
+**TTL requirement**: Each `usage_events` document must include `_expireAt: Timestamp` set to `createdAt + 90 days` at write time. Enable Firestore TTL policy on the `_expireAt` field for the `usage_events` collection.
+
+This replaces the cron-based deletion approach in Section 7.9 for `usage_events` specifically. The cron job (Section 4.8) continues to handle other data collections tied to `dataRetentionDays`.
+
+**BigQuery export**: Analytics requiring data beyond 90 days must query BigQuery. A daily streaming export pipeline from Firestore to BigQuery is required (Cloud Dataflow template or Firestore export → BigQuery load job). Admin dashboards in Section 8.5 for historical analytics beyond 90 days must query BigQuery, not Firestore.
+
+---
+
+### 22.9 Infrastructure as Code
+
+**Source**: Head of Technology (REQ-NEW-01, REQ-12-S01)
+**Priority**: Should-have before production launch
+
+All Firestore and cloud infrastructure must be declared as code:
+
+**Files to create:**
+- `firestore.indexes.json` — composite index definitions (see Section 20.7)
+- `firestore.rules` — security rules committed to version control
+- `infrastructure/main.tf` (or `infrastructure/pulumi/index.ts`) — Cloud Run service, Cloud Scheduler jobs, Secret Manager declarations
+- `infrastructure/README.md` — bootstrap instructions for new environments
+
+**CI/CD integration:**
+- Firestore rules and indexes deployed via `firebase deploy --only firestore:rules,firestore:indexes` on every merge to `main`
+- Cloud Run configuration validated against IaC on every PR
+
+---
+
+### 22.10 Incident Response Runbooks
+
+**Source**: Head of Technology (REQ-NEW-06)
+**Priority**: Should-have before production launch
+
+Create `docs/runbooks/` directory with the following runbooks:
+
+| Runbook | File | Contents |
+|---------|------|----------|
+| Stripe webhook backlog | `stripe-webhook-backlog.md` | Diagnose processing lag; force Stripe event resend; trigger reconciliation |
+| Credit balance corruption | `credit-balance-corruption.md` | Identify corrupted document; recompute from ledger; safe overwrite procedure |
+| Stripe outage | `stripe-outage.md` | Degradation behavior; maintenance mode flag; resume procedure |
+| Stripe key rotation | `stripe-key-rotation.md` | Zero-downtime key rotation for `STRIPE_SECRET_KEY` and `STRIPE_WEBHOOK_SECRET` |
+| Payment failure spike | `payment-failure-spike.md` | Investigate spike; Stripe Radar review; bulk-notify affected users |
+
+Each runbook must include: trigger conditions, severity level, step-by-step resolution, rollback procedure, post-incident documentation template. Runbooks linked from admin security events dashboard (Section 19.6).
+
+---
+
+### 22.11 Cloud Run Infrastructure Requirements
+
+**Source**: Head of Technology (REQ-12-M05)
+**Priority**: Major — required before production launch
+
+Update Section 10.5 (Deployment Notes) with minimum infrastructure requirements:
+
+**Recommended deployment target**: Cloud Run (same GCP project as Firebase — no cross-project egress charges)
+
+**Minimum requirements:**
+- Minimum 2 instances at all times (no cold start on webhook endpoint)
+- Auto-scaling trigger: 70% CPU utilization OR 500ms average response time
+- Minimum 512MB RAM per instance
+- Health check probe: `GET /health` — must return 200 before instance receives traffic
+- Max request timeout: 60 seconds
+- Concurrency: 80 requests per instance
+
+**Why minimum 2 instances**: Stripe delivers webhooks with a 30-second timeout. A Cloud Run cold start (0 → 1 instance) takes 3–8 seconds. A cold start during a monthly billing cycle renewal spike (where hundreds of `invoice.paid` events arrive simultaneously) will cause Stripe to retry, creating a self-amplifying load spike.
+
+---
+
+## Wave 2 Integration — Modification Index <!-- Added per Wave 2 expert review -->
+
+The following modifications were made to existing sections as part of Wave 2 integration. Each entry references the original section and the nature of the change.
+
+| Section | Original Value | Modified Value | Source |
+|---------|---------------|----------------|--------|
+| 2.2.3 Auto-refill monthly cap | No reset mechanism documented | Calendar month reset via cron (1st of month, 00:05 UTC); `autoRefillCountResetAt` field added to schema | Express Dev |
+| 2.2.3 Overage cap | No hard cap defined | Add `overageHardCap` per tier (2x monthly credit allocation) to `TIER_CONFIGS` | Express Dev |
+| 3.4 `credit_balances` schema | `autoRefillEnabled, autoRefillPackType, autoRefillCount` | Add `autoRefillPending: boolean`, `storageUsedBytes: number`, `last7DaysStandardCreditsConsumed: number`, `last7DaysAiCreditsConsumed: number` | Express Dev |
+| 3.5 `credit_transactions` schema | No `stripeEventId` field | Add `stripeEventId: string \| null` for webhook-originated transactions | Express Dev |
+| 3.3 `subscriptions` schema | `interval: 'month'` (hardcoded) | Change to `interval: 'month' \| 'year'`; add `annualBillingEquivalent: number \| null` | Express Dev |
+| 3.9 `usage_events` | No TTL | Add `_expireAt: Timestamp` (TTL: createdAt + 90 days); Firestore TTL policy required | Head of Tech |
+| 3.11 Environment variables | No REDIS_URL | Add `REDIS_URL` for distributed rate limiting | Head of Tech |
+| 4.3 Auth middleware | Firestore read on every request | Use Firebase custom claims; Firestore fallback only for pre-claims-sync users | Express Dev |
+| 4.4.1 `create-pack-session` | `403: Free tier cannot purchase packs` | Remove 403 restriction; Basic tier may purchase packs | Head of Tech (consistent with Wave 1 Lead PM) |
+| 4.4.3 `consumeCredits` response | `{ success, creditsRemaining, source }` | Add `transactionId`, `aiCreditsRemaining`, `autoRefillTriggered` | Express Dev |
+| 4.4.6 Webhook `payment_intent.succeeded` | Handles credit pack purchases | Remove pack handler; packs handled exclusively by `checkout.session.completed (mode='payment')` | Express Dev |
+| 4.6 Rate limiting | `express-rate-limit` (in-memory) | Redis-backed distributed rate limiting; 20/min for consume (down from 60); global IP limit 200/min | Head of Tech + Express Dev |
+| 5.1.2 Pricing card CTA | 3-state logic | Full state table: 7 rows × subscription status | FE Manager |
+| 6.3 `SubscriptionContext` | Exposes `consumeCredits` | Remove `consumeCredits`; add `refreshCredits()` and `connectionStatus` | FE Manager |
+| 7.4 Feature gate table | `creditPacks: basic denied` | Remove restriction; all tiers may purchase packs | FE Manager (consistent with Wave 1 Lead PM + Section 17.1) |
+| 7.10 `past_due` grace period | 7 days | 14 days from `firstPaymentFailedAt` (aligned with Wave 1 Lead PM amendment; confirmed by Express Dev + Head of Tech) | Wave 2 consensus |
+| 10.2 Testing strategy | 4 bullet points | E2E test suite (Playwright, 5 scenarios); accessibility testing (jest-axe); coverage thresholds | FE Manager |
+| 10.5 Deployment notes | "environment variables" guidance | GCP Secret Manager for all secrets in production; `.env` for local dev only | Head of Tech |
+
+---
+
 *End of requirements document.*

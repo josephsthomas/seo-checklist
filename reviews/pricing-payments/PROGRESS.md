@@ -10,7 +10,7 @@
 7. Plan file: /root/.claude/plans/mossy-yawning-canyon.md
 
 ## Current State
-WAVE_2_REVIEWS_COMPLETE
+WAVE_2_INTEGRATED
 
 ## Completed Reviews
 - [x] reviewer_01_lead_product_manager.md
@@ -28,13 +28,13 @@ WAVE_2_REVIEWS_COMPLETE
 
 ## Integration Status
 - [x] Wave 1 integrated into pricing-payments-requirements.md
-- [ ] Wave 2 integrated into pricing-payments-requirements.md
+- [x] Wave 2 integrated into pricing-payments-requirements.md
 - [ ] Wave 3 integrated into pricing-payments-requirements.md
 - [ ] Wave 4 integrated into pricing-payments-requirements.md
 - [ ] integrated_feedback_summary.md written
 
 ## Next Action
-Integrate Wave 2 feedback: Read all 3 Wave 2 reviewer files (03, 11, 12), implement ALL feedback into pricing-payments-requirements.md (append new sections for API improvements, scalability, testing, CI/CD, observability, DR, frontend architecture). Update PROGRESS.md to WAVE_2_INTEGRATED, commit, push.
+Wave 3 agents (a0ec6fc=Sr. React Dev, ad73970=Sr. Visual Designer, a112b9c=Sr. Design System Engineer) are running in background. When complete, extract reviews from subagent jsonl files, write to reviewer_02, reviewer_06, reviewer_07 files, commit, update PROGRESS.md to WAVE_3_REVIEWS_COMPLETE, push. Then integrate Wave 3 feedback into pricing-payments-requirements.md (now 4,817 lines).
 
 ## Wave Definitions
 - Wave 1: reviewers 01, 04, 05 (Lead Product Manager, Lawyer, Head Legal Counsel)
