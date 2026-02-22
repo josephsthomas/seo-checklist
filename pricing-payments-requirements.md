@@ -1,0 +1,3188 @@
+# Content Strategy Portal — Pricing, Payments & Subscription Requirements
+
+> **Version**: 1.0
+> **Last Updated**: 2026-02-22
+> **Status**: Draft — Ready for Implementation
+> **Implementation Strategy**: Organized into 7 executable batches of user stories. Each batch can be implemented independently (with noted dependencies).
+
+---
+
+## Table of Contents
+
+1. [Overview & Goals](#1-overview--goals)
+2. [Tier Definitions & Credit System](#2-tier-definitions--credit-system)
+3. [Data Models & Firestore Schemas](#3-data-models--firestore-schemas)
+4. [Backend API Specifications (Node/Express)](#4-backend-api-specifications-nodeexpress)
+5. [Frontend Components](#5-frontend-components)
+6. [Registration Flow Updates](#6-registration-flow-updates)
+7. [Usage Enforcement & Gating](#7-usage-enforcement--gating)
+8. [Admin Features & Observability](#8-admin-features--observability)
+9. [User Stories by Implementation Batch](#9-user-stories-by-implementation-batch)
+
+---
+
+## 1. Overview & Goals
+
+### 1.1 Business Context
+
+Content Strategy Portal is an all-in-one content and SEO suite offering 7 tools:
+
+| Tool | AI-Powered? | Description |
+|------|------------|-------------|
+| Content Planner | No | 353-item checklist, project management, team collaboration |
+| Technical Audit | Yes | Screaming Frog export analysis, 31 audit categories, AI recommendations |
+| Accessibility Analyzer | Yes | WCAG 2.2 compliance, 93 Axe-core rules, AI remediation suggestions |
+| Meta Data Generator | Yes | AI-powered title/description optimization, bulk generation |
+| Schema Generator | No | JSON-LD structured data for 40+ schema types |
+| Image Alt Generator | Yes | AI-powered alt text generation for images |
+| Readability Analyzer | Yes | Readability scoring, AI-powered rewriting suggestions |
+
+The platform currently has no monetization. All tools are free for any authenticated user. The goal is to introduce a tiered subscription model that:
+
+1. **Covers operational costs** — AI features incur real API costs (LLM calls, image analysis). Revenue must exceed these costs.
+2. **Segments users by need** — From hobbyists (free) to agencies (enterprise).
+3. **Enables sustainable growth** — Credit system prevents unbounded API cost exposure.
+4. **Maintains accessibility** — Free tier and nonprofit discount ensure the tool remains accessible.
+
+### 1.2 Technical Context
+
+| Layer | Technology | Role |
+|-------|-----------|------|
+| Frontend | React 18 + Vite + Tailwind CSS | SPA, public + authenticated routes |
+| Auth | Firebase Auth | Email/password + Google OAuth |
+| Database | Firestore | User profiles, projects, all app data |
+| Storage | Firebase Storage | File uploads (audit exports, images) |
+| Backend (NEW) | Node.js + Express | Stripe webhooks, subscription mgmt, usage tracking |
+| Payments (NEW) | Stripe | Checkout, Customer Portal, Webhooks, Invoicing |
+
+### 1.3 Key Principles
+
+- **No on-site card processing** — All payment handled by Stripe Checkout and Stripe Customer Portal. We never touch raw card data.
+- **Server-authoritative billing** — The Node/Express backend is the source of truth for subscription status and credit balances. Frontend reads from Firestore (synced by backend).
+- **Graceful degradation** — When credits run out, tools remain accessible in read-only/view mode. Users see clear upgrade prompts, not hard errors.
+- **Idempotent webhooks** — All Stripe webhook handlers must be idempotent (safe to replay).
+
+---
+
+## 2. Tier Definitions & Credit System
+
+### 2.1 Subscription Tiers
+
+#### Basic (Free) — $0/month
+- **Seats**: 1
+- **Projects/Websites**: 1
+- **Monthly Credits**: 50
+- **AI Credits**: 10 (subset of total)
+- **Features**: All 7 tools accessible (credit-gated)
+- **Exports**: Watermarked PDF only (no Excel, no branded exports)
+- **Support**: Community (help center, knowledge base)
+- **Storage**: 100 MB
+- **Data Retention**: 30 days for audit/analysis history
+- **No** team features, no shared reports, no scheduled audits
+
+#### Client Side — $99/month
+- **Seats**: 1
+- **Projects/Websites**: 1
+- **Monthly Credits**: 500
+- **AI Credits**: 150 (subset of total)
+- **Features**: All 7 tools, full access
+- **Exports**: PDF, Excel, CSV — no watermark
+- **Support**: Email support (48hr response SLA)
+- **Storage**: 5 GB
+- **Data Retention**: 1 year
+- **Shared reports** (read-only links)
+- **Scheduled audits** (up to 2 recurring)
+- **Overage**: $0.15 per additional credit, $0.50 per additional AI credit
+
+#### Freelance — $149/month
+- **Seats**: 1
+- **Projects/Websites**: Up to 10
+- **Monthly Credits**: 1,500
+- **AI Credits**: 400 (subset of total)
+- **Features**: All 7 tools, full access
+- **Exports**: PDF, Excel, CSV — white-label option (remove CSP branding)
+- **Support**: Priority email (24hr response SLA)
+- **Storage**: 15 GB
+- **Data Retention**: 2 years
+- **Shared reports** with custom branding
+- **Scheduled audits** (up to 10 recurring)
+- **Client handoff reports** — formatted for client delivery
+- **Overage**: $0.12 per additional credit, $0.40 per additional AI credit
+
+#### Agency — $299/month
+- **Seats**: Unlimited
+- **Projects/Websites**: Unlimited
+- **Monthly Credits**: 5,000
+- **AI Credits**: 1,500 (subset of total)
+- **Features**: All 7 tools, full access
+- **Exports**: PDF, Excel, CSV — full white-label
+- **Support**: Priority email (12hr response SLA) + onboarding call
+- **Storage**: 50 GB
+- **Data Retention**: Unlimited
+- **Full team management** — role-based access (existing roles system)
+- **Scheduled audits** (unlimited recurring)
+- **API access** (future — documented but not in v1)
+- **Usage analytics dashboard** per team member
+- **Overage**: $0.10 per additional credit, $0.30 per additional AI credit
+
+#### 501(c)(3) Nonprofit — $49/month
+- **Identical to Client Side** in all features and limits
+- **50% discount** applied automatically after nonprofit verification
+- **Verification required**: Must upload 501(c)(3) determination letter or equivalent
+- **Annual re-verification**: Status confirmed each year
+- **Overage pricing**: Same rates as Client Side
+
+### 2.2 Credit System Design
+
+#### 2.2.1 Credit Types
+
+There are two credit pools tracked independently:
+
+| Pool | Description | Resets |
+|------|------------|--------|
+| **Standard Credits** | Consumed by non-AI tool actions (audit upload, schema generation, readability check, etc.) | Monthly on billing date |
+| **AI Credits** | Consumed by AI-powered actions (AI suggestions, AI rewrites, AI alt text, etc.) | Monthly on billing date |
+
+> **Rationale**: AI calls cost 10-50x more than non-AI operations. Separating pools prevents a user from burning through their entire allocation on expensive AI calls, and ensures pricing aligns with actual costs.
+
+#### 2.2.2 Credit Cost Matrix
+
+Each tool action consumes a specific number of credits. Costs reflect actual operational expense.
+
+**Standard Credit Actions (1 credit = ~$0.01 operational cost target)**
+
+| Action | Credits | Tool |
+|--------|---------|------|
+| Create project | 1 | Content Planner |
+| Export checklist (PDF) | 2 | Content Planner |
+| Export checklist (Excel) | 2 | Content Planner |
+| Upload & process audit file | 5 | Technical Audit |
+| View audit results (per session) | 0 | Technical Audit |
+| Export audit report | 3 | Technical Audit |
+| Upload & process accessibility scan | 5 | Accessibility Analyzer |
+| Generate VPAT report | 5 | Accessibility Analyzer |
+| Generate single schema | 1 | Schema Generator |
+| Bulk schema generation (per 10 schemas) | 5 | Schema Generator |
+| Upload images for alt text (per batch of 10) | 3 | Image Alt Generator |
+| Run readability analysis (per URL/text) | 2 | Readability Analyzer |
+| Export readability report | 2 | Readability Analyzer |
+| Schedule recurring audit | 3 | Technical Audit |
+| Generate shared report link | 1 | All tools |
+
+**AI Credit Actions (1 AI credit = ~$0.05 operational cost target)**
+
+| Action | AI Credits | Tool |
+|--------|-----------|------|
+| AI fix suggestions (per audit category) | 3 | Technical Audit |
+| AI remediation suggestions (per issue batch) | 3 | Accessibility Analyzer |
+| AI meta title generation (per URL) | 1 | Meta Data Generator |
+| AI meta description generation (per URL) | 1 | Meta Data Generator |
+| AI bulk meta generation (per 10 URLs) | 8 | Meta Data Generator |
+| AI alt text generation (per image) | 1 | Image Alt Generator |
+| AI alt text bulk generation (per 10 images) | 8 | Image Alt Generator |
+| AI readability rewrite suggestion | 2 | Readability Analyzer |
+| AI competitor analysis | 5 | Meta Data Generator |
+| AI A/B variant generation (per set) | 3 | Meta Data Generator |
+
+#### 2.2.3 Credit Overage Model
+
+When a user exhausts their monthly credit pool:
+
+1. **Soft gate**: The tool action is blocked with a clear message showing credits remaining (0) and options to:
+   - Purchase a credit pack (immediate)
+   - Upgrade their plan
+   - Wait for monthly reset (shows date)
+
+2. **Credit packs** (one-time purchases, non-expiring until used):
+   - **Starter Pack**: 100 standard + 25 AI credits — $15
+   - **Pro Pack**: 500 standard + 100 AI credits — $60
+   - **Mega Pack**: 2,000 standard + 500 AI credits — $200
+
+3. **Auto-refill option** (opt-in): Automatically purchase a Starter Pack when balance hits 0. Capped at 3 auto-purchases per month to prevent runaway costs.
+
+#### 2.2.4 Credit Economics Validation
+
+Target margins per tier (assuming average usage patterns):
+
+| Tier | Revenue | Est. Credit Cost | Est. AI Cost | Target Margin |
+|------|---------|-----------------|-------------|--------------|
+| Basic | $0 | $0.50 | $0.50 | -$1.00 (loss leader) |
+| Client | $99 | $5.00 | $7.50 | ~87% margin |
+| Freelance | $149 | $15.00 | $20.00 | ~76% margin |
+| Agency | $299 | $50.00 | $75.00 | ~58% margin |
+| Nonprofit | $49 | $5.00 | $7.50 | ~74% margin |
+
+> **Note**: These are estimates. Actual AI costs depend on LLM provider pricing and usage patterns. The credit system allows adjusting credit costs without changing subscription prices.
+
+### 2.3 Feature Access Matrix
+
+| Feature | Basic | Client | Freelance | Agency | Nonprofit |
+|---------|-------|--------|-----------|--------|-----------|
+| Content Planner | 1 project | 1 project | 10 projects | Unlimited | 1 project |
+| Technical Audit | Upload only | Full | Full | Full | Full |
+| Accessibility Analyzer | Upload only | Full | Full | Full | Full |
+| Meta Data Generator | 5/month | Full | Full | Full | Full |
+| Schema Generator | 3 types | All 40+ types | All 40+ types | All 40+ types | All 40+ types |
+| Image Alt Generator | 5 images/mo | Full | Full | Full | Full |
+| Readability Analyzer | 3 analyses/mo | Full | Full | Full | Full |
+| AI Features | Limited (10/mo) | Full (150/mo) | Full (400/mo) | Full (1500/mo) | Full (150/mo) |
+| Exports | Watermarked PDF | PDF/Excel/CSV | White-label | White-label | PDF/Excel/CSV |
+| Team Management | No | No | No | Yes | No |
+| Scheduled Audits | No | 2 recurring | 10 recurring | Unlimited | 2 recurring |
+| Shared Reports | No | Read-only | Branded | Branded | Read-only |
+| Storage | 100 MB | 5 GB | 15 GB | 50 GB | 5 GB |
+| Data Retention | 30 days | 1 year | 2 years | Unlimited | 1 year |
+| Support | Community | Email (48hr) | Priority (24hr) | Priority (12hr) | Email (48hr) |
+
+---
+
+## 3. Data Models & Firestore Schemas
+
+### 3.1 Overview
+
+The billing system introduces new Firestore collections and modifies the existing `users` collection. The Node/Express backend writes to these collections via Firebase Admin SDK; the React frontend reads them in real-time via Firestore listeners.
+
+```
+Firestore Collections (NEW)
+├── subscriptions/{subscriptionId}    — Stripe subscription mirror
+├── credit_balances/{userId}          — Current credit state
+├── credit_transactions/{transId}     — Ledger of all credit changes
+├── credit_packs/{packId}             — Purchased credit pack records
+├── invoices/{invoiceId}              — Stripe invoice mirror
+├── nonprofit_verifications/{userId}  — Nonprofit verification requests
+└── usage_events/{eventId}            — Raw usage tracking log
+
+Firestore Collections (MODIFIED)
+└── users/{userId}                    — Add subscription/tier fields
+```
+
+### 3.2 Modified Collection: `users/{userId}`
+
+Add the following fields to the existing user document (see `src/contexts/AuthContext.jsx:50-57` for current schema):
+
+```javascript
+// EXISTING fields (do not modify)
+{
+  email: string,
+  name: string,
+  role: string,           // 'admin' | 'project_manager' | 'seo_specialist' | etc.
+  createdAt: Timestamp,
+  avatar: string | null,
+  emailVerified: boolean
+}
+
+// NEW fields to add
+{
+  // Subscription info (written by backend, read by frontend)
+  tier: string,                    // 'basic' | 'client' | 'freelance' | 'agency' | 'nonprofit'
+  stripeCustomerId: string | null, // Stripe customer ID (null for free tier)
+  subscriptionId: string | null,   // Active Stripe subscription ID
+  subscriptionStatus: string,      // 'active' | 'past_due' | 'canceled' | 'paused' | 'trialing' | 'incomplete'
+  currentPeriodEnd: Timestamp,     // When current billing period ends
+
+  // Credit summary (denormalized from credit_balances for fast reads)
+  creditsRemaining: number,        // Standard credits remaining this period
+  aiCreditsRemaining: number,      // AI credits remaining this period
+
+  // Nonprofit
+  nonprofitVerified: boolean,      // Whether 501(c)(3) status is verified
+  nonprofitVerifiedAt: Timestamp | null,
+
+  // Limits
+  maxProjects: number,             // -1 for unlimited
+  maxSeats: number,                // -1 for unlimited
+  maxStorageBytes: number,         // Storage limit in bytes
+}
+```
+
+**Migration note**: Existing users without these fields default to `tier: 'basic'` with free-tier limits. The migration should be handled by a one-time backend script.
+
+### 3.3 New Collection: `subscriptions/{subscriptionId}`
+
+Mirrors Stripe subscription data. The `subscriptionId` matches the Stripe subscription ID.
+
+```javascript
+{
+  id: string,                      // Stripe subscription ID (e.g., 'sub_xxx')
+  userId: string,                  // Firebase Auth UID
+  stripeCustomerId: string,        // Stripe customer ID
+  tier: string,                    // 'client' | 'freelance' | 'agency' | 'nonprofit'
+  status: string,                  // 'active' | 'past_due' | 'canceled' | 'paused' | 'trialing' | 'incomplete'
+
+  // Billing period
+  currentPeriodStart: Timestamp,
+  currentPeriodEnd: Timestamp,
+
+  // Stripe price info
+  stripePriceId: string,           // Stripe Price ID for this tier
+  amount: number,                  // Amount in cents (e.g., 9900 for $99)
+  currency: string,                // 'usd'
+  interval: string,                // 'month'
+
+  // Lifecycle
+  cancelAtPeriodEnd: boolean,      // Whether sub cancels at end of period
+  canceledAt: Timestamp | null,
+  pausedAt: Timestamp | null,
+  resumesAt: Timestamp | null,     // When a paused sub resumes
+
+  // Metadata
+  createdAt: Timestamp,
+  updatedAt: Timestamp,
+
+  // Nonprofit
+  nonprofitDiscountApplied: boolean,
+  stripeCouponId: string | null    // Stripe coupon for nonprofit discount
+}
+```
+
+### 3.4 New Collection: `credit_balances/{userId}`
+
+Single document per user tracking current credit state. Updated by the backend on every credit-consuming action.
+
+```javascript
+{
+  userId: string,
+  tier: string,
+
+  // Monthly allocation (set on subscription create/renew)
+  monthlyStandardCredits: number,  // e.g., 500 for Client
+  monthlyAiCredits: number,        // e.g., 150 for Client
+
+  // Current balance (decremented on usage, reset on billing cycle)
+  standardCreditsRemaining: number,
+  aiCreditsRemaining: number,
+
+  // Bonus credits (from purchased packs, non-expiring)
+  bonusStandardCredits: number,
+  bonusAiCredits: number,
+
+  // Overage tracking (current period)
+  standardOverageUsed: number,     // Credits used beyond monthly + bonus
+  aiOverageUsed: number,
+
+  // Auto-refill settings
+  autoRefillEnabled: boolean,
+  autoRefillPackType: string | null,  // 'starter' | 'pro' | 'mega'
+  autoRefillCount: number,            // How many auto-refills this month (max 3)
+
+  // Period tracking
+  periodStart: Timestamp,
+  periodEnd: Timestamp,
+  lastResetAt: Timestamp,
+
+  updatedAt: Timestamp
+}
+```
+
+**Credit consumption priority**: Monthly credits are consumed first, then bonus credits from packs, then overages are tracked.
+
+### 3.5 New Collection: `credit_transactions/{transactionId}`
+
+Immutable ledger of every credit change. Used for audit trail and invoice itemization.
+
+```javascript
+{
+  id: string,                      // Auto-generated
+  userId: string,
+  type: string,                    // 'debit' | 'credit' | 'reset' | 'pack_purchase' | 'overage'
+  creditType: string,              // 'standard' | 'ai'
+  amount: number,                  // Positive for credits added, negative for consumed
+  balanceAfter: number,            // Balance after this transaction
+
+  // Context
+  action: string,                  // e.g., 'audit_upload', 'ai_meta_generation', 'monthly_reset'
+  toolName: string | null,         // e.g., 'technical_audit', 'meta_generator'
+  description: string,             // Human-readable description
+
+  // Reference
+  relatedResourceId: string | null, // e.g., audit ID, project ID
+  packId: string | null,            // If from a credit pack purchase
+
+  createdAt: Timestamp
+}
+```
+
+### 3.6 New Collection: `credit_packs/{packId}`
+
+Records of purchased credit packs.
+
+```javascript
+{
+  id: string,
+  userId: string,
+  packType: string,                // 'starter' | 'pro' | 'mega'
+
+  // Credits granted
+  standardCredits: number,         // Total standard credits in pack
+  aiCredits: number,               // Total AI credits in pack
+  standardCreditsRemaining: number,// Remaining (decremented as used)
+  aiCreditsRemaining: number,
+
+  // Payment
+  amountPaid: number,              // In cents
+  stripePaymentIntentId: string,
+
+  // Lifecycle
+  purchasedAt: Timestamp,
+  fullyConsumedAt: Timestamp | null,
+  isAutoRefill: boolean,           // Whether this was an auto-refill purchase
+
+  createdAt: Timestamp
+}
+```
+
+### 3.7 New Collection: `invoices/{invoiceId}`
+
+Mirrors Stripe invoice data for in-app display.
+
+```javascript
+{
+  id: string,                      // Stripe invoice ID
+  userId: string,
+  stripeCustomerId: string,
+  subscriptionId: string | null,
+
+  // Invoice details
+  number: string,                  // Stripe invoice number
+  status: string,                  // 'draft' | 'open' | 'paid' | 'void' | 'uncollectible'
+  amountDue: number,               // In cents
+  amountPaid: number,
+  currency: string,
+
+  // Line items (denormalized for display)
+  lineItems: [
+    {
+      description: string,
+      amount: number,              // In cents
+      quantity: number
+    }
+  ],
+
+  // URLs
+  hostedInvoiceUrl: string,        // Stripe-hosted invoice page
+  invoicePdf: string,              // PDF download URL
+
+  // Dates
+  periodStart: Timestamp,
+  periodEnd: Timestamp,
+  dueDate: Timestamp | null,
+  paidAt: Timestamp | null,
+
+  createdAt: Timestamp
+}
+```
+
+### 3.8 New Collection: `nonprofit_verifications/{userId}`
+
+Tracks nonprofit verification requests and status.
+
+```javascript
+{
+  userId: string,
+  organizationName: string,
+  ein: string,                     // Employer Identification Number
+
+  // Document upload
+  documentUrl: string,             // Firebase Storage path to uploaded 501(c)(3) letter
+  documentFileName: string,
+
+  // Verification status
+  status: string,                  // 'pending' | 'approved' | 'rejected' | 'expired'
+  reviewedBy: string | null,       // Admin user ID who reviewed
+  reviewedAt: Timestamp | null,
+  rejectionReason: string | null,
+
+  // Expiration
+  verifiedAt: Timestamp | null,
+  expiresAt: Timestamp | null,     // 1 year from verification
+
+  createdAt: Timestamp,
+  updatedAt: Timestamp
+}
+```
+
+### 3.9 New Collection: `usage_events/{eventId}`
+
+Raw usage tracking for analytics and billing reconciliation. High-volume collection.
+
+```javascript
+{
+  id: string,
+  userId: string,
+  tier: string,                    // User's tier at time of event
+
+  // Event details
+  action: string,                  // e.g., 'audit_upload', 'ai_meta_gen'
+  toolName: string,                // e.g., 'technical_audit'
+  creditType: string,              // 'standard' | 'ai'
+  creditsConsumed: number,
+
+  // Source tracking
+  wasOverage: boolean,             // Whether this consumed overage credits
+  wasFromPack: boolean,            // Whether this consumed pack credits
+
+  // Context
+  resourceId: string | null,       // Related resource (audit ID, project ID, etc.)
+  metadata: object | null,         // Additional context (e.g., { urlCount: 5, batchSize: 10 })
+
+  // Performance
+  processingTimeMs: number | null, // How long the action took
+
+  createdAt: Timestamp
+}
+```
+
+**Indexing**: Create composite indexes on:
+- `userId + createdAt` (for user usage history)
+- `toolName + createdAt` (for tool-level analytics)
+- `tier + createdAt` (for tier-level analytics)
+- `userId + toolName + createdAt` (for per-user per-tool queries)
+
+### 3.10 Stripe Product/Price Configuration
+
+These Stripe objects must be created in the Stripe Dashboard or via API during setup:
+
+```
+Products:
+├── prod_client_side      → "Content Strategy Portal — Client Side"
+│   └── price_client_monthly  → $99/month recurring
+├── prod_freelance        → "Content Strategy Portal — Freelance"
+│   └── price_freelance_monthly → $149/month recurring
+├── prod_agency           → "Content Strategy Portal — Agency"
+│   └── price_agency_monthly → $299/month recurring
+├── prod_nonprofit        → "Content Strategy Portal — Nonprofit"
+│   └── price_nonprofit_monthly → $49/month recurring (uses coupon alternatively)
+│
+├── prod_credit_starter   → "Credit Pack — Starter"
+│   └── price_credit_starter → $15 one-time
+├── prod_credit_pro       → "Credit Pack — Pro"
+│   └── price_credit_pro → $60 one-time
+└── prod_credit_mega      → "Credit Pack — Mega"
+    └── price_credit_mega → $200 one-time
+
+Coupons:
+└── coupon_nonprofit_50   → 50% off forever (for nonprofit tier alternative approach)
+```
+
+### 3.11 Environment Variables (New)
+
+```bash
+# Stripe
+STRIPE_SECRET_KEY=sk_xxx
+STRIPE_PUBLISHABLE_KEY=pk_xxx
+STRIPE_WEBHOOK_SECRET=whsec_xxx
+
+# Stripe Price IDs
+STRIPE_PRICE_CLIENT=price_xxx
+STRIPE_PRICE_FREELANCE=price_xxx
+STRIPE_PRICE_AGENCY=price_xxx
+STRIPE_PRICE_NONPROFIT=price_xxx
+STRIPE_PRICE_CREDIT_STARTER=price_xxx
+STRIPE_PRICE_CREDIT_PRO=price_xxx
+STRIPE_PRICE_CREDIT_MEGA=price_xxx
+
+# Stripe Coupon
+STRIPE_COUPON_NONPROFIT=coupon_xxx
+
+# Firebase Admin (for backend)
+FIREBASE_PROJECT_ID=xxx
+FIREBASE_PRIVATE_KEY=xxx
+FIREBASE_CLIENT_EMAIL=xxx
+
+# Server
+PORT=3001
+FRONTEND_URL=http://localhost:5173
+CORS_ORIGINS=http://localhost:5173
+
+# Frontend (add to existing .env)
+VITE_API_URL=http://localhost:3001
+VITE_STRIPE_PUBLISHABLE_KEY=pk_xxx
+```
+
+---
+
+## 4. Backend API Specifications (Node/Express)
+
+### 4.1 Architecture Overview
+
+The backend is a standalone Node.js + Express server that handles:
+- Stripe webhook processing
+- Subscription lifecycle management
+- Credit balance management and usage metering
+- Credit pack purchases
+- Nonprofit verification workflow
+
+It communicates with Firebase via the Admin SDK (writes to Firestore) and with Stripe via the Stripe Node SDK. The React frontend calls this API for any write operations related to billing.
+
+```
+┌─────────────┐     ┌──────────────────┐     ┌─────────┐
+│  React SPA  │────>│  Node/Express    │────>│  Stripe │
+│  (Frontend) │<────│  API Server      │<────│   API   │
+└─────────────┘     └──────────────────┘     └─────────┘
+       │                     │
+       │                     │ Firebase Admin SDK
+       │                     ▼
+       │              ┌─────────────┐
+       └─────────────>│  Firestore  │
+          Firestore   │  (Database) │
+          Listeners   └─────────────┘
+```
+
+### 4.2 Server Directory Structure
+
+```
+server/
+├── package.json
+├── .env
+├── src/
+│   ├── index.js                  # Express app entry point
+│   ├── config/
+│   │   ├── stripe.js             # Stripe client initialization
+│   │   ├── firebase.js           # Firebase Admin SDK initialization
+│   │   └── tiers.js              # Tier definitions, credit limits, pricing constants
+│   ├── routes/
+│   │   ├── webhooks.js           # POST /webhooks/stripe (raw body)
+│   │   ├── subscriptions.js      # Subscription CRUD endpoints
+│   │   ├── credits.js            # Credit balance & usage endpoints
+│   │   ├── checkout.js           # Stripe Checkout session creation
+│   │   ├── billing.js            # Customer portal, invoices
+│   │   └── nonprofit.js          # Nonprofit verification endpoints
+│   ├── middleware/
+│   │   ├── auth.js               # Firebase token verification
+│   │   ├── rateLimiter.js        # Rate limiting per endpoint
+│   │   └── errorHandler.js       # Global error handler
+│   ├── services/
+│   │   ├── subscriptionService.js    # Subscription business logic
+│   │   ├── creditService.js          # Credit consumption/allocation logic
+│   │   ├── webhookService.js         # Webhook event processing
+│   │   ├── nonprofitService.js       # Nonprofit verification logic
+│   │   └── usageService.js           # Usage event recording
+│   └── utils/
+│       ├── logger.js             # Structured logging
+│       └── constants.js          # Shared constants
+└── tests/
+    ├── webhooks.test.js
+    ├── credits.test.js
+    └── subscriptions.test.js
+```
+
+### 4.3 Authentication Middleware
+
+All endpoints (except `/webhooks/stripe`) require a valid Firebase ID token in the `Authorization` header.
+
+```
+Authorization: Bearer <firebase-id-token>
+```
+
+The middleware verifies the token using Firebase Admin SDK and attaches the user's UID and profile to the request.
+
+```javascript
+// middleware/auth.js
+// Verifies Firebase ID token
+// Attaches req.user = { uid, email, tier, ... }
+// Returns 401 if token invalid/expired
+// Returns 403 if user account disabled
+```
+
+### 4.4 API Endpoints
+
+#### 4.4.1 Checkout Endpoints
+
+**POST /api/checkout/create-session**
+
+Creates a Stripe Checkout session for a new subscription or credit pack purchase.
+
+```
+Request:
+{
+  tier: 'client' | 'freelance' | 'agency' | 'nonprofit',
+  successUrl: string,     // Redirect URL after success
+  cancelUrl: string       // Redirect URL if canceled
+}
+
+Response (200):
+{
+  sessionId: string,      // Stripe Checkout Session ID
+  url: string             // Stripe Checkout URL to redirect to
+}
+
+Errors:
+- 400: Invalid tier, user already has active subscription for tier change
+- 401: Not authenticated
+- 409: User already has an active paid subscription (must cancel first or use upgrade)
+```
+
+**POST /api/checkout/create-pack-session**
+
+Creates a Stripe Checkout session for a one-time credit pack purchase.
+
+```
+Request:
+{
+  packType: 'starter' | 'pro' | 'mega',
+  successUrl: string,
+  cancelUrl: string
+}
+
+Response (200):
+{
+  sessionId: string,
+  url: string
+}
+
+Errors:
+- 400: Invalid pack type
+- 401: Not authenticated
+- 403: Free tier users cannot purchase packs (must upgrade first)
+```
+
+#### 4.4.2 Subscription Endpoints
+
+**GET /api/subscriptions/current**
+
+Returns the current user's active subscription details.
+
+```
+Response (200):
+{
+  subscription: {
+    id: string,
+    tier: string,
+    status: string,
+    currentPeriodStart: string (ISO 8601),
+    currentPeriodEnd: string (ISO 8601),
+    cancelAtPeriodEnd: boolean,
+    amount: number,
+    currency: string
+  } | null
+}
+```
+
+**POST /api/subscriptions/upgrade**
+
+Initiates a plan upgrade. Uses Stripe's proration to handle mid-cycle changes.
+
+```
+Request:
+{
+  newTier: 'client' | 'freelance' | 'agency'
+}
+
+Response (200):
+{
+  subscription: { ... },   // Updated subscription
+  prorationAmount: number   // Prorated amount charged/credited
+}
+
+Errors:
+- 400: Cannot downgrade via this endpoint (use /downgrade)
+- 400: Already on this tier
+- 401: Not authenticated
+- 404: No active subscription
+```
+
+**POST /api/subscriptions/downgrade**
+
+Initiates a plan downgrade. Takes effect at end of current billing period.
+
+```
+Request:
+{
+  newTier: 'basic' | 'client' | 'freelance'
+}
+
+Response (200):
+{
+  subscription: { ... },
+  effectiveDate: string (ISO 8601)  // When downgrade takes effect
+}
+
+Errors:
+- 400: Cannot upgrade via this endpoint
+- 400: Already on this tier
+- 401: Not authenticated
+```
+
+**POST /api/subscriptions/cancel**
+
+Cancels the subscription at end of current billing period.
+
+```
+Request:
+{
+  reason: string | null,    // Optional cancellation reason
+  feedback: string | null   // Optional feedback
+}
+
+Response (200):
+{
+  subscription: { ... },
+  cancelAt: string (ISO 8601)
+}
+```
+
+**POST /api/subscriptions/reactivate**
+
+Reactivates a subscription that is set to cancel at period end.
+
+```
+Response (200):
+{
+  subscription: { ... }
+}
+
+Errors:
+- 400: Subscription is not set to cancel
+- 404: No subscription found
+```
+
+**POST /api/subscriptions/pause**
+
+Pauses the subscription. Billing stops; access reverts to Basic tier limits.
+
+```
+Request:
+{
+  resumeDate: string | null  // Optional: auto-resume date (ISO 8601). Max 3 months.
+}
+
+Response (200):
+{
+  subscription: { ... },
+  pausedAt: string,
+  resumesAt: string | null
+}
+
+Errors:
+- 400: Subscription already paused
+- 400: Resume date exceeds 3-month maximum
+```
+
+**POST /api/subscriptions/resume**
+
+Resumes a paused subscription immediately.
+
+```
+Response (200):
+{
+  subscription: { ... }
+}
+```
+
+#### 4.4.3 Credit Endpoints
+
+**GET /api/credits/balance**
+
+Returns current credit balance for the authenticated user.
+
+```
+Response (200):
+{
+  standardCredits: {
+    remaining: number,
+    monthly: number,
+    bonus: number,         // From purchased packs
+    overageUsed: number
+  },
+  aiCredits: {
+    remaining: number,
+    monthly: number,
+    bonus: number,
+    overageUsed: number
+  },
+  periodEnd: string (ISO 8601),
+  autoRefill: {
+    enabled: boolean,
+    packType: string | null,
+    purchasesThisMonth: number
+  }
+}
+```
+
+**POST /api/credits/consume**
+
+Consumes credits for a tool action. Called by the frontend before executing credit-consuming actions.
+
+```
+Request:
+{
+  action: string,          // e.g., 'audit_upload'
+  creditType: 'standard' | 'ai',
+  amount: number,          // Credits to consume
+  toolName: string,        // e.g., 'technical_audit'
+  resourceId: string | null
+}
+
+Response (200):
+{
+  success: true,
+  creditsRemaining: number,
+  source: 'monthly' | 'bonus' | 'overage'
+}
+
+Response (402):
+{
+  success: false,
+  error: 'insufficient_credits',
+  creditsRequired: number,
+  creditsAvailable: number,
+  upgradeOptions: [ ... ]   // Suggested plans or packs
+}
+```
+
+**GET /api/credits/history**
+
+Returns credit transaction history for the current user.
+
+```
+Query params:
+  page: number (default 1)
+  limit: number (default 50, max 100)
+  creditType: 'standard' | 'ai' | 'all' (default 'all')
+  startDate: string (ISO 8601, optional)
+  endDate: string (ISO 8601, optional)
+
+Response (200):
+{
+  transactions: [ ... ],
+  pagination: {
+    page: number,
+    limit: number,
+    total: number,
+    totalPages: number
+  }
+}
+```
+
+**POST /api/credits/auto-refill**
+
+Configures auto-refill settings.
+
+```
+Request:
+{
+  enabled: boolean,
+  packType: 'starter' | 'pro' | 'mega'  // Required if enabled=true
+}
+
+Response (200):
+{
+  autoRefill: {
+    enabled: boolean,
+    packType: string | null
+  }
+}
+```
+
+#### 4.4.4 Billing Endpoints
+
+**POST /api/billing/portal-session**
+
+Creates a Stripe Customer Portal session for managing payment methods, viewing invoices, etc.
+
+```
+Request:
+{
+  returnUrl: string   // URL to redirect back to after portal
+}
+
+Response (200):
+{
+  url: string         // Stripe Customer Portal URL
+}
+```
+
+**GET /api/billing/invoices**
+
+Returns invoice history for the current user.
+
+```
+Query params:
+  page: number (default 1)
+  limit: number (default 20)
+  status: 'paid' | 'open' | 'void' | 'all' (default 'all')
+
+Response (200):
+{
+  invoices: [
+    {
+      id: string,
+      number: string,
+      status: string,
+      amount: number,
+      currency: string,
+      periodStart: string,
+      periodEnd: string,
+      paidAt: string | null,
+      pdfUrl: string,
+      hostedUrl: string
+    }
+  ],
+  pagination: { ... }
+}
+```
+
+#### 4.4.5 Nonprofit Endpoints
+
+**POST /api/nonprofit/submit-verification**
+
+Submits a nonprofit verification request.
+
+```
+Request (multipart/form-data):
+{
+  organizationName: string,
+  ein: string,
+  document: File           // 501(c)(3) determination letter (PDF/image)
+}
+
+Response (200):
+{
+  verificationId: string,
+  status: 'pending'
+}
+
+Errors:
+- 400: Missing required fields
+- 400: Invalid file type (must be PDF, PNG, or JPG)
+- 409: Verification already pending or approved
+```
+
+**GET /api/nonprofit/verification-status**
+
+Returns current nonprofit verification status.
+
+```
+Response (200):
+{
+  status: 'none' | 'pending' | 'approved' | 'rejected' | 'expired',
+  organizationName: string | null,
+  submittedAt: string | null,
+  reviewedAt: string | null,
+  expiresAt: string | null,
+  rejectionReason: string | null
+}
+```
+
+**POST /api/nonprofit/review** *(Admin only)*
+
+Admin endpoint to approve or reject a nonprofit verification.
+
+```
+Request:
+{
+  userId: string,
+  decision: 'approved' | 'rejected',
+  reason: string | null    // Required if rejected
+}
+
+Response (200):
+{
+  status: string,
+  userId: string
+}
+
+Errors:
+- 403: Not an admin
+```
+
+#### 4.4.6 Webhook Endpoint
+
+**POST /webhooks/stripe**
+
+Receives Stripe webhook events. Uses raw body for signature verification. No auth middleware (Stripe signature verification instead).
+
+**Handled events:**
+
+| Event | Handler Action |
+|-------|---------------|
+| `checkout.session.completed` | Create/update subscription in Firestore, provision credits, update user tier |
+| `customer.subscription.created` | Mirror subscription to Firestore |
+| `customer.subscription.updated` | Update subscription status, handle plan changes |
+| `customer.subscription.deleted` | Mark subscription canceled, revert user to Basic tier |
+| `customer.subscription.paused` | Update status to paused, revert access to Basic |
+| `customer.subscription.resumed` | Update status to active, restore tier access |
+| `invoice.paid` | Record invoice in Firestore, reset monthly credits |
+| `invoice.payment_failed` | Update subscription status to past_due, send notification |
+| `invoice.finalized` | Store invoice in Firestore |
+| `payment_intent.succeeded` | Handle credit pack purchases (one-time) |
+| `customer.created` | Store Stripe customer ID in user profile |
+
+**Idempotency**: Each webhook handler checks `event.id` against a `processed_events` collection to avoid duplicate processing.
+
+### 4.5 Error Response Format
+
+All API errors follow a consistent format:
+
+```json
+{
+  "error": {
+    "code": "insufficient_credits",
+    "message": "You do not have enough AI credits for this action.",
+    "details": {
+      "required": 3,
+      "available": 1
+    }
+  }
+}
+```
+
+Standard HTTP status codes:
+- `400` — Bad request (validation errors)
+- `401` — Not authenticated
+- `402` — Payment required (insufficient credits, payment failed)
+- `403` — Forbidden (insufficient permissions)
+- `404` — Resource not found
+- `409` — Conflict (duplicate request, existing subscription)
+- `429` — Rate limited
+- `500` — Internal server error
+
+### 4.6 Rate Limiting
+
+| Endpoint Group | Limit |
+|---------------|-------|
+| Checkout creation | 5 per minute per user |
+| Credit consumption | 60 per minute per user |
+| Credit balance check | 120 per minute per user |
+| Subscription management | 10 per minute per user |
+| Webhook | 1000 per minute (global) |
+
+---
+
+## 5. Frontend Components
+
+### 5.1 Public Pricing Page
+
+**Route**: `/pricing`
+**File**: `src/components/public/PricingPage.jsx`
+**Accessible**: Unauthenticated (public) and authenticated users
+
+#### 5.1.1 Layout & Design
+
+The pricing page follows the existing public page design language (see `src/components/public/LandingPage.jsx`, `FeaturesPage.jsx`) using Tailwind CSS with the project's existing color system (`primary`, `charcoal`, `emerald`, etc.).
+
+**Page Structure:**
+
+```
+┌──────────────────────────────────────────────────────┐
+│  SEOHead (title, meta, structured data)              │
+├──────────────────────────────────────────────────────┤
+│  Hero Section                                         │
+│  "Simple, transparent pricing"                        │
+│  Subtitle explaining the credit-based model           │
+├──────────────────────────────────────────────────────┤
+│  Billing Toggle (Monthly only for now — placeholder   │
+│  for future annual toggle)                            │
+├──────────────────────────────────────────────────────┤
+│  Pricing Cards (5 tiers in responsive grid)           │
+│  ┌─────┐ ┌─────┐ ┌─────────┐ ┌─────┐ ┌─────────┐   │
+│  │Basic│ │Client│ │Freelance│ │Agency│ │Nonprofit │   │
+│  │FREE │ │$99  │ │$149     │ │$299  │ │$49       │   │
+│  │     │ │     │ │POPULAR  │ │      │ │          │   │
+│  └─────┘ └─────┘ └─────────┘ └─────┘ └─────────┘   │
+├──────────────────────────────────────────────────────┤
+│  Feature Comparison Table (expandable/collapsible)    │
+│  Full matrix of features × tiers                      │
+├──────────────────────────────────────────────────────┤
+│  Credit System Explanation                            │
+│  How credits work, what actions cost, overage info    │
+├──────────────────────────────────────────────────────┤
+│  FAQ Section                                          │
+│  Common pricing questions                             │
+├──────────────────────────────────────────────────────┤
+│  CTA Section                                          │
+│  "Start free today" button                            │
+├──────────────────────────────────────────────────────┤
+│  Footer (existing shared footer)                      │
+└──────────────────────────────────────────────────────┘
+```
+
+#### 5.1.2 Pricing Card Component
+
+Each tier card displays:
+
+- **Tier name** and tagline
+- **Price** with "/month" label
+- **Credit allocation** (standard + AI credits)
+- **Key feature bullets** (5-6 highlights per tier)
+- **CTA button**:
+  - Basic: "Get Started Free" → `/register?tier=basic`
+  - Paid tiers: "Start [Tier Name]" → `/register?tier={tierId}`
+  - If user is logged in and on a lower tier: "Upgrade to [Tier Name]"
+  - If user is on this tier: "Current Plan" (disabled)
+- **"Most Popular" badge** on Freelance tier
+- **"50% off" badge** on Nonprofit tier
+
+**Visual differentiation:**
+- Basic: Light gray border, subtle styling
+- Client: Primary color accent
+- Freelance: Highlighted card (elevated shadow, primary border, "Most Popular" ribbon)
+- Agency: Dark/premium styling
+- Nonprofit: Emerald accent with heart icon
+
+#### 5.1.3 Feature Comparison Table
+
+Full-width responsive table (horizontal scroll on mobile) comparing all tiers across:
+
+| Category | Features to Compare |
+|----------|-------------------|
+| Tools | Access level for each of the 7 tools |
+| Credits | Monthly standard credits, monthly AI credits |
+| Limits | Projects, seats, storage, data retention |
+| Exports | PDF, Excel, CSV, white-label options |
+| Collaboration | Team management, shared reports, scheduled audits |
+| Support | Support tier and response SLA |
+| Overages | Per-credit overage pricing |
+
+Use checkmarks, X marks, and specific values. Group rows by category with collapsible sections.
+
+#### 5.1.4 Credit Explainer Section
+
+Visual section explaining the credit system:
+
+- **Two-column layout**: Standard Credits vs AI Credits
+- **Action cost examples** with icons (e.g., "Upload an audit = 5 credits", "AI meta generation = 1 AI credit")
+- **Visual credit meter** showing typical monthly usage for each tier
+- **"What happens when credits run out?"** callout explaining soft gate and credit packs
+
+#### 5.1.5 FAQ Section
+
+Accordion-style FAQ covering:
+
+1. What are credits and how do they work?
+2. What happens when I run out of credits?
+3. Can I upgrade or downgrade my plan?
+4. How does the nonprofit discount work?
+5. Can I pause my subscription?
+6. What payment methods are accepted?
+7. Is there a free trial?
+8. How do credit packs work?
+9. What's included in the free tier?
+10. Can I cancel anytime?
+
+#### 5.1.6 SEO & Structured Data
+
+Use existing `SEOHead` component (`src/components/shared/SEOHead.jsx`) with:
+- Title: "Pricing | Content Strategy Portal"
+- Description: "Choose the right plan for your content strategy needs. Free tier available. Plans from $49/month for nonprofits to $299/month for agencies."
+- JSON-LD: `Product` schema with pricing offers
+
+### 5.2 Billing Dashboard (Authenticated)
+
+**Route**: `/app/billing`
+**File**: `src/components/billing/BillingDashboard.jsx`
+**Access**: Authenticated users only (via `ProtectedRoute`)
+
+#### 5.2.1 Layout
+
+```
+┌──────────────────────────────────────────────────────┐
+│  Page Header: "Billing & Subscription"                │
+├──────────────────────────────────────────────────────┤
+│  Current Plan Card                                    │
+│  ┌────────────────────────────────────────────────┐  │
+│  │ Plan: Freelance        Status: Active           │  │
+│  │ $149/month             Next billing: Mar 22     │  │
+│  │ [Upgrade] [Downgrade] [Pause] [Cancel]          │  │
+│  └────────────────────────────────────────────────┘  │
+├──────────────────────────────────────────────────────┤
+│  Credit Usage (Current Period)                        │
+│  ┌──────────────────┐  ┌──────────────────┐          │
+│  │ Standard Credits  │  │ AI Credits       │          │
+│  │ ████████░░ 350/500│  │ ██████░░░░ 90/150│          │
+│  │ Resets: Mar 22    │  │ Resets: Mar 22   │          │
+│  └──────────────────┘  └──────────────────┘          │
+│  Bonus Credits: 45 standard, 10 AI                    │
+│  [Buy Credit Pack]                                    │
+├──────────────────────────────────────────────────────┤
+│  Quick Actions                                        │
+│  [Manage Payment Method] [View Invoices]              │
+│  [Auto-Refill Settings]                               │
+├──────────────────────────────────────────────────────┤
+│  Recent Usage Activity (last 10 transactions)         │
+│  ┌────────────────────────────────────────────────┐  │
+│  │ Today   AI Meta Gen    -1 AI credit   149 left │  │
+│  │ Today   Audit Upload   -5 credits     345 left │  │
+│  │ ...                                             │  │
+│  └────────────────────────────────────────────────┘  │
+│  [View Full History]                                  │
+└──────────────────────────────────────────────────────┘
+```
+
+#### 5.2.2 Subcomponents
+
+**CurrentPlanCard** — Displays tier, price, status, next billing date. Action buttons for plan management.
+
+**CreditUsageGauge** — Visual progress bars for standard and AI credits. Color-coded:
+- Green (>50% remaining)
+- Yellow (25-50% remaining)
+- Red (<25% remaining)
+
+**CreditPackPurchaseModal** — Modal with 3 pack options (Starter, Pro, Mega). Shows credit quantities and prices. "Buy Now" redirects to Stripe Checkout.
+
+**AutoRefillSettings** — Toggle to enable auto-refill. Dropdown to select pack type. Shows auto-refill count this month and cap (3).
+
+**UsageActivityList** — Recent credit transactions with tool icons, descriptions, and running balance.
+
+### 5.3 Invoice History Page
+
+**Route**: `/app/billing/invoices`
+**File**: `src/components/billing/InvoiceHistory.jsx`
+
+Paginated list of all invoices with:
+- Invoice number, date, amount, status badge
+- "View" link (opens Stripe-hosted invoice page)
+- "Download PDF" link
+- Status filter (All, Paid, Open, Void)
+
+### 5.4 Plan Management Page
+
+**Route**: `/app/billing/plans`
+**File**: `src/components/billing/PlanManagement.jsx`
+
+Side-by-side comparison of current plan vs available plans. Shows:
+- What changes with upgrade/downgrade
+- Prorated cost for immediate upgrade
+- "Effective at period end" note for downgrades
+- Confirmation modal before any plan change
+
+### 5.5 Credit History Page
+
+**Route**: `/app/billing/credits`
+**File**: `src/components/billing/CreditHistory.jsx`
+
+Full transaction ledger with:
+- Date, action, tool, credit type, amount, balance after
+- Filter by credit type (Standard, AI, All)
+- Date range picker
+- Export to CSV
+
+### 5.6 Nonprofit Verification Page
+
+**Route**: `/app/billing/nonprofit`
+**File**: `src/components/billing/NonprofitVerification.jsx`
+
+Accessible only to users applying for nonprofit tier:
+- Upload form for 501(c)(3) letter
+- Organization name and EIN input
+- Status tracker (Pending → In Review → Approved/Rejected)
+- If approved: shows expiration date and re-verification info
+
+### 5.7 Navigation Updates
+
+**Public Navigation** (`src/components/public/PublicNavigation.jsx`):
+- Add "Pricing" link between "Features" and "Help Center"
+
+**Authenticated Sidebar/Navigation**:
+- Add "Billing" section under user menu or settings
+- Show credit balance indicator in header/sidebar (compact: "Credits: 350 | AI: 90")
+
+### 5.8 Shared UI Components (New)
+
+**CreditBadge** — Small inline badge showing credit cost for an action (e.g., "5 credits"). Displayed next to action buttons throughout the app.
+
+**UpgradePrompt** — Reusable modal/banner shown when user hits a tier-gated feature or credit limit. Shows relevant upgrade path.
+
+**TierBadge** — Small badge showing user's current tier. Used in profile, billing, and admin views.
+
+---
+
+## 6. Registration Flow Updates
+
+### 6.1 Current Registration Flow
+
+The existing registration flow (`src/components/auth/RegisterForm.jsx`) collects:
+1. Full Name
+2. Email Address
+3. Password + Confirm Password
+4. Policy acceptance (Terms, Privacy, AI Policy)
+5. Submit → Firebase Auth `createUserWithEmailAndPassword` → Firestore user doc → Redirect to `/`
+
+Google OAuth is also supported as an alternative.
+
+### 6.2 Updated Registration Flow
+
+The registration flow becomes a multi-step process when a tier is pre-selected (via `?tier=` query parameter from pricing page).
+
+#### 6.2.1 Flow Diagram
+
+```
+Pricing Page                    Register Page
+┌──────────┐                    ┌─────────────────────────┐
+│ [Start   │───tier=client────> │ Step 1: Account Details  │
+│ Client]  │                    │   Name, Email, Password  │
+└──────────┘                    │   Policy Acceptance      │
+                                ├─────────────────────────┤
+                                │ Step 2: Plan Confirmation│
+                                │   Selected: Client $99/mo│
+                                │   Features summary       │
+                                │   [Confirm & Pay]        │
+                                ├─────────────────────────┤
+                                │ Step 3: Stripe Checkout   │
+                                │   (Redirect to Stripe)   │
+                                ├─────────────────────────┤
+                                │ Step 4: Success/Welcome   │
+                                │   (Redirect back)        │
+                                │   Account created!       │
+                                │   Credits provisioned    │
+                                └─────────────────────────┘
+```
+
+#### 6.2.2 Registration Scenarios
+
+**Scenario A: Free tier (no `tier` param or `tier=basic`)**
+1. Standard registration form (unchanged from current)
+2. On submit: Create Firebase Auth user + Firestore user doc with `tier: 'basic'`
+3. Provision 50 standard + 10 AI credits
+4. Redirect to `/app` (home dashboard)
+
+**Scenario B: Paid tier (`tier=client|freelance|agency`)**
+1. Step 1: Account creation form (same fields as current)
+2. Step 2: Plan confirmation panel showing tier details, price, credits
+3. Step 3: On "Confirm & Pay" → Call backend `POST /api/checkout/create-session` → Redirect to Stripe Checkout
+4. Stripe Checkout handles card entry and payment
+5. On success: Stripe webhook fires → Backend creates subscription, provisions credits, updates user doc
+6. User redirected to success URL → `/app?subscription=success`
+7. Welcome modal shows plan details and getting started info
+
+**Scenario C: Nonprofit tier (`tier=nonprofit`)**
+1. Step 1: Account creation form
+2. Step 2: Nonprofit verification form (organization name, EIN, document upload)
+3. Step 3: Plan confirmation showing $49/month pending verification
+4. On submit: Create account with `tier: 'basic'` temporarily. Submit nonprofit verification request.
+5. Show "Verification pending" status. User has Basic tier access until approved.
+6. When admin approves: Backend creates Stripe subscription at $49/month, sends email notification
+7. User completes Stripe Checkout via email link or next login prompt
+
+**Scenario D: Google OAuth with tier pre-selection**
+1. Show tier summary before Google sign-in
+2. After Google auth: Check if user profile exists
+3. If new user: Create profile → Same flow as Scenario B/C (redirect to Stripe Checkout or nonprofit verification)
+4. If existing user: Show "You already have an account. Would you like to upgrade?" → Redirect to plan management
+
+#### 6.2.3 URL Parameters
+
+| Parameter | Values | Effect |
+|-----------|--------|--------|
+| `tier` | `basic`, `client`, `freelance`, `agency`, `nonprofit` | Pre-selects tier, shows plan confirmation step |
+| `from` | `pricing`, `upgrade`, `landing` | Tracks where user came from (analytics) |
+
+#### 6.2.4 Registration Form Modifications
+
+**File**: `src/components/auth/RegisterForm.jsx`
+
+Changes:
+1. Read `tier` from URL search params (`useSearchParams`)
+2. Add state machine for multi-step flow: `account_details` → `plan_confirmation` → `checkout` → `success`
+3. For paid tiers: Show plan confirmation step after account creation
+4. For nonprofit: Show verification upload step
+5. Handle Stripe Checkout redirect flow (create session → redirect → handle callback)
+6. Update Firestore user doc creation to include new tier fields
+
+**New sub-components:**
+- `PlanConfirmationStep.jsx` — Shows selected tier details, price, credits, and "Confirm & Pay" button
+- `NonprofitVerificationStep.jsx` — Organization details and document upload form
+- `RegistrationSuccess.jsx` — Welcome screen after successful registration + payment
+
+#### 6.2.5 AuthContext Modifications
+
+**File**: `src/contexts/AuthContext.jsx`
+
+Changes to `signup` function:
+1. Accept optional `tier` parameter
+2. Set `tier` field in Firestore user doc (default: `'basic'`)
+3. Set initial credit balance fields
+4. Do NOT create Stripe subscription inline — that's handled by the checkout flow
+
+New fields in user doc on creation:
+```javascript
+{
+  // ...existing fields...
+  tier: tier || 'basic',
+  stripeCustomerId: null,
+  subscriptionId: null,
+  subscriptionStatus: tier === 'basic' ? 'active' : 'incomplete',
+  creditsRemaining: TIER_CONFIGS[tier].monthlyStandardCredits,
+  aiCreditsRemaining: TIER_CONFIGS[tier].monthlyAiCredits,
+  nonprofitVerified: false,
+  maxProjects: TIER_CONFIGS[tier].maxProjects,
+  maxSeats: TIER_CONFIGS[tier].maxSeats,
+  maxStorageBytes: TIER_CONFIGS[tier].maxStorageBytes,
+}
+```
+
+### 6.3 New Context: SubscriptionContext
+
+**File**: `src/contexts/SubscriptionContext.jsx`
+
+A new React context that provides subscription and credit data to the entire app. Wraps the app inside `AuthProvider`.
+
+```javascript
+// Provides:
+{
+  // Subscription state
+  tier: string,
+  subscription: object | null,
+  isActive: boolean,         // subscription is active (not paused, canceled, past_due)
+  isPaused: boolean,
+  isPastDue: boolean,
+
+  // Credit state
+  credits: {
+    standard: { remaining, monthly, bonus },
+    ai: { remaining, monthly, bonus }
+  },
+
+  // Tier config (limits, features)
+  tierConfig: object,        // From TIER_CONFIGS constant
+
+  // Helper functions
+  canUseFeature: (featureName) => boolean,
+  hasCredits: (creditType, amount) => boolean,
+  consumeCredits: (action, creditType, amount, toolName, resourceId) => Promise<result>,
+
+  // Loading state
+  loading: boolean
+}
+```
+
+This context listens to the `credit_balances/{userId}` Firestore document in real-time for live credit updates.
+
+### 6.4 Tier Configuration Constants
+
+**File**: `src/config/tiers.js` (shared between frontend and conceptually mirrored in `server/src/config/tiers.js`)
+
+```javascript
+export const TIER_IDS = {
+  BASIC: 'basic',
+  CLIENT: 'client',
+  FREELANCE: 'freelance',
+  AGENCY: 'agency',
+  NONPROFIT: 'nonprofit'
+};
+
+export const TIER_CONFIGS = {
+  basic: {
+    id: 'basic',
+    name: 'Basic',
+    tagline: 'Get started for free',
+    price: 0,
+    monthlyStandardCredits: 50,
+    monthlyAiCredits: 10,
+    maxProjects: 1,
+    maxSeats: 1,
+    maxStorageBytes: 100 * 1024 * 1024,  // 100 MB
+    dataRetentionDays: 30,
+    features: {
+      exports: ['pdf_watermarked'],
+      teamManagement: false,
+      sharedReports: false,
+      scheduledAudits: 0,
+      whiteLabel: false,
+      schemaTypes: 3,
+    },
+    overageRates: null,  // No overage for free tier
+  },
+  client: {
+    id: 'client',
+    name: 'Client Side',
+    tagline: 'For managing one website',
+    price: 99,
+    monthlyStandardCredits: 500,
+    monthlyAiCredits: 150,
+    maxProjects: 1,
+    maxSeats: 1,
+    maxStorageBytes: 5 * 1024 * 1024 * 1024,  // 5 GB
+    dataRetentionDays: 365,
+    features: {
+      exports: ['pdf', 'excel', 'csv'],
+      teamManagement: false,
+      sharedReports: 'readonly',
+      scheduledAudits: 2,
+      whiteLabel: false,
+      schemaTypes: -1,  // All
+    },
+    overageRates: { standard: 0.15, ai: 0.50 },
+  },
+  freelance: {
+    id: 'freelance',
+    name: 'Freelance',
+    tagline: 'For managing multiple clients',
+    price: 149,
+    monthlyStandardCredits: 1500,
+    monthlyAiCredits: 400,
+    maxProjects: 10,
+    maxSeats: 1,
+    maxStorageBytes: 15 * 1024 * 1024 * 1024,  // 15 GB
+    dataRetentionDays: 730,  // 2 years
+    features: {
+      exports: ['pdf', 'excel', 'csv', 'white_label'],
+      teamManagement: false,
+      sharedReports: 'branded',
+      scheduledAudits: 10,
+      whiteLabel: true,
+      schemaTypes: -1,
+    },
+    overageRates: { standard: 0.12, ai: 0.40 },
+  },
+  agency: {
+    id: 'agency',
+    name: 'Agency',
+    tagline: 'For teams managing unlimited projects',
+    price: 299,
+    monthlyStandardCredits: 5000,
+    monthlyAiCredits: 1500,
+    maxProjects: -1,  // Unlimited
+    maxSeats: -1,     // Unlimited
+    maxStorageBytes: 50 * 1024 * 1024 * 1024,  // 50 GB
+    dataRetentionDays: -1,  // Unlimited
+    features: {
+      exports: ['pdf', 'excel', 'csv', 'white_label'],
+      teamManagement: true,
+      sharedReports: 'branded',
+      scheduledAudits: -1,  // Unlimited
+      whiteLabel: true,
+      schemaTypes: -1,
+    },
+    overageRates: { standard: 0.10, ai: 0.30 },
+  },
+  nonprofit: {
+    id: 'nonprofit',
+    name: '501(c)(3) Nonprofit',
+    tagline: 'Discounted for verified nonprofits',
+    price: 49,
+    // Same limits as Client
+    monthlyStandardCredits: 500,
+    monthlyAiCredits: 150,
+    maxProjects: 1,
+    maxSeats: 1,
+    maxStorageBytes: 5 * 1024 * 1024 * 1024,
+    dataRetentionDays: 365,
+    features: {
+      exports: ['pdf', 'excel', 'csv'],
+      teamManagement: false,
+      sharedReports: 'readonly',
+      scheduledAudits: 2,
+      whiteLabel: false,
+      schemaTypes: -1,
+    },
+    overageRates: { standard: 0.15, ai: 0.50 },
+  }
+};
+
+export const CREDIT_COSTS = {
+  // Standard credit actions
+  project_create: { type: 'standard', cost: 1 },
+  export_pdf: { type: 'standard', cost: 2 },
+  export_excel: { type: 'standard', cost: 2 },
+  audit_upload: { type: 'standard', cost: 5 },
+  audit_export: { type: 'standard', cost: 3 },
+  accessibility_upload: { type: 'standard', cost: 5 },
+  vpat_generate: { type: 'standard', cost: 5 },
+  schema_generate: { type: 'standard', cost: 1 },
+  schema_bulk: { type: 'standard', cost: 5 },
+  image_upload_batch: { type: 'standard', cost: 3 },
+  readability_analyze: { type: 'standard', cost: 2 },
+  readability_export: { type: 'standard', cost: 2 },
+  schedule_audit: { type: 'standard', cost: 3 },
+  share_report: { type: 'standard', cost: 1 },
+
+  // AI credit actions
+  ai_audit_suggestions: { type: 'ai', cost: 3 },
+  ai_accessibility_suggestions: { type: 'ai', cost: 3 },
+  ai_meta_title: { type: 'ai', cost: 1 },
+  ai_meta_description: { type: 'ai', cost: 1 },
+  ai_meta_bulk: { type: 'ai', cost: 8 },
+  ai_alt_text: { type: 'ai', cost: 1 },
+  ai_alt_text_bulk: { type: 'ai', cost: 8 },
+  ai_readability_rewrite: { type: 'ai', cost: 2 },
+  ai_competitor_analysis: { type: 'ai', cost: 5 },
+  ai_ab_variants: { type: 'ai', cost: 3 },
+};
+
+export const CREDIT_PACKS = {
+  starter: { standard: 100, ai: 25, price: 15 },
+  pro: { standard: 500, ai: 100, price: 60 },
+  mega: { standard: 2000, ai: 500, price: 200 },
+};
+```
+
+---
+
+## 7. Usage Enforcement & Gating
+
+### 7.1 Overview
+
+Usage enforcement is the system that checks credit balances before tool actions execute and gates features based on tier. It operates at two levels:
+
+1. **Credit gating** — Checks if user has sufficient credits before executing a credit-consuming action
+2. **Feature gating** — Checks if user's tier permits access to a feature (e.g., team management, white-label exports)
+
+### 7.2 Credit Consumption Flow
+
+```
+User clicks action → Frontend checks local credit balance →
+  IF sufficient:
+    → Call backend POST /api/credits/consume
+    → Backend validates server-side balance
+    → IF confirmed: Execute action, return updated balance
+    → IF insufficient: Return 402 with details
+  IF insufficient locally:
+    → Show UpgradePrompt immediately (no backend call)
+```
+
+### 7.3 Frontend Hook: `useCredits`
+
+**File**: `src/hooks/useCredits.js`
+
+Custom hook that wraps credit checking and consumption. Used by every tool component that has credit-consuming actions.
+
+```javascript
+// Usage in components:
+const {
+  canAfford,        // (action: string) => boolean
+  consumeCredits,   // (action: string, toolName: string, resourceId?: string) => Promise
+  credits,          // { standard: { remaining, monthly, bonus }, ai: { ... } }
+  isLoading,
+  showUpgradePrompt // () => void — triggers the UpgradePrompt modal
+} = useCredits();
+
+// Before executing an action:
+const handleAuditUpload = async () => {
+  if (!canAfford('audit_upload')) {
+    showUpgradePrompt();
+    return;
+  }
+
+  const result = await consumeCredits('audit_upload', 'technical_audit', auditId);
+  if (!result.success) {
+    // Handle insufficient credits (race condition — credits consumed between check and action)
+    return;
+  }
+
+  // Proceed with actual audit upload logic
+  await processAuditUpload(file);
+};
+```
+
+### 7.4 Feature Gating Hook: `useFeatureGate`
+
+**File**: `src/hooks/useFeatureGate.js`
+
+Checks tier-level feature access. Does not consume credits — purely a permission check.
+
+```javascript
+const {
+  canAccess,         // (featureName: string) => boolean
+  tierRequired,      // (featureName: string) => string — minimum tier needed
+  currentTier,       // string
+  showUpgradeFor     // (featureName: string) => void — shows upgrade prompt with feature context
+} = useFeatureGate();
+
+// Example: Gate team management
+if (!canAccess('teamManagement')) {
+  return <UpgradePrompt feature="teamManagement" />;
+}
+```
+
+**Feature names for gating:**
+
+| Feature Name | Gated Tiers (denied) | Notes |
+|-------------|---------------------|-------|
+| `teamManagement` | basic, client, freelance, nonprofit | Agency only |
+| `whiteLabel` | basic, client, nonprofit | Freelance and Agency |
+| `exportExcel` | basic | All paid tiers |
+| `exportCsv` | basic | All paid tiers |
+| `scheduledAudits` | basic | Paid tiers (with count limits) |
+| `sharedReports` | basic | Paid tiers (readonly vs branded) |
+| `multiProject` | basic, client, nonprofit | Freelance (10), Agency (unlimited) |
+| `allSchemaTypes` | basic | Basic limited to 3 types |
+| `creditPacks` | basic | Free tier cannot buy packs |
+| `autoRefill` | basic | Free tier cannot auto-refill |
+
+### 7.5 Integration Points (Existing Components)
+
+Each existing tool component needs credit gating added at the action level. Here's where to add `useCredits` calls:
+
+| Component | File | Actions to Gate |
+|-----------|------|----------------|
+| Content Planner | `src/components/projects/ProjectCreationWizard.jsx` | `project_create` |
+| Content Planner | `src/components/checklist/PdfExportModal.jsx` | `export_pdf` |
+| Technical Audit | `src/components/audit/upload/AuditUploadScreen.jsx` | `audit_upload` |
+| Technical Audit | `src/components/audit/ai/AISuggestions.jsx` | `ai_audit_suggestions` |
+| Accessibility | `src/components/accessibility/upload/AccessibilityUploadScreen.jsx` | `accessibility_upload` |
+| Accessibility | `src/components/accessibility/FixSuggestionsPanel.jsx` | `ai_accessibility_suggestions` |
+| Accessibility | `src/components/accessibility/VPATReportGenerator.jsx` | `vpat_generate` |
+| Meta Generator | `src/components/meta-generator/upload/MetaUploadScreen.jsx` | `ai_meta_title`, `ai_meta_description` |
+| Meta Generator | `src/components/meta-generator/CompetitorAnalysisPanel.jsx` | `ai_competitor_analysis` |
+| Meta Generator | `src/components/meta-generator/ABVariantsPanel.jsx` | `ai_ab_variants` |
+| Schema Generator | `src/components/schema-generator/SchemaGeneratorPage.jsx` (inferred) | `schema_generate` |
+| Image Alt Gen | `src/components/image-alt-generator/upload/ImageAltUploadScreen.jsx` | `image_upload_batch`, `ai_alt_text` |
+| Readability | `src/components/readability/ReadabilityInputScreen.jsx` | `readability_analyze` |
+| Readability | `src/components/readability/ReadabilityLLMPreview.jsx` | `ai_readability_rewrite` |
+| Export Hub | `src/components/export/ExportHubPage.jsx` | `export_pdf`, `export_excel` |
+| Reports | `src/components/reports/ScheduledReportsPanel.jsx` | `schedule_audit` |
+
+### 7.6 Soft Gate UX
+
+When a user cannot perform an action (insufficient credits or feature-gated), the UI should:
+
+1. **Never hard-block** — Don't remove buttons or hide features entirely. Show them as disabled with explanation.
+2. **Show CreditBadge** — Next to every credit-consuming button, show the credit cost (e.g., "5 credits").
+3. **Inline messaging** — When clicked with insufficient credits, show an inline banner:
+   ```
+   ⚠ This action requires 5 standard credits. You have 2 remaining.
+   [Buy Credit Pack] [Upgrade Plan] [Dismiss]
+   ```
+4. **UpgradePrompt modal** — For feature-gated actions (tier limitation), show a modal:
+   ```
+   🔒 Team Management is available on the Agency plan.
+
+   Your current plan: Freelance ($149/mo)
+   Upgrade to Agency for $299/mo to unlock:
+   ✓ Unlimited team seats
+   ✓ Unlimited projects
+   ✓ 5,000 monthly credits
+
+   [Upgrade to Agency] [Maybe Later]
+   ```
+
+### 7.7 Seat Enforcement
+
+For tiers with seat limits (Basic, Client, Freelance, Nonprofit = 1 seat):
+
+- The "Invite Team Member" button in Team Management is hidden for single-seat tiers
+- If somehow a second user is added (race condition), backend rejects the invite
+- Agency tier has no seat limit — full team management enabled
+
+For project limits:
+- "New Project" button shows project count: "Projects: 1/1" for Client, "3/10" for Freelance
+- When at limit, "New Project" triggers UpgradePrompt
+- Agency shows "Projects: 15/∞"
+
+### 7.8 Storage Enforcement
+
+Storage limits are checked on file upload:
+- Before any file upload (audit exports, images), check current storage usage against tier limit
+- If upload would exceed limit, show storage upgrade prompt
+- Storage usage tracked in `credit_balances` document (add `storageUsedBytes` field)
+
+### 7.9 Data Retention Enforcement
+
+A scheduled backend job (cron or Cloud Scheduler) runs daily:
+- Queries `usage_events` and tool-specific data collections
+- Deletes records older than the user's `dataRetentionDays` setting
+- Basic (30 days): Aggressive cleanup
+- Agency (unlimited): No cleanup
+
+### 7.10 Subscription Status Enforcement
+
+When subscription status is not `active`:
+
+| Status | Access Level | UI Treatment |
+|--------|-------------|-------------|
+| `active` | Full tier access | Normal |
+| `trialing` | Full tier access | Trial banner with end date |
+| `past_due` | Full tier access (grace period: 7 days) | Red banner: "Payment failed. Update payment method." |
+| `past_due` (>7 days) | Reverted to Basic limits | Red banner + UpgradePrompt |
+| `canceled` (before period end) | Full tier access until period end | Yellow banner: "Plan cancels on [date]" |
+| `canceled` (after period end) | Basic tier limits | Downgrade banner |
+| `paused` | Basic tier limits | Blue banner: "Plan paused. [Resume]" |
+| `incomplete` | Basic tier limits | Banner: "Complete payment to activate plan" |
+
+---
+
+## 8. Admin Features & Observability
+
+### 8.1 Overview
+
+Admin features extend the existing admin capabilities (see `src/components/admin/UsageAnalyticsDashboard.jsx`) with subscription-specific analytics and management tools. Only users with `role: 'admin'` (from `src/utils/roles.js`) can access these features.
+
+### 8.2 Subscription Admin Dashboard
+
+**Route**: `/app/admin/subscriptions`
+**File**: `src/components/admin/SubscriptionDashboard.jsx`
+
+#### 8.2.1 Key Metrics Cards
+
+| Metric | Description |
+|--------|-------------|
+| Monthly Recurring Revenue (MRR) | Sum of all active subscription amounts |
+| Total Subscribers | Count by tier (bar chart breakdown) |
+| Churn Rate | % of subscriptions canceled this month |
+| New Subscriptions | Count of new subs this period |
+| Upgrade/Downgrade Rate | Plan changes this period |
+| Average Revenue Per User (ARPU) | MRR / active subscribers |
+| Credit Pack Revenue | One-time credit pack sales this period |
+| Total Revenue | MRR + credit pack revenue + overage charges |
+
+#### 8.2.2 Charts & Visualizations
+
+- **MRR Trend** — Line chart showing MRR over time (30/60/90 days)
+- **Subscribers by Tier** — Stacked bar chart showing subscriber counts per tier over time
+- **Credit Usage Distribution** — Heatmap showing which tools consume the most credits
+- **Churn Waterfall** — New subscribers vs cancellations vs upgrades vs downgrades per period
+- **Revenue Breakdown** — Pie chart: Subscriptions vs Credit Packs vs Overage charges
+
+#### 8.2.3 Subscriber Table
+
+Sortable, filterable table showing all subscribers:
+
+| Column | Description |
+|--------|-------------|
+| User | Name, email, avatar |
+| Tier | Current tier badge |
+| Status | Active, Past Due, Paused, Canceled |
+| MRR | Monthly amount |
+| Credits Used | Standard and AI usage this period (% of allocation) |
+| Joined | Subscription start date |
+| Actions | View details, manage subscription |
+
+Filters: Tier, Status, Date range, Credit usage threshold
+
+### 8.3 Nonprofit Verification Queue
+
+**Route**: `/app/admin/nonprofits`
+**File**: `src/components/admin/NonprofitVerificationQueue.jsx`
+
+Dashboard for managing nonprofit verification requests:
+
+#### 8.3.1 Queue View
+
+Table of pending verification requests:
+
+| Column | Description |
+|--------|-------------|
+| Organization | Name and EIN |
+| Applicant | User name and email |
+| Submitted | Date of submission |
+| Document | Link to view uploaded 501(c)(3) letter |
+| Status | Pending, In Review |
+| Actions | Approve, Reject (with reason) |
+
+#### 8.3.2 Review Workflow
+
+1. Admin clicks "Review" on a pending request
+2. Document viewer opens (embedded PDF/image viewer)
+3. Admin sees organization name, EIN, applicant info
+4. Admin clicks "Approve" or "Reject"
+   - **Approve**: Backend creates Stripe subscription with nonprofit pricing → sends approval email to user with payment link
+   - **Reject**: Admin enters rejection reason → sends rejection email with reason → user can re-apply
+
+#### 8.3.3 Verification History
+
+Tab showing all past verifications (approved, rejected, expired) with search and filter.
+
+### 8.4 Revenue Analytics
+
+**Route**: `/app/admin/revenue`
+**File**: `src/components/admin/RevenueAnalytics.jsx`
+
+Deeper revenue analytics beyond the subscription dashboard:
+
+- **Revenue by source**: Subscriptions, credit packs, overage charges
+- **Revenue by tier**: Which tiers generate the most revenue
+- **LTV estimates**: Average lifetime value per tier based on subscription duration
+- **Failed payment tracking**: List of failed invoice payments with amounts
+- **Refund tracking**: Any Stripe refunds issued
+
+### 8.5 Usage & Cost Analytics
+
+**Route**: `/app/admin/usage`
+**File**: Extended from existing `src/components/admin/UsageAnalyticsDashboard.jsx`
+
+Add to the existing usage analytics dashboard:
+
+- **Credit consumption by tier** — Are any tiers consuming disproportionately?
+- **AI cost tracking** — Estimated actual AI API costs based on usage events
+- **Margin analysis** — Revenue vs estimated costs per tier
+- **Top consumers** — Users consuming the most credits (potential abuse detection)
+- **Credit pack purchase patterns** — Which packs sell most, who buys them
+
+### 8.6 Admin API Endpoints
+
+**GET /api/admin/subscriptions/summary** *(Admin only)*
+
+Returns aggregate subscription metrics.
+
+```
+Response (200):
+{
+  mrr: number,
+  totalSubscribers: number,
+  subscribersByTier: { basic: n, client: n, freelance: n, agency: n, nonprofit: n },
+  churnRate: number,
+  newSubscriptions: number,
+  creditPackRevenue: number,
+  overageRevenue: number
+}
+```
+
+**GET /api/admin/subscriptions/list** *(Admin only)*
+
+Paginated list of all subscriptions with filters.
+
+```
+Query params: page, limit, tier, status, sortBy, sortOrder
+
+Response (200):
+{
+  subscriptions: [ ... ],
+  pagination: { ... }
+}
+```
+
+**GET /api/admin/nonprofit/pending** *(Admin only)*
+
+Returns pending nonprofit verification requests.
+
+**GET /api/admin/revenue/summary** *(Admin only)*
+
+Returns revenue analytics data.
+
+**GET /api/admin/usage/top-consumers** *(Admin only)*
+
+Returns top credit-consuming users for abuse detection.
+
+### 8.7 Alerting & Notifications
+
+Automated alerts sent to admin users:
+
+| Alert | Trigger | Channel |
+|-------|---------|---------|
+| High churn | >5% churn in a week | Email + in-app notification |
+| Payment failure spike | >10 failed payments in 24hr | Email |
+| New nonprofit application | Nonprofit verification submitted | In-app notification |
+| Credit abuse detection | Single user consuming >80% of tier credits in <7 days | Email + in-app |
+| Revenue milestone | MRR crosses $1K, $5K, $10K thresholds | In-app notification |
+
+### 8.8 Data Export (Admin)
+
+Admin can export:
+- Subscriber list (CSV)
+- Revenue report (CSV)
+- Usage analytics (CSV)
+- Nonprofit verification log (CSV)
+
+All exports filter by date range and exclude PII where possible (option to include/exclude emails).
+
+---
+
+## 9. User Stories by Implementation Batch
+
+> Each batch is designed to be implemented as an independent unit. Dependencies between batches are noted. User stories follow the format:
+> **As a [role], I want [action], so that [benefit].**
+> Each story includes acceptance criteria (AC) and the files to create or modify.
+
+---
+
+### BATCH 1: Tier Configuration & Data Model Foundation
+
+**Dependencies**: None (this is the foundation batch)
+**Estimated scope**: ~15 files created/modified
+**Goal**: Establish all data models, tier constants, and Firestore schemas so subsequent batches have a stable foundation.
+
+---
+
+#### Story 1.1: Create Tier Configuration Constants
+
+**As a** developer, **I want** a single source of truth for tier definitions, credit costs, and pack pricing, **so that** all components reference consistent values.
+
+**AC:**
+- [ ] Create `src/config/tiers.js` with `TIER_IDS`, `TIER_CONFIGS`, `CREDIT_COSTS`, and `CREDIT_PACKS` exports (see Section 6.4 for full spec)
+- [ ] All 5 tiers defined with: id, name, tagline, price, credit allocations, limits, features, overage rates
+- [ ] All standard and AI credit action costs defined
+- [ ] All 3 credit pack types defined with quantities and prices
+- [ ] File is importable from both frontend components and test files
+- [ ] Add unit tests in `src/config/__tests__/tiers.test.js` to validate tier configs are complete and consistent
+
+**Files:**
+- Create: `src/config/tiers.js`
+- Create: `src/config/__tests__/tiers.test.js`
+
+---
+
+#### Story 1.2: Extend User Document Schema
+
+**As a** developer, **I want** the Firestore user document to include subscription and credit fields, **so that** the frontend can quickly read tier/credit info without extra queries.
+
+**AC:**
+- [ ] Modify `signup` function in `src/contexts/AuthContext.jsx` to include new fields on user creation: `tier`, `stripeCustomerId`, `subscriptionId`, `subscriptionStatus`, `creditsRemaining`, `aiCreditsRemaining`, `nonprofitVerified`, `nonprofitVerifiedAt`, `maxProjects`, `maxSeats`, `maxStorageBytes`
+- [ ] Default values: `tier: 'basic'`, `stripeCustomerId: null`, `subscriptionId: null`, `subscriptionStatus: 'active'`, `creditsRemaining: 50`, `aiCreditsRemaining: 10`, `nonprofitVerified: false`, `maxProjects: 1`, `maxSeats: 1`, `maxStorageBytes: 104857600`
+- [ ] Modify `loginWithGoogle` to also set these defaults for new Google users
+- [ ] Existing users without these fields are handled gracefully (fallback to basic tier defaults in reads)
+- [ ] Add `tier` and `subscriptionStatus` to the `userProfile` state in AuthContext
+
+**Files:**
+- Modify: `src/contexts/AuthContext.jsx`
+
+---
+
+#### Story 1.3: Create SubscriptionContext
+
+**As a** developer, **I want** a React context that provides subscription status, credit balances, and tier-checking helpers throughout the app, **so that** any component can check permissions and credits.
+
+**AC:**
+- [ ] Create `src/contexts/SubscriptionContext.jsx` with provider and `useSubscription` hook
+- [ ] Context listens to `credit_balances/{userId}` Firestore document in real-time (via `onSnapshot`)
+- [ ] Provides: `tier`, `subscription`, `isActive`, `isPaused`, `isPastDue`, `credits` (standard + AI with remaining/monthly/bonus), `tierConfig`, `canUseFeature(featureName)`, `hasCredits(creditType, amount)`, `loading`
+- [ ] `canUseFeature` checks against `TIER_CONFIGS[tier].features`
+- [ ] `hasCredits` checks remaining + bonus credits against requested amount
+- [ ] Wrap `SubscriptionProvider` inside `AuthProvider` in `src/App.jsx`
+- [ ] Falls back gracefully when `credit_balances` doc doesn't exist (treats as basic tier)
+- [ ] Add unit tests for `canUseFeature` and `hasCredits` logic
+
+**Files:**
+- Create: `src/contexts/SubscriptionContext.jsx`
+- Modify: `src/App.jsx` (wrap with SubscriptionProvider)
+- Create: `src/contexts/__tests__/SubscriptionContext.test.jsx`
+
+---
+
+#### Story 1.4: Create Firestore Security Rules for Billing Collections
+
+**As a** developer, **I want** Firestore security rules that protect billing data, **so that** users can only read their own subscription/credit data and only the backend can write to billing collections.
+
+**AC:**
+- [ ] `credit_balances/{userId}`: Users can read their own doc. Only backend (admin SDK) can write.
+- [ ] `credit_transactions/{transId}`: Users can read their own transactions (where `userId == request.auth.uid`). Only backend can write.
+- [ ] `subscriptions/{subId}`: Users can read their own subscription (where `userId == request.auth.uid`). Only backend can write.
+- [ ] `invoices/{invId}`: Users can read their own invoices. Only backend can write.
+- [ ] `credit_packs/{packId}`: Users can read their own packs. Only backend can write.
+- [ ] `nonprofit_verifications/{userId}`: Users can read their own verification. Only backend can write (except initial submit — users can create their own doc).
+- [ ] `usage_events/{eventId}`: Only backend can read and write (admin analytics).
+- [ ] Document rules in `firestore.rules` or equivalent config file
+
+**Files:**
+- Create or modify: `firestore.rules`
+
+---
+
+#### Story 1.5: Create User Migration Script
+
+**As a** developer, **I want** a one-time migration script that adds tier/credit fields to all existing user documents, **so that** the app works for existing users after deployment.
+
+**AC:**
+- [ ] Create `server/scripts/migrate-users.js` (runs via `node server/scripts/migrate-users.js`)
+- [ ] Reads all documents in `users` collection
+- [ ] For each user without a `tier` field: adds basic tier defaults (same as Story 1.2)
+- [ ] Creates corresponding `credit_balances/{userId}` document with basic tier allocations
+- [ ] Uses batch writes (max 500 per batch) for efficiency
+- [ ] Logs progress and handles errors gracefully
+- [ ] Is idempotent — safe to run multiple times
+- [ ] Dry-run mode (`--dry-run` flag) that logs changes without writing
+
+**Files:**
+- Create: `server/scripts/migrate-users.js`
+
+---
+
+### BATCH 2: Node/Express Backend API
+
+**Dependencies**: Batch 1 (tier configs and data models)
+**Estimated scope**: ~20 files created
+**Goal**: Stand up the complete backend API server with Stripe integration, webhook handling, and credit management.
+
+---
+
+#### Story 2.1: Initialize Node/Express Server Project
+
+**As a** developer, **I want** a properly initialized Node.js + Express server project, **so that** I have a foundation for all billing API endpoints.
+
+**AC:**
+- [ ] Create `server/` directory with `package.json` (name: `csp-billing-api`)
+- [ ] Dependencies: `express`, `stripe`, `firebase-admin`, `cors`, `helmet`, `express-rate-limit`, `dotenv`, `multer` (for file uploads)
+- [ ] Dev dependencies: `vitest`, `supertest`, `nodemon`
+- [ ] Create `server/src/index.js` — Express app with CORS, JSON body parsing, helmet security headers
+- [ ] Create `server/.env.example` with all required env vars (see Section 3.11)
+- [ ] Create `server/src/config/stripe.js` — Stripe client initialization
+- [ ] Create `server/src/config/firebase.js` — Firebase Admin SDK initialization
+- [ ] Create `server/src/config/tiers.js` — Mirror of frontend tier configs (server-side copy)
+- [ ] Server listens on `PORT` (default 3001)
+- [ ] CORS configured for `FRONTEND_URL`
+- [ ] Health check endpoint: `GET /health` returns `{ status: 'ok' }`
+- [ ] Add `npm run dev` script using nodemon
+- [ ] Add `npm run start` script for production
+
+**Files:**
+- Create: `server/package.json`
+- Create: `server/.env.example`
+- Create: `server/src/index.js`
+- Create: `server/src/config/stripe.js`
+- Create: `server/src/config/firebase.js`
+- Create: `server/src/config/tiers.js`
+
+---
+
+#### Story 2.2: Create Authentication Middleware
+
+**As a** developer, **I want** middleware that verifies Firebase ID tokens on API requests, **so that** all billing endpoints are secured to authenticated users.
+
+**AC:**
+- [ ] Create `server/src/middleware/auth.js`
+- [ ] Reads `Authorization: Bearer <token>` header
+- [ ] Verifies token via `admin.auth().verifyIdToken(token)`
+- [ ] Attaches `req.user = { uid, email }` on success
+- [ ] Fetches user profile from Firestore and attaches `req.userProfile = { tier, role, ... }`
+- [ ] Returns 401 for missing/invalid/expired tokens
+- [ ] Returns 403 for disabled accounts
+- [ ] Create `server/src/middleware/adminOnly.js` — checks `req.userProfile.role === 'admin'`
+- [ ] Add unit tests
+
+**Files:**
+- Create: `server/src/middleware/auth.js`
+- Create: `server/src/middleware/adminOnly.js`
+- Create: `server/tests/middleware/auth.test.js`
+
+---
+
+#### Story 2.3: Create Rate Limiter Middleware
+
+**As a** developer, **I want** rate limiting on API endpoints, **so that** the API is protected from abuse.
+
+**AC:**
+- [ ] Create `server/src/middleware/rateLimiter.js`
+- [ ] Uses `express-rate-limit`
+- [ ] Configurable per-route limits (see Section 4.6)
+- [ ] Returns 429 with `Retry-After` header when limit exceeded
+- [ ] Keyed by user UID (authenticated) or IP (unauthenticated)
+- [ ] Error handler middleware: `server/src/middleware/errorHandler.js` — catches unhandled errors, returns consistent error format (see Section 4.5)
+
+**Files:**
+- Create: `server/src/middleware/rateLimiter.js`
+- Create: `server/src/middleware/errorHandler.js`
+
+---
+
+#### Story 2.4: Implement Checkout Endpoints
+
+**As a** user, **I want** to start a Stripe Checkout session for my chosen plan, **so that** I can securely enter payment info and subscribe.
+
+**AC:**
+- [ ] Create `server/src/routes/checkout.js`
+- [ ] `POST /api/checkout/create-session`: Creates Stripe Checkout session for subscription (see Section 4.4.1)
+  - Creates Stripe customer if user doesn't have one
+  - Stores `stripeCustomerId` on user doc
+  - Sets `metadata.userId` and `metadata.tier` on checkout session
+  - Returns `{ sessionId, url }`
+- [ ] `POST /api/checkout/create-pack-session`: Creates Stripe Checkout session for credit pack (one-time payment)
+  - Validates pack type
+  - Rejects free tier users
+  - Returns `{ sessionId, url }`
+- [ ] Both endpoints use auth middleware
+- [ ] Both endpoints use checkout rate limiter (5/min)
+- [ ] Create `server/src/services/checkoutService.js` for business logic
+- [ ] Add integration tests
+
+**Files:**
+- Create: `server/src/routes/checkout.js`
+- Create: `server/src/services/checkoutService.js`
+- Create: `server/tests/checkout.test.js`
+
+---
+
+#### Story 2.5: Implement Stripe Webhook Handler
+
+**As a** system, **I want** to process Stripe webhook events, **so that** subscription status, credits, and invoices are kept in sync with Stripe.
+
+**AC:**
+- [ ] Create `server/src/routes/webhooks.js`
+- [ ] `POST /webhooks/stripe`: Receives Stripe events with raw body for signature verification
+- [ ] Create `server/src/services/webhookService.js` with handlers for all events listed in Section 4.4.6:
+  - `checkout.session.completed` → Create subscription doc, update user tier, provision credits
+  - `customer.subscription.created` → Mirror to Firestore
+  - `customer.subscription.updated` → Update status, handle plan changes
+  - `customer.subscription.deleted` → Revert to basic tier
+  - `customer.subscription.paused` → Update status
+  - `customer.subscription.resumed` → Restore tier
+  - `invoice.paid` → Store invoice, reset monthly credits (new billing period)
+  - `invoice.payment_failed` → Mark as past_due
+  - `invoice.finalized` → Store invoice in Firestore
+  - `payment_intent.succeeded` → Handle credit pack fulfillment
+  - `customer.created` → Store customer ID
+- [ ] Each handler is idempotent (checks `processed_events` collection)
+- [ ] Webhook signature verified using `STRIPE_WEBHOOK_SECRET`
+- [ ] Returns 200 for all events (even unhandled) to prevent Stripe retries
+- [ ] Structured logging for all webhook events
+- [ ] Add tests with mock Stripe events
+
+**Files:**
+- Create: `server/src/routes/webhooks.js`
+- Create: `server/src/services/webhookService.js`
+- Create: `server/tests/webhooks.test.js`
+
+---
+
+#### Story 2.6: Implement Credit Service
+
+**As a** system, **I want** a credit management service, **so that** credits are consumed, tracked, and reset accurately.
+
+**AC:**
+- [ ] Create `server/src/services/creditService.js` with functions:
+  - `consumeCredits(userId, action, creditType, amount, toolName, resourceId)` — Deducts credits following priority: monthly → bonus (packs) → overage. Returns result with source and remaining balance.
+  - `resetMonthlyCredits(userId, tier)` — Resets monthly allocations (called on billing cycle reset). Does NOT reset bonus credits.
+  - `provisionCredits(userId, tier)` — Sets initial credit allocation for new subscription.
+  - `addPackCredits(userId, packType, packId)` — Adds bonus credits from a purchased pack.
+  - `getBalance(userId)` — Returns full credit balance object.
+  - `handleAutoRefill(userId)` — Checks if auto-refill is enabled and triggers pack purchase if balance is 0.
+- [ ] All operations use Firestore transactions to prevent race conditions
+- [ ] All operations create `credit_transactions` records
+- [ ] All operations update denormalized `creditsRemaining`/`aiCreditsRemaining` on user doc
+- [ ] Create `server/src/services/usageService.js` — Records `usage_events` for analytics
+- [ ] Add comprehensive unit tests
+
+**Files:**
+- Create: `server/src/services/creditService.js`
+- Create: `server/src/services/usageService.js`
+- Create: `server/tests/creditService.test.js`
+
+---
+
+#### Story 2.7: Implement Credit API Routes
+
+**As a** user, **I want** API endpoints to check my credit balance, consume credits, and view history, **so that** the frontend can manage credits.
+
+**AC:**
+- [ ] Create `server/src/routes/credits.js` with endpoints (see Section 4.4.3):
+  - `GET /api/credits/balance` — Returns full balance
+  - `POST /api/credits/consume` — Consumes credits (returns 402 if insufficient)
+  - `GET /api/credits/history` — Paginated transaction history
+  - `POST /api/credits/auto-refill` — Configure auto-refill
+- [ ] All endpoints use auth middleware
+- [ ] Consume endpoint uses credit rate limiter (60/min)
+- [ ] Balance endpoint uses balance rate limiter (120/min)
+- [ ] Add integration tests
+
+**Files:**
+- Create: `server/src/routes/credits.js`
+- Create: `server/tests/credits.test.js`
+
+---
+
+#### Story 2.8: Implement Subscription Management Routes
+
+**As a** user, **I want** API endpoints to manage my subscription (upgrade, downgrade, cancel, pause, resume), **so that** I have full control over my plan.
+
+**AC:**
+- [ ] Create `server/src/routes/subscriptions.js` with endpoints (see Section 4.4.2):
+  - `GET /api/subscriptions/current`
+  - `POST /api/subscriptions/upgrade` — Uses Stripe proration
+  - `POST /api/subscriptions/downgrade` — Schedules change at period end
+  - `POST /api/subscriptions/cancel` — Cancels at period end
+  - `POST /api/subscriptions/reactivate` — Removes cancel-at-period-end
+  - `POST /api/subscriptions/pause` — Pauses with optional resume date
+  - `POST /api/subscriptions/resume` — Resumes immediately
+- [ ] Create `server/src/services/subscriptionService.js` for business logic
+- [ ] All endpoints use auth middleware and subscription rate limiter
+- [ ] Upgrade validates tier ordering (can't "upgrade" to a lower tier)
+- [ ] Downgrade takes effect at period end (no immediate change)
+- [ ] Add integration tests
+
+**Files:**
+- Create: `server/src/routes/subscriptions.js`
+- Create: `server/src/services/subscriptionService.js`
+- Create: `server/tests/subscriptions.test.js`
+
+---
+
+#### Story 2.9: Implement Billing & Invoice Routes
+
+**As a** user, **I want** to access my invoices and manage payment methods via Stripe Customer Portal, **so that** I can review my billing history and update payment info.
+
+**AC:**
+- [ ] Create `server/src/routes/billing.js` with endpoints (see Section 4.4.4):
+  - `POST /api/billing/portal-session` — Creates Stripe Customer Portal session
+  - `GET /api/billing/invoices` — Paginated invoice history from Firestore
+- [ ] Portal session configured with return URL
+- [ ] Invoice endpoint supports status filter and pagination
+- [ ] All endpoints use auth middleware
+- [ ] Add tests
+
+**Files:**
+- Create: `server/src/routes/billing.js`
+- Create: `server/tests/billing.test.js`
+
+---
+
+#### Story 2.10: Implement Nonprofit Verification Routes
+
+**As a** nonprofit user, **I want** to submit my 501(c)(3) verification documents, **so that** I can receive the discounted nonprofit pricing.
+
+**AC:**
+- [ ] Create `server/src/routes/nonprofit.js` with endpoints (see Section 4.4.5):
+  - `POST /api/nonprofit/submit-verification` — Multipart upload (uses multer)
+  - `GET /api/nonprofit/verification-status`
+  - `POST /api/nonprofit/review` — Admin-only approve/reject
+- [ ] Create `server/src/services/nonprofitService.js`
+- [ ] Document uploaded to Firebase Storage at `nonprofits/{userId}/{filename}`
+- [ ] On approval: Creates Stripe subscription with nonprofit pricing, updates user tier
+- [ ] On rejection: Sends notification with reason, user remains on basic
+- [ ] Verification expires after 1 year — background job checks and flags expired
+- [ ] Add tests
+
+**Files:**
+- Create: `server/src/routes/nonprofit.js`
+- Create: `server/src/services/nonprofitService.js`
+- Create: `server/tests/nonprofit.test.js`
+
+---
+
+#### Story 2.11: Wire Up All Routes and Middleware
+
+**As a** developer, **I want** all routes and middleware registered in the Express app, **so that** the server is fully functional.
+
+**AC:**
+- [ ] Update `server/src/index.js` to register all routes:
+  - `/webhooks/stripe` (raw body parser, no auth)
+  - `/api/checkout/*` (JSON parser, auth)
+  - `/api/subscriptions/*` (JSON parser, auth)
+  - `/api/credits/*` (JSON parser, auth)
+  - `/api/billing/*` (JSON parser, auth)
+  - `/api/nonprofit/*` (JSON/multipart parser, auth)
+  - `/api/admin/*` (JSON parser, auth + admin)
+- [ ] Global error handler registered last
+- [ ] Webhook route registered BEFORE `express.json()` middleware (needs raw body)
+- [ ] Add structured logging utility (`server/src/utils/logger.js`)
+- [ ] Verify server starts and all routes respond
+
+**Files:**
+- Modify: `server/src/index.js`
+- Create: `server/src/utils/logger.js`
+
+---
+
+### BATCH 3: Public Pricing Page
+
+**Dependencies**: Batch 1 (tier configs)
+**Estimated scope**: ~5 files created/modified
+**Goal**: Build the public-facing pricing page with tier cards, feature comparison, and CTAs.
+
+---
+
+#### Story 3.1: Create Public Pricing Page Component
+
+**As a** visitor, **I want** to see a pricing page with all available plans, **so that** I can compare options and choose the right plan.
+
+**AC:**
+- [ ] Create `src/components/public/PricingPage.jsx`
+- [ ] Hero section with heading "Simple, transparent pricing" and subtitle
+- [ ] 5 pricing tier cards in a responsive grid (1 col mobile, 2 col tablet, 5 col desktop; stacks gracefully)
+- [ ] Each card shows: tier name, tagline, price (formatted as "$99/mo"), credit allocation, 5-6 feature bullets, CTA button
+- [ ] Freelance card has "Most Popular" badge and visually elevated styling (ring border, larger shadow)
+- [ ] Nonprofit card has "50% off" badge and emerald accent
+- [ ] Agency card uses dark/premium styling
+- [ ] Basic card uses subtle gray styling
+- [ ] CTA buttons link to `/register?tier={tierId}` for unauthenticated users
+- [ ] If user is authenticated (via `useAuth`): CTA shows "Upgrade" for lower tiers, "Current Plan" (disabled) for current tier, "Downgrade" for higher-to-lower
+- [ ] Uses `SEOHead` with pricing-specific title, description, and `Product` JSON-LD structured data
+- [ ] All tier data pulled from `TIER_CONFIGS` in `src/config/tiers.js` — no hardcoded prices
+- [ ] Fully responsive and accessible (keyboard navigation, ARIA labels, proper heading hierarchy)
+- [ ] Matches existing public page design language (see `LandingPage.jsx`, `FeaturesPage.jsx`)
+
+**Files:**
+- Create: `src/components/public/PricingPage.jsx`
+
+---
+
+#### Story 3.2: Create Feature Comparison Table
+
+**As a** visitor, **I want** to see a detailed comparison of features across all plans, **so that** I can make an informed decision.
+
+**AC:**
+- [ ] Create `src/components/public/PricingComparisonTable.jsx` (imported by PricingPage)
+- [ ] Full-width table comparing all 5 tiers across all categories (see Section 5.1.3)
+- [ ] Categories: Tools, Credits, Limits, Exports, Collaboration, Support, Overages
+- [ ] Each category is collapsible/expandable (default: expanded)
+- [ ] Uses checkmarks (green), X marks (red), and specific values
+- [ ] Horizontal scroll on mobile with sticky first column (feature names)
+- [ ] Tier column headers match card styling (colors, badges)
+- [ ] Accessible: proper `<table>` semantics, `scope` attributes, `aria-label` on icons
+
+**Files:**
+- Create: `src/components/public/PricingComparisonTable.jsx`
+
+---
+
+#### Story 3.3: Create Credit Explainer and FAQ Sections
+
+**As a** visitor, **I want** to understand how credits work and get answers to common questions, **so that** I feel confident choosing a plan.
+
+**AC:**
+- [ ] Add credit explainer section to `PricingPage.jsx` (see Section 5.1.4):
+  - Two-column layout: Standard Credits vs AI Credits with icons
+  - 4-5 example actions with credit costs
+  - Visual credit meter showing typical monthly usage per tier
+  - "What happens when credits run out?" callout with credit pack info
+- [ ] Add FAQ section to `PricingPage.jsx` (see Section 5.1.5):
+  - Accordion-style (click to expand/collapse)
+  - 10 FAQ items covering credits, upgrades, cancellation, nonprofit, etc.
+  - Accessible: uses `<details>`/`<summary>` or equivalent with ARIA
+- [ ] Add bottom CTA section: "Start free today" button linking to `/register?tier=basic`
+
+**Files:**
+- Modify: `src/components/public/PricingPage.jsx`
+
+---
+
+#### Story 3.4: Add Pricing Route and Navigation Link
+
+**As a** visitor, **I want** to navigate to the pricing page from the site navigation, **so that** I can easily find pricing info.
+
+**AC:**
+- [ ] Add `<Route path="/pricing" element={<PricingPage />} />` to `src/App.jsx` in the public routes section (near line 172)
+- [ ] Add lazy import for `PricingPage` at top of `App.jsx`
+- [ ] Add "Pricing" link to `src/components/public/PublicNavigation.jsx` between "Features" and "Help Center"
+- [ ] Add "Pricing" link to the landing page CTA section and footer
+- [ ] Add redirect: `/plans` → `/pricing` for SEO flexibility
+- [ ] Add pricing page to sitemap config if one exists (`src/config/seo.js`)
+- [ ] Verify pricing page loads correctly at `/pricing` for both authenticated and unauthenticated users
+
+**Files:**
+- Modify: `src/App.jsx`
+- Modify: `src/components/public/PublicNavigation.jsx`
+- Modify: `src/components/public/LandingPage.jsx` (add pricing CTA link)
+- Modify: `src/config/seo.js` (add pricing page SEO config)
+
+---
+
+### BATCH 4: Registration Flow Updates
+
+**Dependencies**: Batch 1 (tier configs, SubscriptionContext), Batch 2 (checkout API endpoints)
+**Estimated scope**: ~6 files created/modified
+**Goal**: Update the registration flow to support tier selection and Stripe Checkout integration.
+
+---
+
+#### Story 4.1: Add Tier Selection to Registration Flow
+
+**As a** new user, **I want** to select a plan during registration, **so that** I can sign up and subscribe in one flow.
+
+**AC:**
+- [ ] Modify `src/components/auth/RegisterForm.jsx`:
+  - Read `tier` from URL search params via `useSearchParams`
+  - Add step state machine: `account_details` → `plan_confirmation` → `checkout`
+  - Step 1 (account_details): Existing registration form (unchanged)
+  - Step 2 (plan_confirmation): Show selected tier details (visible only for paid tiers)
+  - Step indicator showing current step (1/2 or 1/3)
+  - For `tier=basic` or no tier param: Skip step 2 entirely (current behavior)
+  - For paid tiers: After account creation, show plan confirmation before Stripe redirect
+- [ ] Create `src/components/auth/PlanConfirmationStep.jsx`:
+  - Displays: tier name, price, credit allocation, key features (from `TIER_CONFIGS`)
+  - "Confirm & Pay" button that calls backend checkout API
+  - "Change Plan" link back to pricing page
+  - Shows what the user will be charged today
+- [ ] Ensure Google OAuth flow also supports tier pre-selection
+
+**Files:**
+- Modify: `src/components/auth/RegisterForm.jsx`
+- Create: `src/components/auth/PlanConfirmationStep.jsx`
+
+---
+
+#### Story 4.2: Integrate Stripe Checkout Redirect
+
+**As a** new user selecting a paid plan, **I want** to be redirected to Stripe Checkout after registration, **so that** I can securely enter my payment info.
+
+**AC:**
+- [ ] After account creation (Firebase Auth + Firestore doc), call `POST /api/checkout/create-session` with selected tier
+- [ ] Pass Firebase ID token in Authorization header
+- [ ] On success: Redirect to Stripe Checkout URL (`window.location.href = response.url`)
+- [ ] Set success URL to `/app?subscription=success`
+- [ ] Set cancel URL to `/app?subscription=canceled`
+- [ ] Handle errors: Show inline error message if checkout session creation fails
+- [ ] Create `src/lib/api.js` — API client utility for making authenticated requests to the backend
+  - Includes helper to get current user's Firebase ID token
+  - Base URL from `VITE_API_URL` env var
+  - Handles 401 responses (token expired → refresh → retry)
+
+**Files:**
+- Create: `src/lib/api.js`
+- Modify: `src/components/auth/RegisterForm.jsx`
+
+---
+
+#### Story 4.3: Create Registration Success Handler
+
+**As a** new paid user, **I want** to see a welcome message after successful payment, **so that** I know my account is set up and ready.
+
+**AC:**
+- [ ] Create `src/components/auth/RegistrationSuccess.jsx`:
+  - Welcome modal/page shown when URL contains `?subscription=success`
+  - Displays: "Welcome to [Tier Name]!", credit allocation, getting-started tips
+  - "Get Started" button dismisses modal and navigates to dashboard
+  - Shows for both new registrations and plan upgrades
+- [ ] Handle `?subscription=canceled` URL param:
+  - Show info banner: "Payment was not completed. You're on the free plan."
+  - "Try again" link back to pricing page
+- [ ] Integrate into `src/App.jsx` or home page component to detect URL params on mount
+
+**Files:**
+- Create: `src/components/auth/RegistrationSuccess.jsx`
+- Modify: `src/components/home/HomePage.jsx` (detect subscription URL params)
+
+---
+
+#### Story 4.4: Add Nonprofit Verification to Registration
+
+**As a** nonprofit user, **I want** to submit my 501(c)(3) verification during registration, **so that** I can get the discounted pricing.
+
+**AC:**
+- [ ] Create `src/components/auth/NonprofitVerificationStep.jsx`:
+  - Form fields: Organization name, EIN (Employer Identification Number)
+  - File upload for 501(c)(3) determination letter (accepts PDF, PNG, JPG; max 10MB)
+  - Uses `react-dropzone` (already a project dependency)
+  - "Submit for Verification" button calls `POST /api/nonprofit/submit-verification`
+  - After submit: Shows "Verification pending" status with explanation
+  - User is created on Basic tier; upgraded to Nonprofit after admin approval
+- [ ] Modify `RegisterForm.jsx` to show nonprofit verification step when `tier=nonprofit`
+- [ ] Flow: Account Details → Nonprofit Verification → Success (pending verification)
+
+**Files:**
+- Create: `src/components/auth/NonprofitVerificationStep.jsx`
+- Modify: `src/components/auth/RegisterForm.jsx`
+
+---
+
+### BATCH 5: In-App Billing & Account Management
+
+**Dependencies**: Batch 1 (SubscriptionContext), Batch 2 (all billing API endpoints)
+**Estimated scope**: ~10 files created/modified
+**Goal**: Build all authenticated billing pages — dashboard, invoices, plan management, credit history.
+
+---
+
+#### Story 5.1: Create Billing Dashboard
+
+**As a** subscriber, **I want** a billing dashboard showing my current plan, credit usage, and quick actions, **so that** I can manage my subscription.
+
+**AC:**
+- [ ] Create `src/components/billing/BillingDashboard.jsx` (see Section 5.2 for full layout spec)
+- [ ] CurrentPlanCard component: Shows tier badge, price, status, next billing date, action buttons (Upgrade, Pause, Cancel)
+- [ ] CreditUsageGauge component: Two progress bars (standard + AI credits). Color-coded: green >50%, yellow 25-50%, red <25%. Shows "Resets: [date]"
+- [ ] Bonus credits display below gauges
+- [ ] "Buy Credit Pack" button
+- [ ] Quick actions row: "Manage Payment Method" (Stripe portal), "View Invoices", "Auto-Refill Settings"
+- [ ] Recent usage activity list (last 10 credit transactions)
+- [ ] "View Full History" link to credit history page
+- [ ] For Basic (free) tier: Shows simplified view with upgrade CTA instead of billing details
+- [ ] Uses `useSubscription` context for data
+- [ ] Calls `GET /api/credits/balance` and `GET /api/credits/history?limit=10` on mount
+
+**Files:**
+- Create: `src/components/billing/BillingDashboard.jsx`
+
+---
+
+#### Story 5.2: Create Credit Pack Purchase Modal
+
+**As a** subscriber, **I want** to purchase additional credit packs, **so that** I can continue using tools when my monthly credits run out.
+
+**AC:**
+- [ ] Create `src/components/billing/CreditPackModal.jsx`
+- [ ] Modal with 3 pack options: Starter ($15), Pro ($60), Mega ($200)
+- [ ] Each option shows: pack name, standard credits, AI credits, price, price-per-credit calculation
+- [ ] "Buy Now" button calls `POST /api/checkout/create-pack-session` → redirects to Stripe Checkout
+- [ ] Disabled for Basic (free) tier users with "Upgrade to purchase credit packs" message
+- [ ] Accessible: focus trap, escape to close, proper ARIA attributes
+
+**Files:**
+- Create: `src/components/billing/CreditPackModal.jsx`
+
+---
+
+#### Story 5.3: Create Invoice History Page
+
+**As a** subscriber, **I want** to view my invoice history, **so that** I can track my payments and download receipts.
+
+**AC:**
+- [ ] Create `src/components/billing/InvoiceHistory.jsx`
+- [ ] Paginated table with columns: Invoice #, Date, Amount, Status (badge), Actions
+- [ ] Status badges: Paid (green), Open (yellow), Void (gray)
+- [ ] Actions: "View" (opens Stripe-hosted invoice in new tab), "Download PDF"
+- [ ] Status filter dropdown (All, Paid, Open, Void)
+- [ ] Calls `GET /api/billing/invoices` with pagination and filter params
+- [ ] Empty state for users with no invoices
+- [ ] Back link to billing dashboard
+
+**Files:**
+- Create: `src/components/billing/InvoiceHistory.jsx`
+
+---
+
+#### Story 5.4: Create Plan Management Page
+
+**As a** subscriber, **I want** to upgrade, downgrade, or change my plan, **so that** I can adjust my subscription as my needs change.
+
+**AC:**
+- [ ] Create `src/components/billing/PlanManagement.jsx`
+- [ ] Shows current plan highlighted with "Current" badge
+- [ ] All other plans shown side-by-side with comparison of what changes
+- [ ] Upgrade: Shows prorated cost, "Upgrade Now" button, confirmation modal
+- [ ] Downgrade: Shows "Takes effect [date]" note, "Schedule Downgrade" button, confirmation modal
+- [ ] Confirmation modals explain exactly what will happen (immediate charge vs end-of-period change)
+- [ ] Calls appropriate subscription API endpoints on confirm
+- [ ] After successful change: Shows success toast, updates SubscriptionContext
+- [ ] Back link to billing dashboard
+
+**Files:**
+- Create: `src/components/billing/PlanManagement.jsx`
+
+---
+
+#### Story 5.5: Create Credit History Page
+
+**As a** subscriber, **I want** to see a detailed log of all my credit transactions, **so that** I can understand my usage patterns.
+
+**AC:**
+- [ ] Create `src/components/billing/CreditHistory.jsx`
+- [ ] Table with columns: Date/Time, Action (with tool icon), Credit Type, Amount (+/-), Balance After
+- [ ] Filter by credit type: All, Standard, AI
+- [ ] Date range picker (uses existing `react-datepicker` dependency)
+- [ ] Pagination (50 per page)
+- [ ] "Export to CSV" button
+- [ ] Calls `GET /api/credits/history` with filters
+- [ ] Color coding: debits in red, credits/resets in green
+- [ ] Back link to billing dashboard
+
+**Files:**
+- Create: `src/components/billing/CreditHistory.jsx`
+
+---
+
+#### Story 5.6: Create Auto-Refill Settings Component
+
+**As a** subscriber, **I want** to configure auto-refill for credit packs, **so that** I never get interrupted by running out of credits.
+
+**AC:**
+- [ ] Create `src/components/billing/AutoRefillSettings.jsx` (used within BillingDashboard)
+- [ ] Toggle switch to enable/disable auto-refill
+- [ ] Dropdown to select pack type (Starter, Pro, Mega) when enabled
+- [ ] Shows: "Auto-purchases this month: 1/3" with cap explanation
+- [ ] Calls `POST /api/credits/auto-refill` on save
+- [ ] Warning text: "Auto-refill will purchase up to 3 packs per month when your balance reaches 0"
+- [ ] Disabled for Basic tier
+
+**Files:**
+- Create: `src/components/billing/AutoRefillSettings.jsx`
+
+---
+
+#### Story 5.7: Create Nonprofit Verification Status Page
+
+**As a** nonprofit user, **I want** to check the status of my verification and manage re-verification, **so that** I can maintain my discounted pricing.
+
+**AC:**
+- [ ] Create `src/components/billing/NonprofitVerification.jsx`
+- [ ] Shows current verification status with visual tracker: Submitted → In Review → Approved/Rejected
+- [ ] If approved: Shows organization name, verified date, expiration date
+- [ ] If rejected: Shows rejection reason and "Re-apply" button
+- [ ] If expired: Shows "Re-verification required" prompt with upload form
+- [ ] If no verification: Shows application form (same as registration nonprofit step)
+- [ ] Calls `GET /api/nonprofit/verification-status` on mount
+- [ ] Only accessible to users on nonprofit tier or applying for it
+
+**Files:**
+- Create: `src/components/billing/NonprofitVerification.jsx`
+
+---
+
+#### Story 5.8: Add Billing Routes to App Router
+
+**As a** developer, **I want** all billing pages properly routed, **so that** users can navigate to billing features.
+
+**AC:**
+- [ ] Add routes to `src/App.jsx`:
+  - `/app/billing` → `BillingDashboard`
+  - `/app/billing/invoices` → `InvoiceHistory`
+  - `/app/billing/plans` → `PlanManagement`
+  - `/app/billing/credits` → `CreditHistory`
+  - `/app/billing/nonprofit` → `NonprofitVerification`
+- [ ] All billing routes wrapped in `ProtectedRoute`
+- [ ] Add lazy imports for all billing components
+- [ ] Add "Billing" link to authenticated navigation/sidebar
+- [ ] Add credit balance indicator to app header (compact: "Credits: 350 | AI: 90")
+- [ ] Redirect `/billing` → `/app/billing`
+
+**Files:**
+- Modify: `src/App.jsx`
+- Modify: `src/components/layouts/ToolLayout.jsx` or relevant navigation component (add Billing nav item and credit indicator)
+
+---
+
+### BATCH 6: Usage Enforcement & Feature Gating
+
+**Dependencies**: Batch 1 (SubscriptionContext, tier configs), Batch 2 (credit consume API)
+**Estimated scope**: ~20 files modified
+**Goal**: Integrate credit checking and feature gating into all existing tool components.
+
+---
+
+#### Story 6.1: Create useCredits Hook
+
+**As a** developer, **I want** a reusable hook for checking and consuming credits, **so that** I can easily gate tool actions across the app.
+
+**AC:**
+- [ ] Create `src/hooks/useCredits.js` (see Section 7.3 for full spec)
+- [ ] Provides: `canAfford(action)`, `consumeCredits(action, toolName, resourceId)`, `credits`, `isLoading`, `showUpgradePrompt()`
+- [ ] `canAfford` looks up action in `CREDIT_COSTS`, checks balance from SubscriptionContext
+- [ ] `consumeCredits` calls `POST /api/credits/consume` via api client, updates local state on success
+- [ ] Handles 402 responses (insufficient credits) — returns structured error with upgrade options
+- [ ] Uses `useSubscription` context internally
+- [ ] Add unit tests
+
+**Files:**
+- Create: `src/hooks/useCredits.js`
+- Create: `src/hooks/__tests__/useCredits.test.js`
+
+---
+
+#### Story 6.2: Create useFeatureGate Hook
+
+**As a** developer, **I want** a reusable hook for checking tier-based feature access, **so that** I can gate features that are tier-restricted.
+
+**AC:**
+- [ ] Create `src/hooks/useFeatureGate.js` (see Section 7.4 for full spec)
+- [ ] Provides: `canAccess(featureName)`, `tierRequired(featureName)`, `currentTier`, `showUpgradeFor(featureName)`
+- [ ] Feature names map to tier config feature flags (see Section 7.4 table)
+- [ ] Returns minimum tier required for a feature
+- [ ] Uses `useSubscription` context internally
+- [ ] Add unit tests
+
+**Files:**
+- Create: `src/hooks/useFeatureGate.js`
+- Create: `src/hooks/__tests__/useFeatureGate.test.js`
+
+---
+
+#### Story 6.3: Create Shared Gating UI Components
+
+**As a** user, **I want** clear visual feedback about credit costs and upgrade paths, **so that** I understand the value of upgrading.
+
+**AC:**
+- [ ] Create `src/components/shared/CreditBadge.jsx`:
+  - Small inline badge: "5 credits" or "3 AI credits" with coin icon
+  - Props: `action` (looks up cost from `CREDIT_COSTS`), `size` ('sm' | 'md')
+  - Color: default gray, yellow when <25% credits remaining, red when can't afford
+- [ ] Create `src/components/shared/UpgradePrompt.jsx`:
+  - Modal variant: Full upgrade modal with plan comparison and CTA
+  - Banner variant: Inline banner with dismiss button
+  - Props: `feature` (for feature gate), `action` (for credit gate), `variant` ('modal' | 'banner')
+  - Shows current plan, recommended upgrade, and benefits of upgrading
+  - "Upgrade" button links to `/app/billing/plans`
+  - "Buy Credits" button opens CreditPackModal (if credit-gated)
+- [ ] Create `src/components/shared/TierBadge.jsx`:
+  - Small badge showing tier name with tier-appropriate color
+  - Props: `tier` string
+  - Used in profile, billing, admin views
+- [ ] Create `src/components/shared/SubscriptionBanner.jsx`:
+  - Persistent banner for non-active subscription states (past_due, canceled, paused, incomplete)
+  - Color and messaging per status (see Section 7.10)
+  - Dismissible for "canceled before period end" and "trialing"
+  - Not dismissible for past_due and incomplete
+  - Placed at top of app layout
+
+**Files:**
+- Create: `src/components/shared/CreditBadge.jsx`
+- Create: `src/components/shared/UpgradePrompt.jsx`
+- Create: `src/components/shared/TierBadge.jsx`
+- Create: `src/components/shared/SubscriptionBanner.jsx`
+
+---
+
+#### Story 6.4: Integrate Credit Gating into Tool Components
+
+**As a** user on a limited plan, **I want** to see credit costs on actions and be prompted to upgrade when I run out, **so that** I understand the value and can purchase more.
+
+**AC:**
+- [ ] Add `useCredits` hook and `CreditBadge` to all components listed in Section 7.5:
+  - `ProjectCreationWizard.jsx` — Gate `project_create`
+  - `PdfExportModal.jsx` — Gate `export_pdf`
+  - `AuditUploadScreen.jsx` — Gate `audit_upload`
+  - `AISuggestions.jsx` — Gate `ai_audit_suggestions`
+  - `AccessibilityUploadScreen.jsx` — Gate `accessibility_upload`
+  - `FixSuggestionsPanel.jsx` — Gate `ai_accessibility_suggestions`
+  - `VPATReportGenerator.jsx` — Gate `vpat_generate`
+  - `MetaUploadScreen.jsx` — Gate `ai_meta_title`, `ai_meta_description`
+  - `CompetitorAnalysisPanel.jsx` — Gate `ai_competitor_analysis`
+  - `ABVariantsPanel.jsx` — Gate `ai_ab_variants`
+  - `ImageAltUploadScreen.jsx` — Gate `image_upload_batch`, `ai_alt_text`
+  - `ReadabilityInputScreen.jsx` — Gate `readability_analyze`
+  - `ReadabilityLLMPreview.jsx` — Gate `ai_readability_rewrite`
+  - `ExportHubPage.jsx` — Gate `export_pdf`, `export_excel`
+  - `ScheduledReportsPanel.jsx` — Gate `schedule_audit`
+- [ ] Pattern for each component:
+  1. Import `useCredits` hook
+  2. Add `CreditBadge` next to action button
+  3. Wrap action handler with `canAfford` check → `consumeCredits` call → then original action
+  4. Show `UpgradePrompt` if insufficient credits
+- [ ] Do NOT break existing functionality — if credit check fails, show prompt but don't crash
+
+**Files:**
+- Modify: All 15+ components listed above (see Section 7.5 for full file paths)
+
+---
+
+#### Story 6.5: Integrate Feature Gating
+
+**As a** user on a limited plan, **I want** to see which features require an upgrade, **so that** I understand the value of higher tiers.
+
+**AC:**
+- [ ] Add `useFeatureGate` checks to:
+  - Team Management page — Gate `teamManagement` (Agency only)
+  - Export Hub — Gate `exportExcel`, `exportCsv` (paid tiers only)
+  - Scheduled Reports — Gate `scheduledAudits` (paid tiers with count limits)
+  - Shared Reports — Gate `sharedReports` (paid tiers)
+  - Schema Generator — Gate `allSchemaTypes` (Basic limited to 3 types)
+  - Project Creation — Gate `multiProject` (check project count against tier limit)
+- [ ] For gated features: Show disabled state with `UpgradePrompt` explaining which tier unlocks the feature
+- [ ] Add project count display: "Projects: 1/1" or "3/10" or "15/∞" in project dashboard
+- [ ] Add `SubscriptionBanner` to main app layout for non-active subscription states
+
+**Files:**
+- Modify: `src/components/projects/TeamManagementPage.jsx`
+- Modify: `src/components/export/ExportHubPage.jsx`
+- Modify: `src/components/reports/ScheduledReportsPanel.jsx`
+- Modify: `src/components/projects/ProjectCreationWizard.jsx`
+- Modify: `src/components/projects/ProjectDashboard.jsx`
+- Modify: `src/components/layouts/ToolLayout.jsx` (add SubscriptionBanner)
+
+---
+
+### BATCH 7: Admin Features & Observability
+
+**Dependencies**: Batch 1 (data models), Batch 2 (admin API endpoints)
+**Estimated scope**: ~5 files created/modified
+**Goal**: Build admin dashboards for subscription management, nonprofit verification, and revenue analytics.
+
+---
+
+#### Story 7.1: Create Subscription Admin Dashboard
+
+**As an** admin, **I want** a dashboard showing subscription metrics, revenue, and subscriber details, **so that** I can monitor the business health.
+
+**AC:**
+- [ ] Create `src/components/admin/SubscriptionDashboard.jsx` (see Section 8.2)
+- [ ] Key metrics cards: MRR, Total Subscribers, Churn Rate, New Subscriptions, ARPU, Credit Pack Revenue, Total Revenue
+- [ ] Charts (using existing `chart.js` + `react-chartjs-2` dependencies):
+  - MRR trend line chart (30/60/90 day toggle)
+  - Subscribers by tier bar chart
+  - Revenue breakdown pie chart
+- [ ] Subscriber table: sortable, filterable by tier/status, paginated
+- [ ] Calls `GET /api/admin/subscriptions/summary` and `GET /api/admin/subscriptions/list`
+- [ ] Admin-only access (check `userProfile.role === 'admin'`)
+
+**Files:**
+- Create: `src/components/admin/SubscriptionDashboard.jsx`
+
+---
+
+#### Story 7.2: Create Nonprofit Verification Queue
+
+**As an** admin, **I want** to review and approve/reject nonprofit verification requests, **so that** only legitimate nonprofits get the discounted pricing.
+
+**AC:**
+- [ ] Create `src/components/admin/NonprofitVerificationQueue.jsx` (see Section 8.3)
+- [ ] Pending queue table: Organization, Applicant, Submitted date, Document link, Actions
+- [ ] Review modal: Shows document (PDF/image viewer), organization details, EIN
+- [ ] "Approve" button: Calls `POST /api/nonprofit/review` with `decision: 'approved'`
+- [ ] "Reject" button: Opens text input for rejection reason, then calls API
+- [ ] Verification history tab: All past verifications with search and filter
+- [ ] Calls `GET /api/admin/nonprofit/pending` for queue
+- [ ] Real-time badge showing count of pending requests
+
+**Files:**
+- Create: `src/components/admin/NonprofitVerificationQueue.jsx`
+
+---
+
+#### Story 7.3: Extend Usage Analytics Dashboard
+
+**As an** admin, **I want** credit consumption and cost analytics, **so that** I can ensure pricing covers costs and detect abuse.
+
+**AC:**
+- [ ] Extend existing `src/components/admin/UsageAnalyticsDashboard.jsx`:
+  - Add "Credits" tab/section alongside existing tool usage
+  - Credit consumption by tier chart
+  - AI cost estimation based on usage events
+  - Top 10 credit consumers table
+  - Credit pack purchase patterns
+- [ ] Calls `GET /api/admin/usage/top-consumers`
+- [ ] Add margin analysis section: Revenue vs estimated costs per tier
+
+**Files:**
+- Modify: `src/components/admin/UsageAnalyticsDashboard.jsx`
+
+---
+
+#### Story 7.4: Add Admin Routes
+
+**As an** admin, **I want** admin billing pages routed in the app, **so that** I can navigate to them.
+
+**AC:**
+- [ ] Add routes to `src/App.jsx`:
+  - `/app/admin/subscriptions` → `SubscriptionDashboard`
+  - `/app/admin/nonprofits` → `NonprofitVerificationQueue`
+- [ ] Routes wrapped in `ProtectedRoute` and admin role check
+- [ ] Add links in admin navigation (if an admin nav exists, otherwise add to settings/profile)
+- [ ] Add lazy imports
+
+**Files:**
+- Modify: `src/App.jsx`
+
+---
+
+## 10. Implementation Notes & Conventions
+
+### 10.1 Code Conventions
+
+- Follow existing project patterns: functional components, hooks, Tailwind CSS utility classes
+- Use existing color system: `primary`, `charcoal`, `emerald`, `cyan`, `amber`, `rose`, `violet`
+- Import icons from `lucide-react` (already a dependency)
+- Use `react-hot-toast` for success/error notifications (already a dependency)
+- Use `react-hook-form` for complex forms (already a dependency)
+- API calls use the `src/lib/api.js` client (created in Batch 4)
+
+### 10.2 Testing Strategy
+
+- Unit tests for tier configs, credit calculations, and hook logic (using `vitest`)
+- Integration tests for API endpoints (using `supertest` in server tests)
+- Component tests for critical UI flows (using `@testing-library/react`)
+- Manual testing of Stripe Checkout and webhook flows (use Stripe CLI for local webhook testing)
+
+### 10.3 Stripe Testing
+
+- Use Stripe test mode for all development
+- Test card numbers: `4242 4242 4242 4242` (success), `4000 0000 0000 0002` (decline)
+- Use Stripe CLI for local webhook forwarding: `stripe listen --forward-to localhost:3001/webhooks/stripe`
+- Test all webhook event types before deploying
+
+### 10.4 Environment Setup Checklist
+
+1. Create Stripe account and get test API keys
+2. Create Products, Prices, and Coupons in Stripe Dashboard (see Section 3.10)
+3. Configure Stripe Customer Portal settings (payment methods, invoice history, cancellation)
+4. Set up Stripe webhook endpoint (test with CLI, then configure in Stripe Dashboard for production)
+5. Create `server/.env` with all required variables (see Section 3.11)
+6. Add `VITE_API_URL` and `VITE_STRIPE_PUBLISHABLE_KEY` to frontend `.env`
+7. Run user migration script (Story 1.5)
+
+### 10.5 Deployment Considerations
+
+- Backend server needs to be deployed separately from the Vite SPA (e.g., Railway, Render, Fly.io, or Firebase Cloud Run)
+- Stripe webhook URL must be updated to production URL after deployment
+- CORS origins must be updated for production frontend URL
+- Firebase Admin SDK credentials must be securely stored (environment variables, not committed)
+- Enable Stripe production mode and swap API keys for go-live
+
+### 10.6 Security Considerations
+
+- Never log full Stripe webhook payloads (may contain PII)
+- Never store raw card data (all handled by Stripe)
+- Firebase Admin SDK private key must never be exposed to frontend
+- Rate limit all API endpoints to prevent abuse
+- Validate all inputs server-side (don't trust frontend validation alone)
+- Use Stripe webhook signature verification to prevent spoofed events
+- Implement CSRF protection on state-changing endpoints
+
+---
+
+## Appendix A: Batch Dependency Graph
+
+```
+Batch 1: Data Model Foundation
+    │
+    ├──> Batch 2: Backend API (depends on Batch 1)
+    │        │
+    │        ├──> Batch 4: Registration Flow (depends on Batch 1 + 2)
+    │        │
+    │        ├──> Batch 5: Billing UI (depends on Batch 1 + 2)
+    │        │
+    │        └──> Batch 7: Admin Features (depends on Batch 1 + 2)
+    │
+    ├──> Batch 3: Pricing Page (depends on Batch 1 only)
+    │
+    └──> Batch 6: Usage Enforcement (depends on Batch 1 + 2)
+```
+
+**Recommended execution order**: 1 → 2 → 3 (parallel with 2) → 4 → 5 → 6 → 7
+
+Batch 3 (Pricing Page) can be built in parallel with Batch 2 since it only depends on Batch 1 (tier configs) and doesn't need the backend API.
+
+---
+
+## Appendix B: File Manifest
+
+### New Files to Create
+
+| File | Batch | Type |
+|------|-------|------|
+| `src/config/tiers.js` | 1 | Config |
+| `src/config/__tests__/tiers.test.js` | 1 | Test |
+| `src/contexts/SubscriptionContext.jsx` | 1 | Context |
+| `src/contexts/__tests__/SubscriptionContext.test.jsx` | 1 | Test |
+| `firestore.rules` | 1 | Config |
+| `server/package.json` | 2 | Config |
+| `server/.env.example` | 2 | Config |
+| `server/src/index.js` | 2 | Server |
+| `server/src/config/stripe.js` | 2 | Config |
+| `server/src/config/firebase.js` | 2 | Config |
+| `server/src/config/tiers.js` | 2 | Config |
+| `server/src/middleware/auth.js` | 2 | Middleware |
+| `server/src/middleware/adminOnly.js` | 2 | Middleware |
+| `server/src/middleware/rateLimiter.js` | 2 | Middleware |
+| `server/src/middleware/errorHandler.js` | 2 | Middleware |
+| `server/src/routes/webhooks.js` | 2 | Route |
+| `server/src/routes/checkout.js` | 2 | Route |
+| `server/src/routes/subscriptions.js` | 2 | Route |
+| `server/src/routes/credits.js` | 2 | Route |
+| `server/src/routes/billing.js` | 2 | Route |
+| `server/src/routes/nonprofit.js` | 2 | Route |
+| `server/src/services/webhookService.js` | 2 | Service |
+| `server/src/services/checkoutService.js` | 2 | Service |
+| `server/src/services/subscriptionService.js` | 2 | Service |
+| `server/src/services/creditService.js` | 2 | Service |
+| `server/src/services/usageService.js` | 2 | Service |
+| `server/src/services/nonprofitService.js` | 2 | Service |
+| `server/src/utils/logger.js` | 2 | Utility |
+| `server/scripts/migrate-users.js` | 1 | Script |
+| `server/tests/*.test.js` (6 files) | 2 | Tests |
+| `src/components/public/PricingPage.jsx` | 3 | Component |
+| `src/components/public/PricingComparisonTable.jsx` | 3 | Component |
+| `src/components/auth/PlanConfirmationStep.jsx` | 4 | Component |
+| `src/components/auth/NonprofitVerificationStep.jsx` | 4 | Component |
+| `src/components/auth/RegistrationSuccess.jsx` | 4 | Component |
+| `src/lib/api.js` | 4 | Utility |
+| `src/components/billing/BillingDashboard.jsx` | 5 | Component |
+| `src/components/billing/CreditPackModal.jsx` | 5 | Component |
+| `src/components/billing/InvoiceHistory.jsx` | 5 | Component |
+| `src/components/billing/PlanManagement.jsx` | 5 | Component |
+| `src/components/billing/CreditHistory.jsx` | 5 | Component |
+| `src/components/billing/AutoRefillSettings.jsx` | 5 | Component |
+| `src/components/billing/NonprofitVerification.jsx` | 5 | Component |
+| `src/hooks/useCredits.js` | 6 | Hook |
+| `src/hooks/useFeatureGate.js` | 6 | Hook |
+| `src/components/shared/CreditBadge.jsx` | 6 | Component |
+| `src/components/shared/UpgradePrompt.jsx` | 6 | Component |
+| `src/components/shared/TierBadge.jsx` | 6 | Component |
+| `src/components/shared/SubscriptionBanner.jsx` | 6 | Component |
+| `src/components/admin/SubscriptionDashboard.jsx` | 7 | Component |
+| `src/components/admin/NonprofitVerificationQueue.jsx` | 7 | Component |
+
+### Existing Files to Modify
+
+| File | Batch | Changes |
+|------|-------|---------|
+| `src/contexts/AuthContext.jsx` | 1 | Add tier fields to user doc creation |
+| `src/App.jsx` | 1, 3, 5, 7 | Add SubscriptionProvider, routes |
+| `src/components/auth/RegisterForm.jsx` | 4 | Multi-step flow, tier selection |
+| `src/components/public/PublicNavigation.jsx` | 3 | Add Pricing link |
+| `src/components/public/LandingPage.jsx` | 3 | Add pricing CTA |
+| `src/config/seo.js` | 3 | Add pricing page SEO config |
+| `src/components/home/HomePage.jsx` | 4 | Handle subscription URL params |
+| `src/components/layouts/ToolLayout.jsx` | 5, 6 | Add billing nav, credit indicator, SubscriptionBanner |
+| `src/components/admin/UsageAnalyticsDashboard.jsx` | 7 | Add credit consumption analytics |
+| 15+ tool components | 6 | Add credit gating (see Section 7.5) |
+
+---
+
+*End of requirements document.*
