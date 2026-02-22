@@ -3185,4 +3185,635 @@ Batch 3 (Pricing Page) can be built in parallel with Batch 2 since it only depen
 
 ---
 
+## 11. Legal & Compliance Requirements <!-- Added per Wave 1 expert review -->
+
+> **Status:** Required before any paid subscription goes live. All items in this section are blocking unless marked otherwise.
+
+### 11.1 Pre-Launch Legal Checklist
+
+The following must be completed before any paid subscription is accepted:
+
+| # | Requirement | Owner | Blocking? |
+|---|------------|-------|-----------|
+| L-01 | Terms of Service drafted and reviewed by outside counsel | Legal | Yes |
+| L-02 | Privacy Policy updated for new data processing activities | Legal | Yes |
+| L-03 | Stripe Data Processing Agreement executed | Legal / Engineering | Yes (EU/UK launch) |
+| L-04 | Google Cloud / Firebase DPA reviewed and accepted | Legal / Engineering | Yes (EU/UK launch) |
+| L-05 | Auto-renewal disclosures compliant with FTC Negative Option Rule, California ARL | Legal | Yes |
+| L-06 | Refund and cancellation policy finalized and published | Legal | Yes |
+| L-07 | Auto-refill authorization disclosure reviewed by legal | Legal | Yes |
+| L-08 | OFAC sanctions screening implemented | Engineering | Yes |
+| L-09 | Age verification attestation added to registration | Engineering | Yes |
+| L-10 | Money transmission legal analysis for credit system | Outside Counsel | Yes |
+| L-11 | PCI-DSS SAQ-A self-assessment completed | Engineering / Legal | Yes |
+| L-12 | SLA terms with defined remedies added to ToS | Legal | Yes |
+| L-13 | AI output disclaimer and IP ownership provisions in ToS | Legal | Yes |
+| L-14 | Indemnification, limitation of liability, dispute resolution in ToS | Legal | Yes |
+| L-15 | Credit system legal constraints documented in ToS | Legal | Yes |
+| L-16 | Nonprofit fraud liability and clawback provisions in ToS | Legal | Yes |
+| L-17 | Data breach notification procedure documented | Legal / Engineering | No (pre-launch) |
+| L-18 | Cyber liability insurance reviewed for SaaS payment coverage | Legal / Finance | No (pre-launch) |
+
+### 11.2 Terms of Service — Required Sections
+
+The Terms of Service must include a dedicated "Subscription and Billing" section covering:
+
+1. **Auto-renewal**: Exact renewal price, interval, cancellation deadline, how to cancel, that cancellation takes effect at period end
+2. **Cancellation**: Steps to cancel, access after cancellation, data retention after cancellation
+3. **Refunds**: Refund policy for monthly plans, EU/UK 14-day withdrawal right and waiver, credit pack refund conditions
+4. **Overage billing**: Per-credit overage rates by tier, that overages are billed on next invoice, how to view current overage
+5. **Auto-refill**: Authorization scope (pack type, price per trigger, monthly maximum), how to disable, post-charge notification commitment
+6. **Credit system**: Non-transferability, no cash redemption, monthly credit expiration, bonus credit conditions, credit pack expiration (12 months)
+7. **Price changes**: Minimum notice period (30 days US, 60 days EU), cancellation right before new price takes effect
+8. **SLA**: Response time definitions, remedy (service credits), cap on credit liability, force majeure exclusion
+9. **Limitation of liability**: Cap at 12 months' fees paid, exclusion of consequential damages
+10. **Dispute resolution**: Arbitration clause, small claims carve-out, class action waiver, governing law and venue
+11. **AI output**: Disclaimer of warranties, human review requirement, IP ownership (license to user, not assignment)
+12. **Nonprofit tier**: Eligibility requirements, documentation obligations, anti-fraud attestation, clawback on fraud
+
+### 11.3 GDPR / CCPA Compliance Package
+
+Before EU/UK launch, the following must be completed:
+
+- **Record of Processing Activities (RoPA):** Document lawful basis, purpose, retention period, and recipients for each Firestore collection: `users`, `subscriptions`, `credit_balances`, `credit_transactions`, `usage_events`, `invoices`, `credit_packs`, `nonprofit_verifications`, `tos_acceptances`
+- **Data Subject Rights:** Implement `GET /api/privacy/data-export` and `POST /api/privacy/delete-account` (see Section 4.8)
+- **Retention Policy:** Each collection must have a defined retention period. `usage_events` must have an automated deletion schedule (recommend: 24 months rolling)
+- **Sub-Processor Disclosure:** Stripe and Google Cloud/Firebase must be listed as named sub-processors in the Privacy Policy
+- **International Transfer Mechanism:** Execute Firebase Data Processing Addendum (incorporating SCCs) before accepting EU user data
+
+---
+
+## 12. Transactional Email System <!-- Added per Wave 1 expert review -->
+
+### 12.1 Email Provider
+
+Transactional emails are sent via a provider integrated into the Node/Express backend via `server/src/services/emailService.js`. Recommended providers: Postmark (superior deliverability for transactional) or SendGrid.
+
+### 12.2 Required Email Templates
+
+| Event | Trigger | Recipient | Content Required |
+|-------|---------|-----------|-----------------|
+| Subscription Confirmed | `checkout.session.completed` | User | Tier name, price, credit allocation, next billing date, billing dashboard link |
+| Payment Failed | `invoice.payment_failed` | User | Amount due, update payment link, grace period end date |
+| Subscription Canceled | User or admin cancels | User | Effective date, data retention warning, resubscribe link |
+| Subscription Reactivated | `POST /subscriptions/reactivate` | User | Plan reinstated, next billing date |
+| Plan Upgraded | Subscription updated upward | User | Old plan, new plan, credits added, amount charged |
+| Plan Downgraded (scheduled) | Subscription updated downward | User | Effective date, new plan details, credit reduction |
+| Auto-Refill Enabled | `POST /api/credits/auto-refill` enabled=true | User | Pack type, per-occurrence price, monthly max, how to disable |
+| Auto-Refill Charge | Each auto-refill purchase | User | Pack purchased, credits added, month-to-date spend |
+| Cancellation Confirmation | `POST /subscriptions/cancel` | User | Explicit confirmation, access end date, no further charges, resubscribe link |
+| Price Change Notice | Admin triggers notification | User | Current price, new price, effective date, one-click cancel link |
+| Nonprofit Approved | Admin approves | User | Checkout link, tier details, verification expiry date |
+| Nonprofit Rejected | Admin rejects | User | Rejection reason, re-application instructions |
+| Nonprofit Expiring Soon | 30 days before `expiresAt` | User | Re-verification instructions, expiry date |
+| Data Deletion Complete | `POST /api/privacy/delete-account` | User | Confirmation, what was deleted, what was retained |
+| Credit Reset (opt-in) | `invoice.paid` | User | Credits reset, new balance, billing period start |
+| Low Credit Warning (opt-in) | Credits fall below 20% | User | Current balance, top-up options |
+
+### 12.3 Implementation Requirements
+
+**Story 2.12 — Email Service**
+
+**AC:**
+- [ ] Create `server/src/services/emailService.js` with `sendEmail(to, templateId, variables)` function
+- [ ] All template IDs stored as environment variables (`EMAIL_TEMPLATE_*`)
+- [ ] Billing-critical emails (payment failed, subscription confirmed, cancellation confirmation) are **not** opt-out — always sent
+- [ ] Auto-refill charge notification is not opt-out (legal requirement per FTC Negative Option Rule)
+- [ ] Cancellation confirmation email is not opt-out (legal requirement per FTC Negative Option Rule)
+- [ ] Credit reset and low credit warning emails are opt-in (default: off); preference stored in user document as `emailPreferences: { creditReset: boolean, lowCreditWarning: boolean }`
+- [ ] Email sending failures are logged but do not cause API request failures (fire-and-forget pattern with error logging)
+- [ ] Admin can trigger re-send of any billing email from the subscriber management table (Section 8.2.3)
+- [ ] All email templates must be version-controlled and treat content changes as material policy updates requiring legal review
+
+**Files:**
+- Create: `server/src/services/emailService.js`
+- Modify: `server/src/services/subscriptionService.js` (trigger emails on all subscription events)
+- Modify: `server/src/services/webhookService.js` (trigger payment failed, subscription updated emails)
+
+---
+
+## 13. Annual Pricing & Billing Intervals <!-- Added per Wave 1 expert review -->
+
+### 13.1 Annual Plan Definitions
+
+Each paid tier must offer an annual billing option at a 17% discount (equivalent to 2 months free). Annual plans are billed upfront for 12 months.
+
+| Tier | Monthly Price | Annual (per month) | Annual Total | Annual Savings |
+|------|--------------|-------------------|--------------|----------------|
+| Client Side | $99/month | $82/month | $984/year | $204/year |
+| Freelance | $149/month | $124/month | $1,488/year | $300/year |
+| Agency | $299/month | $249/month | $2,988/year | $600/year |
+| Nonprofit | $49/month | $41/month | $492/year | $96/year |
+
+### 13.2 Annual Plan Requirements
+
+- Annual plans are billed upfront via Stripe with `interval: 'year'`
+- Credit allocations are identical to monthly plans — credits reset **monthly**, not annually
+- Annual subscribers do not receive prorated refunds on downgrade — plan changes take effect at annual renewal date
+- The billing dashboard must display: annual renewal date, total next charge amount, and option to switch to monthly at renewal
+- Price change notifications for annual subscribers must be sent at least 60 days before renewal (vs. 30 days for monthly)
+- Annual subscribers receive a 14-day cancellation window for full refund after initial purchase (vs. 24 hours for monthly)
+
+### 13.3 Stripe Configuration — Annual Price IDs
+
+Add to Section 3.10 (Stripe Products and Prices):
+
+```
+STRIPE_PRICE_CLIENT_ANNUAL=price_...    # $984/year
+STRIPE_PRICE_FREELANCE_ANNUAL=price_... # $1,488/year
+STRIPE_PRICE_AGENCY_ANNUAL=price_...    # $2,988/year
+STRIPE_PRICE_NONPROFIT_ANNUAL=price_... # $492/year
+```
+
+Add to `TIER_CONFIGS`:
+```javascript
+clientSide: {
+  // ...existing fields...
+  monthlyPriceId: process.env.STRIPE_PRICE_CLIENT_MONTHLY,
+  annualPriceId: process.env.STRIPE_PRICE_CLIENT_ANNUAL,
+  annualMonthlyEquivalent: 82,   // Display price per month
+  annualTotal: 984,
+}
+```
+
+### 13.4 Frontend — Annual/Monthly Toggle
+
+**Story 13.1 — Annual Pricing Toggle**
+
+**AC:**
+- [ ] Pricing page includes a toggle: "Monthly | Annual (Save 17%)"
+- [ ] Annual option is not the default (avoid confusion for price-sensitive users)
+- [ ] Annual toggle state persists for the page session
+- [ ] Tier cards show per-month price when annual is selected, with total annual charge shown below: "Billed $984/year"
+- [ ] CTA buttons pass `interval: 'month' | 'year'` to `POST /api/checkout/create-session`
+- [ ] `create-session` endpoint accepts and validates `interval` parameter
+- [ ] `PlanConfirmationStep.jsx` shows the correct interval, total charge, and renewal date for annual plans
+
+---
+
+## 14. Free Trial Strategy <!-- Added per Wave 1 expert review -->
+
+### 14.1 Trial Decision
+
+**Decision: Implement a 14-day free trial on the Freelance tier.**
+
+Rationale: The Freelance tier is the "Most Popular" plan and the primary conversion target. A no-credit-card-required trial on the Freelance tier eliminates commitment friction, allows users to discover the AI credit value proposition, and drives conversion through usage rather than price anchoring alone.
+
+### 14.2 Trial Mechanics
+
+- **Trial length:** 14 days
+- **Credit card required:** No — trial starts without payment method
+- **Trial credit allocation:** Full Freelance allocation (1,500 standard + 400 AI credits) for the 14-day period
+- **At trial end:** User is prompted to enter payment method to continue. If not entered within 3 days of trial end, account reverts to Basic tier.
+- **Trial eligibility:** One trial per email address, one trial per payment method (enforced at conversion)
+- **Stripe implementation:** `trial_period_days: 14` on the subscription creation; `payment_behavior: 'default_incomplete'`
+
+### 14.3 Trial User Stories
+
+**Story 14.1 — Start Freelance Trial**
+
+**AC:**
+- [ ] "Start Free Trial" CTA appears on the Freelance pricing card alongside "Start Freelance" for unauthenticated users
+- [ ] Scenario: User clicks "Start Free Trial" → Registers (or logs in) → Lands on billing dashboard with trial banner: "Your 14-day Freelance trial is active. Add a payment method to continue after [date]."
+- [ ] `subscriptionStatus: 'trialing'` with `trialEndDate: Timestamp` stored in subscription document
+- [ ] Full Freelance tier access enforced during trial
+- [ ] Trial credits provisioned immediately on trial start
+
+**Story 14.2 — Trial Conversion**
+
+**AC:**
+- [ ] 3 days before trial end: Email sent with "Your trial ends in 3 days — add a payment method to continue"
+- [ ] 1 day before trial end: In-app full-screen prompt on next login
+- [ ] Trial end: Stripe attempts charge if payment method present; if payment succeeds, subscription converts to active
+- [ ] If no payment method: subscription reverts to `canceled`, user downgrades to Basic
+- [ ] Billing dashboard shows trial countdown in days when `subscriptionStatus === 'trialing'`
+
+---
+
+## 15. Enterprise Tier — Lead Capture <!-- Added per Wave 1 expert review -->
+
+### 15.1 Enterprise Card on Pricing Page
+
+The pricing page must include an "Enterprise" card after the Agency tier card.
+
+**Card content:**
+- Heading: "Enterprise"
+- Subheading: "For large agencies and organizations"
+- Price display: "Custom pricing"
+- Feature list: All Agency features, Custom credit limits, SSO / SAML, Dedicated Customer Success Manager, Custom SLA, White-glove onboarding, Custom contracts
+- CTA: "Contact Sales" button (opens lead capture modal)
+
+### 15.2 Lead Capture
+
+**Story 15.1 — Enterprise Lead Capture**
+
+**AC:**
+- [ ] "Contact Sales" CTA opens a modal with fields: Full Name, Company, Work Email, Number of team members (dropdown: 1-5, 6-20, 21-100, 100+), Estimated monthly audits (dropdown: <100, 100-500, 500-2000, 2000+), "What are you trying to accomplish?" (textarea)
+- [ ] Form submission writes to `leads/{leadId}` Firestore collection: `{ createdAt, source: 'pricing_page', name, company, email, teamSize, monthlyVolume, goals, userId: string | null }`
+- [ ] Submission sends notification email to internal sales address (`SALES_NOTIFICATION_EMAIL` env var)
+- [ ] Success state: "Thanks! We'll be in touch within 1 business day."
+- [ ] No Stripe integration required for Enterprise in v1
+
+**Files:**
+- Modify: `src/components/public/PricingPage.jsx`
+- Create: `src/components/public/EnterpriseLead Modal.jsx`
+- Modify: `server/src/routes/leads.js` (create route)
+
+---
+
+## 16. Cancellation Retention Flow <!-- Added per Wave 1 expert review -->
+
+### 16.1 Multi-Step Cancellation Modal
+
+When a user initiates cancellation from the billing dashboard, a multi-step retention flow must be presented before confirming cancellation.
+
+**Step 1 — Reason selection:**
+- "Before you go — why are you canceling?" with required selection:
+  - Too expensive
+  - Not using it enough
+  - Missing features I need
+  - Switching to a different tool
+  - Temporary break (I'll be back)
+  - Other (with text field)
+
+**Step 2 — Contextual save offer:**
+
+| Reason | Save Offer |
+|--------|-----------|
+| Too expensive | Offer 1-month pause OR one-time 20% discount coupon (if `STRIPE_RETENTION_COUPON_ID` is configured) |
+| Not using it enough | Offer 1-month pause with credit freeze |
+| Temporary break | Offer pause prominently as primary CTA |
+| Missing features | Show upcoming roadmap items; offer to submit feature request |
+| Switching tools | Show comparison benefit; offer to schedule a demo |
+| Other | Generic offer: pause or discount |
+
+**Step 3 — Confirmation:**
+- If user proceeds: Show plan end date, data retention notice, "I changed my mind" reactivate button (available for 24 hours post-cancel)
+
+### 16.2 Implementation Requirements
+
+**Story 16.1 — Cancellation Retention Flow**
+
+**AC:**
+- [ ] Cancellation is a 3-step modal flow, not a single confirm dialog
+- [ ] Step 1 reason selection is required (cannot skip to confirm)
+- [ ] `cancellationReason: string` and `cancellationFeedback: string | null` stored in subscription document on cancel
+- [ ] Save offer is contextual based on selected reason
+- [ ] Pause offer calls `POST /api/subscriptions/pause` without closing the modal
+- [ ] Discount coupon (if `STRIPE_RETENTION_COUPON_ID` env var is set) applied via Stripe API to next invoice
+- [ ] Cancellation confirmation email sent within 5 minutes of cancellation (non-negotiable — FTC requirement)
+- [ ] Admin cancellation reason breakdown available in Section 8.4 Revenue Analytics
+- [ ] Reactivate option available in billing dashboard for 24 hours post-cancel
+
+---
+
+## 17. Credit System — Amended Policies <!-- Added per Wave 1 expert review -->
+
+### 17.1 Credit Pack Access for All Tiers
+
+Free tier (Basic) users are permitted to purchase one-time credit packs. The previous restriction (403 error for Basic users) is removed.
+
+**Rationale:** Restricting pack purchases to paid subscribers eliminates the primary impulse-purchase conversion path. The canonical freemium conversion pattern is: usage → credit exhaustion → pack purchase → familiarity with AI features → subscription upgrade.
+
+**Changes required:**
+- Remove `403: Free tier users cannot purchase packs` from `POST /api/checkout/create-pack-session`
+- Update feature gate in `useFeatureGate`: `creditPacks: []` (no tiers denied)
+- Update Section 7.4 feature gate table: `creditPacks` row — remove Basic from denied tiers
+- After first pack purchase by a Basic user, set `firstPackPurchasedAt: Timestamp` on user document
+- Show post-purchase upsell banner in billing dashboard for first-time pack purchasers on Basic tier
+
+### 17.2 Credit Pack Legal Constraints
+
+Credit packs are subject to the following legal constraints (also documented in Section 11 and Terms of Service):
+
+| Constraint | Requirement |
+|-----------|-------------|
+| Non-transferability | Credits are non-transferable between accounts; `creditService.js` enforces userId match |
+| No cash redemption | Credits have no cash value; no refund endpoint for consumed credits |
+| Pack expiration | Bonus credits expire 12 months after purchase (`expiresAt: Timestamp` on `credit_packs` document) |
+| Forfeiture on cancellation | Unused monthly credits forfeited at period end; unused bonus credits retained (subject to expiry) |
+| Disclosure | Pack purchase modal must link to credit terms section of ToS |
+
+**Schema change — add to `credit_packs` collection:**
+```javascript
+{
+  // ...existing fields...
+  expiresAt: Timestamp,  // ADD: purchasedAt + 365 days
+}
+```
+
+**Daily cron job addition:** Check `credit_packs` for expired packs (`expiresAt < now` and `remainingCredits > 0`), zero out remaining credits, create `credit_transactions` record with `type: 'expiration'`.
+
+### 17.3 Auto-Refill Authorization Disclosure
+
+The auto-refill feature requires a formal authorization disclosure — not merely a "warning text" — with an affirmative acknowledgment checkbox. This is required under the FTC Negative Option Rule.
+
+**Required disclosure text (display in bordered box above Save button):**
+
+> By enabling auto-refill, you authorize Content Strategy Portal to automatically charge your saved payment method **[PACK_PRICE]** (for a [PACK_TYPE] pack: [STANDARD_CREDITS] standard credits + [AI_CREDITS] AI credits) each time your credit balance reaches zero, up to a maximum of **3 times per calendar month** (maximum **[MAX_MONTHLY_CHARGE]/month**). You may disable auto-refill at any time from this page with immediate effect. Each auto-refill charge will be confirmed by email within 24 hours.
+
+**All values must be interpolated from `CREDIT_PACKS` in `src/config/tiers.js` — not hardcoded.**
+
+**Additional AC for `AutoRefillSettings.jsx`:**
+- [ ] "I authorize these automatic charges" checkbox required (unchecked by default) when enabling auto-refill
+- [ ] "Save" button disabled until checkbox is checked (when enabling — not required when disabling)
+- [ ] `POST /api/credits/auto-refill` endpoint requires `consentConfirmed: true` and `tosVersion: string` in request body when `enabled: true`
+- [ ] Endpoint creates `tos_acceptances` record with `method: 'auto_refill_enable'`
+- [ ] Confirmation email sent within 5 minutes of enabling auto-refill
+
+### 17.4 Grace Period Extension
+
+The past_due grace period is extended from **7 days to 14 days** to align with Stripe Smart Retries (which attempt up to 4 retries over approximately 8 days).
+
+**Change to Section 7.10:**
+
+| Status | Access | UI |
+|--------|--------|----|
+| `past_due` | Full tier access (**grace period: 14 days** from first failure) | Red banner: "Payment failed. Update payment method." |
+| `past_due` (>14 days) | Reverted to Basic limits | Red banner + UpgradePrompt |
+
+**Schema addition — add to `subscriptions` collection:**
+```javascript
+{
+  // ...existing fields...
+  firstPaymentFailedAt: Timestamp | null,  // ADD: set on first invoice.payment_failed; used to calculate grace period
+}
+```
+
+---
+
+## 18. Compliance Data Models <!-- Added per Wave 1 expert review -->
+
+### 18.1 New Collection: `tos_acceptances/{acceptanceId}`
+
+Records of Terms of Service and billing disclosure acceptance. **Immutable — never deleted. Retained 7 years minimum.**
+
+```javascript
+{
+  id: string,
+  userId: string,
+  tosVersion: string,                      // e.g., '2026-02-22-v1.0' from server/src/config/policies.js
+  privacyPolicyVersion: string,
+  aiPolicyVersion: string,
+  autoRenewalDisclosureVersion: string,
+  acceptedAt: Timestamp,
+  ipAddress: string,                       // Captured server-side only
+  userAgent: string,
+  method: string,                          // 'registration' | 'plan_upgrade' | 'auto_refill_enable' | 'plan_reactivation'
+  tier: string,
+  sessionId: string | null,
+  createdAt: Timestamp
+}
+```
+
+**Firestore security rules:**
+- Users may **create** their own records (`userId == request.auth.uid`)
+- **No updates or deletes** permitted for any party (including Admin SDK)
+- Admin SDK read-only for audit purposes
+
+### 18.2 New Collection: `deletion_audit_log/{logId}`
+
+Records of account deletion and pseudonymization events. Immutable.
+
+```javascript
+{
+  id: string,
+  userId: string,                          // The UID of the deleted account
+  requestedAt: Timestamp,
+  completedAt: Timestamp | null,
+  deletedCollections: string[],            // ['usage_events', 'credit_balances', 'credit_packs']
+  pseudonymizedCollections: string[],      // ['users', 'subscriptions', 'invoices', 'credit_transactions', 'tos_acceptances']
+  stripeCanceled: boolean,
+  firebaseAuthDeleted: boolean,
+  adminId: string | null,                  // If admin-initiated
+  createdAt: Timestamp
+}
+```
+
+### 18.3 New Collection: `compliance_screening_events/{eventId}`
+
+OFAC and sanctions screening records. Admin-only access.
+
+```javascript
+{
+  id: string,
+  userId: string | null,
+  screenedFields: string[],               // ['name', 'email', 'organizationName']
+  matchResult: string,                    // 'clear' | 'match' | 'possible_match'
+  action: string,                         // 'allowed' | 'blocked' | 'flagged_for_review'
+  screeningProvider: string,              // 'ofac_sdn' | 'stripe_radar' | 'manual'
+  timestamp: Timestamp,
+  createdAt: Timestamp
+}
+```
+
+### 18.4 Additions to `subscriptions/{subscriptionId}` Schema
+
+```javascript
+{
+  // ...existing fields...
+
+  // Consent and disclosure logging (write-once from backend — Firestore rules must prevent frontend writes)
+  autoRenewalDisclosureAcknowledgedAt: Timestamp | null,
+  autoRenewalDisclosureText: string | null,   // Snapshot of exact disclosure shown
+  tosVersionAccepted: string | null,
+  tosAcceptedAt: Timestamp | null,
+  ipAddressAtSubscription: string | null,     // GDPR: disclosed in Privacy Policy
+  billingCountryCode: string | null,          // ISO 3166-1 alpha-2
+  euWithdrawalWaiverAcknowledgedAt: Timestamp | null,
+
+  // Price change tracking
+  pendingPriceChange: {
+    newAmount: number,
+    effectiveDate: Timestamp,
+    notifiedAt: Timestamp
+  } | null,
+
+  // Cancellation data
+  cancellationReason: string | null,          // From retention flow step 1
+  cancellationFeedback: string | null,        // Free text from 'Other' option
+
+  // Payment failure tracking
+  firstPaymentFailedAt: Timestamp | null,     // For grace period calculation
+
+  // Trial
+  trialEndDate: Timestamp | null,
+  trialConvertedAt: Timestamp | null,
+
+  // New subscription eligibility
+  firstPackPurchasedAt: Timestamp | null,     // For free tier upsell targeting
+  subscriptionCreatedAt: Timestamp,           // For 24-hour cancellation window
+}
+```
+
+---
+
+## 19. New API Endpoints — Wave 1 <!-- Added per Wave 1 expert review -->
+
+### 19.1 Price Change Notification
+
+**POST /api/admin/subscriptions/price-change-notification** *(Admin only)*
+
+Triggers price change notification to all active subscribers on a specified tier, meeting the 30-day advance notice requirement (60 days recommended for EU subscribers).
+
+```
+Request:
+{
+  tier: 'client' | 'freelance' | 'agency' | 'nonprofit',
+  newPrice: number,           // New price in cents
+  effectiveDate: string,      // ISO 8601 — minimum 30 days from now
+  notificationMessage: string | null
+}
+
+Response (200):
+{
+  subscribersNotified: number,
+  scheduledEffectiveDate: string,
+  notificationsSent: boolean
+}
+
+Errors:
+- 400: effectiveDate less than 30 days from now
+- 403: Not admin
+```
+
+**Behavior:**
+- Sends price change email to all active subscribers on affected tier
+- Email includes: current price, new price, effective date, one-click cancellation link
+- Sets `pendingPriceChange` field on each affected subscription document
+- `BillingDashboard` shows notice banner when `pendingPriceChange` is set
+
+### 19.2 Data Subject Rights
+
+**GET /api/privacy/data-export** *(Authenticated user)*
+
+Returns complete JSON export of all personal data for the authenticated user.
+
+```
+Response (200): JSON object containing all personal data across all collections
+```
+
+Includes: user profile, subscription record, credit transactions, invoices, credit packs, nonprofit verification, tos_acceptances records. Excludes: raw usage_events (provide aggregate summary). Must be delivered within 30 days (GDPR Article 12).
+
+---
+
+**POST /api/privacy/delete-account** *(Authenticated user — requires email verification)*
+
+Initiates account deletion with pseudonymization of billing records.
+
+```
+Request:
+{ confirmationToken: string }  // From email verification step
+
+Response (200):
+{ deletionScheduled: true, completionDate: string }
+```
+
+**Behavior:**
+- Soft-deletes user profile: replaces PII with pseudonymized values
+- Cancels active Stripe subscription immediately
+- **Retains** billing records (invoices, credit_transactions, tos_acceptances) in pseudonymized form for 7 years
+- **Deletes** usage_events, credit_balances, credit_packs
+- Purges nonprofit verification documents from Firebase Storage
+- Deletes Firebase Auth account
+- Logs to `deletion_audit_log` collection
+- All deletion events logged to immutable audit log
+
+**Files:**
+- Create: `server/src/routes/privacy.js`
+- Create: `server/src/services/privacyService.js`
+
+### 19.3 OFAC Sanctions Screening
+
+**POST /api/compliance/screen** *(Internal — called by other endpoints)*
+
+Screens a set of fields against the OFAC SDN list and other applicable sanctions lists.
+
+**Integration points:**
+- User registration: screen `name` and `email` domain
+- Nonprofit verification submission: screen `organizationName` and `ein`
+- Checkout session creation: screen by billing country code
+
+**Blocked registrations/sessions return HTTP 403 with non-descriptive error (do not reveal screening logic).**
+
+All screening events logged to `compliance_screening_events` collection (admin-only).
+
+**Files:**
+- Create: `server/src/services/complianceService.js`
+- Modify: `server/src/routes/checkout.js` (add screening)
+- Modify: `server/src/routes/nonprofit.js` (add screening)
+- Modify: `server/src/middleware/auth.js` (add country screening)
+
+### 19.4 Pre-Checkout Disclosure Requirements
+
+**Component: `PlanConfirmationStep.jsx` — New disclosure block required**
+
+The following disclosure must appear **above the payment button** at `PlanConfirmationStep`:
+
+```
+By clicking "Confirm & Pay," you authorize Content Strategy Portal to charge
+your payment method [PRICE]/month starting today, automatically renewing each
+month until you cancel. You may cancel at any time from your Billing Dashboard;
+cancellation takes effect at the end of the current billing period and no
+further charges will occur. Overages may apply at the rates shown. By
+proceeding, you agree to our Terms of Service and Billing Policy.
+```
+
+**[For California users — geo-detected by billing address or browser locale — append:]**
+> To cancel, visit your Billing Dashboard at [URL] or contact support at [email].
+
+**AC:**
+- [ ] Disclosure text interpolates price from `TIER_CONFIGS` — never hardcoded
+- [ ] A separate checkbox: "I understand this subscription renews automatically" must be checked before "Confirm & Pay" button is enabled (distinct from existing Terms/Privacy checkboxes)
+- [ ] Disclosure text and acknowledgment timestamp logged server-side on subscription creation
+- [ ] EU/UK users: display EU withdrawal waiver language; log `euWithdrawalWaiverAcknowledgedAt`
+- [ ] Font size: minimum 12px, not greyed out
+
+### 19.5 Refund and Cancellation Policy Page Section
+
+**Component: `PricingPage.jsx` — New section required**
+
+A "Refund and Cancellation Policy" section must appear on the `/pricing` page and be linked from `PlanConfirmationStep.jsx` and `BillingDashboard.jsx`. Minimum content:
+
+- Cancellations: Access continues to period end; no partial-month refunds for monthly plans
+- EU/UK: 14-day withdrawal right and waiver language (shown only to EU/UK users)
+- Credit packs: Non-refundable once credits consumed; 14-day window for completely unused packs
+- Disputes: Contact support before filing chargeback; 5 business day response commitment
+
+### 19.6 Security Incident Response
+
+**Story 19.1 — Security Event Logging**
+
+**AC:**
+- [ ] `server/src/utils/logger.js` logs the following as structured security events to `security_events` Firestore collection:
+  - Failed Stripe webhook signature verification attempts
+  - Multiple failed authentication attempts on a single account (>5 in 1 hour)
+  - Admin data exports (exporter identity, timestamp, record count)
+  - Bulk credit consumption anomalies (>80% of tier allocation in <24 hours)
+  - Unauthorized subscription tier change attempts
+- [ ] `security_events` collection: admin-only read, backend write-only, no deletions
+- [ ] Admin UI at `/app/admin/security`: table view of recent security events with severity, type, user, timestamp
+- [ ] Internal runbook documents: breach notification SLA (GDPR: 72 hours to supervisory authority; US states: 30-90 days to affected individuals), Stripe key rotation procedure
+
+---
+
+## Wave 1 Integration — Modification Index <!-- Added per Wave 1 expert review -->
+
+The following modifications were made to existing sections as part of Wave 1 integration. Each entry references the original section and the nature of the change.
+
+| Section | Original Value | Modified Value | Source |
+|---------|---------------|----------------|--------|
+| 2.1 Freelance — Seats | 1 | 1 (owner) + 1 collaborator seat (read-only) | Lead PM |
+| 2.1 Agency — Data Retention | Unlimited | Retained for subscription duration + 90 days post-cancellation; billing records 7 years pseudonymized | Head Legal Counsel |
+| 2.1 Tier Prices | Agency at $299/month | Confirmed $299/month throughout document | Lead PM |
+| 2.2.3 Credit packs | "non-expiring until used" | Add legal qualifications: conditions on forfeiture; TOS link required with each purchase | Lawyer |
+| 2.2.3 Auto-refill | "Warning text" | Formal authorization disclosure with affirmative checkbox; see Section 17.3 | Lawyer + HLC |
+| 4.4.1 create-pack-session | 403 for Basic users | Remove restriction; allow Basic tier credit pack purchases | Lead PM |
+| 4.4.2 POST /cancel | No email requirement | Cancellation confirmation email required within 5 minutes (FTC mandate) | Lawyer |
+| 4.4.3 auto-refill | No consent record | Require consentConfirmed + tosVersion; create tos_acceptances record | HLC |
+| 7.10 grace period | 7 days | 14 days (aligned with Stripe Smart Retries) | Lead PM |
+| 3.8 nonprofit_verifications | Original schema | Extended schema: add countryCode, nonprofitRegistrationType, documentRetainUntil, applicantAttestedAt, iersVerificationResult, reVerificationReminderSentAt | Lawyer + HLC |
+
+---
+
 *End of requirements document.*
